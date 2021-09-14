@@ -1,0 +1,18 @@
+java:
+  image: 'https://hmctspublic.azurecr.io/ccd/ccd-case-disposer:latest'
+  kind: CronJob
+  schedule: "0 22 * * *"
+  startingDeadlineSeconds: 600
+  concurrencyPolicy: Forbid
+  ingressHost: ccd-case-disposer-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+  aadIdentityName: ccd
+#  Uncomment once the vault containing the app insights key has been set up
+  keyVaults:
+    ccd:
+      secrets:
+        - name: AppInsightsInstrumentationKey
+          alias: azure.application-insights.instrumentation-key
+  environment:
+#    TODO
+  global:
+    jobKind: CronJob
