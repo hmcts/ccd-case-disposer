@@ -109,7 +109,6 @@ sonarqube {
     property "sonar.projectName", "Reform :: ccd-case-disposer"
     property "sonar.projectKey", "uk.gov.hmcts.reform:ccd-case-disposer"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
-    property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
   }
 }
 
