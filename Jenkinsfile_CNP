@@ -29,32 +29,7 @@ withPipeline(type, product, component) {
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
-  nonServiceApp()
-
-  after('test') {
-
-    junit 'build/test-results/test/**/*.xml'
-    archiveArtifacts 'build/reports/tests/test/index.html'
-
-    publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : "build/reports/tests/test",
-      reportFiles          : "index.html",
-      reportName           : "ccd-case-disposer Test Report"
-    ]
-
-    publishHTML target: [
-      allowMissing         : true,
-      alwaysLinkToLastBuild: true,
-      keepAll              : true,
-      reportDir            : "build/reports/jacoco",
-      reportFiles          : "index.html",
-      reportName           : "pcq-consolidation-service Code Coverage Report"
-    ]
-
-  }
+  //nonServiceApp()
 
   after('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/BEFTA Report for Smoke Tests/**/*'
