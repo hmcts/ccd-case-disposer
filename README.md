@@ -1,104 +1,15 @@
-# Spring Boot application template
+# ccd-case-disposer
 
-[![Build Status](https://travis-ci.org/hmcts/spring-boot-template.svg?branch=master)](https://travis-ci.org/hmcts/spring-boot-template)
+[![Build Status](https://travis-ci.org/hmcts/ccd-case-disposer.svg?branch=master)](https://travis-ci.org/hmcts/ccd-case-disposer)
 
 ## Purpose
 
-The purpose of this template is to speed up the creation of new Spring applications within HMCTS
-and help keep the same standards across multiple teams. If you need to create a new app, you can
-simply use this one as a starting point and build on top of it.
+This micro-service disposes off case records after a certain period of inactivity after a significant business event
 
-## What's inside
+## Getting Started
 
-The template is a working application with a minimal setup. It contains:
- * application skeleton
- * setup script to prepare project
- * common plugins and libraries
- * docker setup
- * swagger configuration for api documentation ([see how to publish your api documentation to shared repository](https://github.com/hmcts/reform-api-docs#publish-swagger-docs))
- * code quality tools already set up
- * integration with Travis CI
- * Hystrix circuit breaker enabled
- * MIT license and contribution information
- * Helm chart using chart-java.
-
-The application exposes health endpoint (http://localhost:4550/health) and metrics endpoint
-(http://localhost:4550/metrics).
-
-## Plugins
-
-The template contains the following plugins:
-
-  * checkstyle
-
-    https://docs.gradle.org/current/userguide/checkstyle_plugin.html
-
-    Performs code style checks on Java source files using Checkstyle and generates reports from these checks.
-    The checks are included in gradle's *check* task (you can run them by executing `./gradlew check` command).
-
-  * pmd
-
-    https://docs.gradle.org/current/userguide/pmd_plugin.html
-
-    Performs static code analysis to finds common programming flaws. Included in gradle `check` task.
-
-
-  * jacoco
-
-    https://docs.gradle.org/current/userguide/jacoco_plugin.html
-
-    Provides code coverage metrics for Java code via integration with JaCoCo.
-    You can create the report by running the following command:
-
-    ```bash
-      ./gradlew jacocoTestReport
-    ```
-
-    The report will be created in build/reports subdirectory in your project directory.
-
-  * io.spring.dependency-management
-
-    https://github.com/spring-gradle-plugins/dependency-management-plugin
-
-    Provides Maven-like dependency management. Allows you to declare dependency management
-    using `dependency 'groupId:artifactId:version'`
-    or `dependency group:'group', name:'name', version:version'`.
-
-  * org.springframework.boot
-
-    http://projects.spring.io/spring-boot/
-
-    Reduces the amount of work needed to create a Spring application
-
-  * org.owasp.dependencycheck
-
-    https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/index.html
-
-    Provides monitoring of the project's dependent libraries and creating a report
-    of known vulnerable components that are included in the build. To run it
-    execute `gradle dependencyCheck` command.
-
-  * com.github.ben-manes.versions
-
-    https://github.com/ben-manes/gradle-versions-plugin
-
-    Provides a task to determine which dependencies have updates. Usage:
-
-    ```bash
-      ./gradlew dependencyUpdates -Drevision=release
-    ```
-
-## Setup
-
-Located in `./bin/init.sh`. Simply run and follow the explanation how to execute it.
-
-## Notes
-
-Since Spring Boot 2.1 bean overriding is disabled. If you want to enable it you will need to set `spring.main.allow-bean-definition-overriding` to `true`.
-
-JUnit 5 is now enabled by default in the project. Please refrain from using JUnit4 and use the next generation
-
-## Building and deploying the application
+### Prerequisites
+- [JDK 11](https://java.com)
 
 ### Building the application
 
@@ -125,7 +36,7 @@ Create docker image:
   docker-compose build
 ```
 
-Run the distribution (created in `build/install/spring-boot-template` directory)
+Run the distribution (created in `build/install/ccd-case-disposer` directory)
 by executing the following command:
 
 ```bash
@@ -133,12 +44,12 @@ by executing the following command:
 ```
 
 This will start the API container exposing the application's port
-(set to `4550` in this template app).
+(set to `4458` in this app).
 
 In order to test if the application is up, you can call its health endpoint:
 
 ```bash
-  curl http://localhost:4550/health
+  curl http://localhost:4458/health
 ```
 
 You should get a response similar to this:
@@ -177,15 +88,59 @@ docker image rm <image-id>
 
 There is no need to remove postgres and java or similar core images.
 
-### Other
+## Developing
 
-Hystrix offers much more than Circuit Breaker pattern implementation or command monitoring.
-Here are some other functionalities it provides:
- * [Separate, per-dependency thread pools](https://github.com/Netflix/Hystrix/wiki/How-it-Works#isolation)
- * [Semaphores](https://github.com/Netflix/Hystrix/wiki/How-it-Works#semaphores), which you can use to limit
- the number of concurrent calls to any given dependency
- * [Request caching](https://github.com/Netflix/Hystrix/wiki/How-it-Works#request-caching), allowing
- different code paths to execute Hystrix Commands without worrying about duplicating work
+### Unit tests
+To run all unit tests execute the following command:
+```bash
+./gradlew test
+```
+
+### Integration tests
+To run all integration tests execute the following command:
+```bash
+./gradlew integration
+```
+
+### Functional tests
+The tests are written using befta-fw library. To find out more about BEFTA Framework, see the
+[BEFTA-FW repository and its README](https://github.com/hmcts/befta-fw).
+
+These tests can be run using:
+```bash
+export TEST_URL=http://localhost:4457
+./gradlew functional
+```
+
+> Note: These are the tests run against an environment.
+> Please see [ccd-docker/README.md](./ccd-docker/README.md) for local environment testing.
+>
+> If you would like to test against AAT dependencies then run `docker-compose up`.
+> Also set the required environment variables that can be found by reviewing the contents of this project's
+> [Jenkinsfile_CNP](./Jenkinsfile_CNP) script (particularly the `secrets` mappings, and the variables set by
+> the `setBeftaEnvVariables` routine).
+>
+
+### Code quality checks
+We use [checkstyle](http://checkstyle.sourceforge.net/) and [PMD](https://pmd.github.io/).
+
+To run all checks execute the following command:
+
+```bash
+./gradlew clean checkstyleMain checkstyleTest checkstyleIntegrationTest pmdMain pmdTest pmdIntegrationTest
+```
+
+To run all checks alongside the unit tests execute the following command:
+
+```bash
+./gradlew checks
+```
+
+or to run all checks, all tests and generate a code coverage report execute the following command:
+
+```bash
+./gradlew check integration functional jacocoTestReport
+```
 
 ## License
 
