@@ -94,7 +94,7 @@ pmd {
 }
 
 jacocoTestReport {
-  executionData(test, integration)
+  executionData(test)
   reports {
     xml.enabled = true
     csv.enabled = false
