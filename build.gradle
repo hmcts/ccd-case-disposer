@@ -73,7 +73,8 @@ task integration(type: Test) {
 
 pmd {
   toolVersion = "6.18.0"
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
+  //sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
+  sourceSets = []
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
   ruleSets = []
@@ -163,10 +164,12 @@ dependencies {
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
   implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
     exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
   }
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-elasticsearch'
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
@@ -187,6 +190,7 @@ dependencies {
   }
 
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.16.0'
+  testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.16.0'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.ccd.data.dao;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
 
-public interface CaseEventRepository extends CrudRepository<CaseEventEntity, Long> {
+@Repository
+public interface CaseEventRepository extends JpaRepository<CaseEventEntity, Long> {
 
     void deleteByCaseDataId(Long caseDataId);
 

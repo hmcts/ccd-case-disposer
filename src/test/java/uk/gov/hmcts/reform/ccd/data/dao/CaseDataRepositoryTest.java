@@ -2,11 +2,7 @@ package uk.gov.hmcts.reform.ccd.data.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.time.LocalDate;
@@ -15,11 +11,7 @@ import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("test")
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ComponentScan({ "uk.gov.hmcts.reform.ccd" })
-class CaseDataRepositoryTest {
+class CaseDataRepositoryTest extends RepositoryTestsFixture {
     private static final LocalDate TODAY = LocalDate.now();
     private static final LocalDate YESTERDAY = TODAY.minusDays(1L);
     private static final LocalDate TOMORROW = TODAY.plusDays(1L);
