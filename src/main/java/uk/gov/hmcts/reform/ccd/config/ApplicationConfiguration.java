@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd;
+package uk.gov.hmcts.reform.ccd.config;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.RestClients;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 
 import javax.inject.Inject;
 

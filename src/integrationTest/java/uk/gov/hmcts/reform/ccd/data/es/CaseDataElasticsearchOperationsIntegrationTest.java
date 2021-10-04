@@ -12,8 +12,8 @@ import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
-import uk.gov.hmcts.reform.ccd.ApplicationConfiguration;
 import uk.gov.hmcts.reform.ccd.ApplicationParameters;
+import uk.gov.hmcts.reform.ccd.config.ApplicationConfiguration;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
 
