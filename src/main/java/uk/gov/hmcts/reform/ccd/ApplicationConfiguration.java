@@ -24,6 +24,7 @@ public class ApplicationConfiguration {
     public RestHighLevelClient provideRestHighLevelClient() {
         final ClientConfiguration clientConfiguration = ClientConfiguration.builder()
             .connectedTo(parameters.getElasticsearchHosts())
+            .withConnectTimeout(parameters.getElasticsearchRequestTimeout())
             .build();
 
         return RestClients.create(clientConfiguration).rest();
