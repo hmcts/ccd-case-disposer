@@ -147,6 +147,7 @@ def versions = [
   junit           : '5.7.2',
   junitPlatform   : '1.7.2',
   reformLogging   : '5.1.7',
+  elasticsearch   : '7.15.0',
   testcontainers  : '1.16.0',
   springBoot      : springBoot.class.package.implementationVersion
 ]
@@ -170,7 +171,9 @@ dependencies {
   implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
     exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
   }
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-elasticsearch'
+  implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-elasticsearch') {
+    exclude group: 'org.elasticsearch.client'
+  }
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
@@ -183,6 +186,9 @@ dependencies {
 
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
+  implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: versions.elasticsearch
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
