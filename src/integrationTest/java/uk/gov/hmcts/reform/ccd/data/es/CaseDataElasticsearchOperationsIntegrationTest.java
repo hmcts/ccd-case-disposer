@@ -12,9 +12,10 @@ import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.Query;
+import uk.gov.hmcts.reform.ccd.ApplicationConfiguration;
+import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
-import uk.gov.hmcts.reform.ccd.fixture.TestElasticSearchConfiguration;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,23 +24,26 @@ import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.INDEX_NAME_PATTERN;
 
-@SpringBootTest(classes = {TestElasticSearchConfiguration.class, CaseDataSearchOperations.class})
-class CaseDataSearchOperationsTest {
-    private static final String INDEX_PATTERN = "%s_cases";
-
+@SpringBootTest(classes = {
+    ApplicationParameters.class,
+    ApplicationConfiguration.class,
+    CaseDataElasticsearchOperations.class}
+)
+class CaseDataElasticsearchOperationsIntegrationTest extends TestElasticsearchFixture {
     private final List<String> caseTypes = List.of("aa", "bb");
 
     @Inject
     private ElasticsearchOperations elasticsearchOperations;
 
     @Inject
-    private CaseDataSearchOperations underTest;
+    private CaseDataElasticsearchOperations underTest;
 
     @BeforeEach
     void prepare() {
         caseTypes.forEach(x -> {
-            final String caseIndex = String.format(INDEX_PATTERN, x);
+            final String caseIndex = String.format(INDEX_NAME_PATTERN, x);
             final List<CaseDataEntity> caseDataEntities = buildData(x);
 
             final List<IndexQuery> queries = caseDataEntities.stream()
@@ -65,7 +69,7 @@ class CaseDataSearchOperationsTest {
 
     @Test
     void testDeleteByReference() {
-        underTest.deleteCaseDataByReference("aa_cases", 3L);
+        underTest.deleteByReference("aa_cases", 3L);
 
         final QueryBuilder queryBuilder = QueryBuilders.matchQuery("reference", 3);
         final Query searchQuery = new NativeSearchQueryBuilder()

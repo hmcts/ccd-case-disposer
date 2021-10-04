@@ -9,5 +9,5 @@ import org.springframework.test.context.ActiveProfiles;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ComponentScan({ "uk.gov.hmcts.reform.ccd" })
-public abstract class RepositoryTestsFixture {
+public abstract class TestRepositoryFixture {
 }

@@ -98,7 +98,7 @@ sonarqube {
     property "sonar.projectKey", "uk.gov.hmcts.reform:ccd-case-disposer"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/ccd/ApplicationBootstrap.java"
-    property "sonar.exclusions","**/ccd/ApplicationExecutor.java"
+    property "sonar.exclusions","**/dao/*.java"
   }
 }
 
@@ -147,6 +147,7 @@ def versions = [
   junit           : '5.7.2',
   junitPlatform   : '1.7.2',
   reformLogging   : '5.1.7',
+  testcontainers  : '1.16.0',
   springBoot      : springBoot.class.package.implementationVersion
 ]
 
@@ -189,8 +190,9 @@ dependencies {
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
 
-  testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.16.0'
-  testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: '1.16.0'
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

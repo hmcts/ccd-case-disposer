@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Sql("/data/sql/case-events.sql")
-class CaseEventRepositoryTest extends RepositoryTestsFixture {
+class CaseEventRepositoryIntegrationTest extends TestRepositoryFixture {
 
     @Inject
     private CaseEventRepository underTest;
