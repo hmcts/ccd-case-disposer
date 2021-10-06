@@ -1,61 +1,66 @@
 package uk.gov.hmcts.reform.ccd.data.es;
 
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pivovarit.function.ThrowingConsumer;
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.search.SearchHit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
-import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
-import org.springframework.data.elasticsearch.core.query.IndexQuery;
-import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.data.elasticsearch.core.query.Query;
 import uk.gov.hmcts.reform.ccd.ApplicationParameters;
-import uk.gov.hmcts.reform.ccd.config.ApplicationConfiguration;
+import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.INDEX_NAME_PATTERN;
 
 @SpringBootTest(classes = {
     ApplicationParameters.class,
-    ApplicationConfiguration.class,
+    ElasticsearchConfiguration.class,
     CaseDataElasticsearchOperations.class}
 )
 class CaseDataElasticsearchOperationsIntegrationTest extends TestElasticsearchFixture {
     private final List<String> caseTypes = List.of("aa", "bb");
 
     @Inject
-    private ElasticsearchOperations elasticsearchOperations;
+    private RestHighLevelClient elasticsearchClient;
 
     @Inject
     private CaseDataElasticsearchOperations underTest;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void prepare() {
-        caseTypes.forEach(x -> {
-            final String caseIndex = String.format(INDEX_NAME_PATTERN, x);
-            final List<CaseDataEntity> caseDataEntities = buildData(x);
+        caseTypes.forEach(ThrowingConsumer.unchecked(caseType -> {
+            final String caseIndex = String.format(INDEX_NAME_PATTERN, caseType);
+            final List<CaseDataEntity> caseDataEntities = buildData(caseType);
+            final BulkRequest bulkRequest = buildBulkRequest(caseIndex, caseDataEntities);
 
-            final List<IndexQuery> queries = caseDataEntities.stream()
-                .map(caseDataEntity -> new IndexQueryBuilder()
-                    .withId(caseDataEntity.getId().toString())
-                    .withObject(caseDataEntity).build())
-                .collect(Collectors.toUnmodifiableList());
+            final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
 
-            elasticsearchOperations.bulkIndex(queries, IndexCoordinates.of(caseIndex));
+            assertFalse(bulkResponse.hasFailures());
 
-            elasticsearchOperations.indexOps(IndexCoordinates.of(caseIndex)).refresh();
-        });
+            refreshIndex(caseIndex);
+        }));
     }
 
     private List<CaseDataEntity> buildData(final String caseType) {
@@ -67,29 +72,60 @@ class CaseDataElasticsearchOperationsIntegrationTest extends TestElasticsearchFi
             .collect(Collectors.toUnmodifiableList());
     }
 
+    private BulkRequest buildBulkRequest(final String caseIndex, final List<CaseDataEntity> caseDataEntities) {
+        final BulkRequest bulkRequest = new BulkRequest();
+        caseDataEntities.forEach(ThrowingConsumer.unchecked(data -> {
+            final IndexRequest indexRequest = new IndexRequest(caseIndex);
+            final String value = objectMapper.writeValueAsString(data);
+
+            indexRequest.source(value, XContentType.JSON);
+            bulkRequest.add(indexRequest);
+        }));
+
+        return bulkRequest;
+    }
+
+    private void refreshIndex(final String caseIndex) throws IOException {
+        final RefreshRequest refreshRequest = new RefreshRequest(caseIndex);
+        elasticsearchClient.indices().refresh(refreshRequest, RequestOptions.DEFAULT);
+    }
+
     @Test
-    void testDeleteByReference() {
-        underTest.deleteByReference("aa_cases", 3L);
+    void testDeleteByReference() throws Exception {
+        // GIVEN
+        final String aaCases = "aa_cases";
 
-        final QueryBuilder queryBuilder = QueryBuilders.matchQuery("reference", 3);
-        final Query searchQuery = new NativeSearchQueryBuilder()
-            .withQuery(queryBuilder)
-            .build();
-        final SearchHits<CaseDataEntity> searchHits = elasticsearchOperations
-            .search(searchQuery, CaseDataEntity.class, IndexCoordinates.of("aa_cases"));
-
-        assertThat(searchHits).isEmpty();
-        assertThatCaseTypeBBsAreAllPresent("aa_cases", 4);
-        assertThatCaseTypeBBsAreAllPresent("bb_cases", 5);
-    }
-
-    private void assertThatCaseTypeBBsAreAllPresent(final String index, final int count) {
-        final Query searchQuery = new NativeSearchQueryBuilder().withQuery(matchAllQuery()).build();
-        final SearchHits<CaseDataEntity> searchHits = elasticsearchOperations
-            .search(searchQuery, CaseDataEntity.class, IndexCoordinates.of(index));
-
-        assertThat(searchHits)
+        final List<Long> preDeleteCaseReferences = searchIndex(aaCases);
+        assertThat(preDeleteCaseReferences)
             .isNotEmpty()
-            .hasSize(count);
+            .hasSameElementsAs(List.of(1L, 2L, 3L, 4L, 5L));
+
+        // WHEN
+        underTest.deleteByReference(aaCases, 3L);
+
+        // THEN
+        final List<Long> postDeleteCaseReferences = searchIndex(aaCases);
+        assertThat(postDeleteCaseReferences)
+            .isNotEmpty()
+            .hasSameElementsAs(List.of(1L, 2L, 4L, 5L));
+
+        final List<Long> bbCaseReferences = searchIndex("bb_cases");
+        assertThat(bbCaseReferences)
+            .isNotEmpty()
+            .hasSameElementsAs(List.of(1L, 2L, 3L, 4L, 5L));
     }
+
+    private List<Long> searchIndex(final String index) throws IOException {
+        final SearchRequest searchRequest = new SearchRequest(index);
+        final SearchResponse response = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
+        final SearchHit[] searchHits = response.getHits().getHits();
+
+        return Arrays.stream(searchHits)
+            .map(hit -> {
+                final Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+                return Long.parseLong(sourceAsMap.get("reference").toString());
+            })
+            .collect(Collectors.toUnmodifiableList());
+    }
+
 }

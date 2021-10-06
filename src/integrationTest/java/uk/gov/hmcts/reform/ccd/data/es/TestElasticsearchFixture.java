@@ -12,8 +12,8 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@ContextConfiguration(initializers = {TestElasticsearchFixture.ElasticsearchInitializer.class})
 @Testcontainers
+@ContextConfiguration(initializers = {TestElasticsearchFixture.ElasticsearchInitializer.class})
 public abstract class TestElasticsearchFixture {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestElasticsearchFixture.class);
 

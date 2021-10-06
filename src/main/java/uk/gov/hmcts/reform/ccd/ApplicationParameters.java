@@ -8,6 +8,7 @@ import javax.inject.Named;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @Named
+@SuppressWarnings("ALL")
 public class ApplicationParameters {
 
     @Value("#{'${elasticsearch.hosts}'.split(',')}")
@@ -22,12 +23,10 @@ public class ApplicationParameters {
     @Value("#{'${expirable.case.types}'.split(',')}")
     private List<String> expirableCaseTypes;
 
-    public String[] getElasticsearchHosts() {
-        final List<String> connectionStrings = elasticsearchHosts.stream()
+    public List<String> getElasticsearchHosts() {
+        return elasticsearchHosts.stream()
             .map(quotedHost -> quotedHost.replace("\"", ""))
             .collect(toUnmodifiableList());
-
-        return connectionStrings.toArray(String[]::new);
     }
 
     public Integer getElasticsearchRequestTimeout() {

@@ -171,9 +171,6 @@ dependencies {
   implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
     exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
   }
-  implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-data-elasticsearch') {
-    exclude group: 'org.elasticsearch.client'
-  }
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
@@ -188,6 +185,7 @@ dependencies {
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
 
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
+  implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: versions.elasticsearch
   implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: versions.elasticsearch
 
   testImplementation libraries.junit5
@@ -199,6 +197,8 @@ dependencies {
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
+
+  testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

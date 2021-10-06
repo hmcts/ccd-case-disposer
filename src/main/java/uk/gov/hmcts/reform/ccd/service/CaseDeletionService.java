@@ -33,7 +33,7 @@ public class CaseDeletionService {
     }
 
     public List<CaseDataEntity> getExpiredCases() {
-        return caseDataRepository.findExpiredCases(/*parameters.expirableTypes()*/);
+        return caseDataRepository.findExpiredCases(parameters.getExpirableCaseTypes());
     }
 
     @Transactional

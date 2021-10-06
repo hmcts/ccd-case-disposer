@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.data.dao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.util.List;
@@ -17,6 +18,9 @@ class CaseDataRepositoryIntegrationTest extends TestRepositoryFixture {
     private TestEntityManager entityManager;
 
     @Inject
+    private ApplicationParameters parameters;
+
+    @Inject
     private CaseDataRepository underTest;
 
     @BeforeEach
@@ -26,7 +30,7 @@ class CaseDataRepositoryIntegrationTest extends TestRepositoryFixture {
 
     @Test
     void testFindExpiredCases() {
-        final List<CaseDataEntity> expiredCases = underTest.findExpiredCases();
+        final List<CaseDataEntity> expiredCases = underTest.findExpiredCases(parameters.getExpirableCaseTypes());
 
         assertThat(expiredCases)
             .hasSize(1)

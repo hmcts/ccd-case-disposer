@@ -14,3 +14,5 @@ logging:
     root: ERROR
     com.zaxxer: DEBUG
     org.springframework: INFO
+
+expirable.case.types: "aaa,bbb,ccc"
