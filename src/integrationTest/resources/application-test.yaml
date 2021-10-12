@@ -1,0 +1,18 @@
+app-insights:
+  dev-mode: off
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:11:///databasename?stringtype=unspecified
+
+logging:
+  level:
+    root: ERROR
+    com.zaxxer: DEBUG
+    org.springframework: INFO
+
+expirable.case.types: "aaa,bbb,ccc"

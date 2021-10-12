@@ -12,6 +12,12 @@ java:
       secrets:
         - name: AppInsightsInstrumentationKey
           alias: azure.application-insights.instrumentation-key
+        - name: data-store-api-POSTGRES-USER
+          alias: DATA_STORE_DB_USERNAME
+        - name: data-store-api-POSTGRES-PASS
+          alias: DATA_STORE_DB_PASSWORD
+        - name: ccd-ELASTIC-SEARCH-DATA-NODES-URL
+          alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
   environment:
 #    TODO
   global:

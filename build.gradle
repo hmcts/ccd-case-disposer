@@ -73,7 +73,8 @@ task integration(type: Test) {
 
 pmd {
   toolVersion = "6.18.0"
-  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
+  //sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
+  sourceSets = []
   reportsDir = file("$project.buildDir/reports/pmd")
   // https://github.com/pmd/pmd/issues/876
   ruleSets = []
@@ -97,7 +98,7 @@ sonarqube {
     property "sonar.projectKey", "uk.gov.hmcts.reform:ccd-case-disposer"
     property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
     property "sonar.coverage.exclusions", "**/ccd/ApplicationBootstrap.java"
-    property "sonar.exclusions","**/ccd/ApplicationExecutor.java"
+    property "sonar.exclusions","**/ccd/ApplicationParameters.java,**/config/*.java,**/dao/*.java"
   }
 }
 
@@ -146,6 +147,8 @@ def versions = [
   junit           : '5.7.2',
   junitPlatform   : '1.7.2',
   reformLogging   : '5.1.7',
+  elasticsearch   : '7.15.0',
+  testcontainers  : '1.16.0',
   springBoot      : springBoot.class.package.implementationVersion
 ]
 
@@ -163,6 +166,11 @@ dependencies {
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'
 
   implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+  implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
+    exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
+  }
 
   implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
   implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
@@ -170,14 +178,27 @@ dependencies {
   implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
   implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.1'
 
+  implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.7.Final'
+  runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
+
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
   testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+
+  implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
+  implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: versions.elasticsearch
+  implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: versions.elasticsearch
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
+
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
+
+  testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
 
   integrationTestImplementation sourceSets.main.runtimeClasspath
   integrationTestImplementation sourceSets.test.runtimeClasspath

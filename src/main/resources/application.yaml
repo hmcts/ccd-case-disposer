@@ -1,22 +1,31 @@
-server:
-  port: 4458
-
-management:
-  endpoint:
-    health:
-      show-details: "always"
-  endpoints:
-    web:
-      base-path: /
-      exposure:
-        include: health, info, prometheus
-
-#If you use a database then uncomment below lines and update db properties accordingly
 spring:
   config:
-    import: "optional:configtree:/mnt/secrets/"
+    import: "optional:configtree:/mnt/secrets/ccd/"
   application:
     name: Case Disposer
+  jpa:
+    database: postgresql
+    show-sql: ${SHOW_SQL:true}
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+  datasource:
+    url: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5452}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
+    username: ${DATA_STORE_DB_USERNAME:ccd}
+    password: ${DATA_STORE_DB_PASSWORD:ccd}
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      connection-timeout: ${DATA_STORE_DB_CONNECTION_TIMEOUT:40000}
+      idle-timeout: ${DATA_STORE_DB_IDLE_TIMEOUT:300000}
+      minimum-idle: ${DATA_STORE_DB_MIN_IDLE:8}
+      maximum-pool-size: ${DATA_STORE_DB_MAX_POOL_SIZE:1}
+
+elasticsearch:
+  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
+  request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
+  cases.index.name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
+
+expirable.case.types:
 
 azure:
   application-insights:
