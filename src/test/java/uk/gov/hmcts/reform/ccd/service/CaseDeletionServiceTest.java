@@ -39,17 +39,17 @@ class CaseDeletionServiceTest {
 
     @Test
     void testGetExpiredCases() {
-        final List<String> expirableCaseTypes = emptyList();
+        final List<String> deletableCaseTypes = emptyList();
         final List<CaseDataEntity> expiredCases = List.of(CASE_DATA_YESTERDAY);
-        doReturn(expirableCaseTypes).when(parameters).getExpirableCaseTypes();
-        doReturn(expiredCases).when(caseDataRepository).findExpiredCases(expirableCaseTypes);
+        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(expiredCases).when(caseDataRepository).findExpiredCases(deletableCaseTypes);
 
         final List<CaseDataEntity> actualExpiredCases = underTest.getExpiredCases();
 
         assertThat(actualExpiredCases)
             .isNotEmpty()
             .hasSize(1);
-        verify(caseDataRepository).findExpiredCases(expirableCaseTypes);
+        verify(caseDataRepository).findExpiredCases(deletableCaseTypes);
     }
 
     @Test

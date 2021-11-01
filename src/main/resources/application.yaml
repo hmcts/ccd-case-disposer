@@ -25,7 +25,7 @@ elasticsearch:
   request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
   cases.index.name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
 
-expirable.case.types:
+deletable.case.types: ${DELETE_CASE_TYPES:""}
 
 azure:
   application-insights:

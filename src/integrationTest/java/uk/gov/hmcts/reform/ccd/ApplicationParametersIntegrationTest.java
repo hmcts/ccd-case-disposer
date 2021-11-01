@@ -16,13 +16,13 @@ class ApplicationParametersIntegrationTest {
     private ApplicationParameters underTest;
 
     @Test
-    void testShouldParseExpirableCaseTypesCorrectly() {
-        final List<String> expectedExpirableCaseTypes = List.of("aaa", "bbb", "ccc");
+    void testShouldParseDeletableCaseTypesCorrectly() {
+        final List<String> expectedDeletableCaseTypes = List.of("aaa", "bbb", "ccc");
 
-        final List<String> actualExpirableCaseTypes = underTest.getExpirableCaseTypes();
+        final List<String> actualDeletableCaseTypes = underTest.getDeletableCaseTypes();
 
-        assertThat(actualExpirableCaseTypes)
+        assertThat(actualDeletableCaseTypes)
             .isNotEmpty()
-            .hasSameElementsAs(expectedExpirableCaseTypes);
+            .hasSameElementsAs(expectedDeletableCaseTypes);
     }
 }
