@@ -30,7 +30,7 @@ class CaseDataRepositoryIntegrationTest extends TestRepositoryFixture {
 
     @Test
     void testFindExpiredCases() {
-        final List<CaseDataEntity> expiredCases = underTest.findExpiredCases(parameters.getExpirableCaseTypes());
+        final List<CaseDataEntity> expiredCases = underTest.findExpiredCases(parameters.getDeletableCaseTypes());
 
         assertThat(expiredCases)
             .hasSize(1)

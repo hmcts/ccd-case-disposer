@@ -20,8 +20,8 @@ public class ApplicationParameters {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
-    @Value("#{'${expirable.case.types}'.split(',')}")
-    private List<String> expirableCaseTypes;
+    @Value("#{'${deletable.case.types}'.split(',')}")
+    private List<String> deletableCaseTypes;
 
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -37,7 +37,9 @@ public class ApplicationParameters {
         return casesIndexNamePattern;
     }
 
-    public List<String> getExpirableCaseTypes() {
-        return expirableCaseTypes;
+    public List<String> getDeletableCaseTypes() {
+        return deletableCaseTypes.stream()
+            .map(quotedHost -> quotedHost.replace("\"", ""))
+            .collect(toUnmodifiableList());
     }
 }
