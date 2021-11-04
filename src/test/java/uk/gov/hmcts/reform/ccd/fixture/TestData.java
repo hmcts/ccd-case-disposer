@@ -33,4 +33,16 @@ public interface TestData {
 
     List<CaseDataEntity> CASE_DATA_ENTITIES =
         List.of(CASE_DATA_YESTERDAY, CASE_DATA_TODAY, CASE_DATA_TOMORROW);
+
+    CaseDataEntity LINKED_CASE_DATA_10 = new CaseDataEntityBuilder(10L)
+        .withReference(10L)
+        .withCaseType(CASE_TYPE)
+        .withResolvedTtl(YESTERDAY)
+        .build();
+
+    CaseDataEntity LINKED_CASE_DATA_11 = new CaseDataEntityBuilder(11L)
+        .withReference(11L)
+        .withCaseType(CASE_TYPE)
+        .withResolvedTtl(YESTERDAY)
+        .build();
 }
