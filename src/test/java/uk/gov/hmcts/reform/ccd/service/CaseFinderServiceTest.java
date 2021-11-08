@@ -31,7 +31,7 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_11;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.NON_DELETABLE_CASE_WITH_TODAY_TTL;
 
 @ExtendWith(MockitoExtension.class)
-class CaseFindingServiceTest {
+class CaseFinderServiceTest {
     @Mock
     private CaseDataRepository caseDataRepository;
     @Mock
@@ -39,7 +39,7 @@ class CaseFindingServiceTest {
     @Mock
     private ApplicationParameters parameters;
     @InjectMocks
-    private CaseFindingService underTest;
+    private CaseFinderService underTest;
 
     private final List<String> deletableCaseTypes = List.of(DELETABLE_CASE_TYPE);
 

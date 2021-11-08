@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
-import uk.gov.hmcts.reform.ccd.service.CaseFindingService;
+import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_WITH_TODAY
 @ExtendWith(MockitoExtension.class)
 class ApplicationExecutorTest {
     @Mock
-    private CaseFindingService caseFindingService;
+    private CaseFinderService caseFindingService;
     @Mock
     private CaseDeletionService caseDeletionService;
 

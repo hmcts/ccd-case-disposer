@@ -17,15 +17,15 @@ import javax.inject.Named;
 
 @Named
 @Slf4j
-public class CaseFindingService {
+public class CaseFinderService {
     private final CaseDataRepository caseDataRepository;
     private final CaseLinkRepository caseLinkRepository;
     private final ApplicationParameters parameters;
 
     @Inject
-    public CaseFindingService(final CaseDataRepository caseDataRepository,
-                              final CaseLinkRepository caseLinkRepository,
-                              final ApplicationParameters parameters) {
+    public CaseFinderService(final CaseDataRepository caseDataRepository,
+                             final CaseLinkRepository caseLinkRepository,
+                             final ApplicationParameters parameters) {
         this.caseDataRepository = caseDataRepository;
         this.caseLinkRepository = caseLinkRepository;
         this.parameters = parameters;
