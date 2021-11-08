@@ -12,16 +12,16 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.CASE_TYPE;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 
 @Sql("/sql/data/create-cases.sql")
 class CaseLinkRepositoryIntegrationTest extends TestRepositoryFixture {
     @Inject
     private CaseLinkRepository underTest;
 
-    private final CaseLinkEntity caseLinkEntity = new CaseLinkEntityBuilder(2L, CASE_TYPE, 15L)
+    private final CaseLinkEntity caseLinkEntity = new CaseLinkEntityBuilder(2L, DELETABLE_CASE_TYPE, 15L)
         .build();
-    private final CaseLinkPrimaryKey primaryKey = new CaseLinkPrimaryKey(2L, CASE_TYPE);
+    private final CaseLinkPrimaryKey primaryKey = new CaseLinkPrimaryKey(2L, DELETABLE_CASE_TYPE);
 
     @BeforeEach
     void prepare() {

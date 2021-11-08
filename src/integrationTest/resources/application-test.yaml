@@ -15,4 +15,4 @@ logging:
     com.zaxxer: DEBUG
     org.springframework: INFO
 
-deletable.case.types: ${DELETE_CASE_TYPES:"aaa,bbb,ccc"}
+deletable.case.types: ${DELETE_CASE_TYPES:"deletable_case_type,bbb,ccc"}

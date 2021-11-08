@@ -17,7 +17,7 @@ class ApplicationParametersIntegrationTest {
 
     @Test
     void testShouldParseDeletableCaseTypesCorrectly() {
-        final List<String> expectedDeletableCaseTypes = List.of("aaa", "bbb", "ccc");
+        final List<String> expectedDeletableCaseTypes = List.of("deletable_case_type", "bbb", "ccc");
 
         final List<String> actualDeletableCaseTypes = underTest.getDeletableCaseTypes();
 
