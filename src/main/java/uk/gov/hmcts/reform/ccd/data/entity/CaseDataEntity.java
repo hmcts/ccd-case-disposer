@@ -7,7 +7,11 @@ import lombok.Setter;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
 @Table(name = "case_data")
@@ -15,9 +19,11 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @NoArgsConstructor
+@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
 public class CaseDataEntity {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "reference", nullable = false)
     private Long reference;
