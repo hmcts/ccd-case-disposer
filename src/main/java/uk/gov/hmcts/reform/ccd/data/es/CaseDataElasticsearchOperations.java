@@ -30,8 +30,9 @@ import javax.inject.Named;
 @Slf4j
 public class CaseDataElasticsearchOperations {
     private static final String CASE_REFERENCE_FIELD = "reference";
-    private static final String SEARCH_FAILURES = "Search failures occurred";
     private static final String ELASTICSEARCH_DELETE_FAILURE = "Elasticsearch delete operation failed";
+    private static final String UNEXPECTED_OPERATION_FAILURE = "Unexpected operation: %s, "
+        + "expecting operation type to be of type DELETE";
 
     private final RestHighLevelClient elasticsearchClient;
     private final ApplicationParameters parameters;
@@ -94,36 +95,11 @@ public class CaseDataElasticsearchOperations {
             }
 
             if (bulkItemResponse.getOpType() != DocWriteRequest.OpType.DELETE) {
-                final String message = String.format(
-                    "Unexpected operation: %s, expecting operation type to be of type DELETE",
-                    bulkItemResponse.getOpType()
-                );
+                final String message = String.format(UNEXPECTED_OPERATION_FAILURE, bulkItemResponse.getOpType());
                 log.error(message);
                 throw new ElasticsearchOperationException(message);
             }
         });
     }
 
-//    private RequestOptions buildRequestOptions() {
-//        final RequestConfig requestConfig = RequestConfig.custom()
-//            .setConnectionRequestTimeout(parameters.getElasticsearchRequestTimeout())
-//            .build();
-//        return RequestOptions.DEFAULT.toBuilder()
-//            .setRequestConfig(requestConfig)
-//            .build();
-//    }
-
-//    private <T> boolean isPresent(List<T> list) {
-//        return !list.isEmpty();
-//    }
-
-//    private <T> void throwError(final String message) {
-//        log.error(message);
-//        throw new ElasticsearchOperationException(message);
-//    }
-
-//    private <T> void throwError(final String message, final T cause) {
-//        log.error("{}:: {}", message, cause);
-//        throw new ElasticsearchOperationException(message);
-//    }
 }
