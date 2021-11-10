@@ -153,7 +153,7 @@ def versions = [
   junit           : '5.7.2',
   junitPlatform   : '1.7.2',
   reformLogging   : '5.1.7',
-  elasticsearch   : '7.15.0',
+  elasticsearch   : '6.4.2',
   testcontainers  : '1.16.0',
   springBoot      : springBoot.class.package.implementationVersion
 ]
@@ -167,6 +167,8 @@ ext.libraries = [
     "org.junit.platform:junit-platform-engine:${versions.junitPlatform}"
   ]
 ]
+
+ext['spring-framework.version'] = '5.3.12'
 
 dependencies {
   implementation group: 'javax.inject', name: 'javax.inject', version: '1'

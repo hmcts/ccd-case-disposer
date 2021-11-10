@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,10 +29,6 @@ public class CaseDeletionService {
         this.caseEventRepository = caseEventRepository;
         this.caseDataElasticsearchOperations = caseDataElasticsearchOperations;
         this.parameters = parameters;
-    }
-
-    public List<CaseDataEntity> getExpiredCases() {
-        return caseDataRepository.findExpiredCases(parameters.getDeletableCaseTypes());
     }
 
     @Transactional

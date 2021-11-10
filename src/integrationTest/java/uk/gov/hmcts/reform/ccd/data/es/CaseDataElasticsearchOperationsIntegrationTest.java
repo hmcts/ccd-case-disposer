@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.INDEX_NAME_PATTERN;
 )
 class CaseDataElasticsearchOperationsIntegrationTest extends TestElasticsearchFixture {
     private final List<String> caseTypes = List.of("aa", "bb");
+    private final String indexType = "_doc";
 
     @Inject
     private RestHighLevelClient elasticsearchClient;
@@ -75,10 +76,10 @@ class CaseDataElasticsearchOperationsIntegrationTest extends TestElasticsearchFi
     private BulkRequest buildBulkRequest(final String caseIndex, final List<CaseDataEntity> caseDataEntities) {
         final BulkRequest bulkRequest = new BulkRequest();
         caseDataEntities.forEach(ThrowingConsumer.unchecked(data -> {
-            final IndexRequest indexRequest = new IndexRequest(caseIndex);
             final String value = objectMapper.writeValueAsString(data);
+            final IndexRequest indexRequest = new IndexRequest(caseIndex, indexType)
+                .source(value, XContentType.JSON);
 
-            indexRequest.source(value, XContentType.JSON);
             bulkRequest.add(indexRequest);
         }));
 
