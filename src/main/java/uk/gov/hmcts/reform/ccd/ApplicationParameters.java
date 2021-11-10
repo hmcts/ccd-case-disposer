@@ -20,6 +20,9 @@ public class ApplicationParameters {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
+    @Value("${elasticsearch.cases.index.type}")
+    private String casesIndexType;
+
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
@@ -35,6 +38,10 @@ public class ApplicationParameters {
 
     public String getCasesIndexNamePattern() {
         return casesIndexNamePattern;
+    }
+
+    public String getCasesIndexType() {
+        return casesIndexType;
     }
 
     public List<String> getDeletableCaseTypes() {

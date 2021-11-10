@@ -25,4 +25,23 @@ class ApplicationParametersIntegrationTest {
             .isNotEmpty()
             .hasSameElementsAs(expectedDeletableCaseTypes);
     }
+
+    @Test
+    void testShouldGetDefaultCasesIndexNamePattern() {
+        final String indexNamePattern = underTest.getCasesIndexNamePattern();
+
+        assertThat(indexNamePattern)
+            .isNotNull()
+            .isEqualTo("%s_cases");
+    }
+
+    @Test
+    void testShouldGetDefaultCasesIndexType() {
+        final String type = underTest.getCasesIndexType();
+
+        assertThat(type)
+            .isNotNull()
+            .isEqualTo("_doc");
+    }
+
 }
