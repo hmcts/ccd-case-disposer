@@ -7,4 +7,6 @@ elasticsearch:
   request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
   cases.index.name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
 
-deletable.case.types: ${DELETE_CASE_TYPES:aaa,bbb,ccc}
+deletable.case.types: ${DELETE_CASE_TYPES:FT_MasterCaseType}
+
+test.case.types: FT_MasterCaseType
