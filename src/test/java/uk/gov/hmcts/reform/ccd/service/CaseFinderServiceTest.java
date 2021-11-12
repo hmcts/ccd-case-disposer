@@ -108,7 +108,7 @@ class CaseFinderServiceTest {
 
         final Boolean result = underTest.isCaseDueDeletion(DELETABLE_CASE_WITH_TODAY_TTL);
 
-        assertThat(result).isTrue();
+        assertThat(result).isFalse();
         verify(parameters).getDeletableCaseTypes();
     }
 

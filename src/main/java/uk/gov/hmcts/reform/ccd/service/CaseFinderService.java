@@ -69,7 +69,7 @@ public class CaseFinderService {
 
     private Boolean isExpired(@NonNull final LocalDate caseTtl) {
         final LocalDate today = LocalDate.now();
-        return !caseTtl.isAfter(today);
+        return caseTtl.isBefore(today);
     }
 
     private Boolean isDeletableCaseType(@NonNull final String caseType) {
