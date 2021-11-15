@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.ccd.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,17 +18,17 @@ public class CaseDeletionService {
     private final CaseDataRepository caseDataRepository;
     private final CaseEventRepository caseEventRepository;
     private final CaseDataElasticsearchOperations caseDataElasticsearchOperations;
-    private final ApplicationParameters parameters;
+    private final ParameterResolver parameterResolver;
 
     @Inject
     public CaseDeletionService(final CaseDataRepository caseDataRepository,
                                final CaseEventRepository caseEventRepository,
                                final CaseDataElasticsearchOperations caseDataElasticsearchOperations,
-                               final ApplicationParameters parameters) {
+                               final ParameterResolver parameterResolver) {
         this.caseDataRepository = caseDataRepository;
         this.caseEventRepository = caseEventRepository;
         this.caseDataElasticsearchOperations = caseDataElasticsearchOperations;
-        this.parameters = parameters;
+        this.parameterResolver = parameterResolver;
     }
 
     @Transactional
@@ -41,6 +41,6 @@ public class CaseDeletionService {
     }
 
     private String getIndex(final String caseType) {
-        return String.format(parameters.getCasesIndexNamePattern(), caseType).toLowerCase();
+        return String.format(parameterResolver.getCasesIndexNamePattern(), caseType).toLowerCase();
     }
 }

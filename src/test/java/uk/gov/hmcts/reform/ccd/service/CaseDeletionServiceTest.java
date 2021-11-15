@@ -5,10 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -27,7 +27,7 @@ class CaseDeletionServiceTest {
     @Mock
     private CaseDataElasticsearchOperations caseDataElasticsearchOperations;
     @Mock
-    private ApplicationParameters parameters;
+    private ParameterResolver parameterResolver;
 
     @InjectMocks
     private CaseDeletionService underTest;
@@ -39,7 +39,7 @@ class CaseDeletionServiceTest {
         doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).deleteById(anyLong());
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
-        doReturn(INDEX_NAME_PATTERN).when(parameters).getCasesIndexNamePattern();
+        doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
         underTest.deleteCase(DELETABLE_CASE_WITH_PAST_TTL);
 

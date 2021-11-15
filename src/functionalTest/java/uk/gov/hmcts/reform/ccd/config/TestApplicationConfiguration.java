@@ -9,6 +9,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver;
 
 import java.util.List;
 
@@ -32,6 +34,11 @@ public class TestApplicationConfiguration {
         return testCaseTypes.stream()
             .map(caseType -> caseType.replace("\"", ""))
             .collect(toUnmodifiableList());
+    }
+
+    @Bean
+    public ParameterResolver provideTestParameterResolver() {
+        return new TestParameterResolver();
     }
 
 }

@@ -2,11 +2,11 @@ package uk.gov.hmcts.reform.ccd.service;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,19 +20,19 @@ import javax.inject.Named;
 public class CaseFinderService {
     private final CaseDataRepository caseDataRepository;
     private final CaseLinkRepository caseLinkRepository;
-    private final ApplicationParameters parameters;
+    private final ParameterResolver parameterResolver;
 
     @Inject
     public CaseFinderService(final CaseDataRepository caseDataRepository,
                              final CaseLinkRepository caseLinkRepository,
-                             final ApplicationParameters parameters) {
+                             final ParameterResolver parameterResolver) {
         this.caseDataRepository = caseDataRepository;
         this.caseLinkRepository = caseLinkRepository;
-        this.parameters = parameters;
+        this.parameterResolver = parameterResolver;
     }
 
     List<CaseDataEntity> getExpiredCases() {
-        return caseDataRepository.findExpiredCases(parameters.getDeletableCaseTypes());
+        return caseDataRepository.findExpiredCases(parameterResolver.getDeletableCaseTypes());
     }
 
     List<CaseDataEntity> getLinkedCases(final CaseDataEntity caseData) {
@@ -73,7 +73,7 @@ public class CaseFinderService {
     }
 
     private Boolean isDeletableCaseType(@NonNull final String caseType) {
-        return parameters.getDeletableCaseTypes().contains(caseType);
+        return parameterResolver.getDeletableCaseTypes().contains(caseType);
     }
 
     private Stream<CaseDataEntity> logNonQualifyingCase(final CaseDataEntity caseData,

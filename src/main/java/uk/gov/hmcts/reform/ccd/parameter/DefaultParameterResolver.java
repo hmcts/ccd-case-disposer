@@ -1,15 +1,13 @@
-package uk.gov.hmcts.reform.ccd;
+package uk.gov.hmcts.reform.ccd.parameter;
 
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
-import javax.inject.Named;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 
-@Named
 @SuppressWarnings("ALL")
-public class ApplicationParameters {
+public class DefaultParameterResolver implements ParameterResolver {
 
     @Value("#{'${elasticsearch.hosts}'.split(',')}")
     private List<String> elasticsearchHosts;
@@ -26,27 +24,32 @@ public class ApplicationParameters {
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
+    @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
-            .map(quotedHost -> quotedHost.replace("\"", ""))
+            .map(quotedHost -> quotedHost.replace("\"", "").strip())
             .collect(toUnmodifiableList());
     }
 
+    @Override
     public Integer getElasticsearchRequestTimeout() {
         return elasticsearchRequestTimeout;
     }
 
+    @Override
     public String getCasesIndexNamePattern() {
         return casesIndexNamePattern;
     }
 
+    @Override
     public String getCasesIndexType() {
         return casesIndexType;
     }
 
+    @Override
     public List<String> getDeletableCaseTypes() {
         return deletableCaseTypes.stream()
-            .map(quotedHost -> quotedHost.replace("\"", ""))
+            .map(quotedItem -> quotedItem.replace("\"", "").strip())
             .collect(toUnmodifiableList());
     }
 }

@@ -5,12 +5,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ class CaseFinderServiceTest {
     @Mock
     private CaseLinkRepository caseLinkRepository;
     @Mock
-    private ApplicationParameters parameters;
+    private ParameterResolver parameterResolver;
     @InjectMocks
     private CaseFinderService underTest;
 
@@ -46,7 +46,7 @@ class CaseFinderServiceTest {
     @Test
     void testGetExpiredCases() {
         final List<CaseDataEntity> expiredCases = List.of(DELETABLE_CASE_WITH_PAST_TTL);
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
         doReturn(expiredCases).when(caseDataRepository).findExpiredCases(deletableCaseTypes);
 
         final List<CaseDataEntity> actualExpiredCases = underTest.getExpiredCases();
@@ -54,7 +54,7 @@ class CaseFinderServiceTest {
         assertThat(actualExpiredCases)
             .isNotEmpty()
             .hasSize(1);
-        verify(parameters).getDeletableCaseTypes();
+        verify(parameterResolver).getDeletableCaseTypes();
         verify(caseDataRepository).findExpiredCases(deletableCaseTypes);
     }
 
@@ -94,42 +94,42 @@ class CaseFinderServiceTest {
 
     @Test
     void testIsCaseDueDeletionWhenCaseIsOfDeletableTypeWithTtlInThePast() {
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.isCaseDueDeletion(DELETABLE_CASE_WITH_PAST_TTL);
 
         assertThat(result).isTrue();
-        verify(parameters).getDeletableCaseTypes();
+        verify(parameterResolver).getDeletableCaseTypes();
     }
 
     @Test
     void testIsCaseDueDeletionWhenCaseIsOfDeletableTypeAndTtlIsToday() {
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.isCaseDueDeletion(DELETABLE_CASE_WITH_TODAY_TTL);
 
         assertThat(result).isFalse();
-        verify(parameters).getDeletableCaseTypes();
+        verify(parameterResolver).getDeletableCaseTypes();
     }
 
     @Test
     void testIsCaseDueDeletionWhenCaseIsOfDeletableTypeWithFutureTtl() {
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.isCaseDueDeletion(DELETABLE_CASE_WITH_FUTURE_TTL);
 
         assertThat(result).isFalse();
-        verify(parameters).getDeletableCaseTypes();
+        verify(parameterResolver).getDeletableCaseTypes();
     }
 
     @Test
     void testIsCaseDueDeletionWhenCaseIsNotOfDeletableType() {
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.isCaseDueDeletion(NON_DELETABLE_CASE_WITH_TODAY_TTL);
 
         assertThat(result).isFalse();
-        verify(parameters).getDeletableCaseTypes();
+        verify(parameterResolver).getDeletableCaseTypes();
     }
 
     @Test
@@ -141,7 +141,7 @@ class CaseFinderServiceTest {
 
     @Test
     void testIsAllDueDeletionWhenAllCasesAreDeletable() {
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.isAllDueDeletion(List.of(
             LINKED_CASE_DATA_10,
@@ -149,12 +149,12 @@ class CaseFinderServiceTest {
         ));
 
         assertThat(result).isTrue();
-        verify(parameters, times(2)).getDeletableCaseTypes();
+        verify(parameterResolver, times(2)).getDeletableCaseTypes();
     }
 
     @Test
     void testIsAllDueDeletionWhenNonDeletableCaseTypeIsIncluded() {
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.isAllDueDeletion(List.of(
             LINKED_CASE_DATA_100,
@@ -162,12 +162,12 @@ class CaseFinderServiceTest {
         ));
 
         assertThat(result).isFalse();
-        verify(parameters).getDeletableCaseTypes();
+        verify(parameterResolver).getDeletableCaseTypes();
     }
 
     @Test
     void testIsAllDueDeletionWhenAnUnexpiredCaseIsIncluded() {
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.isAllDueDeletion(List.of(
             LINKED_CASE_DATA_10,
@@ -175,7 +175,7 @@ class CaseFinderServiceTest {
         ));
 
         assertThat(result).isFalse();
-        verify(parameters, times(2)).getDeletableCaseTypes();
+        verify(parameterResolver, times(2)).getDeletableCaseTypes();
     }
 
     @Test
@@ -194,7 +194,7 @@ class CaseFinderServiceTest {
         doReturn(emptyList()).when(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_TODAY_TTL.getId());
         doReturn(List.of(LINKED_CASE_DATA_10, LINKED_CASE_DATA_101))
             .when(caseDataRepository).findAllById(List.of(10L, 101L));
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final List<CaseDataEntity> deletableCandidates = underTest.findDeletableCandidates();
 
@@ -205,7 +205,7 @@ class CaseFinderServiceTest {
         verify(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_PAST_TTL.getId());
         verify(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_TODAY_TTL.getId());
         verify(caseDataRepository).findAllById(List.of(10L, 101L));
-        verify(parameters, times(3)).getDeletableCaseTypes();
+        verify(parameterResolver, times(3)).getDeletableCaseTypes();
     }
 
     @Test
@@ -230,7 +230,7 @@ class CaseFinderServiceTest {
             .when(caseDataRepository).findAllById(List.of(10L, 101L));
         doReturn(List.of(LINKED_CASE_DATA_10, LINKED_CASE_DATA_11))
             .when(caseDataRepository).findAllById(List.of(10L, 11L));
-        doReturn(deletableCaseTypes).when(parameters).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final List<CaseDataEntity> deletableCandidates = underTest.findDeletableCandidates();
 
@@ -242,7 +242,7 @@ class CaseFinderServiceTest {
         verify(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_TODAY_TTL.getId());
         verify(caseDataRepository).findAllById(List.of(10L, 101L));
         verify(caseDataRepository).findAllById(List.of(10L, 11L));
-        verify(parameters, times(5)).getDeletableCaseTypes();
+        verify(parameterResolver, times(5)).getDeletableCaseTypes();
     }
 
 }

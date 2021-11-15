@@ -19,8 +19,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -37,7 +37,7 @@ class CaseDataElasticsearchOperationsTest {
     @Mock
     private RestHighLevelClient elasticsearchClient;
     @Mock
-    private ApplicationParameters parameters;
+    private ParameterResolver parameterResolver;
 
     @InjectMocks
     private CaseDataElasticsearchOperations underTest;
@@ -60,8 +60,8 @@ class CaseDataElasticsearchOperationsTest {
 
     @BeforeEach
     void setup() {
-        doReturn(INDEX_TYPE).when(parameters).getCasesIndexType();
-        doReturn(1).when(parameters).getElasticsearchRequestTimeout();
+        doReturn(INDEX_TYPE).when(parameterResolver).getCasesIndexType();
+        doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
     }
 
     @Test

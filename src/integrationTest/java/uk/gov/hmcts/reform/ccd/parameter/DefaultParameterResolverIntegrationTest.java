@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd;
+package uk.gov.hmcts.reform.ccd.parameter;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,10 +10,10 @@ import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
-@SpringBootTest(classes = {ApplicationParameters.class})
-class ApplicationParametersIntegrationTest {
+@SpringBootTest(classes = {DefaultParameterResolver.class})
+class DefaultParameterResolverIntegrationTest {
     @Inject
-    private ApplicationParameters underTest;
+    private DefaultParameterResolver underTest;
 
     @Test
     void testShouldParseDeletableCaseTypesCorrectly() {
@@ -43,5 +43,4 @@ class ApplicationParametersIntegrationTest {
             .isNotNull()
             .isEqualTo("_doc");
     }
-
 }
