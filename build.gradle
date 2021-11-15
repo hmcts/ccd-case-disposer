@@ -205,6 +205,7 @@ dependencies {
   testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
   testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
+  testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
 
   testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
 
@@ -212,6 +213,7 @@ dependencies {
   integrationTestImplementation sourceSets.test.runtimeClasspath
 
   functionalTestImplementation sourceSets.main.runtimeClasspath
+  functionalTestImplementation sourceSets.test.runtimeClasspath
 }
 
 mainClassName = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'

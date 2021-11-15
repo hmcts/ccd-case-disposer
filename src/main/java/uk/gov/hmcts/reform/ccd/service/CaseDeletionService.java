@@ -41,6 +41,6 @@ public class CaseDeletionService {
     }
 
     private String getIndex(final String caseType) {
-        return String.format(parameters.getCasesIndexNamePattern(), caseType);
+        return String.format(parameters.getCasesIndexNamePattern(), caseType).toLowerCase();
     }
 }
