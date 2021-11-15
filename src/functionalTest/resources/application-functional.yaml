@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5050}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
+
+elasticsearch:
+  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
+  request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
+  cases.index.name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
+
+deletable.case.types: ${DELETE_CASE_TYPES:FT_MasterCaseType}
+
+test.case.types: FT_MasterCaseType

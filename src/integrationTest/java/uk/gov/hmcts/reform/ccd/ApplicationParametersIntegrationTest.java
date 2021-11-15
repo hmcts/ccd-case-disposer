@@ -17,7 +17,7 @@ class ApplicationParametersIntegrationTest {
 
     @Test
     void testShouldParseDeletableCaseTypesCorrectly() {
-        final List<String> expectedDeletableCaseTypes = List.of("aaa", "bbb", "ccc");
+        final List<String> expectedDeletableCaseTypes = List.of("deletable_case_type", "bbb", "ccc");
 
         final List<String> actualDeletableCaseTypes = underTest.getDeletableCaseTypes();
 
@@ -25,4 +25,23 @@ class ApplicationParametersIntegrationTest {
             .isNotEmpty()
             .hasSameElementsAs(expectedDeletableCaseTypes);
     }
+
+    @Test
+    void testShouldGetDefaultCasesIndexNamePattern() {
+        final String indexNamePattern = underTest.getCasesIndexNamePattern();
+
+        assertThat(indexNamePattern)
+            .isNotNull()
+            .isEqualTo("%s_cases");
+    }
+
+    @Test
+    void testShouldGetDefaultCasesIndexType() {
+        final String type = underTest.getCasesIndexType();
+
+        assertThat(type)
+            .isNotNull()
+            .isEqualTo("_doc");
+    }
+
 }

@@ -8,7 +8,6 @@ import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 
-import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -32,10 +31,6 @@ public class CaseDeletionService {
         this.parameters = parameters;
     }
 
-    public List<CaseDataEntity> getExpiredCases() {
-        return caseDataRepository.findExpiredCases(parameters.getDeletableCaseTypes());
-    }
-
     @Transactional
     public void deleteCase(final CaseDataEntity caseData) {
         log.info("About to delete case.reference:: {}", caseData.getReference());
@@ -46,6 +41,6 @@ public class CaseDeletionService {
     }
 
     private String getIndex(final String caseType) {
-        return String.format(parameters.getCasesIndexNamePattern(), caseType);
+        return String.format(parameters.getCasesIndexNamePattern(), caseType).toLowerCase();
     }
 }
