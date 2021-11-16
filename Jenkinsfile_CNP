@@ -7,6 +7,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "ccd"
 def component = "case-disposer"
+def branchesToSync = ['demo', 'ithc', 'perftest']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
@@ -27,6 +28,7 @@ withPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
 
+  syncBranchesWithMaster(branchesToSync)
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
