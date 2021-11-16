@@ -35,7 +35,7 @@ VALUES (3, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
          "PersonFirstName": "PUBLIC"
        }',
        1504259907353527,
-       GETDATE()
+       CURRENT_DATE
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
@@ -87,10 +87,10 @@ VALUES (7, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (1, 'FT_MasterCaseType', 5)
+VALUES (1, 'FT_MasterCaseType', 5);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (2, 'FT_MasterCaseType', 6)
+VALUES (2, 'FT_MasterCaseType', 6);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (3, 'FT_MasterCaseType', 7)
+VALUES (3, 'FT_MasterCaseType', 7);

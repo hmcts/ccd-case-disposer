@@ -35,7 +35,7 @@ VALUES (3, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
          "PersonFirstName": "PUBLIC"
        }',
        1504259907353527,
-       GETDATE()
+       CURRENT_DATE
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)

@@ -147,25 +147,25 @@ VALUES (12, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (1, 'FT_MasterCaseType', 5)
+VALUES (1, 'FT_MasterCaseType', 5);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (1, 'FT_MasterCaseType', 6)
+VALUES (1, 'FT_MasterCaseType', 6);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (2, 'FT_MasterCaseType', 7)
+VALUES (2, 'FT_MasterCaseType', 7);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (2, 'FT_MasterCaseType', 8)
+VALUES (2, 'FT_MasterCaseType', 8);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (3, 'FT_MultiplePages', 9)
+VALUES (3, 'FT_MultiplePages', 9);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (3, 'FT_Conditionals', 10)
+VALUES (3, 'FT_Conditionals', 10);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (4, 'FT_MultiplePages', 11)
+VALUES (4, 'FT_MultiplePages', 11);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (4, 'FT_MultiplePages', 12)
+VALUES (4, 'FT_MultiplePages', 12);

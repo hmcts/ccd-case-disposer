@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -63,12 +64,17 @@ public class TestDataProvider {
     @Inject
     private CaseLinkRepository caseLinkRepository;
 
+    @Inject
+    private ParameterResolver parameterResolver;
+
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
             Arguments.of(
                 null,
                 "scenarios/S-001.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 emptyList(),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                 Map.of(TestTables.CASE_DATA, List.of(1L))
@@ -76,7 +82,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-002.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 emptyList(),
                 Map.of("FT_MultiplePages", List.of(1504259907353529L)),
                 Map.of(TestTables.CASE_DATA, List.of(1L))
@@ -84,7 +92,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-003.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 emptyList(),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                 Map.of(TestTables.CASE_DATA, List.of(1L))
@@ -92,7 +102,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-004.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 emptyList(),
                 Map.of("FT_MasterCaseType", 1504259907353529L,
                        "FT_MultiplePages", 1504259907353528L
@@ -102,7 +114,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-005.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 emptyList(),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -113,7 +127,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-005.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 emptyList(),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -123,7 +139,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-007.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 List.of(new CaseLinkEntityBuilder(1L, "FT_MultiplePages", 4L)),
                 Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", 1504259907353527L
@@ -133,7 +151,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-008.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 List.of(new CaseLinkEntityBuilder(1L, "FT_Conditionals", 4L)),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353527L),
@@ -144,7 +164,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-009.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 List.of(
                     new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 5L),
                     new CaseLinkEntityBuilder(2L, "FT_MasterCaseType", 6L),
@@ -160,7 +182,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-010.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 List.of(
                     new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 5L),
                     new CaseLinkEntityBuilder(2L, "FT_MasterCaseType", 6L),
@@ -176,7 +200,9 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-011.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L)),
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
+                       TestTables.CASE_EVENT, emptyList(),
+                       TestTables.CASE_LINK, emptyList()),
                 List.of(
                     new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 5L),
                     new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 6L),
@@ -206,16 +232,18 @@ public class TestDataProvider {
                              final List<CaseLinkEntity> caseLinkEntities,
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
-        resetIndices(indexedData.keySet());
+        //resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
         insertDataIntoDatabase(scriptPath);
         verifyDatabaseIsPopulated(rowIds, caseLinkEntities);
-        verifyElasticsearchIndicesAreCreated(indexedData);
+        //verifyElasticsearchIndicesAreCreated(indexedData);
     }
 
     private void setDeletableCaseTypes(final String value) {
-        System.setProperty(DELETABLE_CASE_TYPES_PROPERTY, value);
+        if (value != null) {
+            System.setProperty(DELETABLE_CASE_TYPES_PROPERTY, value);
+        }
     }
 
     private void insertDataIntoDatabase(final String scriptPath) throws SQLException {
@@ -294,7 +322,8 @@ public class TestDataProvider {
             final String indexName = getIndex(caseType);
             refreshIndex(indexName);
 
-            final DeleteRequest deleteRequest = new DeleteRequest(indexName);
+            final DeleteRequest deleteRequest = new DeleteRequest(indexName)
+                .type(parameterResolver.getCasesIndexType());
             bulkRequest.add(deleteRequest);
         }));
 
