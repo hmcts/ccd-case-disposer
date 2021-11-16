@@ -1,4 +1,5 @@
 DELETE FROM case_event;
+DELETE FROM case_link;
 DELETE FROM case_data;
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
@@ -9,7 +10,7 @@ VALUES (1, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353529',
+       1504259907353529,
        '2016-06-24 20:44:52.824'
 );
 
@@ -21,7 +22,7 @@ VALUES (2, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353528',
+       1504259907353528,
        '2016-06-24 20:44:52.824'
 );
 
@@ -33,7 +34,7 @@ VALUES (3, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353527',
+       1504259907353527,
        '2016-06-24 20:44:52.824'
 );
 
@@ -45,7 +46,7 @@ VALUES (4, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353526',
+       1504259907353526,
        '2016-06-24 20:44:52.824'
 );
 
@@ -57,7 +58,7 @@ VALUES (5, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353525',
+       1504259907353525,
        '2016-06-24 20:44:52.824'
 );
 
@@ -69,7 +70,7 @@ VALUES (6, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353524',
+       1504259907353524,
        '2121-06-24 20:44:52.824'
 );
 
@@ -81,7 +82,7 @@ VALUES (7, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353523',
+       1504259907353523,
        '2016-06-24 20:44:52.824'
 );
 
@@ -93,7 +94,7 @@ VALUES (8, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353522',
+       1504259907353522,
        '2016-06-24 20:44:52.824'
 );
 
@@ -105,7 +106,7 @@ VALUES (9, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353521',
+       1504259907353521,
        '2016-06-24 20:44:52.824'
 );
 
@@ -117,7 +118,7 @@ VALUES (10, 'FT_Conditionals', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353520',
+       1504259907353520,
        '2016-06-24 20:44:52.824'
 );
 
@@ -129,7 +130,7 @@ VALUES (11, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353519',
+       1504259907353519,
        '2016-06-24 20:44:52.824'
 );
 
@@ -141,7 +142,7 @@ VALUES (12, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       '1504259907353518',
+       1504259907353518,
        '2016-06-24 20:44:52.824'
 );
 
