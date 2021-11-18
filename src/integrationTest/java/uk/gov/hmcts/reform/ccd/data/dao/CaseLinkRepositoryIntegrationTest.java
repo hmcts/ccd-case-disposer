@@ -21,7 +21,7 @@ class CaseLinkRepositoryIntegrationTest extends TestRepositoryFixture {
 
     private final CaseLinkEntity caseLinkEntity = new CaseLinkEntityBuilder(2L, DELETABLE_CASE_TYPE, 15L)
         .build();
-    private final CaseLinkPrimaryKey primaryKey = new CaseLinkPrimaryKey(2L, DELETABLE_CASE_TYPE);
+    private final CaseLinkPrimaryKey primaryKey = new CaseLinkPrimaryKey(2L, 15L);
 
     @BeforeEach
     void prepare() {

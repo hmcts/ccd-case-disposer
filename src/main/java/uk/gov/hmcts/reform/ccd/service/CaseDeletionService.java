@@ -5,9 +5,9 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import javax.inject.Inject;
@@ -37,10 +37,12 @@ public class CaseDeletionService {
     }
 
     @Transactional
-    public void deleteCase(final CaseDataEntity caseData) {
+    public void deleteCase(final CaseData caseData) {
         log.info("About to delete case.reference:: {}", caseData.getReference());
-        final CaseLinkPrimaryKey caseLinkPrimaryKey = new CaseLinkPrimaryKey(caseData.getId(),caseData.getCaseType());
-        caseLinkRepository.deleteById(caseLinkPrimaryKey);
+        caseData.getLinkedCases().forEach(item -> {
+            final CaseLinkPrimaryKey caseLinkPrimaryKey = new CaseLinkPrimaryKey(caseData.getId(), item);
+            caseLinkRepository.deleteById(caseLinkPrimaryKey);
+        });
         caseEventRepository.deleteByCaseDataId(caseData.getId());
         caseDataRepository.deleteById(caseData.getId());
         caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()), caseData.getReference());

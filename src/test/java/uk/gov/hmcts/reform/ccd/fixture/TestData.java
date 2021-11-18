@@ -20,6 +20,12 @@ public interface TestData {
         .withResolvedTtl(YESTERDAY)
         .build();
 
+    CaseDataEntity DELETABLE_CASE2_WITH_PAST_TTL = new CaseDataEntityBuilder(1000L)
+        .withReference(1000L)
+        .withCaseType(DELETABLE_CASE_TYPE)
+        .withResolvedTtl(YESTERDAY)
+        .build();
+
     CaseDataEntity DELETABLE_CASE_WITH_TODAY_TTL = new CaseDataEntityBuilder(2L)
         .withReference(2L)
         .withCaseType(DELETABLE_CASE_TYPE)
@@ -49,6 +55,12 @@ public interface TestData {
 
     CaseDataEntity LINKED_CASE_DATA_11 = new CaseDataEntityBuilder(11L)
         .withReference(11L)
+        .withCaseType(DELETABLE_CASE_TYPE)
+        .withResolvedTtl(YESTERDAY)
+        .build();
+
+    CaseDataEntity LINKED_CASE_DATA_12 = new CaseDataEntityBuilder(12L)
+        .withReference(12L)
         .withCaseType(DELETABLE_CASE_TYPE)
         .withResolvedTtl(YESTERDAY)
         .build();

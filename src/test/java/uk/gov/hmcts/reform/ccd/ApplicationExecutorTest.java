@@ -5,7 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.data.model.RetentionStatus;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 
@@ -33,23 +34,40 @@ class ApplicationExecutorTest {
 
     @Test
     void testFindDeletableCandidatesWhenNoDeletableCandidatesFound() {
-        doReturn(emptyList()).when(caseFindingService).findDeletableCandidates();
+        doReturn(emptyList()).when(caseFindingService).findCasesDueDeletion();
 
         underTest.execute();
 
-        verify(caseFindingService).findDeletableCandidates();
+        verify(caseFindingService).findCasesDueDeletion();
         verifyNoInteractions(caseDeletionService);
     }
 
     @Test
-    void testShouldDeleteTheExpiredCasesFound() {
-        doReturn(List.of(DELETABLE_CASE_WITH_PAST_TTL, DELETABLE_CASE_WITH_TODAY_TTL))
-            .when(caseFindingService).findDeletableCandidates();
-        doNothing().when(caseDeletionService).deleteCase(any(CaseDataEntity.class));
+    void testShouldDeleteTheCasesFound() {
+        final List<CaseData> caseDataList = List.of(
+            new CaseData(
+                DELETABLE_CASE_WITH_PAST_TTL.getId(),
+                DELETABLE_CASE_WITH_PAST_TTL.getReference(),
+                DELETABLE_CASE_WITH_PAST_TTL.getCaseType(),
+                emptyList(),
+                RetentionStatus.DELETE
+            ),
+            new CaseData(
+                DELETABLE_CASE_WITH_TODAY_TTL.getId(),
+                DELETABLE_CASE_WITH_TODAY_TTL.getReference(),
+                DELETABLE_CASE_WITH_TODAY_TTL.getCaseType(),
+                emptyList(),
+                RetentionStatus.DELETE
+            )
+        );
+
+        doReturn(caseDataList)
+            .when(caseFindingService).findCasesDueDeletion();
+        doNothing().when(caseDeletionService).deleteCase(any(CaseData.class));
 
         underTest.execute();
 
-        verify(caseFindingService).findDeletableCandidates();
-        verify(caseDeletionService, times(2)).deleteCase(any(CaseDataEntity.class));
+        verify(caseFindingService).findCasesDueDeletion();
+        verify(caseDeletionService, times(2)).deleteCase(any(CaseData.class));
     }
 }

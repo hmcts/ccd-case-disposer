@@ -9,6 +9,8 @@ import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.data.model.RetentionStatus;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
@@ -20,6 +22,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE2_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_WITH_FUTURE_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_WITH_PAST_TTL;
@@ -28,6 +31,7 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_10;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_100;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_101;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_11;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_12;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.NON_DELETABLE_CASE_WITH_TODAY_TTL;
 
 @ExtendWith(MockitoExtension.class)
@@ -189,6 +193,14 @@ class CaseFinderServiceTest {
             new CaseLinkEntityBuilder(101L, DELETABLE_CASE_TYPE, DELETABLE_CASE_WITH_PAST_TTL.getId()).build()
         );
 
+        final List<CaseData> expectedCaseDataList = List.of(new CaseData(
+            DELETABLE_CASE_WITH_TODAY_TTL.getId(),
+            DELETABLE_CASE_WITH_TODAY_TTL.getReference(),
+            DELETABLE_CASE_WITH_TODAY_TTL.getCaseType(),
+            emptyList(),
+            RetentionStatus.DELETE
+        ));
+
         doReturn(expiredCases).when(caseDataRepository).findExpiredCases(deletableCaseTypes);
         doReturn(caseLinks).when(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_PAST_TTL.getId());
         doReturn(emptyList()).when(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_TODAY_TTL.getId());
@@ -196,11 +208,11 @@ class CaseFinderServiceTest {
             .when(caseDataRepository).findAllById(List.of(10L, 101L));
         doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
-        final List<CaseDataEntity> deletableCandidates = underTest.findDeletableCandidates();
+        final List<CaseData> deletableCandidates = underTest.findCasesDueDeletion();
 
         assertThat(deletableCandidates)
             .isNotEmpty()
-            .hasSameElementsAs(List.of(DELETABLE_CASE_WITH_TODAY_TTL));
+            .hasSameElementsAs(expectedCaseDataList);
         verify(caseDataRepository).findExpiredCases(deletableCaseTypes);
         verify(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_PAST_TTL.getId());
         verify(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_TODAY_TTL.getId());
@@ -209,38 +221,65 @@ class CaseFinderServiceTest {
     }
 
     @Test
-    void testFindDeletableCandidates2() {
+    void testFindDeletableCandidates() {
         final List<CaseDataEntity> expiredCases = List.of(
             DELETABLE_CASE_WITH_PAST_TTL,
-            DELETABLE_CASE_WITH_TODAY_TTL
+            DELETABLE_CASE2_WITH_PAST_TTL,
+            LINKED_CASE_DATA_10,
+            LINKED_CASE_DATA_11,
+            LINKED_CASE_DATA_12
         );
         final List<CaseLinkEntity> caseLinks1 = List.of(
-            new CaseLinkEntityBuilder(10L, DELETABLE_CASE_TYPE, DELETABLE_CASE_WITH_PAST_TTL.getId()).build(),
+            new CaseLinkEntityBuilder(12L, DELETABLE_CASE_TYPE, DELETABLE_CASE_WITH_PAST_TTL.getId()).build(),
             new CaseLinkEntityBuilder(101L, DELETABLE_CASE_TYPE, DELETABLE_CASE_WITH_PAST_TTL.getId()).build()
         );
         final List<CaseLinkEntity> caseLinks2 = List.of(
-            new CaseLinkEntityBuilder(10L, DELETABLE_CASE_TYPE, DELETABLE_CASE_WITH_TODAY_TTL.getId()).build(),
-            new CaseLinkEntityBuilder(11L, DELETABLE_CASE_TYPE, DELETABLE_CASE_WITH_TODAY_TTL.getId()).build()
+            new CaseLinkEntityBuilder(10L, DELETABLE_CASE_TYPE, DELETABLE_CASE2_WITH_PAST_TTL.getId()).build(),
+            new CaseLinkEntityBuilder(11L, DELETABLE_CASE_TYPE, DELETABLE_CASE2_WITH_PAST_TTL.getId()).build()
+        );
+
+        final List<CaseData> expectedCaseDataList = List.of(
+            new CaseData(
+                DELETABLE_CASE2_WITH_PAST_TTL.getId(),
+                DELETABLE_CASE2_WITH_PAST_TTL.getReference(),
+                DELETABLE_CASE2_WITH_PAST_TTL.getCaseType(),
+                List.of(10L, 11L),
+                RetentionStatus.DELETE
+            ),
+            new CaseData(
+                LINKED_CASE_DATA_10.getId(),
+                LINKED_CASE_DATA_10.getReference(),
+                LINKED_CASE_DATA_10.getCaseType(),
+                emptyList(),
+                RetentionStatus.DELETE
+            ),
+            new CaseData(
+                LINKED_CASE_DATA_11.getId(),
+                LINKED_CASE_DATA_11.getReference(),
+                LINKED_CASE_DATA_11.getCaseType(),
+                emptyList(),
+                RetentionStatus.DELETE
+            )
         );
 
         doReturn(expiredCases).when(caseDataRepository).findExpiredCases(deletableCaseTypes);
         doReturn(caseLinks1).when(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_PAST_TTL.getId());
-        doReturn(caseLinks2).when(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_TODAY_TTL.getId());
-        doReturn(List.of(LINKED_CASE_DATA_10, LINKED_CASE_DATA_101))
-            .when(caseDataRepository).findAllById(List.of(10L, 101L));
+        doReturn(caseLinks2).when(caseLinkRepository).findByCaseId(DELETABLE_CASE2_WITH_PAST_TTL.getId());
+        doReturn(List.of(LINKED_CASE_DATA_12, LINKED_CASE_DATA_101))
+            .when(caseDataRepository).findAllById(List.of(12L, 101L));
         doReturn(List.of(LINKED_CASE_DATA_10, LINKED_CASE_DATA_11))
             .when(caseDataRepository).findAllById(List.of(10L, 11L));
         doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
-        final List<CaseDataEntity> deletableCandidates = underTest.findDeletableCandidates();
+        final List<CaseData> deletableCandidates = underTest.findCasesDueDeletion();
 
         assertThat(deletableCandidates)
             .isNotEmpty()
-            .hasSameElementsAs(List.of(DELETABLE_CASE_WITH_TODAY_TTL, LINKED_CASE_DATA_10, LINKED_CASE_DATA_11));
+            .hasSameElementsAs(expectedCaseDataList);
         verify(caseDataRepository).findExpiredCases(deletableCaseTypes);
         verify(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_PAST_TTL.getId());
-        verify(caseLinkRepository).findByCaseId(DELETABLE_CASE_WITH_TODAY_TTL.getId());
-        verify(caseDataRepository).findAllById(List.of(10L, 101L));
+        verify(caseLinkRepository).findByCaseId(DELETABLE_CASE2_WITH_PAST_TTL.getId());
+        verify(caseDataRepository).findAllById(List.of(12L, 101L));
         verify(caseDataRepository).findAllById(List.of(10L, 11L));
         verify(parameterResolver, times(5)).getDeletableCaseTypes();
     }

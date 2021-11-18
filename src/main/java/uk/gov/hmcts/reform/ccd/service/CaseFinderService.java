@@ -6,14 +6,20 @@ import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.data.model.RetentionStatus;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import static java.util.Collections.emptyList;
 
 @Named
 @Slf4j
@@ -54,17 +60,14 @@ public class CaseFinderService {
             .allMatch(this::isCaseDueDeletion);
     }
 
-    public List<CaseDataEntity> findDeletableCandidates() {
+    public List<CaseData> findCasesDueDeletion() {
         final List<CaseDataEntity> expiredCases = getExpiredCases();
 
-        return expiredCases.stream()
-            .flatMap(caseData -> {
-                final List<CaseDataEntity> linkedCases = getLinkedCases(caseData);
-                return isAllDueDeletion(linkedCases)
-                    ? Stream.concat(Stream.of(caseData), linkedCases.stream())
-                    : logNonQualifyingCase(caseData, linkedCases);
-            })
-            .collect(Collectors.toUnmodifiableList());
+        final Map<RetentionStatus, List<CaseData>> partitioned = findLinkedCasesAndPartition(expiredCases);
+
+        final List<Long> casesToRetain = getCaseIdsToExcludeFromDeletion(partitioned.get(RetentionStatus.RETAIN));
+
+        return getDeletableCases(partitioned.get(RetentionStatus.INDETERMINATE), casesToRetain);
     }
 
     private Boolean isExpired(@NonNull final LocalDate caseTtl) {
@@ -76,16 +79,66 @@ public class CaseFinderService {
         return parameterResolver.getDeletableCaseTypes().contains(caseType);
     }
 
-    private Stream<CaseDataEntity> logNonQualifyingCase(final CaseDataEntity caseData,
-                                                        final List<CaseDataEntity> linkedCases) {
+    private Map<RetentionStatus, List<CaseData>> findLinkedCasesAndPartition(final List<CaseDataEntity> expiredCases) {
+        final Map<RetentionStatus, List<CaseData>> groupedByStatus = expiredCases.stream()
+            .map(entity -> {
+                final List<CaseDataEntity> linkedCases = getLinkedCases(entity);
+                return isAllDueDeletion(linkedCases)
+                    ? buildCaseData(entity, linkedCases, RetentionStatus.INDETERMINATE)
+                    : logNonQualifyingCase(entity, linkedCases);
+            })
+            .collect(Collectors.groupingBy(CaseData::getStatus));
+
+        return Map.of(RetentionStatus.RETAIN, nullCheck(groupedByStatus.get(RetentionStatus.RETAIN)),
+                      RetentionStatus.INDETERMINATE, nullCheck(groupedByStatus.get(RetentionStatus.INDETERMINATE)),
+                      RetentionStatus.DELETE, nullCheck(groupedByStatus.get(RetentionStatus.DELETE)));
+    }
+
+    private List<CaseData> nullCheck(final List<CaseData> caseDataList) {
+        return Optional.ofNullable(caseDataList).orElse(emptyList());
+    }
+
+    private CaseData buildCaseData(final CaseDataEntity masterCase,
+                                   final List<CaseDataEntity> linkedCases,
+                                   final RetentionStatus status) {
+        final List<Long> linkedCaseIds = linkedCases.stream()
+            .map(CaseDataEntity::getId)
+            .collect(Collectors.toUnmodifiableList());
+        return new CaseData(
+            masterCase.getId(),
+            masterCase.getReference(),
+            masterCase.getCaseType(),
+            linkedCaseIds,
+            status
+        );
+    }
+
+    private CaseData logNonQualifyingCase(final CaseDataEntity masterCase, final List<CaseDataEntity> linkedCases) {
         final String message = "Not deleting case.reference {}:: "
             + "one or more of the following linked cases.references {} do not meet the criteria for case deletion.";
         final List<Long> linkedCaseIds = linkedCases.stream()
             .map(CaseDataEntity::getReference)
             .collect(Collectors.toUnmodifiableList());
-        log.info(message, caseData.getReference(), linkedCaseIds);
+        log.info(message, masterCase.getReference(), linkedCaseIds);
 
-        return Stream.empty();
+        return buildCaseData(masterCase, linkedCases, RetentionStatus.RETAIN);
+    }
+
+    private List<Long> getCaseIdsToExcludeFromDeletion(final List<CaseData> caseDataList) {
+        return caseDataList.stream()
+            .flatMap(item -> Stream.concat(Stream.of(item.getId()), item.getLinkedCases().stream()))
+            .collect(Collectors.toUnmodifiableList());
+    }
+
+    private List<CaseData> getDeletableCases(final List<CaseData> indeterminateCases, final List<Long> casesToRetain) {
+        return indeterminateCases.stream()
+            .filter(item -> !casesToRetain.contains(item.getId()))
+            .map(caseData -> new CaseData(caseData.getId(),
+                                          caseData.getReference(),
+                                          caseData.getCaseType(),
+                                          caseData.getLinkedCases(),
+                                          RetentionStatus.DELETE))
+            .collect(Collectors.toUnmodifiableList());
     }
 
 }
