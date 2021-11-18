@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -68,7 +69,7 @@ public class TestDataProvider {
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
-            Arguments.of(
+            /*Arguments.of(
                 null,
                 "scenarios/S-001.sql",
                 Map.of(TestTables.CASE_DATA, List.of(1L),
@@ -205,7 +206,7 @@ public class TestDataProvider {
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
                 Map.of(TestTables.CASE_DATA, List.of(2L, 3L, 6L, 7L))
-            ),
+            ),*/
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-011.sql",
@@ -247,6 +248,7 @@ public class TestDataProvider {
         setDeletableCaseTypes(deletableCaseTypes);
         insertDataIntoDatabase(scriptPath);
         verifyDatabaseIsPopulated(rowIds, caseLinkEntities);
+        TimeUnit.SECONDS.sleep(10);
         //verifyElasticsearchIndicesAreCreated(indexedData);
     }
 

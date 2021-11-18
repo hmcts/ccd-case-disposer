@@ -45,7 +45,7 @@ public class CaseFinderService {
         final List<CaseLinkEntity> linkEntities = caseLinkRepository.findByCaseId(caseData.getId());
 
         final List<Long> linkedCaseIds = linkEntities.stream()
-            .map(CaseLinkEntity::getCaseId)
+            .map(CaseLinkEntity::getLinkedCaseId)
             .collect(Collectors.toUnmodifiableList());
 
         return caseDataRepository.findAllById(linkedCaseIds);
