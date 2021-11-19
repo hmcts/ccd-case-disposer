@@ -18,19 +18,4 @@
     <cve>CVE-2020-7712</cve>
   </suppress>
 
-  <suppress>
-    <notes><![CDATA[
-        Elastic search 6.4.2
-    ]]></notes>
-    <cve>CVE-2018-17244</cve>
-    <cve>CVE-2019-7611</cve>
-    <cve>CVE-2019-7614</cve>
-    <cve>CVE-2020-7019</cve>
-    <cve>CVE-2020-7020</cve>
-    <cve>CVE-2020-7021</cve>
-    <cve>CVE-2021-22135</cve>
-    <cve>CVE-2021-22137</cve>
-    <cve>CVE-2021-22144</cve>
-  </suppress>
-
 </suppressions>
