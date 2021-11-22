@@ -25,8 +25,8 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @BeforeAll
     static void setup() {
-        Awaitility.setDefaultPollInterval(10, TimeUnit.SECONDS);
-        Awaitility.setDefaultPollDelay(Duration.TEN_SECONDS);
+        Awaitility.setDefaultPollInterval(2, TimeUnit.SECONDS);
+        Awaitility.setDefaultPollDelay(Duration.FIVE_SECONDS);
         Awaitility.setDefaultTimeout(Duration.FIVE_MINUTES);
     }
 
@@ -37,7 +37,9 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                        final Map<Enum<TestTables>, List<Long>> initialStateRowIds,
                        final List<CaseLinkEntity> caseLinkEntities,
                        final Map<String, List<Long>> indexedData,
-                       final Map<Enum<TestTables>, List<Long>> endStateRowIds) throws Exception {
+                       final Map<Enum<TestTables>, List<Long>> endStateRowIds,
+                       final Map<String, List<Long>> deletedFromIndexed,
+                       final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
         setupData(deletableCaseTypes, scriptPath, initialStateRowIds, caseLinkEntities, indexedData);
 
@@ -46,7 +48,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
 
         // THEN
         verifyDatabaseDeletion(endStateRowIds);
-        //verifyElasticsearchIndexDeletion();
+        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
     }
 
 }

@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -55,19 +57,48 @@ public class CaseFinderService {
         return isDeletableCaseType(caseData.getCaseType()) && isExpired(caseData.getResolvedTtl());
     }
 
-    Boolean isAllDueDeletion(final List<CaseDataEntity> linkedCases) {
-        return linkedCases.stream()
+    Boolean isAllDueDeletion(final CaseDataEntity parentCase, final List<CaseDataEntity> linkedCases) {
+        final List<CaseDataEntity> caseDataEntities = Stream.concat(Stream.of(parentCase), linkedCases.stream())
+            .collect(Collectors.toUnmodifiableList());
+
+        return caseDataEntities.stream()
             .allMatch(this::isCaseDueDeletion);
     }
 
     public List<CaseData> findCasesDueDeletion() {
-        final List<CaseDataEntity> expiredCases = getExpiredCases();
+        final List<CaseDataEntity> candidateCases = findCandidateCases();
 
-        final Map<RetentionStatus, List<CaseData>> partitioned = findLinkedCasesAndPartition(expiredCases);
+        final Map<RetentionStatus, List<CaseData>> partitioned = findLinkedCasesAndPartition(candidateCases);
 
         final List<Long> casesToRetain = getCaseIdsToExcludeFromDeletion(partitioned.get(RetentionStatus.RETAIN));
 
         return getDeletableCases(partitioned.get(RetentionStatus.INDETERMINATE), casesToRetain);
+    }
+
+    private List<CaseDataEntity> findCandidateCases() {
+        final List<CaseDataEntity> expiredCases = getExpiredCases();
+
+        final List<Long> potentialLinkedCaseIds = expiredCases.stream()
+            .map(CaseDataEntity::getId)
+            .collect(Collectors.toUnmodifiableList());
+
+        final List<CaseLinkEntity> parentCaseLinks = caseLinkRepository.findAllByLinkedCaseId(potentialLinkedCaseIds);
+
+        final Set<Long> caseIds = parentCaseLinks.stream()
+            .map(CaseLinkEntity::getCaseId)
+            .collect(Collectors.toUnmodifiableSet());
+
+        final List<CaseDataEntity> parentLinkedCases = caseDataRepository.findAllById(caseIds);
+
+        return Stream.of(expiredCases, parentLinkedCases)
+            .flatMap(List::stream)
+            .collect(Collectors.toMap(
+                CaseDataEntity::getId,
+                Function.identity(),
+                (existing, replacement) -> existing
+            ))
+            .values().stream()
+            .collect(Collectors.toUnmodifiableList());
     }
 
     private Boolean isExpired(@NonNull final LocalDate caseTtl) {
@@ -79,11 +110,11 @@ public class CaseFinderService {
         return parameterResolver.getDeletableCaseTypes().contains(caseType);
     }
 
-    private Map<RetentionStatus, List<CaseData>> findLinkedCasesAndPartition(final List<CaseDataEntity> expiredCases) {
-        final Map<RetentionStatus, List<CaseData>> groupedByStatus = expiredCases.stream()
+    private Map<RetentionStatus, List<CaseData>> findLinkedCasesAndPartition(final List<CaseDataEntity> candidateCases) {
+        final Map<RetentionStatus, List<CaseData>> groupedByStatus = candidateCases.stream()
             .map(entity -> {
                 final List<CaseDataEntity> linkedCases = getLinkedCases(entity);
-                return isAllDueDeletion(linkedCases)
+                return isAllDueDeletion(entity, linkedCases)
                     ? buildCaseData(entity, linkedCases, RetentionStatus.INDETERMINATE)
                     : logNonQualifyingCase(entity, linkedCases);
             })
@@ -91,7 +122,8 @@ public class CaseFinderService {
 
         return Map.of(RetentionStatus.RETAIN, nullCheck(groupedByStatus.get(RetentionStatus.RETAIN)),
                       RetentionStatus.INDETERMINATE, nullCheck(groupedByStatus.get(RetentionStatus.INDETERMINATE)),
-                      RetentionStatus.DELETE, nullCheck(groupedByStatus.get(RetentionStatus.DELETE)));
+                      RetentionStatus.DELETE, nullCheck(groupedByStatus.get(RetentionStatus.DELETE))
+        );
     }
 
     private List<CaseData> nullCheck(final List<CaseData> caseDataList) {
@@ -133,11 +165,13 @@ public class CaseFinderService {
     private List<CaseData> getDeletableCases(final List<CaseData> indeterminateCases, final List<Long> casesToRetain) {
         return indeterminateCases.stream()
             .filter(item -> !casesToRetain.contains(item.getId()))
-            .map(caseData -> new CaseData(caseData.getId(),
-                                          caseData.getReference(),
-                                          caseData.getCaseType(),
-                                          caseData.getLinkedCases(),
-                                          RetentionStatus.DELETE))
+            .map(caseData -> new CaseData(
+                caseData.getId(),
+                caseData.getReference(),
+                caseData.getCaseType(),
+                caseData.getLinkedCases(),
+                RetentionStatus.DELETE
+            ))
             .collect(Collectors.toUnmodifiableList());
     }
 

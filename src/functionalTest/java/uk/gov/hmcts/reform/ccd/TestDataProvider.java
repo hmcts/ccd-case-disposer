@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.ccd;
 
 import com.pivovarit.function.ThrowingConsumer;
-import org.awaitility.Duration;
+import com.pivovarit.function.ThrowingFunction;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest;
@@ -47,6 +49,7 @@ import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_
 
 public class TestDataProvider {
 
+    private static final String INDEX_TYPE = "_doc";
     private static final String CASE_REFERENCE_FIELD = "reference";
 
     @Inject
@@ -69,7 +72,7 @@ public class TestDataProvider {
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
-            /*Arguments.of(
+            Arguments.of(
                 null,
                 "scenarios/S-001.sql",
                 Map.of(TestTables.CASE_DATA, List.of(1L),
@@ -78,7 +81,9 @@ public class TestDataProvider {
                 ),
                 emptyList(),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                Map.of(TestTables.CASE_DATA, List.of(1L))
+                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                Map.of("FT_MasterCaseType", emptyList()),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L))
             ),
             Arguments.of(
                 "FT_MasterCaseType",
@@ -89,7 +94,9 @@ public class TestDataProvider {
                 ),
                 emptyList(),
                 Map.of("FT_MultiplePages", List.of(1504259907353529L)),
-                Map.of(TestTables.CASE_DATA, List.of(1L))
+                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                Map.of("FT_MultiplePages", emptyList()),
+                Map.of("FT_MultiplePages", List.of(1504259907353529L))
             ),
             Arguments.of(
                 "FT_MasterCaseType",
@@ -100,7 +107,9 @@ public class TestDataProvider {
                 ),
                 emptyList(),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                Map.of(TestTables.CASE_DATA, List.of(1L))
+                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                Map.of("FT_MasterCaseType", emptyList()),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L))
             ),
             Arguments.of(
                 "FT_MasterCaseType",
@@ -110,10 +119,16 @@ public class TestDataProvider {
                        TestTables.CASE_LINK, emptyList()
                 ),
                 emptyList(),
-                Map.of("FT_MasterCaseType", 1504259907353529L,
-                       "FT_MultiplePages", 1504259907353528L
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L),
+                       "FT_MultiplePages", List.of(1504259907353528L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L))
+                Map.of(TestTables.CASE_DATA, List.of(1L, 2L)),
+                Map.of("FT_MasterCaseType", emptyList(),
+                       "FT_MultiplePages", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L),
+                       "FT_MultiplePages", List.of(1504259907353528L)
+                )
             ),
             Arguments.of(
                 "FT_MasterCaseType",
@@ -126,7 +141,13 @@ public class TestDataProvider {
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(3L, 4L))
+                Map.of(TestTables.CASE_DATA, List.of(3L, 4L)),
+                Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
+                       "FT_MultiplePages", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353527L),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                )
             ),
             // Scenario 6
             Arguments.of(
@@ -140,7 +161,13 @@ public class TestDataProvider {
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(3L))
+                Map.of(TestTables.CASE_DATA, List.of(3L)),
+                Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353527L),
+                       "FT_MultiplePages", emptyList()
+                )
             ),
             Arguments.of(
                 "FT_MasterCaseType",
@@ -151,9 +178,15 @@ public class TestDataProvider {
                 ),
                 List.of(new CaseLinkEntityBuilder(1L, "FT_MultiplePages", 4L)),
                 Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
-                       "FT_MultiplePages", 1504259907353527L
+                       "FT_MultiplePages", List.of(1504259907353527L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 4L))
+                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 4L)),
+                Map.of("FT_MasterCaseType", List.of(1504259907353528L),
+                       "FT_MultiplePages", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353529L),
+                       "FT_MultiplePages", List.of(1504259907353527L)
+                )
             ),
             Arguments.of(
                 "FT_MasterCaseType",
@@ -167,7 +200,15 @@ public class TestDataProvider {
                        "FT_MultiplePages", List.of(1504259907353527L),
                        "FT_Conditionals", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 4L))
+                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 4L)),
+                Map.of("FT_MasterCaseType", List.of(1504259907353528L),
+                       "FT_MultiplePages", emptyList(),
+                       "FT_Conditionals", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L),
+                       "FT_MultiplePages", List.of(1504259907353527L),
+                       "FT_Conditionals", List.of(1504259907353526L)
+                )
             ),
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
@@ -186,7 +227,15 @@ public class TestDataProvider {
                        ),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(3L, 7L))
+                Map.of(TestTables.CASE_DATA, List.of(3L, 7L)),
+                Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L,
+                                                    1504259907353528L, 1504259907353529L
+                       ),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353527L),
+                       "FT_MultiplePages", emptyList()
+                )
             ),
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
@@ -205,8 +254,16 @@ public class TestDataProvider {
                        ),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(2L, 3L, 6L, 7L))
-            ),*/
+                Map.of(TestTables.CASE_DATA, List.of(2L, 3L, 6L, 7L)),
+                Map.of("FT_MasterCaseType", List.of(1504259907353525L, 1504259907353529L),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L,
+                                                    1504259907353527L, 1504259907353528L
+                       ),
+                       "FT_MultiplePages", emptyList()
+                )
+            ),
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-011.sql",
@@ -232,7 +289,15 @@ public class TestDataProvider {
                     ),
                        "FT_Conditionals", List.of(1504259907353520L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 5L, 6L, 9L, 10L))
+                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 5L, 6L, 9L, 10L)),
+                Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353528L),
+                       "FT_MultiplePages", List.of(1504259907353518L, 1504259907353519L, 1504259907353526L),
+                       "FT_Conditionals", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L, 1504259907353529L),
+                       "FT_MultiplePages", List.of(1504259907353521L, 1504259907353527L),
+                       "FT_Conditionals", List.of(1504259907353520L)
+                )
             )
         );
     }
@@ -243,13 +308,13 @@ public class TestDataProvider {
                              final List<CaseLinkEntity> caseLinkEntities,
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
-        //resetIndices(indexedData.keySet());
+        resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
         insertDataIntoDatabase(scriptPath);
         verifyDatabaseIsPopulated(rowIds, caseLinkEntities);
-        TimeUnit.SECONDS.sleep(10);
-        //verifyElasticsearchIndicesAreCreated(indexedData);
+        TimeUnit.MINUTES.sleep(1);
+        verifyCaseDataAreInElasticsearch(indexedData);
     }
 
     private void setDeletableCaseTypes(final String value) {
@@ -285,38 +350,47 @@ public class TestDataProvider {
         });
     }
 
-    private void verifyElasticsearchIndicesAreCreated(final Map<String, List<Long>> indexedData) {
+    private void verifyCaseDataAreInElasticsearch(final Map<String, List<Long>> indexedData) {
         indexedData.forEach((key, value) -> {
             final String indexName = getIndex(key);
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
                 refreshIndex(indexName);
-                final List<String> caseReferences = findCaseByReference(indexName, caseReference);
+                final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
 
                 with()
-                    .pollDelay(Duration.TEN_SECONDS)
-                    .pollInterval(Duration.TEN_SECONDS)
                     .await()
-                    .untilAsserted(() -> assertThat(caseReferences)
-                        .isNotEmpty()
-                        .containsExactly(caseReference.toString()));
+                    .untilAsserted(() -> assertThat(actualCaseReference)
+                        .isPresent()
+                        .hasValue(caseReference));
             }));
         });
     }
 
-    private List<String> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
+    private Optional<Long> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .query(QueryBuilders.termQuery(CASE_REFERENCE_FIELD, caseReference))
             .from(0);
 
         final SearchRequest searchRequest = new SearchRequest(caseIndex)
-            .types("_doc")
+            .types(INDEX_TYPE)
             .source(searchSourceBuilder);
 
         final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
-        return Arrays.stream(searchResponse.getHits().getHits())
+        final Optional<String> first = Arrays.stream(searchResponse.getHits().getHits())
             .map(SearchHit::getId)
-            .collect(Collectors.toUnmodifiableList());
+            .findFirst();
+
+        return first.map(ThrowingFunction.unchecked(id -> {
+            final GetRequest getRequest = new GetRequest(caseIndex, INDEX_TYPE, id);
+            final GetResponse getResponse = elasticsearchClient.get(getRequest, RequestOptions.DEFAULT);
+
+            if (!getResponse.isExists()) {
+                return null;
+            }
+            final Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
+            return (Long) sourceAsMap.get(CASE_REFERENCE_FIELD);
+        }));
     }
 
     private String getIndex(String caseType) {
@@ -334,18 +408,37 @@ public class TestDataProvider {
 
         caseTypes.forEach(ThrowingConsumer.unchecked(caseType -> {
             final String indexName = getIndex(caseType);
-            refreshIndex(indexName);
+            final List<String> documents = getAllDocuments(indexName);
 
-            final DeleteRequest deleteRequest = new DeleteRequest(indexName)
-                .type(parameterResolver.getCasesIndexType());
-            bulkRequest.add(deleteRequest);
+            documents.forEach(documentId -> {
+                final DeleteRequest deleteRequest = new DeleteRequest(indexName)
+                    .id(documentId)
+                    .type(parameterResolver.getCasesIndexType());
+                bulkRequest.add(deleteRequest);
+            });
         }));
 
-        final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+        if (bulkRequest.numberOfActions() > 0) {
+            final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
 
-        if (bulkResponse.hasFailures()) {
-            throw new Exception("Errors resetting indices::: " + bulkResponse.buildFailureMessage());
+            if (bulkResponse.hasFailures()) {
+                throw new Exception("Errors resetting indices::: " + bulkResponse.buildFailureMessage());
+            }
         }
+    }
+
+    private List<String> getAllDocuments(final String indexName) throws IOException {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+            .query(QueryBuilders.matchAllQuery());
+        final SearchRequest searchRequest = new SearchRequest(indexName)
+            .source(searchSourceBuilder);
+
+        final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
+
+        return Arrays.stream(searchResponse.getHits().getHits())
+            .filter(hit -> indexName.startsWith(hit.getIndex()))
+            .map(SearchHit::getId)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     protected void verifyDatabaseDeletion(final Map<Enum<TestTables>, List<Long>> rowIds) {
@@ -360,21 +453,25 @@ public class TestDataProvider {
             .containsExactlyInAnyOrderElementsOf(ids);
     }
 
-    /*protected void verifyElasticsearchIndexDeletion(final Map<String, List<Long>> indexedData) {
-        indexedData.forEach((key, value) -> {
+    protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
+                                               final Map<String, List<Long>> notDeletedFromIndexed) {
+        verifyCaseDataAreDeletedInElasticsearch(deletedFromIndexed);
+        verifyCaseDataAreInElasticsearch(notDeletedFromIndexed);
+    }
+
+    private void verifyCaseDataAreDeletedInElasticsearch(final Map<String, List<Long>> deletedFromIndexed) {
+        deletedFromIndexed.forEach((key, value) -> {
             final String indexName = getIndex(key);
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
                 refreshIndex(indexName);
-                final List<String> caseReferences = findCaseByReference(indexName, caseReference);
+                final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
 
                 with()
-                    .pollDelay(Duration.TEN_SECONDS)
-                    .pollInterval(Duration.TWO_SECONDS)
                     .await()
-                    .untilAsserted(() -> assertThat(caseReferences).isEmpty());
+                    .untilAsserted(() -> assertThat(actualCaseReference).isNotPresent());
             }));
         });
-    }*/
+    }
 
 }
