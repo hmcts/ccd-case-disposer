@@ -110,7 +110,9 @@ public class CaseFinderService {
         return parameterResolver.getDeletableCaseTypes().contains(caseType);
     }
 
-    private Map<RetentionStatus, List<CaseData>> findLinkedCasesAndPartition(final List<CaseDataEntity> candidateCases) {
+    private Map<RetentionStatus, List<CaseData>> findLinkedCasesAndPartition(
+        final List<CaseDataEntity> candidateCases
+    ) {
         final Map<RetentionStatus, List<CaseData>> groupedByStatus = candidateCases.stream()
             .map(entity -> {
                 final List<CaseDataEntity> linkedCases = getLinkedCases(entity);
