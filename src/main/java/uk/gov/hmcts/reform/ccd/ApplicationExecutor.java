@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd;
 
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 
@@ -24,8 +24,8 @@ public class ApplicationExecutor {
 
     public void execute() {
         log.info("Case-Disposer started...");
-        final List<CaseData> deletableCandidates = caseFindingService.findCasesDueDeletion();
-        deletableCandidates.forEach(caseDeletionService::deleteCase);
+        final List<CaseFamily> casesDueDeletion = caseFindingService.findCasesDueDeletion();
+        casesDueDeletion.forEach(caseDeletionService::deleteCase);
         log.info("Case-Disposer finished.");
     }
 

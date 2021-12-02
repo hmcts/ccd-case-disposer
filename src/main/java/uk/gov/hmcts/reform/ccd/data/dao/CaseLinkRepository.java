@@ -14,6 +14,8 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
 
     List<CaseLinkEntity> findByCaseId(final Long caseId);
 
+    List<CaseLinkEntity> findByLinkedCaseId(final Long linkedCaseId);
+
     @Query("FROM CaseLinkEntity WHERE linked_case_id IN :queryLinkedCases")
     List<CaseLinkEntity> findAllByLinkedCaseId(@Param("queryLinkedCases") final List<Long> linkedCaseIds);
 

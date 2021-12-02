@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
-import uk.gov.hmcts.reform.ccd.data.model.RetentionStatus;
+import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 
@@ -19,8 +19,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_WITH_PAST_TTL;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_WITH_TODAY_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_TODAY_TTL;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationExecutorTest {
@@ -44,30 +44,32 @@ class ApplicationExecutorTest {
 
     @Test
     void testShouldDeleteTheCasesFound() {
-        final List<CaseData> caseDataList = List.of(
-            new CaseData(
-                DELETABLE_CASE_WITH_PAST_TTL.getId(),
-                DELETABLE_CASE_WITH_PAST_TTL.getReference(),
-                DELETABLE_CASE_WITH_PAST_TTL.getCaseType(),
-                emptyList(),
-                RetentionStatus.DELETE
-            ),
-            new CaseData(
-                DELETABLE_CASE_WITH_TODAY_TTL.getId(),
-                DELETABLE_CASE_WITH_TODAY_TTL.getReference(),
-                DELETABLE_CASE_WITH_TODAY_TTL.getCaseType(),
-                emptyList(),
-                RetentionStatus.DELETE
-            )
+        final CaseData caseData1 = new CaseData(
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
+            null
+        );
+        final CaseData caseData2 = new CaseData(
+            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getId(),
+            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getReference(),
+            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getCaseType(),
+            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getResolvedTtl(),
+            null
+        );
+        final List<CaseFamily> caseDataList = List.of(
+            new CaseFamily(caseData1, emptyList()),
+            new CaseFamily(caseData2, emptyList())
         );
 
         doReturn(caseDataList)
             .when(caseFindingService).findCasesDueDeletion();
-        doNothing().when(caseDeletionService).deleteCase(any(CaseData.class));
+        doNothing().when(caseDeletionService).deleteCase(any(CaseFamily.class));
 
         underTest.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(2)).deleteCase(any(CaseData.class));
+        verify(caseDeletionService, times(2)).deleteCase(any(CaseFamily.class));
     }
 }

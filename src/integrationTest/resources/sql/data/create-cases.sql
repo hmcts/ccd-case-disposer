@@ -19,5 +19,6 @@ VALUES
 (1, 'TestAddressBookCaseNoReadFieldAccess', 13),
 (1, 'TestAddressBookCase', 14),
 (2, 'TestAccess', 23),
+(1, 'TestAddress', 24),
 (2, 'TestAddress', 24),
 (3, 'TestAccess', 32);

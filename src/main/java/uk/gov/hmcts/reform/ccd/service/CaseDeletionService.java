@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import javax.inject.Inject;
@@ -37,16 +38,28 @@ public class CaseDeletionService {
     }
 
     @Transactional
-    public void deleteCase(final CaseData caseData) {
+    public void deleteCase(final CaseFamily caseFamily) {
+        final CaseData caseData = caseFamily.getRootAncestor();
         log.info("About to delete case.reference:: {}", caseData.getReference());
-        caseData.getLinkedCases().forEach(item -> {
-            final CaseLinkPrimaryKey caseLinkPrimaryKey = new CaseLinkPrimaryKey(caseData.getId(), item);
-            caseLinkRepository.deleteById(caseLinkPrimaryKey);
+        caseFamily.getFamilyMembers().forEach(item -> {
+            deleteLinkedCase(item.getParentCase().getId(), item);
         });
+        deleteCaseData(caseData);
+        log.info("Deleted case.reference:: {}", caseData.getReference());
+    }
+
+    private void deleteLinkedCase(final Long parentCaseId, final CaseData caseData) {
+        log.info("About to delete linked case.reference:: {}", caseData.getReference());
+        final CaseLinkPrimaryKey caseLinkPrimaryKey = new CaseLinkPrimaryKey(parentCaseId, caseData.getId());
+        caseLinkRepository.deleteById(caseLinkPrimaryKey);
+        deleteCaseData(caseData);
+        log.info("Deleted linked case.reference:: {}", caseData.getReference());
+    }
+
+    private void deleteCaseData(final CaseData caseData) {
         caseEventRepository.deleteByCaseDataId(caseData.getId());
         caseDataRepository.deleteById(caseData.getId());
         caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()), caseData.getReference());
-        log.info("Deleted case.reference:: {}", caseData.getReference());
     }
 
     private String getIndex(final String caseType) {
