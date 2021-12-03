@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.CaseDataNotFound;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.fixture.TestData;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY2_WITH_PAST_TTL;
@@ -138,6 +140,24 @@ class CaseFamilyTreeServiceTest {
                 assertThat(caseDataEntity1.getId()).isEqualTo(1L);
                 assertThat(caseDataEntity2.getId()).isEqualTo(1000L);
             });
+    }
+
+
+    @Test
+    void testGetRootNodesScenario4() {
+        final List<CaseDataEntity> expiredCases = List.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL, LINKED_CASE_ENTITY_10);
+        final CaseLinkEntity caseLink = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L)
+            .build();
+
+        doReturn(List.of(TestData.DELETABLE_CASE_TYPE)).when(parameterResolver).getDeletableCaseTypes();
+        doReturn(expiredCases).when(caseDataRepository).findExpiredCases(anyList());
+        doReturn(emptyList()).when(caseLinkRepository).findByLinkedCaseId(1L);
+        doReturn(List.of(caseLink)).when(caseLinkRepository).findByLinkedCaseId(10L);
+        doReturn(Optional.empty()).when(caseDataRepository).findById(1L);
+
+        assertThatExceptionOfType(CaseDataNotFound.class)
+            .isThrownBy(() -> underTest.getRootNodes())
+            .withMessage("Case data for case_id=1 is not found");
     }
 
     @Test

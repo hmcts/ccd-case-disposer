@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -34,14 +33,13 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
     @MethodSource("provideCaseDeletionScenarios")
     void testSomething(final String deletableCaseTypes,
                        final String scriptPath,
-                       final Map<Enum<TestTables>, List<Long>> initialStateRowIds,
-                       final List<CaseLinkEntity> caseLinkEntities,
+                       final List<Long> initialStateRowIds,
                        final Map<String, List<Long>> indexedData,
-                       final Map<Enum<TestTables>, List<Long>> endStateRowIds,
+                       final List<Long> endStateRowIds,
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
-        setupData(deletableCaseTypes, scriptPath, initialStateRowIds, caseLinkEntities, indexedData);
+        setupData(deletableCaseTypes, scriptPath, initialStateRowIds, indexedData);
 
         // WHEN
         executor.execute();

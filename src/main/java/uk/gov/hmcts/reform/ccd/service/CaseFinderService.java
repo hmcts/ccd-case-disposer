@@ -58,8 +58,8 @@ public class CaseFinderService {
             new CaseTypeRetentionPolicyImpl(parameterResolver)
         );
         return retentionPolicies.stream()
-            .map(x -> x.mustRetain(caseData))
-            .filter(r -> r)
+            .map(policy -> policy.mustRetain(caseData))
+            .filter(result -> result)
             .findFirst()
             .orElse(Boolean.FALSE);
     }

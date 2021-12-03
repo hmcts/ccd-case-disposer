@@ -49,6 +49,8 @@ import static uk.gov.hmcts.reform.ccd.service.CaseFinderService.INTERSECTION_FUN
 class CaseFinderServiceTest {
     @Mock
     private ParameterResolver parameterResolver;
+    @Mock
+    private CaseFamilyTreeService caseFamilyTreeService;
     @InjectMocks
     private CaseFinderService underTest;
 
@@ -74,7 +76,7 @@ class CaseFinderServiceTest {
                 assertThat(caseFamilies2)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(x -> assertThat(x.getRootAncestor().getId()).isEqualTo(1L));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(1L));
             });
     }
 
@@ -95,7 +97,7 @@ class CaseFinderServiceTest {
                 assertThat(caseFamilies1)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(x -> assertThat(x.getRootAncestor().getId()).isEqualTo(caseId));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(caseId));
                 assertThat(caseFamilies2).isEmpty();
             });
     }
@@ -129,11 +131,11 @@ class CaseFinderServiceTest {
                 assertThat(caseFamilies1)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(x -> assertThat(x.getRootAncestor().getId()).isEqualTo(1L));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(1L));
                 assertThat(caseFamilies2)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(x -> assertThat(x.getRootAncestor().getId()).isEqualTo(1000L));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(1000L));
             });
     }
 
@@ -207,7 +209,7 @@ class CaseFinderServiceTest {
         assertThat(results)
             .isNotEmpty()
             .satisfies(caseFamilies -> {
-                final List<Long> collect = caseFamilies.stream()
+                final List<Long> actualCaseIds = caseFamilies.stream()
                     .map(caseFamily -> Stream.concat(Stream.of(caseFamily.getRootAncestor()),
                                                      caseFamily.getFamilyMembers().stream()))
                     .map(entityStream -> entityStream.collect(Collectors.toUnmodifiableList()))
@@ -217,10 +219,41 @@ class CaseFinderServiceTest {
                     .stream()
                     .collect(Collectors.toUnmodifiableList());
 
-                assertThat(collect)
+                assertThat(actualCaseIds)
                     .isNotEmpty()
                     .hasSize(13)
                     .hasSameElementsAs(List.of(1L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 91L, 92L, 100L, 101L, 1000L));
+            });
+    }
+
+    @Test
+    void testFindCasesDueDeletion() {
+        final List<CaseData> linkedCases = List.of(LINKED_CASE_DATA_R13);
+        final CaseFamily caseFamily1 = new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList());
+        final CaseFamily caseFamily2 = new CaseFamily(DELETABLE_CASE_DATA5_WITH_PAST_TTL, linkedCases);
+
+        final List<CaseFamily> deletableCaseFamilies = List.of(caseFamily1, caseFamily2);
+
+        doReturn(deletableCaseFamilies).when(caseFamilyTreeService).getCaseFamilies();
+        doReturn(List.of(TestData.DELETABLE_CASE_TYPE)).when(parameterResolver).getDeletableCaseTypes();
+
+        final List<CaseFamily> casesDueDeletion = underTest.findCasesDueDeletion();
+
+        assertThat(casesDueDeletion)
+            .isNotEmpty()
+            .hasSize(2)
+            .satisfies(caseFamilies -> {
+                final CaseFamily resultCaseFamily1 = caseFamilies.get(0);
+                final CaseFamily resultCaseFamily2 = caseFamilies.get(1);
+
+                assertThat(resultCaseFamily1.getRootAncestor().getId()).isEqualTo(4L);
+                assertThat(resultCaseFamily1.getFamilyMembers()).isEmpty();
+
+                assertThat(resultCaseFamily2.getRootAncestor().getId()).isEqualTo(5L);
+                assertThat(resultCaseFamily2.getFamilyMembers())
+                    .isNotEmpty()
+                    .singleElement()
+                    .satisfies(caseData -> assertThat(caseData.getId()).isEqualTo(13L));
             });
     }
 

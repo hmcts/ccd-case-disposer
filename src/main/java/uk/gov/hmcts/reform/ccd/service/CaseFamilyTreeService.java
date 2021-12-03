@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import static uk.gov.hmcts.reform.ccd.util.ListUtil.distinctByKey;
@@ -35,12 +36,21 @@ public class CaseFamilyTreeService {
 
     private static final String CASE_DATA_NOT_FOUND = "Case data for case_id=%d is not found";
 
+    @Inject
     public CaseFamilyTreeService(final CaseDataRepository caseDataRepository,
                                  final CaseLinkRepository caseLinkRepository,
                                  final ParameterResolver parameterResolver) {
         this.caseDataRepository = caseDataRepository;
         this.caseLinkRepository = caseLinkRepository;
         this.parameterResolver = parameterResolver;
+    }
+
+    public List<CaseFamily> getCaseFamilies() {
+        final List<CaseDataEntity> rootNodes = getRootNodes();
+
+        return rootNodes.stream()
+            .map(this::buildCaseFamily)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     private List<CaseDataEntity> getExpiredCases() {
@@ -130,13 +140,5 @@ public class CaseFamilyTreeService {
         );
         final List<CaseData> familyMembers = familyMembersFunction.apply(rootCaseData);
         return new CaseFamily(rootCaseData, familyMembers);
-    }
-
-    public List<CaseFamily> getCaseFamilies() {
-        final List<CaseDataEntity> rootNodes = getRootNodes();
-
-        return rootNodes.stream()
-            .map(this::buildCaseFamily)
-            .collect(Collectors.toUnmodifiableList());
     }
 }

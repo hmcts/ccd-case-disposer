@@ -23,9 +23,6 @@ import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
-import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
@@ -75,54 +72,38 @@ public class TestDataProvider {
             Arguments.of(
                 null,
                 "scenarios/S-001.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                emptyList(),
+                List.of(1L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                List.of(1L),
                 Map.of("FT_MasterCaseType", emptyList()),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L))
             ),
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-002.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                emptyList(),
+                List.of(1L),
                 Map.of("FT_MultiplePages", List.of(1504259907353529L)),
-                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                List.of(1L),
                 Map.of("FT_MultiplePages", emptyList()),
                 Map.of("FT_MultiplePages", List.of(1504259907353529L))
             ),
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-003.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                emptyList(),
+                List.of(1L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                Map.of(TestTables.CASE_DATA, List.of(1L)),
+                List.of(1L),
                 Map.of("FT_MasterCaseType", emptyList()),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L))
             ),
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-004.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                emptyList(),
+                List.of(1L, 2L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353528L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L)),
+                List.of(1L, 2L),
                 Map.of("FT_MasterCaseType", emptyList(),
                        "FT_MultiplePages", emptyList()
                 ),
@@ -133,15 +114,11 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-005.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                emptyList(),
+                List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(3L, 4L)),
+                List.of(3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", emptyList()
                 ),
@@ -153,15 +130,11 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-005.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                emptyList(),
+                List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(3L)),
+                List.of(3L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
@@ -172,15 +145,11 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-007.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                List.of(new CaseLinkEntityBuilder(1L, "FT_MultiplePages", 4L)),
+                List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353527L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 4L)),
+                List.of(1L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L),
                        "FT_MultiplePages", emptyList()
                 ),
@@ -191,16 +160,12 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType",
                 "scenarios/S-008.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                List.of(new CaseLinkEntityBuilder(1L, "FT_Conditionals", 4L)),
+                List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353527L),
                        "FT_Conditionals", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 4L)),
+                List.of(1L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L),
                        "FT_MultiplePages", emptyList(),
                        "FT_Conditionals", emptyList()
@@ -213,21 +178,13 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-009.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                List.of(
-                    new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 5L),
-                    new CaseLinkEntityBuilder(2L, "FT_MasterCaseType", 6L),
-                    new CaseLinkEntityBuilder(3L, "FT_MasterCaseType", 7L)
-                ),
+                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
                                                     1504259907353527L, 1504259907353528L, 1504259907353529L
                        ),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(3L, 7L)),
+                List.of(3L, 7L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L,
                                                     1504259907353528L, 1504259907353529L
                        ),
@@ -240,21 +197,13 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-010.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                List.of(
-                    new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 5L),
-                    new CaseLinkEntityBuilder(2L, "FT_MasterCaseType", 6L),
-                    new CaseLinkEntityBuilder(3L, "FT_MasterCaseType", 7L)
-                ),
+                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
                                                     1504259907353527L, 1504259907353528L, 1504259907353529L
                        ),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(2L, 3L, 6L, 7L)),
+                List.of(2L, 3L, 6L, 7L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353525L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 ),
@@ -267,20 +216,7 @@ public class TestDataProvider {
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
                 "scenarios/S-011.sql",
-                Map.of(TestTables.CASE_DATA, List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
-                       TestTables.CASE_EVENT, emptyList(),
-                       TestTables.CASE_LINK, emptyList()
-                ),
-                List.of(
-                    new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 5L),
-                    new CaseLinkEntityBuilder(1L, "FT_MasterCaseType", 6L),
-                    new CaseLinkEntityBuilder(2L, "FT_MasterCaseType", 7L),
-                    new CaseLinkEntityBuilder(2L, "FT_MasterCaseType", 8L),
-                    new CaseLinkEntityBuilder(3L, "FT_MultiplePages", 9L),
-                    new CaseLinkEntityBuilder(3L, "FT_Conditionals", 10L),
-                    new CaseLinkEntityBuilder(4L, "FT_MultiplePages", 11L),
-                    new CaseLinkEntityBuilder(4L, "FT_MultiplePages", 12L)
-                ),
+                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353524L,
                                                     1504259907353525L, 1504259907353528L, 1504259907353529L
                        ),
@@ -289,7 +225,7 @@ public class TestDataProvider {
                     ),
                        "FT_Conditionals", List.of(1504259907353520L)
                 ),
-                Map.of(TestTables.CASE_DATA, List.of(1L, 3L, 5L, 6L, 9L, 10L)),
+                List.of(1L, 3L, 5L, 6L, 9L, 10L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353528L),
                        "FT_MultiplePages", List.of(1504259907353518L, 1504259907353519L, 1504259907353526L),
                        "FT_Conditionals", emptyList()
@@ -298,21 +234,65 @@ public class TestDataProvider {
                        "FT_MultiplePages", List.of(1504259907353521L, 1504259907353527L),
                        "FT_Conditionals", List.of(1504259907353520L)
                 )
+            ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                "scenarios/S-012.sql",
+                List.of(1L, 2L, 3L),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
+                       "FT_MultiplePages", List.of(1504259907353528L)
+                ),
+                List.of(1L, 2L, 3L),
+                Map.of("FT_MasterCaseType", emptyList(),
+                       "FT_MultiplePages", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
+                       "FT_MultiplePages", List.of(1504259907353528L)
+                )
+            ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                "scenarios/S-013.sql",
+                List.of(1L, 2L, 3L, 4L),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                ),
+                List.of(1L, 2L, 3L, 4L),
+                Map.of("FT_MasterCaseType", emptyList(),
+                       "FT_MultiplePages", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                )
+            ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                "scenarios/S-014.sql",
+                List.of(1L, 2L, 3L, 4L),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                ),
+                List.of(1L, 2L, 3L, 4L),
+                Map.of("FT_MasterCaseType", emptyList(),
+                       "FT_MultiplePages", emptyList()
+                ),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                       "FT_MultiplePages", List.of(1504259907353526L)
+                )
             )
         );
     }
 
     protected void setupData(final String deletableCaseTypes,
                              final String scriptPath,
-                             final Map<Enum<TestTables>, List<Long>> rowIds,
-                             final List<CaseLinkEntity> caseLinkEntities,
+                             final List<Long> rowIds,
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
         insertDataIntoDatabase(scriptPath);
-        verifyDatabaseIsPopulated(rowIds, caseLinkEntities);
+        verifyDatabaseIsPopulated(rowIds);
         TimeUnit.MINUTES.sleep(1);
         verifyCaseDataAreInElasticsearch(indexedData);
     }
@@ -330,23 +310,10 @@ public class TestDataProvider {
         }
     }
 
-    private void verifyDatabaseIsPopulated(final Map<Enum<TestTables>, List<Long>> rowIds,
-                                           final List<CaseLinkEntity> caseLinkEntities) {
-        rowIds.get(TestTables.CASE_DATA).forEach(x -> {
-            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findById(x);
+    private void verifyDatabaseIsPopulated(final List<Long> rowIds) {
+        rowIds.forEach(item -> {
+            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findById(item);
             assertThat(caseDataToDelete).isPresent();
-        });
-
-        rowIds.get(TestTables.CASE_EVENT).forEach(x -> {
-            Optional<CaseEventEntity> caseEventToDelete = caseEventRepository.findById(x);
-            assertThat(caseEventToDelete).isPresent();
-        });
-
-        rowIds.get(TestTables.CASE_LINK).forEach(x -> {
-            final List<CaseLinkEntity> entities = caseLinkRepository.findByCaseId(x);
-            assertThat(entities)
-                .isNotEmpty()
-                .hasSameElementsAs(caseLinkEntities);
         });
     }
 
@@ -441,8 +408,7 @@ public class TestDataProvider {
             .collect(Collectors.toUnmodifiableList());
     }
 
-    protected void verifyDatabaseDeletion(final Map<Enum<TestTables>, List<Long>> rowIds) {
-        final List<Long> ids = rowIds.get(TestTables.CASE_DATA);
+    protected void verifyDatabaseDeletion(final List<Long> rowIds) {
         final List<CaseDataEntity> all = caseDataRepository.findAll();
         final List<Long> actualRowIds = all.stream()
             .map(CaseDataEntity::getId)
@@ -450,7 +416,7 @@ public class TestDataProvider {
 
         assertThat(actualRowIds)
             .isNotNull()
-            .containsExactlyInAnyOrderElementsOf(ids);
+            .containsExactlyInAnyOrderElementsOf(rowIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
