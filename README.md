@@ -43,20 +43,7 @@ by executing the following command:
   docker-compose up
 ```
 
-This will start the API container exposing the application's port
-(set to `4458` in this app).
-
-In order to test if the application is up, you can call its health endpoint:
-
-```bash
-  curl http://localhost:4458/health
-```
-
-You should get a response similar to this:
-
-```
-  {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
-```
+This will start the API container and immediately attempt to delete qualifying case records from the data sources it's configured to connected to.
 
 ### Alternative script to run application
 
@@ -103,12 +90,11 @@ To run all integration tests execute the following command:
 ```
 
 ### Functional tests
-The tests are written using befta-fw library. To find out more about BEFTA Framework, see the
-[BEFTA-FW repository and its README](https://github.com/hmcts/befta-fw).
+The functional tests expect indices of the relevant case types to be present in the Elasticsearch instance. The tests will fail if these indices are absent.
+The easiest way to create the indices is to run the `ccd-data-store-api` functional tests.  This is especially useful when testing locally.
 
-These tests can be run using:
+Run the functional tests using the following command:
 ```bash
-export TEST_URL=http://localhost:4457
 ./gradlew functional
 ```
 
