@@ -24,9 +24,9 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @BeforeAll
     static void setup() {
-        Awaitility.setDefaultPollInterval(2, TimeUnit.SECONDS);
+        Awaitility.setDefaultPollInterval(1, TimeUnit.SECONDS);
         Awaitility.setDefaultPollDelay(Duration.FIVE_SECONDS);
-        Awaitility.setDefaultTimeout(Duration.FIVE_MINUTES);
+        Awaitility.setDefaultTimeout(30, TimeUnit.SECONDS);
     }
 
     @ParameterizedTest

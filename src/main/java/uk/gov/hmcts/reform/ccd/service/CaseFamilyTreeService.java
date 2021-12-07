@@ -120,7 +120,7 @@ public class CaseFamilyTreeService {
 
         final Set<CaseDataEntity> roots = expiredCases.stream()
             .map(parentNodesFunction)
-            .map(this::findLeafNodes)
+            .map(leafNodesFunction)
             .flatMap(Collection::stream)
             .map(CaseTreeNode::getCaseNode)
             .collect(Collectors.toUnmodifiableSet());

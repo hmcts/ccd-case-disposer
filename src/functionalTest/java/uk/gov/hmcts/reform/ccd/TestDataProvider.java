@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
@@ -293,7 +292,6 @@ public class TestDataProvider {
         setDeletableCaseTypes(deletableCaseTypes);
         insertDataIntoDatabase(scriptPath);
         verifyDatabaseIsPopulated(rowIds);
-        TimeUnit.MINUTES.sleep(1);
         verifyCaseDataAreInElasticsearch(indexedData);
     }
 
@@ -322,14 +320,16 @@ public class TestDataProvider {
             final String indexName = getIndex(key);
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
-                refreshIndex(indexName);
-                final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
-
                 with()
                     .await()
-                    .untilAsserted(() -> assertThat(actualCaseReference)
-                        .isPresent()
-                        .hasValue(caseReference));
+                    .untilAsserted(() -> {
+                        refreshIndex(indexName);
+                        final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
+
+                        assertThat(actualCaseReference)
+                            .isPresent()
+                            .hasValue(caseReference);
+                    });
             }));
         });
     }

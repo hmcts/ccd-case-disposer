@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,6 +49,7 @@ class CaseFamilyTreeServiceTest {
     private CaseFamilyTreeService underTest;
 
     @Test
+    @DisplayName("Get root nodes when two cases are linked to one and the same case.")
     void testGetRootNodesScenario1() {
         final List<CaseDataEntity> expiredCases = List.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL, LINKED_CASE_ENTITY_10);
         final CaseLinkEntity caseLink10_1 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L)
@@ -77,6 +79,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
+    @DisplayName("Get root nodes when one case is linked to two other cases.")
     void testGetRootNodesScenario2() {
         final List<CaseDataEntity> expiredCases = List.of(
             DELETABLE_CASE_ENTITY_WITH_PAST_TTL,
@@ -104,6 +107,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
+    @DisplayName("Get root nodes when a linked case is linked to another case.")
     void testGetRootNodesScenario3() {
         final List<CaseDataEntity> expiredCases = List.of(
             DELETABLE_CASE_ENTITY_WITH_PAST_TTL,
@@ -144,6 +148,7 @@ class CaseFamilyTreeServiceTest {
 
 
     @Test
+    @DisplayName("Get root nodes throws an exception when a case cannot be found by id.")
     void testGetRootNodesScenario4() {
         final List<CaseDataEntity> expiredCases = List.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL, LINKED_CASE_ENTITY_10);
         final CaseLinkEntity caseLink = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L)
@@ -161,6 +166,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
+    @DisplayName("Get case family when the family consists of a root node with no members.")
     void testBuildCaseFamilyScenario1() {
         doReturn(emptyList()).when(caseLinkRepository).findByCaseId(1L);
 
@@ -175,6 +181,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
+    @DisplayName("Get case family when the family consists of a root node with one other family member.")
     void testBuildCaseFamilyScenario2() {
         final CaseLinkEntity caseLink10 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L)
             .build();
@@ -198,6 +205,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
+    @DisplayName("Get case family when the family consists of a root node with multiple family members.")
     void testBuildCaseFamilyScenario3() {
         final CaseLinkEntity caseLink10 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L)
             .build();
@@ -228,6 +236,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
+    @DisplayName("Get case family when the family consists of a root node with multi-linked family members.")
     void testBuildCaseFamilyScenario4() {
         final CaseLinkEntity caseLink10 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L)
             .build();

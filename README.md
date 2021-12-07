@@ -90,10 +90,23 @@ To run all integration tests execute the following command:
 ```
 
 ### Functional tests
-The functional tests expect indices of the relevant case types to be present in the Elasticsearch instance. The tests will fail if these indices are absent.
-The easiest way to create the indices is to run the `ccd-data-store-api` functional tests.  This is especially useful when testing locally.
+The functional tests require Elasticsearch, which is not enable by default on the local `ccd-docker` setup, thus it should be enabled along with logstash with this command:
+```bash
+./ccd enable elasticsearch logstash
+```
 
-Run the functional tests using the following command:
+The next step is to get both `ccd-definition-store-api` and `ccd-data-store-api` to use Elasticsearch and this is done by exporting the following environment variables:
+```bash
+export ES_ENABLED_DOCKER=true
+export ELASTIC_SEARCH_ENABLED=$ES_ENABLED_DOCKER
+export ELASTIC_SEARCH_FTA_ENABLED=$ES_ENABLED_DOCKER
+```
+
+Indices of the relevant case types are expected to be present in the Elasticsearch instance for the tests to work.
+The easiest way to get the indices created is to run the `ccd-data-store-api` functional tests at least once prior to running these functional tests.
+This is especially useful when testing locally.
+
+When the above steps are completed, run the functional tests using the following command:
 ```bash
 ./gradlew functional
 ```

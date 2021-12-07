@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -59,6 +60,7 @@ class CaseFinderServiceTest {
     private static final Set<Long> SET_C = Set.of(1L);
 
     @Test
+    @DisplayName("Partition by retainability when no retainable case families present")
     void testPartitionByRetainabilityScenario1() {
         final List<CaseFamily> caseFamilies = List.of(new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()));
 
@@ -82,6 +84,7 @@ class CaseFinderServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideScenario2Params")
+    @DisplayName("Partition by retainability when only retainable case families present")
     void testPartitionByRetainabilityScenario2(final CaseData ancestorCase, final Long caseId) {
         final List<CaseFamily> caseFamilies = List.of(new CaseFamily(ancestorCase, emptyList()));
 
@@ -110,6 +113,8 @@ class CaseFinderServiceTest {
     }
 
     @Test
+    @DisplayName("Partition by retainability when both retainable case families"
+        + " and indeterminate case families are present")
     void testPartitionByRetainabilityScenario3() {
         final List<CaseData> linkedCases1 = List.of(LINKED_CASE_DATA_R10, LINKED_CASE_DATA_R100);
         final List<CaseData> linkedCases2 = List.of(LINKED_CASE_DATA_R11);
