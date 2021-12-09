@@ -6,53 +6,5 @@ job:
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
-  environment:
-    DATA_STORE_DB_HOST: "{{ .Release.Name }}-postgresql"
-    DATA_STORE_DB_PORT: 5452
-    DATA_STORE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-    DATA_STORE_DB_OPTIONS: "?stringtype=unspecified"
-    DATA_STORE_DB_MAX_POOL_SIZE: 10
 global:
   jobKind: CronJob
-postgresql:
-  enabled: true
-elastic:
-  enabled: true
-elasticsearch:
-  clusterName: "es"
-  imageTag: "6.4.2"
-  replicas: 1
-  minimumMasterNodes: 1
-  antiAffinity: "soft"
-  esJavaOpts: "-Xmx512m -Xms512m"
-  persistence:
-    enabled: false
-  ingress:
-    enabled: true
-    annotations:
-      kubernetes.io/ingress.class: traefik
-    path: /
-    hosts:
-      - es-${SERVICE_FQDN}
-logstash:
-  image:
-    repository: hmctspublic.azurecr.io/ccd/logstash
-    tag: latest
-    pullPolicy: IfNotPresent
-  logstashJavaOpts: -Xmx1g -Xms512M
-  persistence:
-    enabled: false
-  volumeMounts:
-    - name: pipeline
-      mountPath: /usr/share/logstash/files # hack to prevent override of default pipeline in the custom image hmcts/ccd-logstash
-  elasticsearch:
-    host: "{{ .Release.Name }}-es-master"
-    port: 9200
-  configTpl:
-    xpack.monitoring.enabled: "false"
-    db.url: "jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/javadatabase?stringtype=unspecified"
-    db.user: "javapostgres"
-    db.pwd: "javapassword"
-    es.data.nodes.url: "http://{{ .Release.Name }}-es-master:9200"
