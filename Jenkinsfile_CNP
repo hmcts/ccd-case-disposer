@@ -47,21 +47,19 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   nonServiceApp()
 
+  // Set required environment variables to run functional tests apart from one in vaults.
+  env.DATA_STORE_DB_HOST = "ccd-data-store-api-pr-1757-postgresql"
+  env.DATA_STORE_DB_PORT = "5432"
+  env.DATA_STORE_DB_NAME = "javadatabase"
+  env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://ccd-data-store-api-pr-1757-es-master:9200"
+  // For preview we might have to point to "develop" PR of data_store ES url and DB.
+  // (or hardcode standard java chart username/password of postgres)
+
   after('akschartsinstall') {
     echo "Overriding vault environment"
     overrideVaultEnvironments(vaultOverrides)
     echo "Loading the secrets again"
     loadVaultSecrets(secrets)
-
-    // Set required environment variables to run functional tests apart from one in vaults.
-
-    env.DATA_STORE_DB_HOST = "ccd-data-store-api-pr-1757-postgresql"
-    env.DATA_STORE_DB_PORT = "5432"
-    env.DATA_STORE_DB_NAME = "javadatabase"
-    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://ccd-data-store-api-pr-1757-es-master:9200"
-
-    // For preview we might have to point to "develop" PR of data_store ES url and DB.
-    // (or hardcode standard java chart username/password of postgres)
 
     echo "Verifying that functional test run correctly"
     try {
