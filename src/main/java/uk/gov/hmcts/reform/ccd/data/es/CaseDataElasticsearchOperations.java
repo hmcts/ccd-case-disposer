@@ -33,6 +33,7 @@ public class CaseDataElasticsearchOperations {
     private static final String ELASTICSEARCH_DELETE_FAILURE = "Elasticsearch delete operation failed";
     private static final String UNEXPECTED_OPERATION_FAILURE = "Unexpected operation: %s, "
         + "expecting operation type to be of type DELETE";
+    private static final String CASE_NOT_FOUND = "Case.reference={} is not found in index={}";
 
     private final RestHighLevelClient elasticsearchClient;
     private final ParameterResolver parameterResolver;
@@ -48,11 +49,15 @@ public class CaseDataElasticsearchOperations {
         try {
             final List<String> documentIds = findCaseByReference(caseIndex, caseReference);
 
-            final BulkRequest request = buildBulkDeleteQueryRequest(caseIndex, documentIds);
+            if (documentIds.isEmpty()) {
+                log.info(CASE_NOT_FOUND, caseReference, caseIndex);
+            } else {
+                final BulkRequest request = buildBulkDeleteQueryRequest(caseIndex, documentIds);
 
-            final BulkResponse bulkResponse = elasticsearchClient.bulk(request, RequestOptions.DEFAULT);
+                final BulkResponse bulkResponse = elasticsearchClient.bulk(request, RequestOptions.DEFAULT);
 
-            handleBulkResponse(bulkResponse);
+                handleBulkResponse(bulkResponse);
+            }
         } catch (IOException e) {
             throw new ElasticsearchOperationException(e);
         }
