@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
 @ActiveProfiles("functional")
+@SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
 class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @Autowired
@@ -31,7 +31,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @ParameterizedTest
     @MethodSource("provideCaseDeletionScenarios")
-    void testSomething(final String deletableCaseTypes,
+    void testScenarios(final String deletableCaseTypes,
                        final String scriptPath,
                        final List<Long> initialStateRowIds,
                        final Map<String, List<Long>> indexedData,

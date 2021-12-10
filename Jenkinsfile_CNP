@@ -18,7 +18,6 @@ def secrets = [
   'ccd-${env}': [
     secret( 'data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
     secret( 'data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
-    secret( 'ccd-ELASTIC-SEARCH-DATA-NODES-URL', 'ELASTIC_SEARCH_DATA_NODES_HOSTS'),
   ]
 ]
 
@@ -53,7 +52,6 @@ withPipeline(type, product, component) {
     echo "Loading the secrets again"
     loadVaultSecrets(secrets)
 
-
     // Set required environment variables to run functional tests apart from one in vaults.
     env.DATA_STORE_DB_HOST = "ccd-data-store-api-pr-1757-postgresql"
     env.DATA_STORE_DB_PORT = "5432"
@@ -61,8 +59,6 @@ withPipeline(type, product, component) {
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://ccd-data-store-api-pr-1757-es-master:9200"
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
     // (or hardcode standard java chart username/password of postgres)
-
-    sh "env"
 
     echo "Verifying that functional test run correctly"
     try {
