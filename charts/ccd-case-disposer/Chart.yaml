@@ -10,18 +10,3 @@ dependencies:
   - name: job
     version: ~0.7.1
     repository: '@hmctspublic'
-  - name: java
-    version: 3.6.0
-    repository: '@hmctspublic'
-  - name: elasticsearch
-    version: 7.8.2
-    repository: '@hmctspublic'
-    condition: elastic.enabled
-  - name: logstash
-    version: 2.4.1
-    repository: '@hmctspublic'
-    condition: elastic.enabled
-  - name: ccd
-    version: 5.0.7
-    repository: '@hmctspublic'
-    condition: ccd.enabled
