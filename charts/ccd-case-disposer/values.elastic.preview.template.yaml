@@ -1,0 +1,51 @@
+
+ccd:
+  ccd-definition-store-api:
+    java:
+      environment:
+        ELASTIC_SEARCH_ENABLED: true
+        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        ELASTIC_SEARCH_FAIL_ON_IMPORT: true
+
+elastic:
+  enabled: true
+
+elasticsearch:
+  clusterName: "es"
+  imageTag: "6.4.2"
+  replicas: 1
+  minimumMasterNodes: 1
+  antiAffinity: "soft"
+  esJavaOpts: "-Xmx512m -Xms512m"
+  persistence:
+    enabled: false
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
+
+logstash:
+  image:
+    repository: hmctspublic.azurecr.io/ccd/logstash
+    tag: latest
+    pullPolicy: IfNotPresent
+  logstashJavaOpts: -Xmx1g -Xms512M
+  persistence:
+    enabled: false
+  volumeMounts:
+    - name: pipeline
+      mountPath: /usr/share/logstash/files
+  elasticsearch:
+    host: ${SERVICE_NAME}-es-master
+    port: 9200
+  configTpl:
+    xpack.monitoring.enabled: "false"
+    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
+    db.user: hmcts
+    db.pwd: hmcts
+    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
+  livenessProbe:
+    initialDelaySeconds: 90
