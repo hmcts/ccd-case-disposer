@@ -1,4 +1,14 @@
 
+java:
+  environment:
+    DATA_STORE_DB_NAME: data-store
+    DATA_STORE_DB_USERNAME: hmcts
+    DATA_STORE_DB_PASSWORD: hmcts
+    DEFINITION_STORE_HOST: http://ccd-definition-store-${SERVICE_FQDN}
+    USER_PROFILE_HOST: http://ccd-user-profile-api-${SERVICE_FQDN}
+  postgresql:
+    enabled: false # CCD chart includes an instance we'll re-use
+
 ccd:
   enabled: true
   ccd:
