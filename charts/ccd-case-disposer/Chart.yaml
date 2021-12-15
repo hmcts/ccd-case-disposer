@@ -21,3 +21,7 @@ dependencies:
   - name: java
     version: 3.6.0
     repository: '@hmctspublic'
+  - name: ccd
+    version: 5.0.7
+    repository: '@hmctspublic'
+    condition: ccd.enabled
