@@ -4,7 +4,7 @@ ccd:
     java:
       environment:
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        ELASTIC_SEARCH_HOST: {{ .Release.Name }}-es-master
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
 
 elastic:
@@ -39,13 +39,13 @@ logstash:
     - name: pipeline
       mountPath: /usr/share/logstash/files
   elasticsearch:
-    host: ${SERVICE_NAME}-es-master
+    host: {{ .Release.Name }}-es-master
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
-    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
+    db.url: jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
     db.user: hmcts
     db.pwd: hmcts
-    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
+    es.data.nodes.url: http://{{ .Release.Name }}-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
