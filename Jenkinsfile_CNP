@@ -53,9 +53,12 @@ withPipeline(type, product, component) {
     // Set required environment variables to run functional tests apart from one in vaults.
     env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql.service.core-compute-preview.internal"
     env.DATA_STORE_DB_PORT = "5432"
-    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://ccd-case-disposer-pr-${CHANGE_ID}-es-master.service.core-compute-preview.internal:9200"
+    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal:9200"
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
     // (or hardcode standard java chart username/password of postgres)
+
+    // test if Elasticsearch is reachable
+    curl "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal:9200"
 
     echo "Verifying that functional test run correctly"
     try {
