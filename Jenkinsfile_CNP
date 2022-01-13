@@ -57,6 +57,9 @@ withPipeline(type, product, component) {
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
     // (or hardcode standard java chart username/password of postgres)
 
+    // test if Postgres is reachable
+    sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql.service.core-compute-preview.internal 5432"
+
     // test if Elasticsearch is reachable
     sh "nc -zv es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal 9200"
 
