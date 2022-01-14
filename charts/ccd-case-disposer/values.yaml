@@ -1,6 +1,6 @@
 elastic:
   enabled: false
-ccd:
+postgresql:
   enabled: false
 
 java:

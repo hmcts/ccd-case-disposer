@@ -6,9 +6,6 @@ job:
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
-  environment:
-    postgresqlUsername: "{{ .Values.postgresql.postgresqlUsername }}"
-    postgresqlPassword: "{{ .Values.postgresql.postgresqlPassword }}"
 global:
   jobKind: CronJob
 
