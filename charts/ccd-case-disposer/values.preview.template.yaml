@@ -6,6 +6,9 @@ job:
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
+  environment:
+    postgresqlUsername: "{{ .Values.postgresql.postgresqlUsername }}"
+    postgresqlPassword: "{{ .Values.postgresql.postgresqlPassword }}"
 global:
   jobKind: CronJob
 
@@ -54,90 +57,94 @@ logstash:
   livenessProbe:
     initialDelaySeconds: 90
 
-
-ccd:
+postgresql:
   enabled: true
-  ccd:
-    adminWeb:
-      enabled: false
-    definitionImporter:
-      enabled: false
-    userProfileImporter:
-      enabled: false
-    apiGatewayWeb:
-      enabled: false
-    postgresql:
-      enabled: true
-      networkPolicy:
-        enabled: true
-    s2s:
-      enabled: false
-    elastic:
-      enabled: false
-    ras:
-      enabled: false
+  networkPolicy:
+    enabled: true
 
-  ingressHost: ${SERVICE_FQDN}
-
-  global:
-    ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
-    ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
-    ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
-    dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
-    idamApiUrl: https://idam-api.aat.platform.hmcts.net
-    idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
-    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
-    enableKeyVaults: true
-    devMode: true
-
-  ccd-definition-store-api:
-    java:
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
-      ingressHost: ccd-definition-store-${SERVICE_FQDN}
-      imagePullPolicy: Always
-      environment:
-        ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
-        ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
-        DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
-        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_document_am_api
-        OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
-      devmemoryRequests: "1024Mi"
-      devmemoryLimits: "2048Mi"
-      keyVaults: [ ]
-
-  ccd-data-store-api:
-    java:
-      image: hmctspublic.azurecr.io/ccd/data-store-api:latest
-      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
-      imagePullPolicy: Always
-      memoryRequests: '1524Mi'
-      cpuRequests: '900m'
-      environment:
-        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
-        DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
-        DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps
-        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-        IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
-        IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
-        IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps
-        ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
-        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
-        HTTP_CLIENT_READ_TIMEOUT: '120000'
-        HTTP_CLIENT_MAX_TOTAL: '300'
-        HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
-        DATA_STORE_DB_MAX_POOL_SIZE: 80
-        CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
-        CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
-        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
-        IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
-        IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
-        IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
-      keyVaults: [ ]
-      autoscaling:
-        enabled: false
+#ccd:
+#  enabled: true
+#  ccd:
+#    adminWeb:
+#      enabled: false
+#    definitionImporter:
+#      enabled: false
+#    userProfileImporter:
+#      enabled: false
+#    apiGatewayWeb:
+#      enabled: false
+#    postgresql:
+#      enabled: true
+#      networkPolicy:
+#        enabled: true
+#    s2s:
+#      enabled: false
+#    elastic:
+#      enabled: false
+#    ras:
+#      enabled: false
+#
+#  ingressHost: ${SERVICE_FQDN}
+#
+#  global:
+#    ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
+#    ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
+#    ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
+#    dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
+#    idamApiUrl: https://idam-api.aat.platform.hmcts.net
+#    idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
+#    s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+#    ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
+#    enableKeyVaults: true
+#    devMode: true
+#
+#  ccd-definition-store-api:
+#    java:
+#      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
+#      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+#      imagePullPolicy: Always
+#      environment:
+#        ELASTIC_SEARCH_ENABLED: true
+#        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+#        ELASTIC_SEARCH_FAIL_ON_IMPORT: true
+#        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+#        DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
+#        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+#        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_document_am_api
+#        OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
+#      devmemoryRequests: "1024Mi"
+#      devmemoryLimits: "2048Mi"
+#      keyVaults: [ ]
+#
+#  ccd-data-store-api:
+#    java:
+#      image: hmctspublic.azurecr.io/ccd/data-store-api:latest
+#      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+#      imagePullPolicy: Always
+#      memoryRequests: '1524Mi'
+#      cpuRequests: '900m'
+#      environment:
+#        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+#        DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
+#        DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps
+#        IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
+#        IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
+#        IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
+#        IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+#        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps
+#        ELASTIC_SEARCH_ENABLED: true
+#        ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
+#        ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+#        HTTP_CLIENT_READ_TIMEOUT: '120000'
+#        HTTP_CLIENT_MAX_TOTAL: '300'
+#        HTTP_CLIENT_MAX_CLIENT_PER_ROUTE: '30'
+#        DATA_STORE_DB_MAX_POOL_SIZE: 80
+#        CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
+#        CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
+#        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
+#        IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
+#        IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
+#        IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
+#      keyVaults: [ ]
+#      autoscaling:
+#        enabled: false
