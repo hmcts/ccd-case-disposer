@@ -68,8 +68,10 @@ ccd:
       enabled: false
     postgresql:
       enabled: true
-      networkPolicy:
-        enabled: true
+      service:
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
     s2s:
       enabled: false
     elastic:
