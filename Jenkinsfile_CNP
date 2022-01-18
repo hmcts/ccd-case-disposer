@@ -54,6 +54,8 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql.service.core-compute-preview.internal"
     env.DATA_STORE_DB_PORT = "5432"
     env.DATA_STORE_DB_NAME = "data-store"
+    env.DATA_STORE_DB_USERNAME = ""
+    env.DATA_STORE_DB_PASSWORD = ""
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
     // (or hardcode standard java chart username/password of postgres)
