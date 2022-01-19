@@ -68,10 +68,6 @@ ccd:
       enabled: false
     postgresql:
       enabled: true
-      service:
-        type: LoadBalancer
-        annotations:
-          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
     s2s:
       enabled: false
     elastic:
@@ -143,3 +139,9 @@ ccd:
       keyVaults: [ ]
       autoscaling:
         enabled: false
+
+  postgresql:
+    service:
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
