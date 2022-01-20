@@ -140,8 +140,8 @@ ccd:
       autoscaling:
         enabled: false
 
-  postgresql:
-    service:
-      type: LoadBalancer
-      annotations:
-        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+postgresql:
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-internal: "true"
