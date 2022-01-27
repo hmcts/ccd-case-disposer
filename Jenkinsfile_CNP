@@ -51,7 +51,7 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
 
     // Set required environment variables to run functional tests apart from one in vaults.
-    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql.service.core-compute-preview.internal"
+    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local"
     env.DATA_STORE_DB_PORT = "5432"
     env.DATA_STORE_DB_NAME = "data-store"
     env.DATA_STORE_DB_USERNAME = "hmcts"
@@ -64,7 +64,7 @@ withPipeline(type, product, component) {
     sh "nc -zv es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal 80"
 
     // test if Postgres is reachable
-    sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql.service.core-compute-preview.internal 5432"
+    sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
 
     echo "Verifying that functional test run correctly"
     try {
