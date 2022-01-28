@@ -146,13 +146,15 @@ dependencyManagement {
 repositories {
   mavenLocal()
   mavenCentral()
-  jcenter()
+  maven {
+    url 'https://jitpack.io'
+  }
 }
 
 def versions = [
   junit           : '5.7.2',
   junitPlatform   : '1.7.2',
-  reformLogging   : '5.1.7',
+  reformLogging   : '5.1.9',
   elasticsearch   : '6.8.17',
   testcontainers  : '1.16.0',
   springBoot      : springBoot.class.package.implementationVersion
@@ -181,8 +183,8 @@ dependencies {
     exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
   }
 
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging', version: versions.reformLogging
-  implementation group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
 
   implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.7.Final'
   runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.23'
