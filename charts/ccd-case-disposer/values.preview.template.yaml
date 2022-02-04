@@ -144,5 +144,5 @@ ccd:
     service:
       type: LoadBalancer
       annotations:
-        external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_NAME}.
+        external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}.
         service.beta.kubernetes.io/azure-load-balancer-internal: "true"
