@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,8 +27,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.INDEX_NAME_PATTERN;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_ENTITY_10;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_ENTITY_11;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.YESTERDAY;
 
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +58,8 @@ class CaseDeletionServiceTest {
         final CaseFamily caseFamily = new CaseFamily(caseData, emptyList());
 
         doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
-        doNothing().when(caseDataRepository).deleteById(anyLong());
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(anyLong());
+        doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
@@ -61,7 +67,8 @@ class CaseDeletionServiceTest {
 
         verify(caseLinkRepository, never()).deleteById(any(CaseLinkPrimaryKey.class));
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
-        verify(caseDataRepository).deleteById(1L);
+        verify(caseDataRepository).findById(1L);
+        verify(caseDataRepository).delete(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
     }
 
@@ -73,20 +80,64 @@ class CaseDeletionServiceTest {
 
         final CaseFamily caseFamily = new CaseFamily(caseData, List.of(linkedCaseData1, linkedCaseData2));
 
-        doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
-        doNothing().when(caseDataRepository).deleteById(anyLong());
-        doNothing().when(caseLinkRepository).deleteById(any(CaseLinkPrimaryKey.class));
+        List.of(1L, 10L, 11L)
+            .forEach(caseId -> {
+                         doNothing().when(caseEventRepository).deleteByCaseDataId(caseId);
+                         doReturn(
+                             Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                             Optional.of(LINKED_CASE_ENTITY_10),
+                             Optional.of(LINKED_CASE_ENTITY_11)
+                         ).when(caseDataRepository).findById(caseId);
+                     }
+            );
+        doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
         underTest.deleteCase(caseFamily);
 
-        verify(caseLinkRepository).deleteById(new CaseLinkPrimaryKey(1L, 10L));
-        verify(caseLinkRepository).deleteById(new CaseLinkPrimaryKey(1L, 11L));
-        verify(caseEventRepository, times(3)).deleteByCaseDataId(anyLong());
-        verify(caseDataRepository).deleteById(1L);
-        verify(caseDataRepository).deleteById(10L);
-        verify(caseDataRepository).deleteById(11L);
+        List.of(1L, 10L, 11L).forEach(caseId -> {
+            verify(caseEventRepository).deleteByCaseDataId(caseId);
+            verify(caseDataRepository).findById(caseId);
+        });
+        verify(caseDataRepository, times(3)).delete(any(CaseDataEntity.class));
+        verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
+        verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 10L);
+        verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 11L);
+    }
+
+    @Test
+    void TODO_testDeleteCaseWithLinkedCases_TODO() {
+        final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, null);
+        final CaseData linkedCaseData1 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, YESTERDAY, caseData);
+        final CaseData linkedCaseData2 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, YESTERDAY, caseData);
+
+        final CaseFamily caseFamily = new CaseFamily(caseData, List.of(linkedCaseData1, linkedCaseData2));
+
+        List.of(1L, 10L, 11L)
+            .forEach(caseId -> {
+                         doNothing().when(caseEventRepository).deleteByCaseDataId(caseId);
+                         doReturn(
+                             Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                             Optional.of(LINKED_CASE_ENTITY_10),
+                             Optional.of(LINKED_CASE_ENTITY_11)
+                         ).when(caseDataRepository).findById(caseId);
+                     }
+            );
+        doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
+//        doNothing().when(caseLinkRepository).deleteById(any(CaseLinkPrimaryKey.class));
+        doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
+        doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
+
+        underTest.deleteCase(caseFamily);
+
+//        verify(caseLinkRepository).deleteById(new CaseLinkPrimaryKey(1L, 10L));
+//        verify(caseLinkRepository).deleteById(new CaseLinkPrimaryKey(1L, 11L));
+        List.of(1L, 10L, 11L).forEach(caseId -> {
+            verify(caseEventRepository).deleteByCaseDataId(caseId);
+            verify(caseDataRepository).findById(caseId);
+        });
+        verify(caseDataRepository, times(3)).delete(any(CaseDataEntity.class));
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 10L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 11L);

@@ -25,6 +25,7 @@ public class ApplicationExecutor {
     public void execute() {
         log.info("Case-Disposer started...");
         final List<CaseFamily> casesDueDeletion = caseFindingService.findCasesDueDeletion();
+        casesDueDeletion.forEach(caseDeletionService::deleteLinkedCases);
         casesDueDeletion.forEach(caseDeletionService::deleteCase);
         log.info("Case-Disposer finished.");
     }

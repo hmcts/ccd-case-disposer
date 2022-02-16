@@ -278,6 +278,35 @@ public class TestDataProvider {
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
                        "FT_MultiplePages", List.of(1504259907353526L)
                 )
+            ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                "scenarios/S-015.sql",
+                List.of(1L, 2L, 3L),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
+                emptyList(),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
+                Map.of("FT_MasterCaseType", emptyList())
+            ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                "scenarios/S-016.sql",
+                List.of(1L, 2L, 3L, 4L, 5L),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
+                                                    1504259907353526L, 1504259907353525L)),
+                emptyList(),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
+                                                    1504259907353526L, 1504259907353525L)),
+                Map.of("FT_MasterCaseType", emptyList())
+            ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                "scenarios/S-017-cyclically-linked-cases.sql",
+                List.of(1L, 2L),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
+                emptyList(),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
+                Map.of("FT_MasterCaseType", emptyList())
             )
         );
     }
