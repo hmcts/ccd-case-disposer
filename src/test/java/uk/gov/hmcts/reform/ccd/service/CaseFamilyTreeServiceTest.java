@@ -175,8 +175,8 @@ class CaseFamilyTreeServiceTest {
         assertThat(caseFamily)
             .isNotNull()
             .satisfies(item -> {
-                assertThat(item.getRootAncestor().getId()).isEqualTo(1L);
-                assertThat(item.getFamilyMembers()).isEmpty();
+                assertThat(item.getRootCase().getId()).isEqualTo(1L);
+                assertThat(item.getLinkedCases()).isEmpty();
             });
     }
 
@@ -195,8 +195,8 @@ class CaseFamilyTreeServiceTest {
         assertThat(caseFamily)
             .isNotNull()
             .satisfies(item -> {
-                assertThat(item.getRootAncestor().getId()).isEqualTo(1L);
-                assertThat(item.getFamilyMembers())
+                assertThat(item.getRootCase().getId()).isEqualTo(1L);
+                assertThat(item.getLinkedCases())
                     .singleElement()
                     .satisfies(member -> {
                         assertThat(member.getId()).isEqualTo(10L);
@@ -222,8 +222,8 @@ class CaseFamilyTreeServiceTest {
         assertThat(caseFamily)
             .isNotNull()
             .satisfies(item -> {
-                assertThat(item.getRootAncestor().getId()).isEqualTo(1L);
-                assertThat(item.getFamilyMembers())
+                assertThat(item.getRootCase().getId()).isEqualTo(1L);
+                assertThat(item.getLinkedCases())
                     .hasSize(2)
                     .satisfies(members -> {
                         final CaseData member1 = members.get(0);
@@ -259,8 +259,8 @@ class CaseFamilyTreeServiceTest {
         assertThat(caseFamily)
             .isNotNull()
             .satisfies(item -> {
-                assertThat(item.getRootAncestor().getId()).isEqualTo(1L);
-                assertThat(item.getFamilyMembers())
+                assertThat(item.getRootCase().getId()).isEqualTo(1L);
+                assertThat(item.getLinkedCases())
                     .hasSize(3)
                     .satisfies(members -> {
                         final CaseData member1 = members.get(0);
@@ -275,6 +275,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
+    @DisplayName("Get case families.")
     void testGetCaseFamilies() {
         final List<CaseDataEntity> expiredCases = List.of(
             DELETABLE_CASE_ENTITY_WITH_PAST_TTL,
@@ -323,28 +324,104 @@ class CaseFamilyTreeServiceTest {
             .hasSize(3)
             .satisfies(items -> {
                 final CaseFamily caseFamily1 = items.get(0);
-                final List<Long> familyMembers1 = caseFamily1.getFamilyMembers().stream()
+                final List<Long> familyMembers1 = caseFamily1.getLinkedCases().stream()
                     .map(CaseData::getId)
                     .collect(Collectors.toUnmodifiableList());
 
                 final CaseFamily caseFamily2 = items.get(1);
-                final List<Long> familyMembers2 = caseFamily2.getFamilyMembers().stream()
+                final List<Long> familyMembers2 = caseFamily2.getLinkedCases().stream()
                     .map(CaseData::getId)
                     .collect(Collectors.toUnmodifiableList());
 
                 final CaseFamily caseFamily3 = items.get(2);
-                final List<Long> familyMembers3 = caseFamily3.getFamilyMembers().stream()
+                final List<Long> familyMembers3 = caseFamily3.getLinkedCases().stream()
                     .map(CaseData::getId)
                     .collect(Collectors.toUnmodifiableList());
 
-                assertThat(caseFamily1.getRootAncestor().getId()).isEqualTo(1L);
+                assertThat(caseFamily1.getRootCase().getId()).isEqualTo(1L);
                 assertThat(familyMembers1).hasSize(3).hasSameElementsAs(List.of(10L, 11L, 100L));
 
-                assertThat(caseFamily2.getRootAncestor().getId()).isEqualTo(2L);
+                assertThat(caseFamily2.getRootCase().getId()).isEqualTo(2L);
                 assertThat(familyMembers2).hasSize(3).hasSameElementsAs(List.of(10L, 11L, 100L));
 
-                assertThat(caseFamily3.getRootAncestor().getId()).isEqualTo(1000L);
+                assertThat(caseFamily3.getRootCase().getId()).isEqualTo(1000L);
                 assertThat(familyMembers3).isEmpty();
+            });
+    }
+
+    @Test
+    @DisplayName("Get case families when cases are cyclically linked.")
+    void testGetCaseFamiliesScenario2() {
+        final List<CaseDataEntity> expiredCases = List.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL, LINKED_CASE_ENTITY_10);
+
+        final CaseLinkEntity caseLink1_10 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L)
+            .build();
+        final CaseLinkEntity caseLink10_1 = new CaseLinkEntityBuilder(10L, DELETABLE_CASE_TYPE, 1L)
+            .build();
+
+        doReturn(List.of(TestData.DELETABLE_CASE_TYPE)).when(parameterResolver).getDeletableCaseTypes();
+        doReturn(expiredCases).when(caseDataRepository).findExpiredCases(anyList());
+        doReturn(List.of(caseLink10_1)).when(caseLinkRepository).findByLinkedCaseId(1L);
+        doReturn(List.of(caseLink1_10)).when(caseLinkRepository).findByLinkedCaseId(10L);
+
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
+        doReturn(Optional.of(LINKED_CASE_ENTITY_10)).when(caseDataRepository).findById(10L);
+
+        doReturn(List.of(caseLink1_10)).when(caseLinkRepository).findByCaseId(1L);
+        doReturn(List.of(caseLink10_1)).when(caseLinkRepository).findByCaseId(10L);
+
+        final List<CaseFamily> caseFamilies = underTest.getCaseFamilies();
+
+        assertThat(caseFamilies)
+            .isNotEmpty()
+            .hasSize(2)
+            .satisfies(items -> {
+                final CaseFamily caseFamily1 = items.get(0);
+                final List<Long> familyMembers1 = caseFamily1.getLinkedCases().stream()
+                    .map(CaseData::getId)
+                    .collect(Collectors.toUnmodifiableList());
+
+                final CaseFamily caseFamily2 = items.get(1);
+                final List<Long> familyMembers2 = caseFamily2.getLinkedCases().stream()
+                    .map(CaseData::getId)
+                    .collect(Collectors.toUnmodifiableList());
+
+                assertThat(caseFamily1.getRootCase().getId()).isEqualTo(1L);
+                assertThat(familyMembers1).singleElement().isEqualTo(10L);
+
+                assertThat(caseFamily2.getRootCase().getId()).isEqualTo(10L);
+                assertThat(familyMembers2).singleElement().isEqualTo(1L);
+            });
+    }
+
+    @Test
+    @DisplayName("Get case families when cases are cyclically linked.")
+    void testGetCaseFamiliesScenario3() {
+        final List<CaseDataEntity> expiredCases = List.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
+
+        final CaseLinkEntity caseLink1_1 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 1L)
+            .build();
+
+        doReturn(List.of(TestData.DELETABLE_CASE_TYPE)).when(parameterResolver).getDeletableCaseTypes();
+        doReturn(expiredCases).when(caseDataRepository).findExpiredCases(anyList());
+        doReturn(List.of(caseLink1_1)).when(caseLinkRepository).findByLinkedCaseId(1L);
+
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
+
+        doReturn(List.of(caseLink1_1)).when(caseLinkRepository).findByCaseId(1L);
+
+        final List<CaseFamily> caseFamilies = underTest.getCaseFamilies();
+
+        assertThat(caseFamilies)
+            .isNotEmpty()
+            .singleElement()
+            .satisfies(caseFamily -> {
+                final List<Long> familyMembers = caseFamily.getLinkedCases().stream()
+                    .map(CaseData::getId)
+                    .collect(Collectors.toUnmodifiableList());
+
+                assertThat(caseFamily.getRootCase().getId()).isEqualTo(1L);
+                assertThat(familyMembers).singleElement().isEqualTo(1L);
             });
     }
 

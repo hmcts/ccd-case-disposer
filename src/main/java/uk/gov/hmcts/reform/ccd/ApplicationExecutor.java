@@ -9,6 +9,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.LINKED_FAMILIES_FUNCTION;
+
 @Slf4j
 @Named
 public class ApplicationExecutor {
@@ -25,8 +27,15 @@ public class ApplicationExecutor {
     public void execute() {
         log.info("Case-Disposer started...");
         final List<CaseFamily> casesDueDeletion = caseFindingService.findCasesDueDeletion();
-        casesDueDeletion.forEach(caseDeletionService::deleteLinkedCases);
-        casesDueDeletion.forEach(caseDeletionService::deleteCase);
+
+        casesDueDeletion.forEach(caseFamily -> {
+            final List<CaseFamily> linkedFamilies = LINKED_FAMILIES_FUNCTION.apply(casesDueDeletion,
+                                                                                   caseFamily.getLinkedCases());
+
+            caseDeletionService.deleteCases(linkedFamilies);
+            caseDeletionService.deleteCase(caseFamily);
+        });
+
         log.info("Case-Disposer finished.");
     }
 

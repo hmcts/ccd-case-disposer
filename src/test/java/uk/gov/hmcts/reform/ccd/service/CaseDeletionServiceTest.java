@@ -9,10 +9,12 @@ import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.List;
@@ -54,7 +56,7 @@ class CaseDeletionServiceTest {
 
     @Test
     void testDeleteCaseWithNoLinkedCases() {
-        final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, null);
+        final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, null);
         final CaseFamily caseFamily = new CaseFamily(caseData, emptyList());
 
         doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
@@ -74,21 +76,21 @@ class CaseDeletionServiceTest {
 
     @Test
     void testDeleteCaseWithLinkedCases() {
-        final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, null);
-        final CaseData linkedCaseData1 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, YESTERDAY, caseData);
-        final CaseData linkedCaseData2 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, YESTERDAY, caseData);
+        final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, null);
+        final CaseData linkedCaseData1 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, caseData);
+        final CaseData linkedCaseData2 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, caseData);
 
         final CaseFamily caseFamily = new CaseFamily(caseData, List.of(linkedCaseData1, linkedCaseData2));
 
         List.of(1L, 10L, 11L)
             .forEach(caseId -> {
-                         doNothing().when(caseEventRepository).deleteByCaseDataId(caseId);
-                         doReturn(
-                             Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
-                             Optional.of(LINKED_CASE_ENTITY_10),
-                             Optional.of(LINKED_CASE_ENTITY_11)
-                         ).when(caseDataRepository).findById(caseId);
-                     }
+                doNothing().when(caseEventRepository).deleteByCaseDataId(caseId);
+                    doReturn(
+                        Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                        Optional.of(LINKED_CASE_ENTITY_10),
+                        Optional.of(LINKED_CASE_ENTITY_11)
+                    ).when(caseDataRepository).findById(caseId);
+                }
             );
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
@@ -107,39 +109,22 @@ class CaseDeletionServiceTest {
     }
 
     @Test
-    void TODO_testDeleteCaseWithLinkedCases_TODO() {
-        final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, null);
-        final CaseData linkedCaseData1 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, YESTERDAY, caseData);
-        final CaseData linkedCaseData2 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, YESTERDAY, caseData);
+    void testDeleteLinkedCases() {
+        final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, null);
+        final CaseData linkedCaseData1 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, caseData);
+        final CaseData linkedCaseData2 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, caseData);
 
-        final CaseFamily caseFamily = new CaseFamily(caseData, List.of(linkedCaseData1, linkedCaseData2));
+        final CaseLinkEntity caseLinkEntity1 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L).build();
+        final CaseLinkEntity caseLinkEntity2 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 11L).build();
 
-        List.of(1L, 10L, 11L)
-            .forEach(caseId -> {
-                         doNothing().when(caseEventRepository).deleteByCaseDataId(caseId);
-                         doReturn(
-                             Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
-                             Optional.of(LINKED_CASE_ENTITY_10),
-                             Optional.of(LINKED_CASE_ENTITY_11)
-                         ).when(caseDataRepository).findById(caseId);
-                     }
-            );
-        doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
-//        doNothing().when(caseLinkRepository).deleteById(any(CaseLinkPrimaryKey.class));
-        doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
-        doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
+        doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
+            .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
+        doNothing().when(caseLinkRepository).delete(any(CaseLinkEntity.class));
 
-        underTest.deleteCase(caseFamily);
+        underTest.deleteLinkedCases(List.of(linkedCaseData1, linkedCaseData2));
 
-//        verify(caseLinkRepository).deleteById(new CaseLinkPrimaryKey(1L, 10L));
-//        verify(caseLinkRepository).deleteById(new CaseLinkPrimaryKey(1L, 11L));
-        List.of(1L, 10L, 11L).forEach(caseId -> {
-            verify(caseEventRepository).deleteByCaseDataId(caseId);
-            verify(caseDataRepository).findById(caseId);
-        });
-        verify(caseDataRepository, times(3)).delete(any(CaseDataEntity.class));
-        verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
-        verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 10L);
-        verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 11L);
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
+        verify(caseLinkRepository, times(2)).delete(any(CaseLinkEntity.class));
     }
 }

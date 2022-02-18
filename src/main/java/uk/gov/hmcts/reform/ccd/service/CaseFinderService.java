@@ -66,8 +66,8 @@ public class CaseFinderService {
 
     private boolean isCaseFamilyRetainable(final CaseFamily caseFamily) {
         return Stream.concat(
-                Stream.of(caseFamily.getRootAncestor()),
-                caseFamily.getFamilyMembers().stream()
+                Stream.of(caseFamily.getRootCase()),
+                caseFamily.getLinkedCases().stream()
             )
             .anyMatch(this::isCaseRetainable);
     }
@@ -83,8 +83,8 @@ public class CaseFinderService {
 
     private Set<Long> getCaseFamilyCaseIds(final CaseFamily caseFamily) {
         return Stream.concat(
-                Stream.of(caseFamily.getRootAncestor()),
-                caseFamily.getFamilyMembers().stream()
+                Stream.of(caseFamily.getRootCase()),
+                caseFamily.getLinkedCases().stream()
             )
             .map(CaseData::getId)
             .collect(Collectors.toUnmodifiableSet());
@@ -119,7 +119,7 @@ public class CaseFinderService {
         }
 
         return retentionList.stream()
-            .sorted(Comparator.comparing(caseFamily -> caseFamily.getRootAncestor().getId()))
+            .sorted(Comparator.comparing(caseFamily -> caseFamily.getRootCase().getId()))
             .collect(Collectors.toUnmodifiableList());
     }
 
@@ -133,8 +133,8 @@ public class CaseFinderService {
         final Set<Long> caseFamiliesToRetainCaseIds = getCaseFamiliesToRetainCaseIds(caseFamiliesToRetain);
 
         return caseFamilies.stream()
-            .filter(distinctByKey(caseFamily -> caseFamily.getRootAncestor().getId()))
-            .filter(caseFamily -> !caseFamiliesToRetainCaseIds.contains(caseFamily.getRootAncestor().getId()))
+            .filter(distinctByKey(caseFamily -> caseFamily.getRootCase().getId()))
+            .filter(caseFamily -> !caseFamiliesToRetainCaseIds.contains(caseFamily.getRootCase().getId()))
             .collect(Collectors.toUnmodifiableList());
     }
 

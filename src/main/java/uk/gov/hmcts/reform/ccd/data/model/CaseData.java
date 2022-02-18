@@ -10,5 +10,6 @@ public class CaseData {
     Long reference;
     String caseType;
     LocalDate resolvedTtl;
+    Long familyId;
     CaseData parentCase;
 }

@@ -78,7 +78,7 @@ class CaseFinderServiceTest {
                 assertThat(caseFamilies2)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(1L));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootCase().getId()).isEqualTo(1L));
             });
     }
 
@@ -100,7 +100,7 @@ class CaseFinderServiceTest {
                 assertThat(caseFamilies1)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(caseId));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootCase().getId()).isEqualTo(caseId));
                 assertThat(caseFamilies2).isEmpty();
             });
     }
@@ -136,11 +136,11 @@ class CaseFinderServiceTest {
                 assertThat(caseFamilies1)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(1L));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootCase().getId()).isEqualTo(1L));
                 assertThat(caseFamilies2)
                     .isNotEmpty()
                     .singleElement()
-                    .satisfies(caseFamily -> assertThat(caseFamily.getRootAncestor().getId()).isEqualTo(1000L));
+                    .satisfies(caseFamily -> assertThat(caseFamily.getRootCase().getId()).isEqualTo(1000L));
             });
     }
 
@@ -215,8 +215,8 @@ class CaseFinderServiceTest {
             .isNotEmpty()
             .satisfies(caseFamilies -> {
                 final List<Long> actualCaseIds = caseFamilies.stream()
-                    .map(caseFamily -> Stream.concat(Stream.of(caseFamily.getRootAncestor()),
-                                                     caseFamily.getFamilyMembers().stream()))
+                    .map(caseFamily -> Stream.concat(Stream.of(caseFamily.getRootCase()),
+                                                     caseFamily.getLinkedCases().stream()))
                     .map(entityStream -> entityStream.collect(Collectors.toUnmodifiableList()))
                     .flatMap(Collection::stream)
                     .map(CaseData::getId)
@@ -251,11 +251,11 @@ class CaseFinderServiceTest {
                 final CaseFamily resultCaseFamily1 = caseFamilies.get(0);
                 final CaseFamily resultCaseFamily2 = caseFamilies.get(1);
 
-                assertThat(resultCaseFamily1.getRootAncestor().getId()).isEqualTo(4L);
-                assertThat(resultCaseFamily1.getFamilyMembers()).isEmpty();
+                assertThat(resultCaseFamily1.getRootCase().getId()).isEqualTo(4L);
+                assertThat(resultCaseFamily1.getLinkedCases()).isEmpty();
 
-                assertThat(resultCaseFamily2.getRootAncestor().getId()).isEqualTo(5L);
-                assertThat(resultCaseFamily2.getFamilyMembers())
+                assertThat(resultCaseFamily2.getRootCase().getId()).isEqualTo(5L);
+                assertThat(resultCaseFamily2.getLinkedCases())
                     .isNotEmpty()
                     .singleElement()
                     .satisfies(caseData -> assertThat(caseData.getId()).isEqualTo(13L));

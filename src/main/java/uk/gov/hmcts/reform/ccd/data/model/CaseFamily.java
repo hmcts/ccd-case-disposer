@@ -6,6 +6,6 @@ import java.util.List;
 
 @Value
 public class CaseFamily {
-    CaseData rootAncestor;
-    List<CaseData> familyMembers;
+    CaseData rootCase;
+    List<CaseData> linkedCases;
 }

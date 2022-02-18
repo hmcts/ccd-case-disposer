@@ -70,7 +70,7 @@ public class TestDataProvider {
         return Stream.of(
             Arguments.of(
                 null,
-                "scenarios/S-001.sql",
+                "scenarios/S-001-no-case-types-specified-in-delete-request.sql",
                 List.of(1L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                 List.of(1L),
@@ -79,7 +79,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-002.sql",
+                "scenarios/S-002-no-cases-exist-for-the-specified-case-type-in-delete-request.sql",
                 List.of(1L),
                 Map.of("FT_MultiplePages", List.of(1504259907353529L)),
                 List.of(1L),
@@ -88,7 +88,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-003.sql",
+                "scenarios/S-003-resolved-ttl-is-in-the-future.sql",
                 List.of(1L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                 List.of(1L),
@@ -281,7 +281,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-015.sql",
+                "scenarios/S-015-case-links-three-levels-deep.sql",
                 List.of(1L, 2L, 3L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
                 emptyList(),
@@ -306,6 +306,15 @@ public class TestDataProvider {
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
                 emptyList(),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
+                Map.of("FT_MasterCaseType", emptyList())
+            ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                "scenarios/S-018-case-linked-to-itself.sql",
+                List.of(1L),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
+                emptyList(),
+                Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                 Map.of("FT_MasterCaseType", emptyList())
             )
         );

@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.data.model.CaseTreeNode;
-import uk.gov.hmcts.reform.ccd.data.model.LinkedEntity;
+import uk.gov.hmcts.reform.ccd.data.model.LinkedEntities;
 import uk.gov.hmcts.reform.ccd.exception.CaseDataNotFound;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
@@ -33,8 +33,8 @@ public class CaseFamilyTreeService {
     private final CaseLinkRepository caseLinkRepository;
     private final ParameterResolver parameterResolver;
 
-    private final Function<LinkedEntity<CaseDataEntity>, CaseTreeNode> parentNodesFunction = this::findParents;
-    private final Function<LinkedEntity<CaseData>, List<CaseData>> familyMembersFunction = this::findFamilyMembers;
+    private final Function<LinkedEntities<CaseDataEntity>, CaseTreeNode> parentNodesFunction = this::findParents;
+    private final Function<LinkedEntities<CaseData>, List<CaseData>> familyMembersFunction = this::findFamilyMembers;
     private final Function<CaseTreeNode, Set<CaseTreeNode>> leafNodesFunction = this::findLeafNodes;
 
     private static final String CASE_DATA_NOT_FOUND = "Case data for case_id=%d is not found";
@@ -60,25 +60,28 @@ public class CaseFamilyTreeService {
         return caseDataRepository.findExpiredCases(parameterResolver.getDeletableCaseTypes());
     }
 
-    private CaseTreeNode findParents(@NonNull final LinkedEntity<CaseDataEntity> linkedEntity) {
-        final CaseDataEntity caseDataEntity = linkedEntity.getT();
+    private CaseTreeNode findParents(@NonNull final LinkedEntities<CaseDataEntity> linkedEntities) {
+        final CaseDataEntity caseDataEntity = linkedEntities.getData();
         final List<CaseLinkEntity> parentEntities = caseLinkRepository.findByLinkedCaseId(caseDataEntity.getId());
 
         final List<CaseTreeNode> parentNodes = parentEntities.stream()
             .filter(distinctByKey(CaseLinkEntity::getCaseId))
-            .filter(x -> cyclicallyLinked(linkedEntity.getLinks(), x.getCaseId()))
+            .filter(entity -> cyclicallyLinked(linkedEntities.getLinks(), entity.getCaseId()))
             .map(parentEntity -> {
                 final Long caseId = parentEntity.getCaseId();
                 final Optional<CaseDataEntity> entity = caseDataRepository.findById(caseId);
                 return entity.map(parentCase -> {
-                        final List<Long> descendants = Stream.of(linkedEntity.getLinks(),
-                                                                 List.of(caseDataEntity.getId()))
-                            .flatMap(Collection::stream)
-                            .collect(Collectors.toUnmodifiableList());
+                    final List<Long> descendants = Stream.of(linkedEntities.getLinks(), List.of(caseDataEntity.getId()))
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toUnmodifiableList());
 
-                        return parentNodesFunction.apply(new LinkedEntity<>(parentCase, descendants));
-                    })
-                    .orElseThrow(() -> new CaseDataNotFound(String.format(CASE_DATA_NOT_FOUND, caseId)));
+                    final LinkedEntities<CaseDataEntity> linked = new LinkedEntities<>(
+                        parentCase,
+                        linkedEntities.getFamilyId(),
+                        descendants
+                    );
+                    return parentNodesFunction.apply(linked);
+                }).orElseThrow(() -> new CaseDataNotFound(String.format(CASE_DATA_NOT_FOUND, caseId)));
             })
             .collect(Collectors.toUnmodifiableList());
 
@@ -96,18 +99,18 @@ public class CaseFamilyTreeService {
             .collect(Collectors.toUnmodifiableSet());
     }
 
-    private List<CaseData> findFamilyMembers(@NonNull final LinkedEntity<CaseData> linkedEntity) {
-        final CaseData caseNode = linkedEntity.getT();
+    private List<CaseData> findFamilyMembers(@NonNull final LinkedEntities<CaseData> linkedEntities) {
+        final CaseData caseNode = linkedEntities.getData();
         final List<CaseData> members = new ArrayList<>();
         final List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseId(caseNode.getId());
         final List<CaseData> descendants = caseLinkEntities.stream()
-            .filter(x -> cyclicallyLinked(linkedEntity.getLinks(), x.getLinkedCaseId()))
+            .filter(x -> cyclicallyLinked(linkedEntities.getLinks(), x.getLinkedCaseId()))
             .map(caseLink -> {
                 final Long linkedCaseId = caseLink.getLinkedCaseId();
                 final Optional<CaseDataEntity> childEntity = caseDataRepository.findById(linkedCaseId);
                 return childEntity
                     .map(entity -> {
-                        final List<Long> ancestors = Stream.of(linkedEntity.getLinks(), List.of(caseNode.getId()))
+                        final List<Long> ancestors = Stream.of(linkedEntities.getLinks(), List.of(caseNode.getId()))
                             .flatMap(Collection::stream)
                             .collect(Collectors.toUnmodifiableList());
 
@@ -116,10 +119,17 @@ public class CaseFamilyTreeService {
                             entity.getReference(),
                             entity.getCaseType(),
                             entity.getResolvedTtl(),
+                            linkedEntities.getFamilyId(),
                             caseNode
                         );
                         members.add(caseData);
-                        return familyMembersFunction.apply(new LinkedEntity<>(caseData, ancestors));
+
+                        final LinkedEntities<CaseData> linked = new LinkedEntities<>(
+                            caseData,
+                            linkedEntities.getFamilyId(),
+                            ancestors
+                        );
+                        return familyMembersFunction.apply(linked);
                     })
                     .orElseThrow(() -> new CaseDataNotFound(String.format(CASE_DATA_NOT_FOUND, linkedCaseId)));
             })
@@ -142,8 +152,12 @@ public class CaseFamilyTreeService {
 
         final Set<CaseDataEntity> roots = expiredCases.stream()
             .map(caseDataEntity -> {
-                final LinkedEntity<CaseDataEntity> linkedEntity = new LinkedEntity<>(caseDataEntity, emptyList());
-                return parentNodesFunction.apply(linkedEntity);
+                final LinkedEntities<CaseDataEntity> linkedEntities = new LinkedEntities<>(
+                    caseDataEntity,
+                    null,
+                    emptyList()
+                );
+                return parentNodesFunction.apply(linkedEntities);
             })
             .map(leafNodesFunction)
             .flatMap(Collection::stream)
@@ -161,10 +175,17 @@ public class CaseFamilyTreeService {
             caseNode.getReference(),
             caseNode.getCaseType(),
             caseNode.getResolvedTtl(),
+            caseNode.getId(),
             null
         );
-        final LinkedEntity<CaseData> linkedEntity = new LinkedEntity<>(rootCaseData, emptyList());
-        final List<CaseData> familyMembers = familyMembersFunction.apply(linkedEntity);
+        final LinkedEntities<CaseData> linkedEntities = new LinkedEntities<>(
+            rootCaseData,
+            caseNode.getId(),
+            emptyList()
+        );
+
+        final List<CaseData> familyMembers = familyMembersFunction.apply(linkedEntities);
+
         return new CaseFamily(rootCaseData, familyMembers);
     }
 }

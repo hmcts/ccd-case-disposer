@@ -5,7 +5,8 @@ import lombok.Value;
 import java.util.List;
 
 @Value
-public class LinkedEntity<T> {
-    T t;
+public class LinkedEntities<T> {
+    T data;
+    Long familyId;
     List<Long> links;
 }
