@@ -97,7 +97,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-004.sql",
+                "scenarios/S-004-no-deletable-cases-present.sql",
                 List.of(1L, 2L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353528L)
@@ -112,7 +112,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-005.sql",
+                "scenarios/S-005-unexpired-cases-and-undeletable-case-types-present.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -128,7 +128,7 @@ public class TestDataProvider {
             // Scenario 6
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-005.sql",
+                "scenarios/S-005-unexpired-cases-and-undeletable-case-types-present.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -143,7 +143,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-007.sql",
+                "scenarios/S-007-deletable-case-linked-to-undeletable-ttl-case.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353527L)
@@ -158,7 +158,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-008.sql",
+                "scenarios/S-008-deletable-case-linked-to-undeletable-case-type-case.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353527L),
