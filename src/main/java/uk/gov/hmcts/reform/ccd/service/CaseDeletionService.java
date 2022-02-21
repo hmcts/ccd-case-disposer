@@ -39,12 +39,12 @@ public class CaseDeletionService {
     }
 
     @Transactional
-    public void deleteCases(List<CaseFamily> linkedFamilies) {
+    public void deleteCases(final List<CaseFamily> linkedFamilies) {
         linkedFamilies.forEach(caseFamily -> deleteLinkedCases(caseFamily.getLinkedCases()));
         linkedFamilies.forEach(this::deleteCase);
     }
 
-    public void deleteCase(final CaseFamily caseFamily) {
+    void deleteCase(final CaseFamily caseFamily) {
         try {
             final CaseData rootCaseData = caseFamily.getRootCase();
             final List<CaseData> linkedCases = caseFamily.getLinkedCases();
@@ -52,7 +52,7 @@ public class CaseDeletionService {
             linkedCases.forEach(this::deleteCaseData);
             deleteCaseData(rootCaseData);
             log.info("Deleted case.reference:: {}", rootCaseData.getReference());
-        } catch (Exception e) {
+        } catch (Exception e) { // Catch all exception
             log.error("some error");
         }
     }

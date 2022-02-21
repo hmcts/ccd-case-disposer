@@ -14,38 +14,28 @@ public class CaseFamilyUtil {
     private CaseFamilyUtil() {
     }
 
-    private static final Function<CaseFamily, List<CaseData>> FLATTEN_FUNCTION = caseFamily ->
-        Stream.of(List.of(caseFamily.getRootCase()), caseFamily.getLinkedCases())
-            .flatMap(List::stream)
-            .collect(Collectors.toUnmodifiableList());
+    private static final BiFunction<List<CaseFamily>, Function<CaseFamily, List<CaseData>>, List<CaseData>>
+        AGGREGATE_FUNCTION = (caseFamilies, func) -> caseFamilies.stream()
+        .map(func)
+        .flatMap(List::stream)
+        .collect(Collectors.toUnmodifiableList());
 
-    private static final Function<List<CaseFamily>, Function<CaseData, List<Long>>> AGGREGATE_FUNCTION =
-        caseFamilies -> linkedCase -> {
-            final List<CaseData> allCases = caseFamilies.stream()
-                .map(FLATTEN_FUNCTION)
+    public static final Function<List<CaseFamily>, List<CaseData>> FLATTEN_CASE_FAMILIES_FUNCTION = caseFamilies -> {
+        final Function<CaseFamily, List<CaseData>> func = caseFamily ->
+            Stream.of(List.of(caseFamily.getRootCase()), caseFamily.getLinkedCases())
                 .flatMap(List::stream)
                 .collect(Collectors.toUnmodifiableList());
 
-            return allCases.stream()
-                .filter(caseData -> caseData.getId().equals(linkedCase.getId()))
-                .map(CaseData::getFamilyId)
-                .collect(Collectors.toUnmodifiableList());
+        return AGGREGATE_FUNCTION.apply(caseFamilies, func);
+    };
+
+    public static final Function<List<CaseFamily>, List<CaseData>> POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION =
+        caseFamilies -> {
+            final Function<CaseFamily, List<CaseData>> func = caseFamily ->
+                caseFamily.getLinkedCases().isEmpty()
+                    ? List.of(caseFamily.getRootCase())
+                    : caseFamily.getLinkedCases();
+
+            return AGGREGATE_FUNCTION.apply(caseFamilies, func);
         };
-
-    public static final BiFunction<List<CaseFamily>, List<CaseData>, List<CaseFamily>> LINKED_FAMILIES_FUNCTION =
-        (caseFamilies, linkedCases) -> {
-            final Function<List<CaseData>, List<Long>> linkedFamilyIdsFunction = linked -> linked.stream()
-                .map(caseData -> AGGREGATE_FUNCTION.apply(caseFamilies).apply(caseData))
-                .flatMap(List::stream)
-                .collect(Collectors.toUnmodifiableList());
-
-            final Function<List<Long>, List<CaseFamily>> linkedFamiliesFunction =
-                linkedFamilyIds -> caseFamilies.stream()
-                    .filter(caseFamily -> linkedFamilyIds.contains(caseFamily.getRootCase().getFamilyId()))
-                    .collect(Collectors.toUnmodifiableList());
-
-            return linkedFamilyIdsFunction.andThen(linkedFamiliesFunction)
-                .apply(linkedCases);
-        };
-
 }

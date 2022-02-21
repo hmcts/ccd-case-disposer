@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -67,11 +67,11 @@ class ApplicationExecutorTest {
 
         doReturn(caseDataList)
             .when(caseFindingService).findCasesDueDeletion();
-        doNothing().when(caseDeletionService).deleteCase(any(CaseFamily.class));
+        doNothing().when(caseDeletionService).deleteCases(anyList());
 
         underTest.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(2)).deleteCase(any(CaseFamily.class));
+        verify(caseDeletionService, times(2)).deleteCases(anyList());
     }
 }
