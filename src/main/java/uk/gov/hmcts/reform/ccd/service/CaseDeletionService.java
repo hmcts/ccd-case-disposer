@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.util.Snooper;
 
 import java.util.List;
 import javax.inject.Inject;
@@ -24,36 +26,39 @@ public class CaseDeletionService {
     private final CaseLinkRepository caseLinkRepository;
     private final CaseDataElasticsearchOperations caseDataElasticsearchOperations;
     private final ParameterResolver parameterResolver;
+    private final Snooper snooper;
 
     @Inject
     public CaseDeletionService(final CaseDataRepository caseDataRepository,
                                final CaseEventRepository caseEventRepository,
                                final CaseLinkRepository caseLinkRepository,
                                final CaseDataElasticsearchOperations caseDataElasticsearchOperations,
-                               final ParameterResolver parameterResolver) {
+                               final ParameterResolver parameterResolver,
+                               final Snooper snooper) {
         this.caseDataRepository = caseDataRepository;
         this.caseEventRepository = caseEventRepository;
         this.caseLinkRepository = caseLinkRepository;
         this.caseDataElasticsearchOperations = caseDataElasticsearchOperations;
         this.parameterResolver = parameterResolver;
+        this.snooper = snooper;
     }
 
     @Transactional
-    public void deleteCases(final List<CaseFamily> linkedFamilies) {
+    public void deleteCases(@NonNull final List<CaseFamily> linkedFamilies) {
         linkedFamilies.forEach(caseFamily -> deleteLinkedCases(caseFamily.getLinkedCases()));
         linkedFamilies.forEach(this::deleteCase);
     }
 
     void deleteCase(final CaseFamily caseFamily) {
+        final CaseData rootCaseData = caseFamily.getRootCase();
         try {
-            final CaseData rootCaseData = caseFamily.getRootCase();
             final List<CaseData> linkedCases = caseFamily.getLinkedCases();
             log.info("About to delete case.reference:: {}", rootCaseData.getReference());
             linkedCases.forEach(this::deleteCaseData);
             deleteCaseData(rootCaseData);
             log.info("Deleted case.reference:: {}", rootCaseData.getReference());
         } catch (Exception e) { // Catch all exception
-            log.error("some error");
+            snooper.snoop(String.format("Could not delete case.reference:: %s", rootCaseData.getReference()), e);
         }
     }
 
@@ -69,7 +74,7 @@ public class CaseDeletionService {
                 .ifPresent(caseLinkRepository::delete);
             log.info("Deleted linked case.reference:: {}", caseData.getReference());
         } catch (Exception e) { // Catch all exception
-            log.error("Could not delete linked case.reference:: {}", caseData.getReference());
+            snooper.snoop(String.format("Could not delete linked case.reference:: %s", caseData.getReference()), e);
         }
     }
 

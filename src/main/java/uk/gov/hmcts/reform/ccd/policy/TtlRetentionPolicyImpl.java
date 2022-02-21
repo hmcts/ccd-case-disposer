@@ -7,8 +7,8 @@ import java.time.LocalDate;
 
 public class TtlRetentionPolicyImpl implements RetentionPolicy {
     @Override
-    public Boolean mustRetain(@NonNull final CaseData caseDataEntity) {
-        return !isExpired(caseDataEntity.getResolvedTtl());
+    public Boolean mustRetain(@NonNull final CaseData caseData) {
+        return !isExpired(caseData.getResolvedTtl());
     }
 
     private boolean isExpired(@NonNull final LocalDate caseTtl) {

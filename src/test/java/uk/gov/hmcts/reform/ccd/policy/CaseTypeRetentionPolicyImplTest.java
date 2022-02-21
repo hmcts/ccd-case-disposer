@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.policy;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -16,9 +17,11 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_TODAY_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.NON_DELETABLE_CASE_DATA_WITH_PAST_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.TODAY;
 
 @ExtendWith(MockitoExtension.class)
 class CaseTypeRetentionPolicyImplTest {
@@ -28,11 +31,29 @@ class CaseTypeRetentionPolicyImplTest {
     @InjectMocks
     private CaseTypeRetentionPolicyImpl underTest;
 
+    @Test
+    void testShouldRaiseNullPointerExceptionWhenNullValueIsProvided() {
+        // GIVEN
+        final CaseData caseData = null;
+
+        // WHEN/THEN
+        assertThatNullPointerException().isThrownBy(() -> underTest.mustRetain(caseData));
+    }
+
+    @Test
+    void testShouldRaiseNullPointerExceptionWhenCaseTypeIsNull() {
+        // GIVEN
+        final CaseData caseData = new CaseData(2L, 2L, null, TODAY, 2L, null);
+
+        // WHEN/THEN
+        assertThatNullPointerException().isThrownBy(() -> underTest.mustRetain(caseData));
+    }
+
     @ParameterizedTest
     @MethodSource("provideTestParams")
     void testMustRetain(final List<String> deletableCaseTypes,
-                                               final CaseData caseData,
-                                               final boolean flag) {
+                        final CaseData caseData,
+                        final boolean flag) {
         doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
 
         final Boolean result = underTest.mustRetain(caseData);

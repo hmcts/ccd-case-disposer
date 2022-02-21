@@ -262,4 +262,20 @@ class CaseFinderServiceTest {
             });
     }
 
+    @Test
+    void testFindCasesDueDeletionShouldReturnEmpty() {
+        final List<CaseData> linkedCases = List.of(LINKED_CASE_DATA_R101);
+        final CaseFamily caseFamily = new CaseFamily(DELETABLE_CASE_DATA5_WITH_PAST_TTL, linkedCases);
+
+        final List<CaseFamily> deletableCaseFamilies = List.of(caseFamily);
+
+        doReturn(deletableCaseFamilies).when(caseFamilyTreeService).getCaseFamilies();
+        doReturn(List.of(TestData.DELETABLE_CASE_TYPE)).when(parameterResolver).getDeletableCaseTypes();
+
+        final List<CaseFamily> casesDueDeletion = underTest.findCasesDueDeletion();
+
+        assertThat(casesDueDeletion)
+            .isEmpty();
+    }
+
 }

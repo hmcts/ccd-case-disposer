@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY2_WITH_PAST_TTL;
@@ -395,7 +396,7 @@ class CaseFamilyTreeServiceTest {
     }
 
     @Test
-    @DisplayName("Get case families when cases are cyclically linked.")
+    @DisplayName("Get case families when a case is linked back to itself.")
     void testGetCaseFamiliesScenario3() {
         final List<CaseDataEntity> expiredCases = List.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
 
@@ -423,6 +424,15 @@ class CaseFamilyTreeServiceTest {
                 assertThat(caseFamily.getRootCase().getId()).isEqualTo(1L);
                 assertThat(familyMembers).singleElement().isEqualTo(1L);
             });
+    }
+
+    @Test
+    void testThatNullPointerExceptionIsRaisedWhenNullCaseDataEntityIsPassedToBuildCaseFamily() {
+        // GIVEN
+        final CaseDataEntity caseNode = null;
+
+        // WHEN/THEN
+        assertThatNullPointerException().isThrownBy(() -> underTest.buildCaseFamily(caseNode));
     }
 
 }

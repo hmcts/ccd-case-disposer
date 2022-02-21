@@ -12,8 +12,8 @@ public class CaseTypeRetentionPolicyImpl implements RetentionPolicy {
     }
 
     @Override
-    public Boolean mustRetain(@NonNull final CaseData caseDataEntity) {
-        return !isDeletableCaseType(caseDataEntity.getCaseType());
+    public Boolean mustRetain(@NonNull final CaseData caseData) {
+        return !isDeletableCaseType(caseData.getCaseType());
     }
 
     private Boolean isDeletableCaseType(@NonNull final String caseType) {

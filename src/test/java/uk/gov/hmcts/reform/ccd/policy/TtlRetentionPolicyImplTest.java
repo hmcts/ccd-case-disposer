@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.policy;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -8,12 +9,32 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_FUTURE_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_TODAY_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 
 class TtlRetentionPolicyImplTest {
     private final TtlRetentionPolicyImpl underTest = new TtlRetentionPolicyImpl();
+
+    @Test
+    void testShouldRaiseNullPointerExceptionWhenNullValueIsProvided() {
+        // GIVEN
+        final CaseData caseData = null;
+
+        // WHEN/THEN
+        assertThatNullPointerException().isThrownBy(() -> underTest.mustRetain(caseData));
+    }
+
+    @Test
+    void testShouldRaiseNullPointerExceptionWhenDateIsNull() {
+        // GIVEN
+        final CaseData caseData = new CaseData(2L, 2L, DELETABLE_CASE_TYPE, null, 2L, null);
+
+        // WHEN/THEN
+        assertThatNullPointerException().isThrownBy(() -> underTest.mustRetain(caseData));
+    }
 
     @ParameterizedTest
     @MethodSource("provideTestParams")

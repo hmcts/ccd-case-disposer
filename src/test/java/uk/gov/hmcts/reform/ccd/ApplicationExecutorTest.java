@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_TODAY_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY2_WITH_PAST_TTL;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationExecutorTest {
@@ -53,11 +53,11 @@ class ApplicationExecutorTest {
             null
         );
         final CaseData caseData2 = new CaseData(
-            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getId(),
-            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getReference(),
-            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getCaseType(),
-            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA_WITH_TODAY_TTL.getId(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getReference(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getCaseType(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getResolvedTtl(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
             null
         );
         final List<CaseFamily> caseDataList = List.of(
