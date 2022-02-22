@@ -162,13 +162,13 @@ class CaseDeletionServiceTest {
         final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily);
         List.of(1L, 10L, 11L)
             .forEach(caseId -> {
-                         doNothing().when(caseEventRepository).deleteByCaseDataId(caseId);
-                         doReturn(
-                             Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
-                             Optional.of(LINKED_CASE_ENTITY_10),
-                             Optional.of(LINKED_CASE_ENTITY_11)
-                         ).when(caseDataRepository).findById(caseId);
-                     }
+                doNothing().when(caseEventRepository).deleteByCaseDataId(caseId);
+                    doReturn(
+                        Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                        Optional.of(LINKED_CASE_ENTITY_10),
+                        Optional.of(LINKED_CASE_ENTITY_11)
+                    ).when(caseDataRepository).findById(caseId);
+                }
             );
         doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
             .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
