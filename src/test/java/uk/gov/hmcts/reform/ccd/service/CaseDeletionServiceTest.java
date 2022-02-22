@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
@@ -22,7 +23,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -125,9 +128,13 @@ class CaseDeletionServiceTest {
         doThrow(IllegalArgumentException.class).when(caseEventRepository).deleteByCaseDataId(anyLong());
 
         // WHEN
-        underTest.deleteCase(caseFamily);
+        final Throwable thrown = catchThrowable(() -> underTest.deleteCase(caseFamily));
 
         // THEN
+        assertThat(thrown)
+            .isInstanceOf(CaseDeletionException.class)
+            .hasMessageStartingWith("Could not delete case.reference:: 1");
+
         verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(Exception.class));
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
         verifyNoInteractions(caseDataRepository);
@@ -200,9 +207,13 @@ class CaseDeletionServiceTest {
         doThrow(IllegalArgumentException.class).when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
 
         // WHEN
-        underTest.deleteLinkedCases(List.of(linkedCaseData1));
+        final Throwable thrown = catchThrowable(() -> underTest.deleteLinkedCases(List.of(linkedCaseData1)));
 
         // THEN
+        assertThat(thrown)
+            .isInstanceOf(CaseDeletionException.class)
+            .hasMessageStartingWith("Could not delete linked case.reference:: 10");
+
         verify(snooper).snoop(eq("Could not delete linked case.reference:: 10"), any(Exception.class));
         verify(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
         verifyNoMoreInteractions(caseLinkRepository);

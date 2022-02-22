@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
 
@@ -58,7 +59,10 @@ public class CaseDeletionService {
             deleteCaseData(rootCaseData);
             log.info("Deleted case.reference:: {}", rootCaseData.getReference());
         } catch (Exception e) { // Catch all exception
-            snooper.snoop(String.format("Could not delete case.reference:: %s", rootCaseData.getReference()), e);
+            final String errorMessage = String.format("Could not delete case.reference:: %s",
+                                                      rootCaseData.getReference());
+            snooper.snoop(errorMessage, e);
+            throw new CaseDeletionException(errorMessage, e);
         }
     }
 
@@ -74,7 +78,10 @@ public class CaseDeletionService {
                 .ifPresent(caseLinkRepository::delete);
             log.info("Deleted linked case.reference:: {}", caseData.getReference());
         } catch (Exception e) { // Catch all exception
-            snooper.snoop(String.format("Could not delete linked case.reference:: %s", caseData.getReference()), e);
+            final String errorMessage = String.format("Could not delete linked case.reference:: %s",
+                                                      caseData.getReference());
+            snooper.snoop(errorMessage, e);
+            throw new CaseDeletionException(errorMessage, e);
         }
     }
 
