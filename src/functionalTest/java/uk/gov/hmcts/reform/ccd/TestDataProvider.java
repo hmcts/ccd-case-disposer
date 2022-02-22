@@ -97,7 +97,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-004-no-deletable-cases-present.sql",
+                "scenarios/S-004-no-cases-due-deletion-present.sql",
                 List.of(1L, 2L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353528L)
@@ -112,7 +112,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-005-unexpired-cases-and-undeletable-case-types-present.sql",
+                "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -128,7 +128,7 @@ public class TestDataProvider {
             // Scenario 6
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-005-unexpired-cases-and-undeletable-case-types-present.sql",
+                "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -143,7 +143,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-007-deletable-case-linked-to-undeletable-ttl-case.sql",
+                "scenarios/S-007-deletable-case-linked-to-nondeletable-ttl-case.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353527L)
@@ -158,7 +158,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-008-deletable-case-linked-to-undeletable-case-type-case.sql",
+                "scenarios/S-008-case-due-deletion-linked-to-nondeletable-case-type-case.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                        "FT_MultiplePages", List.of(1504259907353527L),
@@ -176,7 +176,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-009.sql",
+                "scenarios/S-009-nondeletable-ttl-case-linked-to-deletable-case.sql",
                 List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
                                                     1504259907353527L, 1504259907353528L, 1504259907353529L
@@ -195,7 +195,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-010.sql",
+                "scenarios/S-010-deletable-cases-linked-to-multiple-nondeletable-cases.sql",
                 List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
                                                     1504259907353527L, 1504259907353528L, 1504259907353529L
@@ -214,7 +214,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-011.sql",
+                "scenarios/S-011-mix-bag-of-deletable-and-nondeletable-cases.sql",
                 List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353524L,
                                                     1504259907353525L, 1504259907353528L, 1504259907353529L
@@ -236,7 +236,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-012.sql",
+                "scenarios/S-012-multi-parent-case-when-one-parent-is-nondeletable-ttl-case.sql",
                 List.of(1L, 2L, 3L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
                        "FT_MultiplePages", List.of(1504259907353528L)
@@ -251,7 +251,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-013.sql",
+                "scenarios/S-013-cases-due-deletion-linked-to-third-level-deep-nondeletable-case.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -266,7 +266,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-014.sql",
+                "scenarios/S-014-nondeletable-multi-parent-case.sql",
                 List.of(1L, 2L, 3L, 4L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
                        "FT_MultiplePages", List.of(1504259907353526L)
@@ -290,7 +290,7 @@ public class TestDataProvider {
             ),
             Arguments.of(
                 "FT_MasterCaseType",
-                "scenarios/S-016.sql",
+                "scenarios/S-016-deletable-multi-parent-case.sql",
                 List.of(1L, 2L, 3L, 4L, 5L),
                 Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
                                                     1504259907353526L, 1504259907353525L)),
