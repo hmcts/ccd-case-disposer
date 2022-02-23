@@ -67,11 +67,11 @@ class ApplicationExecutorTest {
 
         doReturn(caseDataList)
             .when(caseFindingService).findCasesDueDeletion();
-        doNothing().when(caseDeletionService).deleteCases(anyList());
+        doNothing().when(caseDeletionService).deleteLinkedCaseFamilies(anyList());
 
         underTest.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(2)).deleteCases(anyList());
+        verify(caseDeletionService, times(2)).deleteLinkedCaseFamilies(anyList());
     }
 }

@@ -160,7 +160,7 @@ class CaseDeletionServiceTest {
         final List<CaseFamily> linkedFamilies = null;
 
         // WHEN/THEN
-        assertThatNullPointerException().isThrownBy(() -> underTest.deleteCases(linkedFamilies));
+        assertThatNullPointerException().isThrownBy(() -> underTest.deleteLinkedCaseFamilies(linkedFamilies));
     }
 
     @Test
@@ -185,7 +185,7 @@ class CaseDeletionServiceTest {
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
         // WHEN
-        underTest.deleteCases(linkedFamilies);
+        underTest.deleteLinkedCaseFamilies(linkedFamilies);
 
         // THEN
         List.of(1L, 10L, 11L).forEach(caseId -> {

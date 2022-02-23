@@ -45,9 +45,9 @@ public class CaseDeletionService {
     }
 
     @Transactional
-    public void deleteCases(@NonNull final List<CaseFamily> linkedFamilies) {
-        linkedFamilies.forEach(caseFamily -> deleteLinkedCases(caseFamily.getLinkedCases()));
-        linkedFamilies.forEach(this::deleteCase);
+    public void deleteLinkedCaseFamilies(@NonNull final List<CaseFamily> linkedCaseFamilies) {
+        linkedCaseFamilies.forEach(caseFamily -> deleteLinkedCases(caseFamily.getLinkedCases()));
+        linkedCaseFamilies.forEach(this::deleteCase);
     }
 
     void deleteCase(final CaseFamily caseFamily) {

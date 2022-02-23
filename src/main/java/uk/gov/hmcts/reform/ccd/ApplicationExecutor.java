@@ -42,7 +42,7 @@ public class ApplicationExecutor {
                                                                            caseFamiliesDueDeletion,
                                                                            subjectCaseData);
 
-            caseDeletionService.deleteCases(linkedFamilies);
+            caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
         });
         log.info("Case-Disposer finished.");
     }
