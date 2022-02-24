@@ -63,15 +63,16 @@ withPipeline(type, product, component) {
     // test if Elasticsearch is reachable
     sh "nc -zv es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal 80"
 
-    // test if Postgres is reachable
-    sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
-
-    echo "Verifying that functional test run correctly"
-    try {
-      builder.gradle('functional')
-    } finally {
-      junit '**/test-results/**/*.xml'
-    }
+    //  BLOCKED BY https://tools.hmcts.net/jira/browse/RDM-13045 and https://tools.hmcts.net/jira/browse/DTSPO-6431
+    //    // test if Postgres is reachable
+    //    sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
+    //
+    //    echo "Verifying that functional test run correctly"
+    //    try {
+    //      builder.gradle('functional')
+    //    } finally {
+    //      junit '**/test-results/**/*.xml'
+    //    }
   }
 
   after('functionalTest:preview') {
