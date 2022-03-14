@@ -149,7 +149,7 @@ def versions = [
   junit           : '5.7.2',
   junitPlatform   : '1.7.2',
   reformLogging   : '5.1.9',
-  elasticsearch   : '6.4.2',
+  elasticsearch   : '7.16.2',
   testcontainers  : '1.16.0',
   springBoot      : springBoot.class.package.implementationVersion
 ]
@@ -195,6 +195,9 @@ dependencies {
   implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
   implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: versions.elasticsearch
   implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: versions.elasticsearch
+
+  implementation 'co.elastic.clients:elasticsearch-java:8.1.0'
+
 
   testImplementation libraries.junit5
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', {
