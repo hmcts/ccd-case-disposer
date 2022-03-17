@@ -10,8 +10,8 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.xcontent.XContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +41,6 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.INDEX_NAME_PATTERN;
 )
 class CaseDataElasticsearchOperationsIntegrationTest extends TestElasticsearchFixture {
     private final List<String> caseTypes = List.of("aa", "bb");
-    private final String indexType = "_doc";
 
     @Inject
     private RestHighLevelClient elasticsearchClient;
@@ -79,8 +78,8 @@ class CaseDataElasticsearchOperationsIntegrationTest extends TestElasticsearchFi
         final BulkRequest bulkRequest = new BulkRequest();
         caseDataEntities.forEach(ThrowingConsumer.unchecked(data -> {
             final String value = objectMapper.writeValueAsString(data);
-            final IndexRequest indexRequest = new IndexRequest(caseIndex, indexType)
-                .source(value, XContentType.JSON);
+            final IndexRequest indexRequest = new IndexRequest(caseIndex)
+                    .source(value, XContentType.JSON);
 
             bulkRequest.add(indexRequest);
         }));
