@@ -102,5 +102,4 @@ withPipeline(type, product, component) {
       reportName           : "ccd-case-disposer Functional Test Report"
     ]
   }
-
 }
