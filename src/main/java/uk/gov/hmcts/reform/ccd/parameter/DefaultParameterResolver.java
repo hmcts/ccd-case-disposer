@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.ccd.parameter;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 
@@ -24,11 +26,14 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
+    @Value("#{'${deletable.case.types.simulation}'.split(',')}")
+    private List<String> deletableCaseTypeSimulation;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
-            .map(quotedHost -> quotedHost.replace("\"", "").strip())
-            .collect(toUnmodifiableList());
+                .map(quotedHost -> quotedHost.replace("\"", "").strip())
+                .collect(toUnmodifiableList());
     }
 
     @Override
@@ -49,7 +54,20 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Override
     public List<String> getDeletableCaseTypes() {
         return deletableCaseTypes.stream()
-            .map(quotedItem -> quotedItem.replace("\"", "").strip())
-            .collect(toUnmodifiableList());
+                .map(quotedItem -> quotedItem.replace("\"", "").strip())
+                .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public List<String> getDeletableCaseTypesSimulation() {
+        return deletableCaseTypeSimulation.stream()
+                .map(quotedItem -> quotedItem.replace("\"", "").strip())
+                .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public List<String> getAllDeletableCaseTypes() {
+        return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
+                .collect(Collectors.toList());
     }
 }

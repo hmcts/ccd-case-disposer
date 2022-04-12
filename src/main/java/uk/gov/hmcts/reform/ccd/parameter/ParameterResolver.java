@@ -12,4 +12,8 @@ public interface ParameterResolver {
     String getCasesIndexType();
 
     List<String> getDeletableCaseTypes();
+
+    List<String> getDeletableCaseTypesSimulation();
+
+    List<String> getAllDeletableCaseTypes();
 }

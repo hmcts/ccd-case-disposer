@@ -25,5 +25,6 @@ java:
           alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
   environment:
     DELETE_CASE_TYPES:
+    DELETE_CASE_TYPES_SIMULATION:
   global:
     jobKind: CronJob
