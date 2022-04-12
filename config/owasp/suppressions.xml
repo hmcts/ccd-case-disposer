@@ -38,10 +38,6 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-beans@.*$</packageUrl>
     <vulnerabilityName>CVE-2022-22965</vulnerabilityName>
   </suppress>
-  
-   @@ -18,19 +18,25 @@
-     <cve>CVE-2020-7712</cve>
-   </suppress>
 
   <suppress until="2022-04-25">
      <notes><![CDATA[
