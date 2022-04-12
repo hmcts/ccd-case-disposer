@@ -1,11 +1,19 @@
 package uk.gov.hmcts.reform.ccd.data.es;
 
+import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse.Failure;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryRequest;
-import org.elasticsearch.index.reindex.ScrollableHitSource;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,14 +23,14 @@ import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,63 +43,99 @@ class CaseDataElasticsearchOperationsTest {
     @InjectMocks
     private CaseDataElasticsearchOperations underTest;
 
-    private final BulkByScrollResponse bulkByScrollResponse = mock(BulkByScrollResponse.class);
+    private final SearchResponse searchResponse = mock(SearchResponse.class);
+    private final SearchHits searchHits = mock(SearchHits.class);
+    private final BulkResponse bulkResponse = mock(BulkResponse.class);
 
     private static final String CASE_INDEX = "test_case_index";
+    private static final String INDEX_TYPE = "_doc";
     private static final Long CASE_REFERENCE = 1902145L;
+    private static final String DOCUMENT_ID = UUID.randomUUID().toString();
+    private static final SearchHit SEARCH_HIT = new SearchHit(1, DOCUMENT_ID, null, null);
+    private static final SearchHit[] SEARCH_HIT_ARRAY = new SearchHit[1];
+
+    @BeforeAll
+    static void prepare() {
+        SEARCH_HIT_ARRAY[0] = SEARCH_HIT;
+    }
+
+    @BeforeEach
+    void setup() {
+        doReturn(INDEX_TYPE).when(parameterResolver).getCasesIndexType();
+        doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
+    }
 
     @Test
     void testShouldDeleteByReferenceSuccessfully() throws Exception {
-        doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
-        doReturn(bulkByScrollResponse).when(elasticsearchClient)
-                .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
-        doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
-        doReturn(emptyList()).when(bulkByScrollResponse).getBulkFailures();
+        doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        doReturn(searchHits).when(searchResponse).getHits();
+        doReturn(SEARCH_HIT_ARRAY).when(searchHits).getHits();
+        doReturn(bulkResponse).when(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
+        doReturn(new BulkItemResponse[0]).when(bulkResponse).getItems();
 
         underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE);
 
-        verify(elasticsearchClient)
-                .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+        verify(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        verify(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
     }
 
     @Test
-    void testShouldRaiseSearchFailuresWhenDeleteByReference() throws Exception {
-        doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
-        doReturn(bulkByScrollResponse).when(elasticsearchClient)
-                .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
-        doReturn(List.of(new ScrollableHitSource.SearchFailure(new Throwable())))
-                .when(bulkByScrollResponse).getSearchFailures();
-        doReturn(emptyList()).when(bulkByScrollResponse).getBulkFailures();
+    void testShouldRaiseDeleteFailuresWhenDeleteByReference() throws Exception {
+        final BulkItemResponse[] bulkItemResponses = new BulkItemResponse[1];
+        final Failure failure = new Failure(CASE_INDEX, INDEX_TYPE, DOCUMENT_ID, new Exception());
+        bulkItemResponses[0] = new BulkItemResponse(1, DocWriteRequest.OpType.DELETE, failure);
+        doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        doReturn(searchHits).when(searchResponse).getHits();
+        doReturn(SEARCH_HIT_ARRAY).when(searchHits).getHits();
+        doReturn(bulkResponse).when(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
+        doReturn(bulkItemResponses).when(bulkResponse).getItems();
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
-                .isThrownBy(() -> underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE))
-                .withMessage("Search failures occurred");
-        verify(elasticsearchClient)
-                .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+            .isThrownBy(() -> underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE))
+            .withMessage("Elasticsearch delete operation failed");
+        verify(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        verify(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
     }
 
     @Test
-    void testShouldRaiseElasticsearchFailuresWhenDeleteByReference() throws Exception {
-        doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
-        doReturn(bulkByScrollResponse).when(elasticsearchClient)
-                .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
-        doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
-        doReturn(List.of(new BulkItemResponse.Failure(CASE_INDEX, "_doc", "101", new Exception())))
-                .when(bulkByScrollResponse).getBulkFailures();
+    void testShouldRaiseUnexpectedOperationFailuresWhenDeleteByReference() throws Exception {
+        final String errorMessage = String.format(
+            "Unexpected operation: %s, expecting operation type to be of type DELETE",
+            DocWriteRequest.OpType.UPDATE
+        );
+        final BulkItemResponse[] bulkItemResponses = new BulkItemResponse[1];
+        bulkItemResponses[0] = new BulkItemResponse(1, DocWriteRequest.OpType.UPDATE, new UpdateResponse());
+        doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        doReturn(searchHits).when(searchResponse).getHits();
+        doReturn(SEARCH_HIT_ARRAY).when(searchHits).getHits();
+        doReturn(bulkResponse).when(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
+        doReturn(bulkItemResponses).when(bulkResponse).getItems();
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
-                .isThrownBy(() -> underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE))
-                .withMessage("Elasticsearch operation failures occurred");
-        verify(elasticsearchClient)
-                .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+            .isThrownBy(() -> underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE))
+            .withMessage(errorMessage);
+        verify(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        verify(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
     }
 
     @Test
     void testShouldRaiseExceptionWhenDeleteByQueryFails() throws Exception {
         doThrow(new IOException()).when(elasticsearchClient)
-                .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+            .search(any(SearchRequest.class), any(RequestOptions.class));
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
-                .isThrownBy(() -> underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE));
+            .isThrownBy(() -> underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE));
+    }
+
+    @Test
+    void testShouldDeleteByReferenceWhenFindCaseByReferenceReturnsEmpty() throws Exception {
+        doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        doReturn(searchHits).when(searchResponse).getHits();
+        doReturn(new SearchHit[0]).when(searchHits).getHits();
+
+        underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE);
+
+        verify(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        verify(elasticsearchClient, never()).bulk(any(BulkRequest.class), any(RequestOptions.class));
     }
 }

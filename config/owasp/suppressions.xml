@@ -20,7 +20,7 @@
 
   <suppress>
     <notes><![CDATA[
-        Elastic search 7.16.2
+        Elastic search 6.4.2
     ]]></notes>
     <cve>CVE-2018-17244</cve>
     <cve>CVE-2019-7611</cve>

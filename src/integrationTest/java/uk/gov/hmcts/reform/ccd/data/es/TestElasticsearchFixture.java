@@ -17,11 +17,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public abstract class TestElasticsearchFixture {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestElasticsearchFixture.class);
 
-    private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:7.16.2";
+    private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:6.4.2";
 
     private static final ElasticsearchContainer ELASTICSEARCH_CONTAINER = new ElasticsearchContainer(IMAGE)
-            .withLogConsumer(new Slf4jLogConsumer(LOGGER))
-            .waitingFor(Wait.forListeningPort());
+        .withLogConsumer(new Slf4jLogConsumer(LOGGER))
+        .waitingFor(Wait.forListeningPort());
 
     static {
         if (!ELASTICSEARCH_CONTAINER.isRunning()) {
@@ -30,12 +30,12 @@ public abstract class TestElasticsearchFixture {
     }
 
     public static class ElasticsearchInitializer
-            implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
         public void initialize(@NonNull ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils.addInlinedPropertiesToEnvironment(
-                    applicationContext,
-                    "elasticsearch.hosts=" + ELASTICSEARCH_CONTAINER.getHttpHostAddress()
+                applicationContext,
+                "elasticsearch.hosts=" + ELASTICSEARCH_CONTAINER.getHttpHostAddress()
             );
         }
     }
