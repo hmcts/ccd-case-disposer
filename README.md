@@ -43,20 +43,7 @@ by executing the following command:
   docker-compose up
 ```
 
-This will start the API container exposing the application's port
-(set to `4458` in this app).
-
-In order to test if the application is up, you can call its health endpoint:
-
-```bash
-  curl http://localhost:4458/health
-```
-
-You should get a response similar to this:
-
-```
-  {"status":"UP","diskSpace":{"status":"UP","total":249644974080,"free":137188298752,"threshold":10485760}}
-```
+This will start the API container and immediately attempt to delete qualifying case records from the data sources it's configured to connected to.
 
 ### Alternative script to run application
 
@@ -103,12 +90,24 @@ To run all integration tests execute the following command:
 ```
 
 ### Functional tests
-The tests are written using befta-fw library. To find out more about BEFTA Framework, see the
-[BEFTA-FW repository and its README](https://github.com/hmcts/befta-fw).
-
-These tests can be run using:
+The functional tests require Elasticsearch, which is not enable by default on the local `ccd-docker` setup, thus it should be enabled along with logstash with this command:
 ```bash
-export TEST_URL=http://localhost:4457
+./ccd enable elasticsearch logstash
+```
+
+The next step is to get both `ccd-definition-store-api` and `ccd-data-store-api` to use Elasticsearch and this is done by exporting the following environment variables:
+```bash
+export ES_ENABLED_DOCKER=true
+export ELASTIC_SEARCH_ENABLED=$ES_ENABLED_DOCKER
+export ELASTIC_SEARCH_FTA_ENABLED=$ES_ENABLED_DOCKER
+```
+
+Indices of the relevant case types are expected to be present in the Elasticsearch instance for the tests to work.
+The easiest way to get the indices created is to run the `ccd-data-store-api` functional tests at least once prior to running these functional tests.
+This is especially useful when testing locally.
+
+When the above steps are completed, run the functional tests using the following command:
+```bash
 ./gradlew functional
 ```
 

@@ -19,8 +19,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -30,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +38,7 @@ class CaseDataElasticsearchOperationsTest {
     @Mock
     private RestHighLevelClient elasticsearchClient;
     @Mock
-    private ApplicationParameters parameters;
+    private ParameterResolver parameterResolver;
 
     @InjectMocks
     private CaseDataElasticsearchOperations underTest;
@@ -60,8 +61,8 @@ class CaseDataElasticsearchOperationsTest {
 
     @BeforeEach
     void setup() {
-        doReturn(INDEX_TYPE).when(parameters).getCasesIndexType();
-        doReturn(1).when(parameters).getElasticsearchRequestTimeout();
+        doReturn(INDEX_TYPE).when(parameterResolver).getCasesIndexType();
+        doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
     }
 
     @Test
@@ -69,8 +70,7 @@ class CaseDataElasticsearchOperationsTest {
         doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
         doReturn(searchHits).when(searchResponse).getHits();
         doReturn(SEARCH_HIT_ARRAY).when(searchHits).getHits();
-        doReturn(bulkResponse).when(elasticsearchClient)
-            .bulk(any(BulkRequest.class), any(RequestOptions.class));
+        doReturn(bulkResponse).when(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
         doReturn(new BulkItemResponse[0]).when(bulkResponse).getItems();
 
         underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE);
@@ -87,8 +87,7 @@ class CaseDataElasticsearchOperationsTest {
         doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
         doReturn(searchHits).when(searchResponse).getHits();
         doReturn(SEARCH_HIT_ARRAY).when(searchHits).getHits();
-        doReturn(bulkResponse).when(elasticsearchClient)
-            .bulk(any(BulkRequest.class), any(RequestOptions.class));
+        doReturn(bulkResponse).when(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
         doReturn(bulkItemResponses).when(bulkResponse).getItems();
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
@@ -109,8 +108,7 @@ class CaseDataElasticsearchOperationsTest {
         doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
         doReturn(searchHits).when(searchResponse).getHits();
         doReturn(SEARCH_HIT_ARRAY).when(searchHits).getHits();
-        doReturn(bulkResponse).when(elasticsearchClient)
-            .bulk(any(BulkRequest.class), any(RequestOptions.class));
+        doReturn(bulkResponse).when(elasticsearchClient).bulk(any(BulkRequest.class), any(RequestOptions.class));
         doReturn(bulkItemResponses).when(bulkResponse).getItems();
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
@@ -127,5 +125,17 @@ class CaseDataElasticsearchOperationsTest {
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
             .isThrownBy(() -> underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE));
+    }
+
+    @Test
+    void testShouldDeleteByReferenceWhenFindCaseByReferenceReturnsEmpty() throws Exception {
+        doReturn(searchResponse).when(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        doReturn(searchHits).when(searchResponse).getHits();
+        doReturn(new SearchHit[0]).when(searchHits).getHits();
+
+        underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE);
+
+        verify(elasticsearchClient).search(any(SearchRequest.class), any(RequestOptions.class));
+        verify(elasticsearchClient, never()).bulk(any(BulkRequest.class), any(RequestOptions.class));
     }
 }

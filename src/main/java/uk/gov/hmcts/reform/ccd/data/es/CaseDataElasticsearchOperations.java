@@ -15,8 +15,8 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,26 +33,31 @@ public class CaseDataElasticsearchOperations {
     private static final String ELASTICSEARCH_DELETE_FAILURE = "Elasticsearch delete operation failed";
     private static final String UNEXPECTED_OPERATION_FAILURE = "Unexpected operation: %s, "
         + "expecting operation type to be of type DELETE";
+    private static final String CASE_NOT_FOUND = "Case.reference={} is not found in index={}";
 
     private final RestHighLevelClient elasticsearchClient;
-    private final ApplicationParameters parameters;
+    private final ParameterResolver parameterResolver;
 
     @Inject
     public CaseDataElasticsearchOperations(final RestHighLevelClient elasticsearchClient,
-                                           final ApplicationParameters parameters) {
+                                           final ParameterResolver parameterResolver) {
         this.elasticsearchClient = elasticsearchClient;
-        this.parameters = parameters;
+        this.parameterResolver = parameterResolver;
     }
 
     public void deleteByReference(final String caseIndex, final Long caseReference) {
         try {
             final List<String> documentIds = findCaseByReference(caseIndex, caseReference);
 
-            final BulkRequest request = buildBulkDeleteQueryRequest(caseIndex, documentIds);
+            if (documentIds.isEmpty()) {
+                log.info(CASE_NOT_FOUND, caseReference, caseIndex);
+            } else {
+                final BulkRequest request = buildBulkDeleteQueryRequest(caseIndex, documentIds);
 
-            final BulkResponse bulkResponse = elasticsearchClient.bulk(request, RequestOptions.DEFAULT);
+                final BulkResponse bulkResponse = elasticsearchClient.bulk(request, RequestOptions.DEFAULT);
 
-            handleBulkResponse(bulkResponse);
+                handleBulkResponse(bulkResponse);
+            }
         } catch (IOException e) {
             throw new ElasticsearchOperationException(e);
         }
@@ -64,10 +69,10 @@ public class CaseDataElasticsearchOperations {
             //.query(QueryBuilders.termsQuery(CASE_REFERENCE_FIELD, <list of case references>));
             .query(QueryBuilders.termQuery(CASE_REFERENCE_FIELD, caseReference))
             .from(0)
-            .timeout(new TimeValue(parameters.getElasticsearchRequestTimeout(), TimeUnit.SECONDS));
+            .timeout(new TimeValue(parameterResolver.getElasticsearchRequestTimeout(), TimeUnit.SECONDS));
 
         final SearchRequest searchRequest = new SearchRequest(caseIndex)
-            .types(parameters.getCasesIndexType())
+            .types(parameterResolver.getCasesIndexType())
             .source(searchSourceBuilder);
 
         final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
@@ -80,7 +85,10 @@ public class CaseDataElasticsearchOperations {
         final BulkRequest bulkRequest = new BulkRequest()
             .setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
 
-        documentIds.forEach(id -> bulkRequest.add(new DeleteRequest(caseIndex, parameters.getCasesIndexType(), id)));
+        documentIds.forEach(id -> {
+            final DeleteRequest deleteRequest = new DeleteRequest(caseIndex, parameterResolver.getCasesIndexType(), id);
+            bulkRequest.add(deleteRequest);
+        });
 
         return bulkRequest;
     }

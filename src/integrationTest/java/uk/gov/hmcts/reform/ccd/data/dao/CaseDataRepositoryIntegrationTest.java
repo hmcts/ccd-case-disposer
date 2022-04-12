@@ -3,22 +3,23 @@ package uk.gov.hmcts.reform.ccd.data.dao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.List;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.CASE_DATA_ENTITIES;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_WITH_PAST_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.YESTERDAY;
 
 class CaseDataRepositoryIntegrationTest extends TestRepositoryFixture {
     @Inject
     private TestEntityManager entityManager;
 
     @Inject
-    private ApplicationParameters parameters;
+    private ParameterResolver parameterResolver;
 
     @Inject
     private CaseDataRepository underTest;
@@ -30,16 +31,16 @@ class CaseDataRepositoryIntegrationTest extends TestRepositoryFixture {
 
     @Test
     void testFindExpiredCases() {
-        final List<CaseDataEntity> expiredCases = underTest.findExpiredCases(parameters.getDeletableCaseTypes());
+        final List<CaseDataEntity> expiredCases = underTest.findExpiredCases(parameterResolver.getDeletableCaseTypes());
 
         assertThat(expiredCases)
-            .hasSize(1)
-            .element(0)
+            .isNotEmpty()
+            .singleElement()
             .satisfies(item -> {
-                assertThat(item.getId()).isEqualTo(DELETABLE_CASE_WITH_PAST_TTL.getId());
-                assertThat(item.getReference()).isEqualTo(DELETABLE_CASE_WITH_PAST_TTL.getReference());
-                assertThat(item.getCaseType()).isEqualTo(DELETABLE_CASE_WITH_PAST_TTL.getCaseType());
-                assertThat(item.getResolvedTtl()).isEqualTo(DELETABLE_CASE_WITH_PAST_TTL.getResolvedTtl());
+                assertThat(item.getId()).isEqualTo(1L);
+                assertThat(item.getReference()).isEqualTo(1L);
+                assertThat(item.getCaseType()).isEqualTo(DELETABLE_CASE_TYPE);
+                assertThat(item.getResolvedTtl()).isEqualTo(YESTERDAY);
             });
     }
 }

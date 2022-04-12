@@ -20,8 +20,8 @@ class CaseEventRepositoryIntegrationTest extends TestRepositoryFixture {
 
         final Iterable<CaseEventEntity> entities = underTest.findAll();
         assertThat(entities)
-            .hasSize(1)
-            .element(0)
+            .isNotEmpty()
+            .singleElement()
             .satisfies(item -> assertThat(item.getCaseDataId()).isEqualTo(2));
     }
 

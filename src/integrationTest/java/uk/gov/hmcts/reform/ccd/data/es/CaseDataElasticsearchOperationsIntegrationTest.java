@@ -15,10 +15,11 @@ import org.elasticsearch.search.SearchHit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import uk.gov.hmcts.reform.ccd.ApplicationParameters;
+import uk.gov.hmcts.reform.ccd.config.ApplicationConfiguration;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,7 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.INDEX_NAME_PATTERN;
 
 @SpringBootTest(classes = {
-    ApplicationParameters.class,
+    ParameterResolver.class,
+    ApplicationConfiguration.class,
     ElasticsearchConfiguration.class,
     CaseDataElasticsearchOperations.class}
 )

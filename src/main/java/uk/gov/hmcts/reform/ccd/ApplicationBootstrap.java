@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 @Slf4j
 @SpringBootApplication
-@SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, its not a utility class
+@SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, it's not a utility class
 public class ApplicationBootstrap implements ApplicationRunner {
 
     @Inject
