@@ -51,7 +51,7 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
 
     // Set required environment variables to run functional tests apart from one in vaults.
-    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local"
+    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0"
     env.DATA_STORE_DB_PORT = "5432"
     env.DATA_STORE_DB_NAME = "data-store"
     env.DATA_STORE_DB_USERNAME = "hmcts"
