@@ -26,7 +26,7 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
-    @Value("#{'${deletable.case.types.simulation}'.split(',')}")
+    @Value("#{'${simulated.case.types}'.split(',')}")
     private List<String> deletableCaseTypeSimulation;
 
     @Override

@@ -28,7 +28,7 @@ elasticsearch:
     name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
 
 deletable.case.types: ${DELETE_CASE_TYPES:}
-deletable.case.types.simulation: ${DELETE_CASE_TYPES_SIMULATION:}
+simulated.case.types: ${SIMULATED_CASE_TYPES:}
 
 azure:
   application-insights:

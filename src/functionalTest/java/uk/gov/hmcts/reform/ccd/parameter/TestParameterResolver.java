@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 @SuppressWarnings("ALL")
 public class TestParameterResolver implements ParameterResolver {
     public static final String DELETABLE_CASE_TYPES_PROPERTY = "deletable.case.types";
-    public static final String DELETABLE_CASE_TYPES_PROPERTY_SIMULATION = "deletable.case.types.simulation";
+    public static final String DELETABLE_CASE_TYPES_PROPERTY_SIMULATION = "simulated.case.types";
 
     @Value("#{'${elasticsearch.hosts}'.split(',')}")
     private List<String> elasticsearchHosts;
