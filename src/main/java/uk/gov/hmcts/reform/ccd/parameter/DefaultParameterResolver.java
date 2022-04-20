@@ -24,6 +24,12 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
+    @Value("${dm.remote.store-app-url}")
+    private String dmRemoteStoreAppUrl;
+
+    @Value("${dm.remote.documents-delete-path}")
+    private String dmRemoteCaseDocumentsDeletePath;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -51,5 +57,10 @@ public class DefaultParameterResolver implements ParameterResolver {
         return deletableCaseTypes.stream()
             .map(quotedItem -> quotedItem.replace("\"", "").strip())
             .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public String getDocumentsDeleteUrl() {
+        return this.dmRemoteStoreAppUrl + this.dmRemoteCaseDocumentsDeletePath;
     }
 }

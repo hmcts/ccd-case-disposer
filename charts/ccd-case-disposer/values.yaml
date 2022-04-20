@@ -23,7 +23,12 @@ java:
           alias: DATA_STORE_DB_PASSWORD
         - name: ccd-ELASTIC-SEARCH-DATA-NODES-URL
           alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        - name: ccd-case-disposer-s2s-secret
+          alias: CCD_CASE_DISPOSER_IDAM_KEY
   environment:
     DELETE_CASE_TYPES:
+    IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    IDAM_S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DOCUMENT_MANAGEMENT_STORE_APP_URL: http://document-management-store-app-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
   global:
     jobKind: CronJob

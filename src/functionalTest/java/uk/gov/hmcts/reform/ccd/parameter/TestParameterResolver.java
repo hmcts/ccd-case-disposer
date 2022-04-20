@@ -24,6 +24,12 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
+    @Value("${dm.remote.store-app-url}")
+    private String dmRemoteStoreAppUrl;
+
+    @Value("${dm.remote.documents-delete-path}")
+    private String dmRemoteCaseDocumentsDeletePath;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -55,5 +61,10 @@ public class TestParameterResolver implements ParameterResolver {
         return Arrays.stream(result)
             .map(quotedItem -> quotedItem.replace("\"", "").strip())
             .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public String getDocumentsDeleteUrl() {
+        return this.dmRemoteStoreAppUrl + this.dmRemoteCaseDocumentsDeletePath;
     }
 }

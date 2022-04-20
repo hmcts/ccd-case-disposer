@@ -12,4 +12,6 @@ public interface ParameterResolver {
     String getCasesIndexType();
 
     List<String> getDeletableCaseTypes();
+
+    String getDocumentsDeleteUrl();
 }

@@ -3,6 +3,8 @@ spring:
     import: "optional:configtree:/mnt/secrets/ccd/"
   application:
     name: Case Disposer
+  main:
+    web-application-type: none
   jpa:
     database: postgresql
     show-sql: ${SHOW_SQL:true}
@@ -10,7 +12,7 @@ spring:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect
   datasource:
-    url: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5452}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
+    url: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5050}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
     username: ${DATA_STORE_DB_USERNAME:ccd}
     password: ${DATA_STORE_DB_PASSWORD:ccd}
     type: com.zaxxer.hikari.HikariDataSource
@@ -28,6 +30,19 @@ elasticsearch:
     name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
 
 deletable.case.types: ${DELETE_CASE_TYPES:""}
+
+dm:
+  remote:
+    store-app-url: ${DOCUMENT_MANAGEMENT_STORE_APP_URL:http://localhost:4603}
+    documents-delete-path: /documents/delete
+
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-auth:
+    name: ccd_case_disposer
+    url: ${IDAM_S2S_URL:http://localhost:4502}
+    secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
 
 azure:
   application-insights:
