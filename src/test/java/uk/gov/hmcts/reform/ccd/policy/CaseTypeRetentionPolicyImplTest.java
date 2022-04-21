@@ -54,7 +54,7 @@ class CaseTypeRetentionPolicyImplTest {
     void testMustRetain(final List<String> deletableCaseTypes,
                         final CaseData caseData,
                         final boolean flag) {
-        doReturn(deletableCaseTypes).when(parameterResolver).getDeletableCaseTypes();
+        doReturn(deletableCaseTypes).when(parameterResolver).getAllDeletableCaseTypes();
 
         final Boolean result = underTest.mustRetain(caseData);
 
