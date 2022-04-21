@@ -9,6 +9,8 @@ public interface ParameterResolver {
 
     String getCasesIndexNamePattern();
 
+    String getGlobalSearchIndexName();
+
     String getCasesIndexType();
 
     List<String> getDeletableCaseTypes();

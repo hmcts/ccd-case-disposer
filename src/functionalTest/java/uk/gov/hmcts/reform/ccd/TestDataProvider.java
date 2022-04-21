@@ -382,6 +382,17 @@ public class TestDataProvider {
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList()),
                         Map.of("FT_MultiplePages", List.of(1504259907353528L, 1504259907353527L))
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-022-global-search.sql",
+                        List.of(1L),
+                        Map.of("global_search", List.of(1504259907351111L)),
+                        emptyList(),
+                        emptyList(),
+                        Map.of("global_search", List.of(1504259907351111L)),
+                        Map.of("global_search", emptyList())
                 )
         );
     }
@@ -474,7 +485,10 @@ public class TestDataProvider {
     }
 
     private String getIndex(String caseType) {
-        return String.format("%s_cases", caseType.toLowerCase());
+        if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {
+            return String.format("%s_cases", caseType.toLowerCase());
+        }
+        return caseType;
     }
 
     private void refreshIndex(final String index) throws IOException {

@@ -23,6 +23,9 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
+    @Value("${elasticsearch.global.search.index.name}")
+    private String globalSearchIndexName;
+
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
@@ -44,6 +47,11 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Override
     public String getCasesIndexNamePattern() {
         return casesIndexNamePattern;
+    }
+
+    @Override
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
     }
 
     @Override

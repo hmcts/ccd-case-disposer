@@ -23,6 +23,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
+    @Value("${elasticsearch.global.search.index.name}")
+    private String globalSearchIndexName;
+
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
@@ -41,6 +44,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getCasesIndexNamePattern() {
         return casesIndexNamePattern;
+    }
+
+    @Override
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
     }
 
     @Override

@@ -26,6 +26,7 @@ elasticsearch:
   cases.index:
     type: ${ELASTICSEARCH_CASE_INDEX_TYPE:_doc}
     name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
+    global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
 
 deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}

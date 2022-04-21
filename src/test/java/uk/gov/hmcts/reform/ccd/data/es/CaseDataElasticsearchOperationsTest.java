@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,11 +39,13 @@ class CaseDataElasticsearchOperationsTest {
     private final BulkByScrollResponse bulkByScrollResponse = mock(BulkByScrollResponse.class);
 
     private static final String CASE_INDEX = "test_case_index";
+    private static final String GLOBAL_SEARCH_INDEX = "global_search";
     private static final Long CASE_REFERENCE = 1902145L;
 
     @Test
     void testShouldDeleteByReferenceSuccessfully() throws Exception {
         doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
+        doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
         doReturn(bulkByScrollResponse).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
         doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
@@ -50,13 +53,14 @@ class CaseDataElasticsearchOperationsTest {
 
         underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE);
 
-        verify(elasticsearchClient)
+        verify(elasticsearchClient, times(2))
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
     }
 
     @Test
     void testShouldRaiseSearchFailuresWhenDeleteByReference() throws Exception {
         doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
+        doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
         doReturn(bulkByScrollResponse).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
         doReturn(List.of(new ScrollableHitSource.SearchFailure(new Throwable())))
@@ -73,6 +77,7 @@ class CaseDataElasticsearchOperationsTest {
     @Test
     void testShouldRaiseElasticsearchFailuresWhenDeleteByReference() throws Exception {
         doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
+        doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
         doReturn(bulkByScrollResponse).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
         doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
@@ -88,6 +93,7 @@ class CaseDataElasticsearchOperationsTest {
 
     @Test
     void testShouldRaiseExceptionWhenDeleteByQueryFails() throws Exception {
+        doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
         doThrow(new IOException()).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
 

@@ -37,8 +37,18 @@ public class CaseDataElasticsearchOperations {
     }
 
     public void deleteByReference(final String caseIndex, final Long caseReference) {
-        final DeleteByQueryRequest request = buildDeleteByQueryRequest(caseIndex, caseReference);
+        final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(caseIndex,
+                caseReference);
 
+        final DeleteByQueryRequest globalSearchIndexDeleteRequest =
+                buildDeleteByQueryRequest(parameterResolver.getGlobalSearchIndexName(),
+                        caseReference);
+
+        deleteByQueryRequest(caseIndexDeleteRequest);
+        deleteByQueryRequest(globalSearchIndexDeleteRequest);
+    }
+
+    private void deleteByQueryRequest(final DeleteByQueryRequest request) {
         try {
             final RequestOptions requestOptions = buildRequestOptions();
             final BulkByScrollResponse bulkResponse = elasticsearchClient.deleteByQuery(request, requestOptions);
