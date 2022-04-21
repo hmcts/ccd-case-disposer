@@ -10,7 +10,7 @@ spring:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect
   datasource:
-    url: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5050}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
+    url: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5055}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
     username: ${DATA_STORE_DB_USERNAME:ccd}
     password: ${DATA_STORE_DB_PASSWORD:ccd}
     type: com.zaxxer.hikari.HikariDataSource

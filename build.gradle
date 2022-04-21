@@ -149,7 +149,7 @@ def versions = [
         junit         : '5.7.2',
         junitPlatform : '1.7.2',
         reformLogging : '5.1.9',
-        elasticsearch : '7.16.2',
+        elasticsearch : '7.17.1',
         testcontainers: '1.16.0',
         springBoot    : springBoot.class.package.implementationVersion
 ]
