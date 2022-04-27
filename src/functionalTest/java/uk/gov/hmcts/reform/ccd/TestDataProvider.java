@@ -21,6 +21,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewHolder;
 
@@ -62,6 +63,9 @@ public class TestDataProvider {
 
     @Inject
     private CaseDataViewHolder caseDataViewHolder;
+
+    @Inject
+    private GlobalSearchIndexCreator globalSearchIndexCreator;
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
@@ -404,6 +408,9 @@ public class TestDataProvider {
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
+
+        globalSearchIndexCreator.createGlobalSearchIndex();
+
         resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);

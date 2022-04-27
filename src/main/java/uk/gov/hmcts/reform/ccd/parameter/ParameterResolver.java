@@ -18,4 +18,10 @@ public interface ParameterResolver {
     List<String> getDeletableCaseTypesSimulation();
 
     List<String> getAllDeletableCaseTypes();
+
+    String getCaseDefinitionHost();
+
+    String getIdamUsername();
+
+    String getIdamPassword();
 }

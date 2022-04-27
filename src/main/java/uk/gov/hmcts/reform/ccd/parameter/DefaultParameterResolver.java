@@ -78,4 +78,19 @@ public class DefaultParameterResolver implements ParameterResolver {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public String getCaseDefinitionHost() {
+        return null;
+    }
+
+    @Override
+    public String getIdamUsername() {
+        return null;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return null;
+    }
 }

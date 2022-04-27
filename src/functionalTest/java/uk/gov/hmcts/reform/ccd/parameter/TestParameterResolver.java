@@ -29,6 +29,16 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
+    @Value("${ccd.case-definition.host}")
+    private String caseDefinitionHost;
+
+    @Value("${idam.api.username}")
+    private String idamApiUsername;
+
+    @Value("${idam.api.password}")
+    private String idamApiPassword;
+
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -54,6 +64,20 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getCasesIndexType() {
         return casesIndexType;
+    }
+
+    public String getCaseDefinitionHost() {
+        return caseDefinitionHost;
+    }
+
+    @Override
+    public String getIdamUsername() {
+        return idamApiUsername;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return idamApiPassword;
     }
 
     @Override
