@@ -11,6 +11,8 @@ public interface ParameterResolver {
 
     String getGlobalSearchIndexName();
 
+    boolean isGlobalSearchEnabled();
+
     String getCasesIndexType();
 
     List<String> getDeletableCaseTypes();

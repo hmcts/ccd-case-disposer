@@ -46,6 +46,7 @@ class CaseDataElasticsearchOperationsTest {
     void testShouldDeleteByReferenceSuccessfully() throws Exception {
         doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
         doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
+        doReturn(true).when(parameterResolver).isGlobalSearchEnabled();
         doReturn(bulkByScrollResponse).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
         doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
@@ -60,7 +61,6 @@ class CaseDataElasticsearchOperationsTest {
     @Test
     void testShouldRaiseSearchFailuresWhenDeleteByReference() throws Exception {
         doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
-        doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
         doReturn(bulkByScrollResponse).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
         doReturn(List.of(new ScrollableHitSource.SearchFailure(new Throwable())))
@@ -77,7 +77,6 @@ class CaseDataElasticsearchOperationsTest {
     @Test
     void testShouldRaiseElasticsearchFailuresWhenDeleteByReference() throws Exception {
         doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
-        doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
         doReturn(bulkByScrollResponse).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
         doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
@@ -93,7 +92,6 @@ class CaseDataElasticsearchOperationsTest {
 
     @Test
     void testShouldRaiseExceptionWhenDeleteByQueryFails() throws Exception {
-        doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
         doThrow(new IOException()).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
 

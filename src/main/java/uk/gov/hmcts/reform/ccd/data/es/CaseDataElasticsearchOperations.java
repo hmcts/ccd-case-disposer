@@ -40,12 +40,14 @@ public class CaseDataElasticsearchOperations {
         final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(caseIndex,
                 caseReference);
 
-        final DeleteByQueryRequest globalSearchIndexDeleteRequest =
-                buildDeleteByQueryRequest(parameterResolver.getGlobalSearchIndexName(),
-                        caseReference);
-
         deleteByQueryRequest(caseIndexDeleteRequest);
-        deleteByQueryRequest(globalSearchIndexDeleteRequest);
+
+        if (parameterResolver.isGlobalSearchEnabled()) {
+            final DeleteByQueryRequest globalSearchIndexDeleteRequest =
+                    buildDeleteByQueryRequest(parameterResolver.getGlobalSearchIndexName(),
+                            caseReference);
+            deleteByQueryRequest(globalSearchIndexDeleteRequest);
+        }
     }
 
     private void deleteByQueryRequest(final DeleteByQueryRequest request) {
@@ -79,11 +81,11 @@ public class CaseDataElasticsearchOperations {
 
     private RequestOptions buildRequestOptions() {
         final RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectionRequestTimeout(parameterResolver.getElasticsearchRequestTimeout())
-            .build();
+                .setConnectionRequestTimeout(parameterResolver.getElasticsearchRequestTimeout())
+                .build();
         return RequestOptions.DEFAULT.toBuilder()
-            .setRequestConfig(requestConfig)
-            .build();
+                .setRequestConfig(requestConfig)
+                .build();
     }
 
     private <T> void throwError(final String message, final List<T> list) {

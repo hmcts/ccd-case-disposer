@@ -26,6 +26,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.global.search.index.name}")
     private String globalSearchIndexName;
 
+    @Value("${elasticsearch.global.search.index.enabled}")
+    private String isGlobalSearchEnabled;
+
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
@@ -59,6 +62,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getGlobalSearchIndexName() {
         return globalSearchIndexName;
+    }
+
+    @Override
+    public boolean isGlobalSearchEnabled() {
+        return Boolean.parseBoolean(isGlobalSearchEnabled);
     }
 
     @Override

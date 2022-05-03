@@ -409,7 +409,7 @@ public class TestDataProvider {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
 
-        globalSearchIndexCreator.createGlobalSearchIndex();
+        createGlobalSearchIndex(indexedData);
 
         resetIndices(indexedData.keySet());
 
@@ -436,6 +436,12 @@ public class TestDataProvider {
         try (Connection connection = dataSource.getConnection()) {
             final ClassPathResource resource = new ClassPathResource(scriptPath);
             ScriptUtils.executeSqlScript(connection, resource);
+        }
+    }
+
+    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) {
+        if (indexedData.containsKey(parameterResolver.getGlobalSearchIndexName())) {
+            globalSearchIndexCreator.createGlobalSearchIndex();
         }
     }
 

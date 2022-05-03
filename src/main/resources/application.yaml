@@ -23,10 +23,13 @@ spring:
 elasticsearch:
   hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
   request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
+  global.search:
+    index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
+    index.enabled: ${GLOBAL_SEARCH_ENABLED:false}
   cases.index:
     type: ${ELASTICSEARCH_CASE_INDEX_TYPE:_doc}
     name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
-    global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
+
 
 deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
