@@ -37,8 +37,20 @@ public class CaseDataElasticsearchOperations {
     }
 
     public void deleteByReference(final String caseIndex, final Long caseReference) {
-        final DeleteByQueryRequest request = buildDeleteByQueryRequest(caseIndex, caseReference);
+        final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(caseIndex,
+                caseReference);
 
+        deleteByQueryRequest(caseIndexDeleteRequest);
+
+        if (parameterResolver.isGlobalSearchEnabled()) {
+            final DeleteByQueryRequest globalSearchIndexDeleteRequest =
+                    buildDeleteByQueryRequest(parameterResolver.getGlobalSearchIndexName(),
+                            caseReference);
+            deleteByQueryRequest(globalSearchIndexDeleteRequest);
+        }
+    }
+
+    private void deleteByQueryRequest(final DeleteByQueryRequest request) {
         try {
             final RequestOptions requestOptions = buildRequestOptions();
             final BulkByScrollResponse bulkResponse = elasticsearchClient.deleteByQuery(request, requestOptions);
@@ -69,11 +81,11 @@ public class CaseDataElasticsearchOperations {
 
     private RequestOptions buildRequestOptions() {
         final RequestConfig requestConfig = RequestConfig.custom()
-            .setConnectionRequestTimeout(parameterResolver.getElasticsearchRequestTimeout())
-            .build();
+                .setConnectionRequestTimeout(parameterResolver.getElasticsearchRequestTimeout())
+                .build();
         return RequestOptions.DEFAULT.toBuilder()
-            .setRequestConfig(requestConfig)
-            .build();
+                .setRequestConfig(requestConfig)
+                .build();
     }
 
     private <T> void throwError(final String message, final List<T> list) {

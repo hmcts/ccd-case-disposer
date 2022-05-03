@@ -9,6 +9,10 @@ public interface ParameterResolver {
 
     String getCasesIndexNamePattern();
 
+    String getGlobalSearchIndexName();
+
+    boolean isGlobalSearchEnabled();
+
     String getCasesIndexType();
 
     List<String> getDeletableCaseTypes();
@@ -16,4 +20,10 @@ public interface ParameterResolver {
     List<String> getDeletableCaseTypesSimulation();
 
     List<String> getAllDeletableCaseTypes();
+
+    String getCaseDefinitionHost();
+
+    String getIdamUsername();
+
+    String getIdamPassword();
 }

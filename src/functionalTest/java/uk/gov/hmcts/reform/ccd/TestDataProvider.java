@@ -21,6 +21,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewHolder;
 
@@ -62,6 +63,9 @@ public class TestDataProvider {
 
     @Inject
     private CaseDataViewHolder caseDataViewHolder;
+
+    @Inject
+    private GlobalSearchIndexCreator globalSearchIndexCreator;
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
@@ -382,6 +386,17 @@ public class TestDataProvider {
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList()),
                         Map.of("FT_MultiplePages", List.of(1504259907353528L, 1504259907353527L))
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-022-global-search.sql",
+                        List.of(1L),
+                        Map.of("global_search", List.of(1504259907351111L)),
+                        emptyList(),
+                        emptyList(),
+                        Map.of("global_search", List.of(1504259907351111L)),
+                        Map.of("global_search", emptyList())
                 )
         );
     }
@@ -393,6 +408,9 @@ public class TestDataProvider {
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
+
+        createGlobalSearchIndex(indexedData);
+
         resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
@@ -418,6 +436,12 @@ public class TestDataProvider {
         try (Connection connection = dataSource.getConnection()) {
             final ClassPathResource resource = new ClassPathResource(scriptPath);
             ScriptUtils.executeSqlScript(connection, resource);
+        }
+    }
+
+    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) {
+        if (indexedData.containsKey(parameterResolver.getGlobalSearchIndexName())) {
+            globalSearchIndexCreator.createGlobalSearchIndex();
         }
     }
 
@@ -474,7 +498,10 @@ public class TestDataProvider {
     }
 
     private String getIndex(String caseType) {
-        return String.format("%s_cases", caseType.toLowerCase());
+        if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {
+            return String.format("%s_cases", caseType.toLowerCase());
+        }
+        return caseType;
     }
 
     private void refreshIndex(final String index) throws IOException {

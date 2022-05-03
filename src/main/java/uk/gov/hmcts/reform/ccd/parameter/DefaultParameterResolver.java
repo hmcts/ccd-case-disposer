@@ -20,8 +20,14 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
+    @Value("${elasticsearch.global.search.index.enabled}")
+    private String isGlobalSearchEnabled;
+
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
+
+    @Value("${elasticsearch.global.search.index.name}")
+    private String globalSearchIndexName;
 
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
@@ -47,6 +53,16 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
+    }
+
+    @Override
+    public boolean isGlobalSearchEnabled() {
+        return Boolean.parseBoolean(isGlobalSearchEnabled);
+    }
+
+    @Override
     public String getCasesIndexType() {
         return casesIndexType;
     }
@@ -69,5 +85,20 @@ public class DefaultParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getCaseDefinitionHost() {
+        return null;
+    }
+
+    @Override
+    public String getIdamUsername() {
+        return null;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return null;
     }
 }

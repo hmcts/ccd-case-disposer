@@ -134,15 +134,19 @@ dependencyManagement {
         dependencySet(group: 'com.google.guava', version: '30.1.1-jre') {
             entry 'guava'
         }
+        dependencySet(group: 'org.springframework.cloud', version: '3.0.5') {
+            entry 'spring-cloud-starter-openfeign'
+            entry 'spring-cloud-openfeign-core'
+        }
     }
 }
 
 repositories {
-  mavenLocal()
-  mavenCentral()
-  maven {
-    url 'https://jitpack.io'
-  }
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 def versions = [
@@ -151,6 +155,10 @@ def versions = [
         reformLogging : '5.1.9',
         elasticsearch : '7.17.1',
         testcontainers: '1.16.0',
+        restAssured   : '4.4.0',
+        idamClient    : '2.0.1',
+        s2sClient     : '4.0.3',
+        commonsIo     : '2.7',
         springBoot    : springBoot.class.package.implementationVersion
 ]
 
@@ -169,20 +177,26 @@ ext['log4j2.version'] = '2.17.1'
 ext['jackson.version'] = '2.13.2'
 
 dependencies {
-  compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
-  compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
-  compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
+    compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
 
-  implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4'
-  implementation group: 'javax.inject', name: 'javax.inject', version: '1'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
-  implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
-    exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
-  }
-  configurations {
-    compile.exclude module: 'spring-boot-starter-logging'
-  }
+    implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
+    implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
+
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamClient
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
+
+    implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4'
+    implementation group: 'javax.inject', name: 'javax.inject', version: '1'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+    implementation(group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc') {
+        exclude group: 'org.apache.tomcat', module: 'tomcat-jdbc'
+    }
+    configurations {
+        compile.exclude module: 'spring-boot-starter-logging'
+    }
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging

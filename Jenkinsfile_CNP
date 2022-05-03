@@ -16,6 +16,9 @@ def vaultOverrides = [
 
 def secrets = [
   'ccd-${env}': [
+          secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
+          secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
+          secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET')
   ]
 ]
 
