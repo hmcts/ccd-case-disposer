@@ -65,7 +65,9 @@ withPipeline(type, product, component) {
 
     // BLOCKED BY https://tools.hmcts.net/jira/browse/RDM-13045 and https://tools.hmcts.net/jira/browse/DTSPO-6431
     // test if Postgres is reachable
-    sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
+    //sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
+    sh "nc -zv ccd-case-disposer-pr-33-postgresql-0.ccd-case-disposer-pr-33-postgresql-headless.ccd.svc.cluster.local 5432"
+
     //
     //    echo "Verifying that functional test run correctly"
     //    try {
