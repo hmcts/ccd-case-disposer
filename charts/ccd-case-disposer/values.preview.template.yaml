@@ -142,6 +142,7 @@ ccd:
 
   postgresql:
     service:
+      ingressHost: ccd-case-disposer-pr-33-postgresql-0
       type: LoadBalancer
       annotations:
         external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}
