@@ -51,7 +51,8 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
 
     // Set required environment variables to run functional tests apart from one in vaults.
-    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local"
+    //env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local"
+    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-33-postgresql"
     env.DATA_STORE_DB_PORT = "5432"
     env.DATA_STORE_DB_NAME = "data-store"
     env.DATA_STORE_DB_USERNAME = "hmcts"
@@ -66,15 +67,15 @@ withPipeline(type, product, component) {
     // BLOCKED BY https://tools.hmcts.net/jira/browse/RDM-13045 and https://tools.hmcts.net/jira/browse/DTSPO-6431
     // test if Postgres is reachable
     //sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
-    sh "nc -zv ccd-case-disposer-pr-33-postgresql-0.ccd-case-disposer-pr-33-postgresql-headless.ccd.svc.cluster.local 5432"
+    //sh "nc -zv ccd-case-disposer-pr-33-postgresql-0.ccd-case-disposer-pr-33-postgresql-headless.ccd.svc.cluster.local 5432"
 
     //
     //    echo "Verifying that functional test run correctly"
-    //    try {
-    //      builder.gradle('functional')
-    //    } finally {
-    //      junit '**/test-results/**/*.xml'
-    //    }
+    try {
+      builder.gradle('functional')
+    } finally {
+      junit '**/test-results/**/*.xml'
+    }
   }
 
   after('functionalTest:preview') {
