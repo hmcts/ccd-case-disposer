@@ -47,7 +47,7 @@ logstash:
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
-    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
+    db.url: jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/ccd-data-store?stringtype=unspecified&ssl=false
     db.user: hmcts
     db.pwd: hmcts
     es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
@@ -98,7 +98,7 @@ ccd:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DEFINITION_STORE_DB_HOST: {{ .Release.Name }}-postgresql
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_document_am_api
@@ -115,7 +115,7 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DATA_STORE_DB_HOST: {{ .Release.Name }}-postgresql
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -140,9 +140,16 @@ ccd:
       autoscaling:
         enabled: false
 
+#  postgresql:
+#    service:
+#      type: LoadBalancer
+#      annotations:
+#        external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}
+#        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+
   postgresql:
-    service:
-      type: LoadBalancer
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}
-        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    enabled: true
+    postgresqlUsername: ccd
+    postgresqlPassword: ccd
+    postgresqlDatabase: ccd_data_store
+    initdbUser: postgres

@@ -38,6 +38,7 @@ resource "random_string" "draft_encryption_key" {
 ////////////////////////////////
 // DB version 11              //
 ////////////////////////////////
+/*
 
 module "data-store-staging-db-v11" {
   count           = local.instance_count
@@ -103,3 +104,4 @@ resource "azurerm_key_vault_secret" "draft-store-key" {
   value        = random_string.draft_encryption_key.result
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
+*/
