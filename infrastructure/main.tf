@@ -40,7 +40,7 @@ resource "random_string" "draft_encryption_key" {
 ////////////////////////////////
 
 module "data-store-preview-db-v11" {
-  count           = local.instance_count
+  count           = "${local.instance_count}"
   source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product         = var.product
   component       = var.component
