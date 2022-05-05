@@ -61,7 +61,7 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_PASSWORD = "hmcts"
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-${env.BRANCH_NAME}.service.core-compute-preview.internal"
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
-    // (or hardcode standard java chart username/password of postgres)
+    // (or hardcode standard java chart username/password of postgres.)
 
     // test if Elasticsearch is reachable
     sh "nc -zv es-ccd-case-disposer-${env.BRANCH_NAME}.service.core-compute-preview.internal 80"
