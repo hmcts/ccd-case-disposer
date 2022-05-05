@@ -7,8 +7,8 @@ locals {
   app_full_name  = "${var.product}-data-store-api-staging"
 
   // Preview Only
-  is_preview     = "${(var.env == "preview" || var.env == "spreview")}"
-  instance_count = "${local.is_preview ? 1 : 0}"
+  is_aat     = "${(var.env == "aat" || var.env == "saat")}"
+  instance_count = "${local.is_aat ? 1 : 0}"
 
   // Vault name
   vaultName      = "${var.raw_product}-${var.env}"
