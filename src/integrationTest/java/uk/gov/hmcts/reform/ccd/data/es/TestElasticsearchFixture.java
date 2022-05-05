@@ -17,7 +17,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public abstract class TestElasticsearchFixture {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestElasticsearchFixture.class);
 
-    private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:6.4.2";
+    private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:7.17.1";
 
     private static final ElasticsearchContainer ELASTICSEARCH_CONTAINER = new ElasticsearchContainer(IMAGE)
         .withLogConsumer(new Slf4jLogConsumer(LOGGER))

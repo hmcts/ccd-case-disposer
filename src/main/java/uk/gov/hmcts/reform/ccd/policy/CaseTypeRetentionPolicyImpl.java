@@ -17,7 +17,7 @@ public class CaseTypeRetentionPolicyImpl implements RetentionPolicy {
     }
 
     private Boolean isDeletableCaseType(@NonNull final String caseType) {
-        return parameterResolver.getDeletableCaseTypes().contains(caseType);
+        return parameterResolver.getAllDeletableCaseTypes().contains(caseType);
     }
 
 }

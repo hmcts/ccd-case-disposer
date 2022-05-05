@@ -23,7 +23,14 @@ java:
           alias: DATA_STORE_DB_PASSWORD
         - name: ccd-ELASTIC-SEARCH-DATA-NODES-URL
           alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        - name: idam-case-disposer-system-user-username
+          alias: IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME
+        - name: idam-case-disposer-system-user-password
+          alias: IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD
+        - name: idam-case-disposer-client-secret
+          alias: IDAM_CASE_DISPOSER_CLIENT_SECRET
   environment:
     DELETE_CASE_TYPES:
+    SIMULATED_CASE_TYPES:
   global:
     jobKind: CronJob

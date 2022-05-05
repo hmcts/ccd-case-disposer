@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.ccd.parameter;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 
@@ -18,17 +20,26 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
+    @Value("${elasticsearch.global.search.index.enabled}")
+    private String isGlobalSearchEnabled;
+
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
+
+    @Value("${elasticsearch.global.search.index.name}")
+    private String globalSearchIndexName;
 
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
+    @Value("#{'${simulated.case.types}'.split(',')}")
+    private List<String> deletableCaseTypeSimulation;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
-            .map(quotedHost -> quotedHost.replace("\"", "").strip())
-            .collect(toUnmodifiableList());
+                .map(quotedHost -> quotedHost.replace("\"", "").strip())
+                .collect(toUnmodifiableList());
     }
 
     @Override
@@ -42,6 +53,16 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
+    }
+
+    @Override
+    public boolean isGlobalSearchEnabled() {
+        return Boolean.parseBoolean(isGlobalSearchEnabled);
+    }
+
+    @Override
     public String getCasesIndexType() {
         return casesIndexType;
     }
@@ -49,7 +70,35 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Override
     public List<String> getDeletableCaseTypes() {
         return deletableCaseTypes.stream()
-            .map(quotedItem -> quotedItem.replace("\"", "").strip())
-            .collect(toUnmodifiableList());
+                .map(quotedItem -> quotedItem.replace("\"", "").strip())
+                .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public List<String> getDeletableCaseTypesSimulation() {
+        return deletableCaseTypeSimulation.stream()
+                .map(quotedItem -> quotedItem.replace("\"", "").strip())
+                .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public List<String> getAllDeletableCaseTypes() {
+        return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getCaseDefinitionHost() {
+        return null;
+    }
+
+    @Override
+    public String getIdamUsername() {
+        return null;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return null;
     }
 }
