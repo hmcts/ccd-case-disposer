@@ -4,13 +4,14 @@ provider "azurerm" {
 
 locals {
   // Staging DB used as a data-store-api DB for functional testts in preview.
-  app_full_name = "${var.product}-data-store-api-preview"
+  app_full_name  = "${var.product}-data-store-api-preview"
 
   // Preview Only
-  instance_count = (var.env == "preview") ? 1 : 0
+  is_preview     = "${(var.env == "preview" || var.env == "spreview")}"
+  instance_count = "${local.is_preview ? 1 : 0}"
 
   // Vault name
-  vaultName = "${var.raw_product}-${var.env}"
+  vaultName      = "${var.raw_product}-${var.env}"
 
   // Shared Resource Group
   sharedResourceGroup = "${var.raw_product}-shared-${var.env}"
