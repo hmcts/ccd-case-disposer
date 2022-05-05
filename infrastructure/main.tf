@@ -15,24 +15,11 @@ locals {
 
   // Shared Resource Group
   sharedResourceGroup = "${var.raw_product}-shared-${var.env}"
-
-  sharedASPResourceGroup = "${var.raw_product}-shared-${var.env}"
 }
 
 data "azurerm_key_vault" "ccd_shared_key_vault" {
   name                = "${local.vaultName}"
   resource_group_name = "${local.sharedResourceGroup}"
-}
-
-resource "random_string" "draft_encryption_key" {
-  length  = 16
-  special = true
-  upper   = true
-  lower   = true
-  number  = true
-  lifecycle {
-    ignore_changes = all
-  }
 }
 
 ////////////////////////////////
@@ -96,16 +83,3 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   value        = module.data-store-staging-db-v11[0].postgresql_database
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
-
-resource "azurerm_key_vault_secret" "ccd_draft_encryption_key" {
-  name         = "${var.component}-draftStoreEncryptionSecret"
-  value        = random_string.draft_encryption_key.result
-  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
-resource "azurerm_key_vault_secret" "draft-store-key" {
-  name         = "${var.component}-draft-key"
-  value        = random_string.draft_encryption_key.result
-  key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
-}
-
