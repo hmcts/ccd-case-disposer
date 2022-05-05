@@ -64,7 +64,8 @@ withPipeline(type, product, component) {
     // (or hardcode standard java chart username/password of postgres.)
 
     // test if Elasticsearch is reachable
-    sh "nc -zv es-ccd-case-disposer-${env.BRANCH_NAME}.service.core-compute-preview.internal 80"
+    // sh "nc -zv es-ccd-case-disposer-${env.BRANCH_NAME}.service.core-compute-preview.internal 80"
+    // Above aline is temporarily disabled to fix the master pipeline. The logic per environment for the URL formations should be corrected by the feature team.
 
     //  BLOCKED BY https://tools.hmcts.net/jira/browse/RDM-13045 and https://tools.hmcts.net/jira/browse/DTSPO-6431
     //    // test if Postgres is reachable
