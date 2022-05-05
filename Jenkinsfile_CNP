@@ -54,21 +54,21 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
 
     // Set required environment variables to run functional tests apart from one in vaults.
-    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local"
+    env.DATA_STORE_DB_HOST = "ccd-case-disposer-pr-${env.CHANGE_ID}-postgresql-0.ccd.svc.cluster.local"
     env.DATA_STORE_DB_PORT = "5432"
     env.DATA_STORE_DB_NAME = "data-store"
     env.DATA_STORE_DB_USERNAME = "hmcts"
     env.DATA_STORE_DB_PASSWORD = "hmcts"
-    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${env.CHANGE_ID}.service.core-compute-preview.internal"
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
     // (or hardcode standard java chart username/password of postgres)
 
     // test if Elasticsearch is reachable
-    sh "nc -zv es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal 80"
+    sh "nc -zv es-ccd-case-disposer-pr-${env.CHANGE_ID}.service.core-compute-preview.internal 80"
 
     //  BLOCKED BY https://tools.hmcts.net/jira/browse/RDM-13045 and https://tools.hmcts.net/jira/browse/DTSPO-6431
     //    // test if Postgres is reachable
-    //    sh "nc -zv ccd-case-disposer-pr-${CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
+    //    sh "nc -zv ccd-case-disposer-pr-${env.CHANGE_ID}-postgresql-0.ccd.svc.cluster.local 5432"
     //
     //    echo "Verifying that functional test run correctly"
     //    try {
