@@ -20,10 +20,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
-import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
-import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewHolder;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -42,6 +42,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.with;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
+import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
 public class TestDataProvider {
 
@@ -58,276 +59,362 @@ public class TestDataProvider {
     private CaseDataRepository caseDataRepository;
 
     @Inject
-    private CaseEventRepository caseEventRepository;
-
-    @Inject
-    private CaseLinkRepository caseLinkRepository;
-
-    @Inject
     private ParameterResolver parameterResolver;
+
+    @Inject
+    private CaseDataViewHolder caseDataViewHolder;
+
+    @Inject
+    private GlobalSearchIndexCreator globalSearchIndexCreator;
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
-            Arguments.of(
-                null,
-                "scenarios/S-001-no-case-types-specified-in-delete-request.sql",
-                List.of(1L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                List.of(1L),
-                Map.of("FT_MasterCaseType", emptyList()),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L))
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-002-no-cases-exist-for-the-specified-case-type-in-delete-request.sql",
-                List.of(1L),
-                Map.of("FT_MultiplePages", List.of(1504259907353529L)),
-                List.of(1L),
-                Map.of("FT_MultiplePages", emptyList()),
-                Map.of("FT_MultiplePages", List.of(1504259907353529L))
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-003-resolved-ttl-is-in-the-future.sql",
-                List.of(1L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                List.of(1L),
-                Map.of("FT_MasterCaseType", emptyList()),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L))
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-004-no-cases-due-deletion-present.sql",
-                List.of(1L, 2L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353528L)
+                Arguments.of(
+                        null,
+                        null,
+                        "scenarios/S-001-no-case-types-specified-in-delete-request.sql",
+                        List.of(1L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
+                        List.of(1L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", emptyList()),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L))
                 ),
-                List.of(1L, 2L),
-                Map.of("FT_MasterCaseType", emptyList(),
-                       "FT_MultiplePages", emptyList()
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-002-no-cases-exist-for-the-specified-case-type-in-delete-request.sql",
+                        List.of(1L),
+                        Map.of("FT_MultiplePages", List.of(1504259907353529L)),
+                        List.of(1L),
+                        emptyList(),
+                        Map.of("FT_MultiplePages", emptyList()),
+                        Map.of("FT_MultiplePages", List.of(1504259907353529L))
                 ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353528L)
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-003-resolved-ttl-is-in-the-future.sql",
+                        List.of(1L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
+                        List.of(1L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", emptyList()),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L))
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-004-no-cases-due-deletion-present.sql",
+                        List.of(1L, 2L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353528L)
+                        ),
+                        List.of(1L, 2L), //endStateRowIds
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", emptyList(),
+                                "FT_MultiplePages", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353528L)
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
+                        List.of(1L, 2L, 3L, 4L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        List.of(3L, 4L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
+                                "FT_MultiplePages", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        )
+                ),
+                // Scenario 6
+                Arguments.of(
+                        "FT_MasterCaseType, FT_MultiplePages",
+                        null,
+                        "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
+                        List.of(1L, 2L, 3L, 4L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        List.of(3L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L),
+                                "FT_MultiplePages", emptyList()
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-007-deletable-case-linked-to-nondeletable-ttl-case.sql",
+                        List.of(1L, 2L, 3L, 4L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353527L)
+                        ),
+                        List.of(1L, 3L, 4L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353528L),
+                                "FT_MultiplePages", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353527L)
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-008-case-due-deletion-linked-to-nondeletable-case-type-case.sql",
+                        List.of(1L, 2L, 3L, 4L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353527L),
+                                "FT_Conditionals", List.of(1504259907353526L)
+                        ),
+                        List.of(1L, 3L, 4L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353528L),
+                                "FT_MultiplePages", emptyList(),
+                                "FT_Conditionals", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353527L),
+                                "FT_Conditionals", List.of(1504259907353526L)
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType, FT_MultiplePages",
+                        null,
+                        "scenarios/S-009-nondeletable-ttl-case-linked-to-deletable-case.sql",
+                        List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
+                                        1504259907353527L, 1504259907353528L, 1504259907353529L
+                                ),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        List.of(3L, 7L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L,
+                                        1504259907353528L, 1504259907353529L
+                                ),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353527L),
+                                "FT_MultiplePages", emptyList()
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType, FT_MultiplePages",
+                        null,
+                        "scenarios/S-010-deletable-cases-linked-to-multiple-nondeletable-cases.sql",
+                        List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
+                                        1504259907353527L, 1504259907353528L, 1504259907353529L
+                                ),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        List.of(2L, 3L, 6L, 7L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353525L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L,
+                                        1504259907353527L, 1504259907353528L
+                                ),
+                                "FT_MultiplePages", emptyList()
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType, FT_MultiplePages",
+                        null,
+                        "scenarios/S-011-mix-bag-of-deletable-and-nondeletable-cases.sql",
+                        List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353524L,
+                                        1504259907353525L, 1504259907353528L, 1504259907353529L
+                                ),
+                                "FT_MultiplePages", List.of(1504259907353518L, 1504259907353519L, 1504259907353521L,
+                                        1504259907353526L, 1504259907353527L
+                                ),
+                                "FT_Conditionals", List.of(1504259907353520L)
+                        ),
+                        List.of(1L, 3L, 5L, 6L, 9L, 10L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353528L),
+                                "FT_MultiplePages", List.of(1504259907353518L, 1504259907353519L, 1504259907353526L),
+                                "FT_Conditionals", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L, 1504259907353529L),
+                                "FT_MultiplePages", List.of(1504259907353521L, 1504259907353527L),
+                                "FT_Conditionals", List.of(1504259907353520L)
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-012-multi-parent-case-when-one-parent-is-nondeletable-ttl-case.sql",
+                        List.of(1L, 2L, 3L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
+                                "FT_MultiplePages", List.of(1504259907353528L)
+                        ),
+                        List.of(1L, 2L, 3L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", emptyList(),
+                                "FT_MultiplePages", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
+                                "FT_MultiplePages", List.of(1504259907353528L)
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-013-cases-due-deletion-linked-to-third-level-deep-nondeletable-case.sql",
+                        List.of(1L, 2L, 3L, 4L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        List.of(1L, 2L, 3L, 4L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", emptyList(),
+                                "FT_MultiplePages", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-014-nondeletable-multi-parent-case.sql",
+                        List.of(1L, 2L, 3L, 4L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        ),
+                        List.of(1L, 2L, 3L, 4L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", emptyList(),
+                                "FT_MultiplePages", emptyList()
+                        ),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                                "FT_MultiplePages", List.of(1504259907353526L)
+                        )
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-015-case-links-three-levels-deep.sql",
+                        List.of(1L, 2L, 3L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
+                        emptyList(),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
+                        Map.of("FT_MasterCaseType", emptyList())
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-016-deletable-multi-parent-case.sql",
+                        List.of(1L, 2L, 3L, 4L, 5L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
+                                1504259907353526L, 1504259907353525L)),
+                        emptyList(),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
+                                1504259907353526L, 1504259907353525L)),
+                        Map.of("FT_MasterCaseType", emptyList())
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-017-cyclically-linked-cases.sql",
+                        List.of(1L, 2L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
+                        emptyList(),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
+                        Map.of("FT_MasterCaseType", emptyList())
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-018-case-linked-to-itself.sql",
+                        List.of(1L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
+                        emptyList(),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
+                        Map.of("FT_MasterCaseType", emptyList())
+                ),
+                Arguments.of(
+                        null,
+                        "FT_MultiplePages",
+                        "scenarios/S-019-simulated-case-type.sql",
+                        List.of(1L, 2L),
+                        Map.of("FT_MultiplePages", List.of(1504259907353529L, 1504259907353528L)),
+                        List.of(1L, 2L),
+                        List.of(1L, 2L),
+                        Map.of("FT_MultiplePages", emptyList()),
+                        Map.of("FT_MultiplePages", List.of(1504259907353529L, 1504259907353528L))
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        "FT_MultiplePages",
+                        "scenarios/S-020-simulated-and-deletable-case-types.sql",
+                        List.of(1L, 2L),
+                        Map.of("FT_MultiplePages", List.of(1504259907353529L)),
+                        List.of(2L),
+                        List.of(2L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
+                        Map.of("FT_MultiplePages", List.of(1504259907353528L))
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        "FT_MultiplePages",
+                        "scenarios/S-021-mix-bag-of-deletable-and-simulated-cases.sql",
+                        List.of(1L, 2L, 3L),
+                        Map.of("FT_MultiplePages", List.of(1504259907353529L)),
+                        List.of(2L, 3L),
+                        emptyList(),
+                        Map.of("FT_MasterCaseType", emptyList()),
+                        Map.of("FT_MultiplePages", List.of(1504259907353528L, 1504259907353527L))
+                ),
+                Arguments.of(
+                        "FT_MasterCaseType",
+                        null,
+                        "scenarios/S-022-global-search.sql",
+                        List.of(1L),
+                        Map.of("global_search", List.of(1504259907351111L)),
+                        emptyList(),
+                        emptyList(),
+                        Map.of("global_search", List.of(1504259907351111L)),
+                        Map.of("global_search", emptyList())
                 )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                List.of(3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
-                       "FT_MultiplePages", emptyList()
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353527L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                )
-            ),
-            // Scenario 6
-            Arguments.of(
-                "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                List.of(3L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353527L),
-                       "FT_MultiplePages", emptyList()
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-007-deletable-case-linked-to-nondeletable-ttl-case.sql",
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353527L)
-                ),
-                List.of(1L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353528L),
-                       "FT_MultiplePages", emptyList()
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353527L)
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-008-case-due-deletion-linked-to-nondeletable-case-type-case.sql",
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353527L),
-                       "FT_Conditionals", List.of(1504259907353526L)
-                ),
-                List.of(1L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353528L),
-                       "FT_MultiplePages", emptyList(),
-                       "FT_Conditionals", emptyList()
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353527L),
-                       "FT_Conditionals", List.of(1504259907353526L)
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-009-nondeletable-ttl-case-linked-to-deletable-case.sql",
-                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
-                                                    1504259907353527L, 1504259907353528L, 1504259907353529L
-                       ),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                List.of(3L, 7L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L,
-                                                    1504259907353528L, 1504259907353529L
-                       ),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353527L),
-                       "FT_MultiplePages", emptyList()
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-010-deletable-cases-linked-to-multiple-nondeletable-cases.sql",
-                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
-                                                    1504259907353527L, 1504259907353528L, 1504259907353529L
-                       ),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                List.of(2L, 3L, 6L, 7L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353525L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L,
-                                                    1504259907353527L, 1504259907353528L
-                       ),
-                       "FT_MultiplePages", emptyList()
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType, FT_MultiplePages",
-                "scenarios/S-011-mix-bag-of-deletable-and-nondeletable-cases.sql",
-                List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353524L,
-                                                    1504259907353525L, 1504259907353528L, 1504259907353529L
-                       ),
-                       "FT_MultiplePages", List.of(1504259907353518L, 1504259907353519L, 1504259907353521L,
-                                                   1504259907353526L, 1504259907353527L
-                    ),
-                       "FT_Conditionals", List.of(1504259907353520L)
-                ),
-                List.of(1L, 3L, 5L, 6L, 9L, 10L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353528L),
-                       "FT_MultiplePages", List.of(1504259907353518L, 1504259907353519L, 1504259907353526L),
-                       "FT_Conditionals", emptyList()
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L, 1504259907353529L),
-                       "FT_MultiplePages", List.of(1504259907353521L, 1504259907353527L),
-                       "FT_Conditionals", List.of(1504259907353520L)
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-012-multi-parent-case-when-one-parent-is-nondeletable-ttl-case.sql",
-                List.of(1L, 2L, 3L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
-                       "FT_MultiplePages", List.of(1504259907353528L)
-                ),
-                List.of(1L, 2L, 3L),
-                Map.of("FT_MasterCaseType", emptyList(),
-                       "FT_MultiplePages", emptyList()
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
-                       "FT_MultiplePages", List.of(1504259907353528L)
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-013-cases-due-deletion-linked-to-third-level-deep-nondeletable-case.sql",
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", emptyList(),
-                       "FT_MultiplePages", emptyList()
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-014-nondeletable-multi-parent-case.sql",
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                ),
-                List.of(1L, 2L, 3L, 4L),
-                Map.of("FT_MasterCaseType", emptyList(),
-                       "FT_MultiplePages", emptyList()
-                ),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
-                       "FT_MultiplePages", List.of(1504259907353526L)
-                )
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-015-case-links-three-levels-deep.sql",
-                List.of(1L, 2L, 3L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
-                emptyList(),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
-                Map.of("FT_MasterCaseType", emptyList())
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-016-deletable-multi-parent-case.sql",
-                List.of(1L, 2L, 3L, 4L, 5L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
-                                                    1504259907353526L, 1504259907353525L)),
-                emptyList(),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
-                                                    1504259907353526L, 1504259907353525L)),
-                Map.of("FT_MasterCaseType", emptyList())
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-017-cyclically-linked-cases.sql",
-                List.of(1L, 2L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
-                emptyList(),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
-                Map.of("FT_MasterCaseType", emptyList())
-            ),
-            Arguments.of(
-                "FT_MasterCaseType",
-                "scenarios/S-018-case-linked-to-itself.sql",
-                List.of(1L),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                emptyList(),
-                Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                Map.of("FT_MasterCaseType", emptyList())
-            )
         );
     }
 
     protected void setupData(final String deletableCaseTypes,
+                             final String deletableCaseTypesSimulation,
                              final String scriptPath,
                              final List<Long> rowIds,
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
+        System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
+
+        createGlobalSearchIndex(indexedData);
+
         resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
+        setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
         insertDataIntoDatabase(scriptPath);
         verifyDatabaseIsPopulated(rowIds);
         verifyCaseDataAreInElasticsearch(indexedData);
@@ -339,10 +426,22 @@ public class TestDataProvider {
         }
     }
 
+    private void setDeletableCaseTypesSimulation(final String value) {
+        if (value != null) {
+            System.setProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION, value);
+        }
+    }
+
     private void insertDataIntoDatabase(final String scriptPath) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             final ClassPathResource resource = new ClassPathResource(scriptPath);
             ScriptUtils.executeSqlScript(connection, resource);
+        }
+    }
+
+    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) {
+        if (indexedData.containsKey(parameterResolver.getGlobalSearchIndexName())) {
+            globalSearchIndexCreator.createGlobalSearchIndex();
         }
     }
 
@@ -359,32 +458,32 @@ public class TestDataProvider {
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
                 with()
-                    .await()
-                    .untilAsserted(() -> {
-                        refreshIndex(indexName);
-                        final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
+                        .await()
+                        .untilAsserted(() -> {
+                            refreshIndex(indexName);
+                            final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
 
-                        assertThat(actualCaseReference)
-                            .isPresent()
-                            .hasValue(caseReference);
-                    });
+                            assertThat(actualCaseReference)
+                                    .isPresent()
+                                    .hasValue(caseReference);
+                        });
             }));
         });
     }
 
     private Optional<Long> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-            .query(QueryBuilders.termQuery(CASE_REFERENCE_FIELD, caseReference))
-            .from(0);
+                .query(QueryBuilders.termQuery(CASE_REFERENCE_FIELD, caseReference))
+                .from(0);
 
         final SearchRequest searchRequest = new SearchRequest(caseIndex)
-            .types(INDEX_TYPE)
-            .source(searchSourceBuilder);
+                .types(INDEX_TYPE)
+                .source(searchSourceBuilder);
 
         final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
         final Optional<String> first = Arrays.stream(searchResponse.getHits().getHits())
-            .map(SearchHit::getId)
-            .findFirst();
+                .map(SearchHit::getId)
+                .findFirst();
 
         return first.map(ThrowingFunction.unchecked(id -> {
             final GetRequest getRequest = new GetRequest(caseIndex, INDEX_TYPE, id);
@@ -399,7 +498,10 @@ public class TestDataProvider {
     }
 
     private String getIndex(String caseType) {
-        return String.format("%s_cases", caseType.toLowerCase());
+        if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {
+            return String.format("%s_cases", caseType.toLowerCase());
+        }
+        return caseType;
     }
 
     private void refreshIndex(final String index) throws IOException {
@@ -409,7 +511,7 @@ public class TestDataProvider {
 
     private void resetIndices(final Set<String> caseTypes) throws Exception {
         final BulkRequest bulkRequest = new BulkRequest()
-            .setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
+                .setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
 
         caseTypes.forEach(ThrowingConsumer.unchecked(caseType -> {
             final String indexName = getIndex(caseType);
@@ -417,8 +519,8 @@ public class TestDataProvider {
 
             documents.forEach(documentId -> {
                 final DeleteRequest deleteRequest = new DeleteRequest(indexName)
-                    .id(documentId)
-                    .type(parameterResolver.getCasesIndexType());
+                        .id(documentId)
+                        .type(parameterResolver.getCasesIndexType());
                 bulkRequest.add(deleteRequest);
             });
         }));
@@ -434,27 +536,27 @@ public class TestDataProvider {
 
     private List<String> getAllDocuments(final String indexName) throws IOException {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-            .query(QueryBuilders.matchAllQuery());
+                .query(QueryBuilders.matchAllQuery());
         final SearchRequest searchRequest = new SearchRequest(indexName)
-            .source(searchSourceBuilder);
+                .source(searchSourceBuilder);
 
         final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
 
         return Arrays.stream(searchResponse.getHits().getHits())
-            .filter(hit -> indexName.startsWith(hit.getIndex()))
-            .map(SearchHit::getId)
-            .collect(Collectors.toUnmodifiableList());
+                .filter(hit -> indexName.startsWith(hit.getIndex()))
+                .map(SearchHit::getId)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     protected void verifyDatabaseDeletion(final List<Long> rowIds) {
         final List<CaseDataEntity> all = caseDataRepository.findAll();
         final List<Long> actualRowIds = all.stream()
-            .map(CaseDataEntity::getId)
-            .collect(Collectors.toUnmodifiableList());
+                .map(CaseDataEntity::getId)
+                .collect(Collectors.toUnmodifiableList());
 
         assertThat(actualRowIds)
-            .isNotNull()
-            .containsExactlyInAnyOrderElementsOf(rowIds);
+                .isNotNull()
+                .containsExactlyInAnyOrderElementsOf(rowIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
@@ -472,10 +574,15 @@ public class TestDataProvider {
                 final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
 
                 with()
-                    .await()
-                    .untilAsserted(() -> assertThat(actualCaseReference).isNotPresent());
+                        .await()
+                        .untilAsserted(() -> assertThat(actualCaseReference).isNotPresent());
             }));
         });
     }
 
+    protected void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
+        assertThat(simulatedEndStateRowIds)
+                .isNotNull()
+                .containsExactlyInAnyOrderElementsOf(caseDataViewHolder.getSimulatedCaseIds());
+    }
 }
