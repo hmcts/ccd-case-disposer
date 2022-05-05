@@ -4,7 +4,7 @@ provider "azurerm" {
 
 locals {
   // Staging DB used as a data-store-api DB for functional testts in preview.
-  app_full_name  = "${var.product}-data-store-api-preview"
+  app_full_name  = "${var.product}-data-store-api-staging"
 
   // Preview Only
   is_preview     = "${(var.env == "preview" || var.env == "spreview")}"
@@ -39,8 +39,8 @@ resource "random_string" "draft_encryption_key" {
 // DB version 11              //
 ////////////////////////////////
 
-module "data-store-preview-db-v11" {
-  #count           = "${local.instance_count}"
+module "data-store-staging-db-v11" {
+  count           = "${local.instance_count}"
   source          = "git@github.com:hmcts/cnp-module-postgres?ref=master"
   product         = var.product
   component       = var.component
@@ -63,32 +63,37 @@ module "data-store-preview-db-v11" {
 ////////////////////////////////
 
 resource "azurerm_key_vault_secret" "POSTGRES-USER" {
+  count        = local.instance_count
   name         = "${var.component}-POSTGRES-USER"
-  value        = module.data-store-preview-db-v11.user_name
+  value        = module.data-store-staging-db-v11[0].user_name
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES-PASS" {
+  count        = local.instance_count
   name         = "${var.component}-POSTGRES-PASS"
-  value        = module.data-store-preview-db-v11.postgresql_password
+  value        = module.data-store-staging-db-v11[0].postgresql_password
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_HOST" {
+  count        = local.instance_count
   name         = "${var.component}-POSTGRES-HOST"
-  value        = module.data-store-preview-db-v11.host_name
+  value        = module.data-store-staging-db-v11[0].host_name
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_PORT" {
+  count        = local.instance_count
   name         = "${var.component}-POSTGRES-PORT"
-  value        = module.data-store-preview-db-v11.postgresql_listen_port
+  value        = module.data-store-staging-db-v11[0].postgresql_listen_port
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
 resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
+  count        = local.instance_count
   name         = "${var.component}-POSTGRES-DATABASE"
-  value        = module.data-store-preview-db-v11.postgresql_database
+  value        = module.data-store-staging-db-v11[0].postgresql_database
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
 }
 
