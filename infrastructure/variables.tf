@@ -47,7 +47,7 @@ variable "database_sku_name" {
 }
 
 variable "database_sku_capacity" {
-  default = "1"
+  default = "2"
 }
 
 variable "database_storage_mb" {
