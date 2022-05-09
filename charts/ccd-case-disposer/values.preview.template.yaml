@@ -116,8 +116,9 @@ ccd:
       cpuRequests: '900m'
       environment:
         DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
-        DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
-        DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD}
+        DATA_STORE_DB_NAME: ${PREVIEW_DATA_STORE_DB_NAME}
+        DATA_STORE_DB_USERNAME: ${PREVIEW_DATA_STORE_DB_USERNAME}
+        DATA_STORE_DB_PASSWORD: ${PREVIEW_DATA_STORE_DB_PASSWORD}
         DATA_STORE_DB_OPTIONS: "?sslmode=require"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps

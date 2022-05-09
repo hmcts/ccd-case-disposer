@@ -1,7 +1,3 @@
-provider "azurerm" {
-  features {}
-}
-
 locals {
   // Staging DB used as a data-store-api DB for functional testts in preview.
   app_full_name  = "${var.product}-data-store-api-staging"
@@ -82,4 +78,28 @@ resource "azurerm_key_vault_secret" "POSTGRES_DATABASE" {
   name         = "${var.component}-POSTGRES-DATABASE"
   value        = module.data-store-staging-db-v11[0].postgresql_database
   key_vault_id = data.azurerm_key_vault.ccd_shared_key_vault.id
+}
+
+////////////////////////////////
+// Network access to allow from Preview
+////////////////////////////////
+
+data "azurerm_virtual_network" "aks_preview_vnet" {
+  provider            = azurerm.aks-preview
+  name                = "cft-preview-vnet"
+  resource_group_name = "cft-preview-network-rg"
+}
+
+data "azurerm_subnet" "aks-00-preview" {
+  provider             = azurerm.aks-preview
+  name                 = "aks-00"
+  virtual_network_name = data.azurerm_virtual_network.aks_preview_vnet.name
+  resource_group_name  = data.azurerm_virtual_network.aks_preview_vnet.resource_group_name
+}
+
+data "azurerm_subnet" "aks-01-preview" {
+  provider             = azurerm.aks-preview
+  name                 = "aks-01"
+  virtual_network_name = data.azurerm_virtual_network.aks_preview_vnet.name
+  resource_group_name  = data.azurerm_virtual_network.aks_preview_vnet.resource_group_name
 }

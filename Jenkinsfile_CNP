@@ -29,11 +29,9 @@ def prSecrets = [
           secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
           secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
           secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
-          secret('case-disposer-POSTGRES-HOST', 'DATA_STORE_DB_HOST'),
-          secret('case-disposer-POSTGRES-PORT', 'DATA_STORE_DB_PORT'),
-          secret('case-disposer-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
-          secret('case-disposer-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
-          secret('case-disposer-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD')
+          secret('case-disposer-POSTGRES-DATABASE', 'PREVIEW_DATA_STORE_DB_NAME'),
+          secret('case-disposer-POSTGRES-USER', 'PREVIEW_DATA_STORE_DB_USERNAME'),
+          secret('case-disposer-POSTGRES-PASS', 'PREVIEW_DATA_STORE_DB_PASSWORD')
   ]
 ]
 

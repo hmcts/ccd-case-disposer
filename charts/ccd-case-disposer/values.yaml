@@ -21,6 +21,12 @@ java:
           alias: DATA_STORE_DB_USERNAME
         - name: data-store-api-POSTGRES-PASS
           alias: DATA_STORE_DB_PASSWORD
+        - name: case-disposer-POSTGRES-DATABASE
+          alias: PREVIEW_DATA_STORE_DB_NAME
+        - name: case-disposer-POSTGRES-USER
+          alias: PREVIEW_DATA_STORE_DB_USERNAME
+        - name: case-disposer-POSTGRES-PASS
+          alias: PREVIEW_DATA_STORE_DB_PASSWORD
         - name: ccd-ELASTIC-SEARCH-DATA-NODES-URL
           alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
         - name: idam-case-disposer-system-user-username
