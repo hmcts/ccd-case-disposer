@@ -22,10 +22,6 @@ variable "env" {}
 
 variable "subscription" {}
 
-variable "aks_infra_subscription_id" {}
-
-variable "aks_preview_subscription_id" {}
-
 variable "common_tags" {
   type = map(string)
 }
