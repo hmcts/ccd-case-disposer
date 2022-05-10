@@ -46,6 +46,7 @@
      <cve>CVE-2021-22144</cve>
    </suppress>
 
+  <!--
   <suppress until="2022-05-25">
     <notes><![CDATA[
    file name: spring-core-5.3.18.jar
@@ -53,5 +54,6 @@
     <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
     <cve>CVE-2022-22968</cve>
   </suppress>
+  -->
 
 </suppressions>
