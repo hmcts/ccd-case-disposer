@@ -72,11 +72,9 @@ withPipeline(type, product, component) {
 
   after('akschartsinstall') {
     // Set required environment variables to run functional tests apart from one in vaults.
-    // env.DATA_STORE_DB_HOST = "ccd-case-disposer-${env.BRANCH_NAME}-postgresql-0.ccd.svc.cluster.local"
-    // env.DATA_STORE_DB_PORT = "5432"
-    // env.DATA_STORE_DB_NAME = "data-store"
-    // env.DATA_STORE_DB_USERNAME = "hmcts"
-    // env.DATA_STORE_DB_PASSWORD = "hmcts"
+    env.DATA_STORE_DB_HOST = "ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com"
+    env.DATA_STORE_DB_PORT = "5432"
+    env.DATA_STORE_DB_NAME = "ccd_data_store"
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-${env.BRANCH_NAME}.service.core-compute-preview.internal"
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
     // (or hardcode standard java chart username/password of postgres.)

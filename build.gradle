@@ -184,8 +184,8 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
     implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
 
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamClient
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
+    testImplementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamClient
+    testImplementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
 
     implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
