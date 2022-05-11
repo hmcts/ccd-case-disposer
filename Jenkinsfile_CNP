@@ -90,11 +90,11 @@ withPipeline(type, product, component) {
     //    sh "nc -zv ccd-case-disposer-${env.BRANCH_NAME}-postgresql-0.ccd.svc.cluster.local 5432"
     //
     //    echo "Verifying that functional test run correctly"
-    //    try {
-    //      builder.gradle('functional')
-    //    } finally {
-    //      junit '**/test-results/**/*.xml'
-    //    }
+    try {
+      builder.gradle('functional')
+    } finally {
+      junit '**/test-results/**/*.xml'
+    }
   }
 
   after('functionalTest:preview') {
