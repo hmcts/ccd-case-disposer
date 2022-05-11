@@ -9,6 +9,9 @@ job:
   environment:
     DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
     DATA_STORE_DB_PORT: 5432
+    DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
+    DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
+    DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD}
     DATA_STORE_DB_OPTIONS: "?sslmode=require"
 global:
   jobKind: CronJob
@@ -113,7 +116,7 @@ ccd:
 
   ccd-data-store-api:
     java:
-      #image: hmctspublic.azurecr.io/ccd/data-store-api:pr-1872
+      #image: hmctspublic.azurecr.io/ccd/data-store-api:latest
       image: hmctspublic.azurecr.io/ccd/data-store-api:pr-1872
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       imagePullPolicy: Always
