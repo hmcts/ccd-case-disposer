@@ -95,8 +95,7 @@ ccd:
 
   ccd-definition-store-api:
     java:
-      #image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
-      image: hmctspublic.azurecr.io/ccd/definition-store-api:case_retention_and_disposal
+      image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       ingressHost: ccd-definition-store-${SERVICE_FQDN}
       imagePullPolicy: Always
       environment:
@@ -114,8 +113,7 @@ ccd:
 
   ccd-data-store-api:
     java:
-      #image: hmctspublic.azurecr.io/ccd/data-store-api:latest
-      image: hmctspublic.azurecr.io/ccd/data-store-api:case_retention_and_disposal
+      image: hmctspublic.azurecr.io/ccd/data-store-api:latest
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
