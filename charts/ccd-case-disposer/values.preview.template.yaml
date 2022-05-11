@@ -6,6 +6,13 @@ job:
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
+  environment:
+    DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
+    DATA_STORE_DB_PORT: 5432
+    DATA_STORE_DB_NAME: ${PREVIEW_DATA_STORE_DB_NAME}
+    DATA_STORE_DB_USERNAME: ${PREVIEW_DATA_STORE_DB_USERNAME}
+    DATA_STORE_DB_PASSWORD: ${PREVIEW_DATA_STORE_DB_PASSWORD}
+    DATA_STORE_DB_OPTIONS: "?sslmode=require"
 global:
   jobKind: CronJob
 
@@ -116,6 +123,7 @@ ccd:
       cpuRequests: '900m'
       environment:
         DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
+        DATA_STORE_DB_PORT: 5432
         DATA_STORE_DB_NAME: ${PREVIEW_DATA_STORE_DB_NAME}
         DATA_STORE_DB_USERNAME: ${PREVIEW_DATA_STORE_DB_USERNAME}
         DATA_STORE_DB_PASSWORD: ${PREVIEW_DATA_STORE_DB_PASSWORD}
