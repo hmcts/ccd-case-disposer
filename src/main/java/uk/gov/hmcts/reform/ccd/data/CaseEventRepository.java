@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.data.dao;
+package uk.gov.hmcts.reform.ccd.data;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

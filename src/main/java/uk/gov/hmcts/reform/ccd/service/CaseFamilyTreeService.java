@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.service;
 
 import lombok.NonNull;
-import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
-import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
+import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
+import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;

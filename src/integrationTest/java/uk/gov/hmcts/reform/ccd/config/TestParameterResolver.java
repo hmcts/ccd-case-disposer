@@ -1,6 +1,7 @@
-package uk.gov.hmcts.reform.ccd.parameter;
+package uk.gov.hmcts.reform.ccd.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,24 +27,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.global.search.index.name}")
     private String globalSearchIndexName;
 
-    @Value("${elasticsearch.global.search.index.enabled}")
-    private String isGlobalSearchEnabled;
 
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
-
-    @Value("${ccd.case-definition.host}")
-    private String caseDefinitionHost;
-
-    @Value("${idam.api.username}")
-    private String idamApiUsername;
-
-    @Value("${idam.api.password}")
-    private String idamApiPassword;
-
-
-    @Value("${dm.remote.documents-delete-url}")
-    private String dmRemoteDocumentsDeleteUrl;
 
     @Override
     public List<String> getElasticsearchHosts() {
@@ -67,24 +53,23 @@ public class TestParameterResolver implements ParameterResolver {
         return globalSearchIndexName;
     }
 
-
     @Override
     public String getCasesIndexType() {
         return casesIndexType;
     }
 
     public String getCaseDefinitionHost() {
-        return caseDefinitionHost;
+        return null;
     }
 
     @Override
     public String getIdamUsername() {
-        return idamApiUsername;
+        return null;
     }
 
     @Override
     public String getIdamPassword() {
-        return idamApiPassword;
+        return null;
     }
 
     @Override
@@ -113,10 +98,5 @@ public class TestParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(toUnmodifiableList());
-    }
-
-    @Override
-    public String getDocumentsDeleteUrl() {
-        return this.dmRemoteDocumentsDeleteUrl;
     }
 }

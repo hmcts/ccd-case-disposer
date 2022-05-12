@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.data.es;
+package uk.gov.hmcts.reform.ccd.config.es;
 
 import lombok.NonNull;
 import org.slf4j.Logger;
@@ -13,9 +13,9 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
-@ContextConfiguration(initializers = {TestElasticsearchFixture.ElasticsearchInitializer.class})
-public abstract class TestElasticsearchFixture {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestElasticsearchFixture.class);
+@ContextConfiguration(initializers = {TestElasticsearchContainer.ElasticsearchInitializer.class})
+public abstract class TestElasticsearchContainer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestElasticsearchContainer.class);
 
     private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:7.17.1";
 

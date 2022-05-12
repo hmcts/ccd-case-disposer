@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.data.es;
+package uk.gov.hmcts.reform.ccd.config.es;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
@@ -28,12 +28,15 @@ public class CaseDataElasticsearchOperations {
 
     private final RestHighLevelClient elasticsearchClient;
     private final ParameterResolver parameterResolver;
+    private GlobalSearchIndexChecker globalSearchIndexChecker;
 
     @Inject
     public CaseDataElasticsearchOperations(final RestHighLevelClient elasticsearchClient,
-                                           final ParameterResolver parameterResolver) {
+                                           final ParameterResolver parameterResolver,
+                                           final GlobalSearchIndexChecker globalSearchIndexChecker) {
         this.elasticsearchClient = elasticsearchClient;
         this.parameterResolver = parameterResolver;
+        this.globalSearchIndexChecker = globalSearchIndexChecker;
     }
 
     public void deleteByReference(final String caseIndex, final Long caseReference) {
@@ -42,7 +45,7 @@ public class CaseDataElasticsearchOperations {
 
         deleteByQueryRequest(caseIndexDeleteRequest);
 
-        if (parameterResolver.isGlobalSearchEnabled()) {
+        if (globalSearchIndexChecker.isGlobalSearchExist()) {
             final DeleteByQueryRequest globalSearchIndexDeleteRequest =
                     buildDeleteByQueryRequest(parameterResolver.getGlobalSearchIndexName(),
                             caseReference);
