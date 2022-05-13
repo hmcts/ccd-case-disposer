@@ -9,6 +9,20 @@ spring:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:11:///databasename?stringtype=unspecified
 
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+    username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
+  s2s-auth:
+    name: ccd_case_disposer
+    url: ${IDAM_S2S_URL:http://localhost:4502}
+    secret: ${IDAM_KEY_CCD_CASE_DISPOSER:AAAAAAAAAAAAAAAA}
+  client:
+    id: ccd-case-disposer
+    secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
+    redirect_uri: http://ccd-case-disposer/oauth2redirect
+
 logging:
   level:
     root: ERROR
