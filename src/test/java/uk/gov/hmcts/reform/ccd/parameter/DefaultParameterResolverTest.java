@@ -12,7 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class DefaultParameterResolverTest {
+class DefaultParameterResolverTest {
 
     private static final String ELASTICSEARCH_HOSTS = "elasticsearchHosts";
     private static final String ELASTICSEARCH_REQUEST_TIMEOUT = "elasticsearchRequestTimeout";
