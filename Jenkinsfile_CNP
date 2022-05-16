@@ -77,8 +77,10 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_HOST = 'ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com'
     env.DATA_STORE_DB_PORT = '5432'
     env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
-    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal:9200"
     env.ELASTIC_SEARCH_ENABLED = true
+    //env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal:9200"
+    //env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal:9200"
+    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = 'http://ccd-case-disposer-pr-47-es-master:9200'
     env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal:9200"
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
