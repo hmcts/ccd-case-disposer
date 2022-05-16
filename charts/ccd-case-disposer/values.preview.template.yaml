@@ -64,6 +64,12 @@ logstash:
     es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
+  environment:
+    XPACK_MONITORING_ENABLED: false
+    DATA_STORE_URL: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require
+    DATA_STORE_USER: ${DATA_STORE_DB_USERNAME}
+    DATA_STORE_PASS: ${DATA_STORE_DB_PASSWORD}
+    ES_HOSTS: http://${SERVICE_NAME}-es-master:9200
 
 ccd:
   enabled: true
@@ -77,9 +83,9 @@ ccd:
     apiGatewayWeb:
       enabled: false
     postgresql:
-      enabled: true
+      enabled: false
     s2s:
-      enabled: true
+      enabled: false
     elastic:
       enabled: true
     ras:
@@ -108,7 +114,11 @@ ccd:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DEFINITION_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
+        DEFINITION_STORE_DB_PORT: 5432
+        DEFINITION_STORE_DB_USERNAME: "${DATA_STORE_DB_USERNAME}"
+        DEFINITION_STORE_DB_PASSWORD: "${DATA_STORE_DB_PASSWORD}"
+        DEFINITION_STORE_DB_USE_SSL: "true"
         DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_document_am_api,ccd_case_disposer
