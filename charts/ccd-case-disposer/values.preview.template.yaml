@@ -58,13 +58,12 @@ logstash:
     port: 9200
   configTpl:
     xpack.monitoring.enabled: "false"
-    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
-    db.user: hmcts
-    db.pwd: hmcts
+    db.url: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require
+    db.user: ${DATA_STORE_DB_USERNAME}
+    db.pwd: ${DATA_STORE_DB_PASSWORD}
     es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
-
 
 ccd:
   enabled: true
@@ -80,9 +79,9 @@ ccd:
     postgresql:
       enabled: true
     s2s:
-      enabled: false
+      enabled: true
     elastic:
-      enabled: false
+      enabled: true
     ras:
       enabled: false
 
