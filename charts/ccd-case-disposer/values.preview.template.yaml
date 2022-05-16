@@ -115,6 +115,7 @@ ccd:
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
         DEFINITION_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
+        DEFINITION_STORE_DB_NAME: ccd_definition_store
         DEFINITION_STORE_DB_PORT: 5432
         DEFINITION_STORE_DB_USERNAME: "${DATA_STORE_DB_USERNAME}"
         DEFINITION_STORE_DB_PASSWORD: "${DATA_STORE_DB_PASSWORD}"
