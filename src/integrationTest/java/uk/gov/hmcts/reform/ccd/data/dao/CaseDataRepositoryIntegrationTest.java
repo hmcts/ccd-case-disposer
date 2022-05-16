@@ -11,7 +11,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.CASE_DATA_ENTITIES;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.YESTERDAY;
@@ -45,6 +44,6 @@ class CaseDataRepositoryIntegrationTest extends TestRepositoryFixture {
                 assertThat(item.getResolvedTtl()).isEqualTo(YESTERDAY);
             });
 
-        //Mockito.verifyNoInteractions(authTokenGenerator);
+        Mockito.verifyNoInteractions(authTokenGenerator);
     }
 }
