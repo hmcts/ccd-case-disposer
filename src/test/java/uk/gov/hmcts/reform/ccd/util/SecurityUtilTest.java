@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.ccd.util;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,16 +22,13 @@ class SecurityUtilTest {
     @InjectMocks
     private SecurityUtil securityUtil;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        when(serviceTokenGenerator.generate()).thenReturn(SERVICE_AUTH_JWT);
-    }
-
     @Test
     @DisplayName("should return a value from getServiceAuthorization")
     void shouldGetServiceAuthorization() {
+        MockitoAnnotations.openMocks(this);
+
+        when(serviceTokenGenerator.generate()).thenReturn(SERVICE_AUTH_JWT);
+
         assertThat(securityUtil.getServiceAuthorization(), is(SERVICE_AUTH_JWT));
     }
 

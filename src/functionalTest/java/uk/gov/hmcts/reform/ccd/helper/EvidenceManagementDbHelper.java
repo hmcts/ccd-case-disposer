@@ -19,13 +19,16 @@ public class EvidenceManagementDbHelper {
     @Inject
     private DataSource emDatasource;
 
+    private static final String RECORD_COUNT_SQL = "SELECT COUNT(*) AS recordCount FROM storeddocument where deleted=?";
+
+    private static final String DELETED_DOCS_IDS_SQL = "SELECT id FROM storeddocument where deleted=?";
+
     public int getDocumentsCount(boolean deletedFlag) throws SQLException {
 
         int rowCount;
-        final String sql = "SELECT COUNT(*) AS recordCount FROM storeddocument where deleted=?";
 
         try (Connection connection = emDatasource.getConnection()) {
-            final PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            final PreparedStatement preparedStatement = connection.prepareStatement(RECORD_COUNT_SQL);
             preparedStatement.setObject(1, deletedFlag, java.sql.Types.BOOLEAN);
 
             final ResultSet resultSet = preparedStatement.executeQuery();
@@ -41,10 +44,9 @@ public class EvidenceManagementDbHelper {
     public List<String> getDocumentsIds(boolean deletedFlag) throws SQLException {
 
         List<String> documentIds = new ArrayList<>();
-        final String sql = "SELECT id FROM storeddocument where deleted=?";
 
         try (Connection connection = emDatasource.getConnection()) {
-            final PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            final PreparedStatement preparedStatement = connection.prepareStatement(DELETED_DOCS_IDS_SQL);
             preparedStatement.setObject(1, deletedFlag, java.sql.Types.BOOLEAN);
 
             final ResultSet resultSet = preparedStatement.executeQuery();

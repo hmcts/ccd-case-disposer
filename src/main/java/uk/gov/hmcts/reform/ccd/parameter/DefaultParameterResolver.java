@@ -107,6 +107,6 @@ public class DefaultParameterResolver implements ParameterResolver {
 
     @Override
     public String getDocumentsDeleteUrl() {
-        return this.dmRemoteDocumentsDeleteUrl;
+        return dmRemoteDocumentsDeleteUrl;
     }
 }

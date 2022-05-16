@@ -22,7 +22,7 @@ import java.net.http.HttpResponse;
 @Service
 @Slf4j
 @Qualifier("DisposeCaseRemoteOperation")
-public class DisposeCaseRemoteOperation implements DisposeRemoteOperation {
+public class DisposeCaseRemoteOperation {
 
     private final SecurityUtil securityUtil;
 
@@ -43,7 +43,6 @@ public class DisposeCaseRemoteOperation implements DisposeRemoteOperation {
         this.parameterResolver = parameterResolver;
     }
 
-    @Override
     public void postDocumentsDelete(String caseRef) {
 
         try {
