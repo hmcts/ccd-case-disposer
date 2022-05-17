@@ -5,8 +5,6 @@ spring:
     import: "optional:configtree:/mnt/secrets/ccd/"
   application:
     name: Case Disposer
-  main:
-    web-application-type: none
   jpa:
     database: postgresql
     show-sql: ${SHOW_SQL:true}
