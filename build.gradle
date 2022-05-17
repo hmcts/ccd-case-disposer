@@ -232,6 +232,7 @@ dependencies {
 
     functionalTestImplementation sourceSets.main.runtimeClasspath
     functionalTestImplementation sourceSets.test.runtimeClasspath
+    functionalTestImplementation group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
 }
 
 mainClassName = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'
