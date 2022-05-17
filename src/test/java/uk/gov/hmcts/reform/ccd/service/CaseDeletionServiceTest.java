@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.remote.DisposeCaseRemoteOperation;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
 
 import java.util.List;
@@ -54,6 +55,8 @@ class CaseDeletionServiceTest {
     @Mock
     private CaseLinkRepository caseLinkRepository;
     @Mock
+    private DisposeCaseRemoteOperation disposeCaseRemoteOperation;
+    @Mock
     private CaseDataElasticsearchOperations caseDataElasticsearchOperations;
     @Mock
     private ParameterResolver parameterResolver;
@@ -81,6 +84,7 @@ class CaseDeletionServiceTest {
         doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
+        doNothing().when(disposeCaseRemoteOperation).postDocumentsDelete(anyString());
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
@@ -90,6 +94,7 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
         verify(caseDataRepository).findById(1L);
         verify(caseDataRepository).delete(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
+        verify(disposeCaseRemoteOperation).postDocumentsDelete(anyString());
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
     }
 
@@ -106,6 +111,7 @@ class CaseDeletionServiceTest {
                 }
             );
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
+        doNothing().when(disposeCaseRemoteOperation).postDocumentsDelete(anyString());
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
@@ -116,6 +122,7 @@ class CaseDeletionServiceTest {
             verify(caseDataRepository).findById(caseId);
         });
         verify(caseDataRepository, times(3)).delete(any(CaseDataEntity.class));
+        verify(disposeCaseRemoteOperation, times(3)).postDocumentsDelete(anyString());
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 10L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 11L);
@@ -139,6 +146,7 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
         verifyNoInteractions(caseDataRepository);
         verifyNoInteractions(caseLinkRepository);
+        verifyNoInteractions(disposeCaseRemoteOperation);
         verifyNoInteractions(caseDataElasticsearchOperations);
     }
 
@@ -181,6 +189,7 @@ class CaseDeletionServiceTest {
             .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
         doNothing().when(caseLinkRepository).delete(any(CaseLinkEntity.class));
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
+        doNothing().when(disposeCaseRemoteOperation).postDocumentsDelete(anyString());
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
@@ -196,6 +205,7 @@ class CaseDeletionServiceTest {
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
         verify(caseLinkRepository, times(2)).delete(any(CaseLinkEntity.class));
         verify(caseDataRepository, times(3)).delete(any(CaseDataEntity.class));
+        verify(disposeCaseRemoteOperation, times(3)).postDocumentsDelete(anyString());
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 10L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 11L);
