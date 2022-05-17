@@ -3,6 +3,8 @@ spring:
     import: "optional:configtree:/mnt/secrets/ccd/"
   application:
     name: Case Disposer
+  main:
+    web-application-type: none
   jpa:
     database: postgresql
     show-sql: ${SHOW_SQL:true}
@@ -33,6 +35,18 @@ elasticsearch:
 
 deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
+
+dm:
+  remote:
+    documents-delete-url: ${DM_REMOTE_DOCS_DELETE_URL:http://localhost:4603/documents/delete}
+
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+  s2s-auth:
+    name: ccd_case_disposer
+    url: ${S2S_URL:http://localhost:4502}
+    secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
 
 azure:
   application-insights:

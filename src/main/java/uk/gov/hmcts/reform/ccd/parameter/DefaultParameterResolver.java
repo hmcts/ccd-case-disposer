@@ -35,6 +35,9 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("#{'${simulated.case.types}'.split(',')}")
     private List<String> deletableCaseTypeSimulation;
 
+    @Value("${dm.remote.documents-delete-url}")
+    private String dmRemoteDocumentsDeleteUrl;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -100,5 +103,10 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Override
     public String getIdamPassword() {
         return null;
+    }
+
+    @Override
+    public String getDocumentsDeleteUrl() {
+        return dmRemoteDocumentsDeleteUrl;
     }
 }
