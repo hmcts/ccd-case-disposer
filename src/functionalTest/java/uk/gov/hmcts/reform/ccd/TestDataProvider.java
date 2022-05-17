@@ -492,7 +492,7 @@ public class TestDataProvider {
 
         createGlobalSearchIndex(indexedData);
 
-        resetIndices(indexedData.keySet());
+        //resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
@@ -500,7 +500,7 @@ public class TestDataProvider {
         insertDataIntoDatabase(evidenceDataSource, emScriptPath);
         verifyDatabaseIsPopulated(rowIds);
         verifyEvidenceDatabaseIsPopulated();
-        verifyCaseDataAreInElasticsearch(indexedData);
+        //verifyCaseDataAreInElasticsearch(indexedData);
     }
 
     private void setDeletableCaseTypes(final String value) {
