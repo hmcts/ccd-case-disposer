@@ -24,6 +24,7 @@ elastic:
   enabled: true
 
 elasticsearch:
+  ingressHost: es-${SERVICE_FQDN}
   clusterName: "es"
   imageTag: "7.17.1"
   replicas: 1
