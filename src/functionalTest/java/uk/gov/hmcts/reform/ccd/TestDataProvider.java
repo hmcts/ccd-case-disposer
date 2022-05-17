@@ -17,10 +17,12 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.params.provider.Arguments;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.helper.EvidenceManagementDbHelper;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewHolder;
@@ -49,6 +51,9 @@ public class TestDataProvider {
     private static final String INDEX_TYPE = "_doc";
     private static final String CASE_REFERENCE_FIELD = "reference";
 
+    private static final int EM_DB_INITIAL_DOCUMENTS = 6;
+    private static final String EM_DATABASE_SCRIPT = "scenarios/S-000-evidence-management-database-setup.sql";
+
     @Inject
     private RestHighLevelClient elasticsearchClient;
 
@@ -56,7 +61,18 @@ public class TestDataProvider {
     private DataSource dataSource;
 
     @Inject
+    @Qualifier("ccd")
+    private DataSource ccdDataSource;
+
+    @Inject
+    @Qualifier("evidence")
+    private DataSource evidenceDataSource;
+
+    @Inject
     private CaseDataRepository caseDataRepository;
+
+    @Inject
+    private EvidenceManagementDbHelper evidenceManagementDbHelper;
 
     @Inject
     private ParameterResolver parameterResolver;
@@ -73,9 +89,11 @@ public class TestDataProvider {
                         null,
                         null,
                         "scenarios/S-001-no-case-types-specified-in-delete-request.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                         List.of(1L),
+                        emptyList(),
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList()),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L))
@@ -84,9 +102,11 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-002-no-cases-exist-for-the-specified-case-type-in-delete-request.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L)),
                         List.of(1L),
+                        emptyList(),
                         emptyList(),
                         Map.of("FT_MultiplePages", emptyList()),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L))
@@ -95,9 +115,11 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-003-resolved-ttl-is-in-the-future.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                         List.of(1L),
+                        emptyList(),
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList()),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L))
@@ -106,11 +128,13 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-004-no-cases-due-deletion-present.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L),
                                 "FT_MultiplePages", List.of(1504259907353528L)
                         ),
                         List.of(1L, 2L), //endStateRowIds
+                        emptyList(),
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList(),
                                 "FT_MultiplePages", emptyList()
@@ -123,12 +147,16 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         ),
                         List.of(3L, 4L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638", "40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                                 "FT_MultiplePages", emptyList()
                         ),
@@ -141,12 +169,16 @@ public class TestDataProvider {
                         "FT_MasterCaseType, FT_MultiplePages",
                         null,
                         "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         ),
                         List.of(3L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638", "40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         ),
@@ -158,12 +190,15 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-007-deletable-case-linked-to-nondeletable-ttl-case.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353526L, 1504259907353528L, 1504259907353529L),
                                 "FT_MultiplePages", List.of(1504259907353527L)
                         ),
                         List.of(1L, 3L, 4L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353528L),
                                 "FT_MultiplePages", emptyList()
                         ),
@@ -175,6 +210,7 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-008-case-due-deletion-linked-to-nondeletable-case-type-case.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                                 "FT_MultiplePages", List.of(1504259907353527L),
@@ -182,6 +218,8 @@ public class TestDataProvider {
                         ),
                         List.of(1L, 3L, 4L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353528L),
                                 "FT_MultiplePages", emptyList(),
                                 "FT_Conditionals", emptyList()
@@ -195,6 +233,7 @@ public class TestDataProvider {
                         "FT_MasterCaseType, FT_MultiplePages",
                         null,
                         "scenarios/S-009-nondeletable-ttl-case-linked-to-deletable-case.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
                                         1504259907353527L, 1504259907353528L, 1504259907353529L
@@ -203,6 +242,9 @@ public class TestDataProvider {
                         ),
                         List.of(3L, 7L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638", "40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353524L, 1504259907353525L,
                                         1504259907353528L, 1504259907353529L
                                 ),
@@ -216,6 +258,7 @@ public class TestDataProvider {
                         "FT_MasterCaseType, FT_MultiplePages",
                         null,
                         "scenarios/S-010-deletable-cases-linked-to-multiple-nondeletable-cases.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353523L, 1504259907353524L, 1504259907353525L,
                                         1504259907353527L, 1504259907353528L, 1504259907353529L
@@ -224,6 +267,9 @@ public class TestDataProvider {
                         ),
                         List.of(2L, 3L, 6L, 7L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638"),
+
                         Map.of("FT_MasterCaseType", List.of(1504259907353525L, 1504259907353529L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         ),
@@ -237,6 +283,7 @@ public class TestDataProvider {
                         "FT_MasterCaseType, FT_MultiplePages",
                         null,
                         "scenarios/S-011-mix-bag-of-deletable-and-nondeletable-cases.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353524L,
                                         1504259907353525L, 1504259907353528L, 1504259907353529L
@@ -248,6 +295,8 @@ public class TestDataProvider {
                         ),
                         List.of(1L, 3L, 5L, 6L, 9L, 10L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353522L, 1504259907353523L, 1504259907353528L),
                                 "FT_MultiplePages", List.of(1504259907353518L, 1504259907353519L, 1504259907353526L),
                                 "FT_Conditionals", emptyList()
@@ -261,11 +310,13 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-012-multi-parent-case-when-one-parent-is-nondeletable-ttl-case.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353527L),
                                 "FT_MultiplePages", List.of(1504259907353528L)
                         ),
                         List.of(1L, 2L, 3L),
+                        emptyList(),
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList(),
                                 "FT_MultiplePages", emptyList()
@@ -278,11 +329,13 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-013-cases-due-deletion-linked-to-third-level-deep-nondeletable-case.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         ),
                         List.of(1L, 2L, 3L, 4L),
+                        emptyList(),
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList(),
                                 "FT_MultiplePages", emptyList()
@@ -295,11 +348,13 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-014-nondeletable-multi-parent-case.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         ),
                         List.of(1L, 2L, 3L, 4L),
+                        emptyList(),
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList(),
                                 "FT_MultiplePages", emptyList()
@@ -312,10 +367,14 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-015-case-links-three-levels-deep.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
                         emptyList(),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638", "40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L)),
                         Map.of("FT_MasterCaseType", emptyList())
                 ),
@@ -323,11 +382,15 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-016-deletable-multi-parent-case.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L, 4L, 5L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
                                 1504259907353526L, 1504259907353525L)),
                         emptyList(),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638", "40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L,
                                 1504259907353526L, 1504259907353525L)),
                         Map.of("FT_MasterCaseType", emptyList())
@@ -336,10 +399,14 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-017-cyclically-linked-cases.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
                         emptyList(),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638", "40e6215d-b5c6-4896-987c-f30f3678f648",
+                                "40e6215d-b5c6-4896-987c-f30f3678f658"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L)),
                         Map.of("FT_MasterCaseType", emptyList())
                 ),
@@ -347,10 +414,13 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-018-case-linked-to-itself.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                         emptyList(),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                         Map.of("FT_MasterCaseType", emptyList())
                 ),
@@ -358,10 +428,12 @@ public class TestDataProvider {
                         null,
                         "FT_MultiplePages",
                         "scenarios/S-019-simulated-case-type.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L, 1504259907353528L)),
                         List.of(1L, 2L),
                         List.of(1L, 2L),
+                        emptyList(),
                         Map.of("FT_MultiplePages", emptyList()),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L, 1504259907353528L))
                 ),
@@ -369,10 +441,13 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         "FT_MultiplePages",
                         "scenarios/S-020-simulated-and-deletable-case-types.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L)),
                         List.of(2L),
                         List.of(2L),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638"),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                         Map.of("FT_MultiplePages", List.of(1504259907353528L))
                 ),
@@ -380,10 +455,13 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         "FT_MultiplePages",
                         "scenarios/S-021-mix-bag-of-deletable-and-simulated-cases.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L, 2L, 3L),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L)),
                         List.of(2L, 3L),
                         emptyList(),
+                        List.of("40e6215d-b5c6-4896-987c-f30f3678f618", "40e6215d-b5c6-4896-987c-f30f3678f628",
+                                "40e6215d-b5c6-4896-987c-f30f3678f638"),
                         Map.of("FT_MasterCaseType", emptyList()),
                         Map.of("FT_MultiplePages", List.of(1504259907353528L, 1504259907353527L))
                 ),
@@ -391,8 +469,10 @@ public class TestDataProvider {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-022-global-search.sql",
+                        EM_DATABASE_SCRIPT,
                         List.of(1L),
                         Map.of("global_search", List.of(1504259907351111L)),
+                        emptyList(),
                         emptyList(),
                         emptyList(),
                         Map.of("global_search", List.of(1504259907351111L)),
@@ -403,7 +483,8 @@ public class TestDataProvider {
 
     protected void setupData(final String deletableCaseTypes,
                              final String deletableCaseTypesSimulation,
-                             final String scriptPath,
+                             final String ccdScriptPath,
+                             final String emScriptPath,
                              final List<Long> rowIds,
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
@@ -415,8 +496,10 @@ public class TestDataProvider {
 
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
-        insertDataIntoDatabase(scriptPath);
+        insertDataIntoDatabase(ccdDataSource, ccdScriptPath);
+        insertDataIntoDatabase(evidenceDataSource, emScriptPath);
         verifyDatabaseIsPopulated(rowIds);
+        verifyEvidenceDatabaseIsPopulated();
         verifyCaseDataAreInElasticsearch(indexedData);
     }
 
@@ -432,7 +515,7 @@ public class TestDataProvider {
         }
     }
 
-    private void insertDataIntoDatabase(final String scriptPath) throws SQLException {
+    private void insertDataIntoDatabase(final DataSource dataSource, String scriptPath) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
             final ClassPathResource resource = new ClassPathResource(scriptPath);
             ScriptUtils.executeSqlScript(connection, resource);
@@ -440,9 +523,7 @@ public class TestDataProvider {
     }
 
     private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) {
-        if (indexedData.containsKey(parameterResolver.getGlobalSearchIndexName())) {
-            globalSearchIndexCreator.createGlobalSearchIndex();
-        }
+        globalSearchIndexCreator.createGlobalSearchIndex();
     }
 
     private void verifyDatabaseIsPopulated(final List<Long> rowIds) {
@@ -450,6 +531,10 @@ public class TestDataProvider {
             Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findById(item);
             assertThat(caseDataToDelete).isPresent();
         });
+    }
+
+    private void verifyEvidenceDatabaseIsPopulated() throws SQLException {
+        assertThat(evidenceManagementDbHelper.getDocumentsCount(false) == EM_DB_INITIAL_DOCUMENTS);
     }
 
     private void verifyCaseDataAreInElasticsearch(final Map<String, List<Long>> indexedData) {
@@ -557,6 +642,14 @@ public class TestDataProvider {
         assertThat(actualRowIds)
                 .isNotNull()
                 .containsExactlyInAnyOrderElementsOf(rowIds);
+    }
+
+    protected void verifyEvidenceDatabaseDeletion(List<String> deletableDocumentIds) throws SQLException {
+        final List<String> documentsIds =  evidenceManagementDbHelper.getDocumentsIds(true);
+
+        assertThat(documentsIds)
+            .isNotNull()
+            .containsExactlyInAnyOrderElementsOf(deletableDocumentIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,

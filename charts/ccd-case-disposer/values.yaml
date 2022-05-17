@@ -29,8 +29,13 @@ java:
           alias: IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD
         - name: idam-case-disposer-client-secret
           alias: IDAM_CASE_DISPOSER_CLIENT_SECRET
+        - name: ccd-case-disposer-s2s-secret
+          alias: CCD_CASE_DISPOSER_IDAM_KEY
   environment:
     DELETE_CASE_TYPES:
     SIMULATED_CASE_TYPES:
+    IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DM_REMOTE_DOCS_DELETE_URL: http://document-management-store-app-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/documents/delete
   global:
     jobKind: CronJob

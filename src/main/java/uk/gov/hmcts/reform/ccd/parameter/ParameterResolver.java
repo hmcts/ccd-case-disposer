@@ -26,4 +26,6 @@ public interface ParameterResolver {
     String getIdamUsername();
 
     String getIdamPassword();
+
+    String getDocumentsDeleteUrl();
 }

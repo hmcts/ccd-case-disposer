@@ -42,6 +42,9 @@ public class TestParameterResolver implements ParameterResolver {
     private String idamApiPassword;
 
 
+    @Value("${dm.remote.documents-delete-url}")
+    private String dmRemoteDocumentsDeleteUrl;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -114,5 +117,10 @@ public class TestParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public String getDocumentsDeleteUrl() {
+        return this.dmRemoteDocumentsDeleteUrl;
     }
 }
