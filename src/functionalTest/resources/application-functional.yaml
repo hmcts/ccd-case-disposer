@@ -11,9 +11,9 @@ datasource:
     password: ${DATA_STORE_DB_PASSWORD:ccd}
 
 elasticsearch:
-  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
-  request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
-  cases.index.name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
+  hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
+  request.timeout: ${ELASTIC_SEARCH_REQUEST_TIMEOUT:6000}
+  cases.index.name.pattern: ${ELASTIC_SEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
   global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
   global.search.index.enabled: ${GLOBAL_SEARCH_ENABLED:true}
 
