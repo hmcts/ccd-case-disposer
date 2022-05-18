@@ -89,16 +89,6 @@ public class TestDataProvider {
     @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;
 
-    @PostConstruct
-    public void init() {
-        final HttpHost[] httpHosts = parameterResolver.getElasticsearchHosts().stream()
-            .map(HttpHost::create)
-            .toArray(HttpHost[]::new);
-        final RestClientBuilder restClientBuilder = RestClient.builder(httpHosts);
-
-        elasticsearchClient = new RestHighLevelClient(restClientBuilder);
-    }
-
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
                 Arguments.of(
@@ -643,6 +633,10 @@ public class TestDataProvider {
 
         log.info("getAllDocuments(" + indexName + ")");
         log.info("SearchReqest: " + searchRequest.toString());
+
+        log.info("elasticsearchClient.ping(RequestOptions.DEFAULT)");
+
+        elasticsearchClient.ping(RequestOptions.DEFAULT);
 
         log.info("before elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT)");
 
