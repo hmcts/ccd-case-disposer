@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd;
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -13,6 +14,8 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -38,6 +41,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
@@ -84,6 +88,16 @@ public class TestDataProvider {
 
     @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;
+
+    @PostConstruct
+    public void init() {
+        final HttpHost[] httpHosts = parameterResolver.getElasticsearchHosts().stream()
+            .map(HttpHost::create)
+            .toArray(HttpHost[]::new);
+        final RestClientBuilder restClientBuilder = RestClient.builder(httpHosts);
+
+        elasticsearchClient = new RestHighLevelClient(restClientBuilder);
+    }
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(
