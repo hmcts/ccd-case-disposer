@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.ccd;
 
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -46,6 +47,7 @@ import static org.awaitility.Awaitility.with;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
+@Slf4j
 public class TestDataProvider {
 
     private static final String INDEX_TYPE = "_doc";
@@ -492,8 +494,6 @@ public class TestDataProvider {
 
         createGlobalSearchIndex(indexedData);
 
-        globalSearchIndexCreator.testEsConnection();
-
         resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
@@ -627,7 +627,14 @@ public class TestDataProvider {
         final SearchRequest searchRequest = new SearchRequest(indexName)
                 .source(searchSourceBuilder);
 
+        log.info("getAllDocuments(" + indexName + ")");
+        log.info("SearchReqest: " + searchRequest.toString());
+
+        log.info("before elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT)");
+
         final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
+
+        log.info("after elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT)");
 
         return Arrays.stream(searchResponse.getHits().getHits())
                 .filter(hit -> indexName.startsWith(hit.getIndex()))
