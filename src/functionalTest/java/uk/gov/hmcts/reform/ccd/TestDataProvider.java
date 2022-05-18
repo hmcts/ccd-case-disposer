@@ -630,6 +630,8 @@ public class TestDataProvider {
         log.info("getAllDocuments(" + indexName + ")");
         log.info("SearchReqest: " + searchRequest.toString());
 
+        log.info("elasticsearchClient URL: " +  parameterResolver.getElasticsearchHosts().toString());
+
         log.info("elasticsearchClient.ping(RequestOptions.DEFAULT)");
 
         elasticsearchClient.ping(RequestOptions.DEFAULT);
