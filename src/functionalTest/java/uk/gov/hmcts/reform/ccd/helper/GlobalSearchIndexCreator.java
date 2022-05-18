@@ -39,4 +39,17 @@ public class GlobalSearchIndexCreator {
 
         assertThat(response.getStatusCode()).isEqualTo(201);
     }
+
+    public void testEsConnection() {
+        final Response response = RestAssured
+            .given()
+            .relaxedHTTPSValidation()
+            .baseUri("http://es-ccd-case-disposer-pr-47.service.core-compute-preview.internal/_aliases?pretty=true")
+            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .when()
+            .get()
+            .andReturn();
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+    }
 }

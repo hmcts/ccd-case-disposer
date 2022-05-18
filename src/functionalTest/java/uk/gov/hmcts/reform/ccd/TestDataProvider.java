@@ -492,6 +492,8 @@ public class TestDataProvider {
 
         createGlobalSearchIndex(indexedData);
 
+        globalSearchIndexCreator.testEsConnection();
+
         resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
