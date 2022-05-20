@@ -146,7 +146,7 @@ ccd:
   ccd-data-store-api:
     java:
       #image: hmctspublic.azurecr.io/ccd/data-store-api:latest
-      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-1872
+      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-1831
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
