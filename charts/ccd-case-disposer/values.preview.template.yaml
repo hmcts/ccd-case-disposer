@@ -66,12 +66,12 @@ logstash:
     es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
-  environment:
-    XPACK_MONITORING_ENABLED: false
-    DATA_STORE_URL: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require
-    DATA_STORE_USER: ${DATA_STORE_DB_USERNAME}
-    DATA_STORE_PASS: ${DATA_STORE_DB_PASSWORD}
-    ES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+#  environment:
+#    XPACK_MONITORING_ENABLED: false
+#    DATA_STORE_URL: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require
+#    DATA_STORE_USER: ${DATA_STORE_DB_USERNAME}
+#    DATA_STORE_PASS: ${DATA_STORE_DB_PASSWORD}
+#    ES_HOSTS: http://${SERVICE_NAME}-es-master:9200
 
 ccd:
   enabled: true
@@ -81,7 +81,7 @@ ccd:
     definitionImporter:
       enabled: false
     userProfileImporter:
-      enabled: false
+      enabled: true
     apiGatewayWeb:
       enabled: false
     postgresql:
