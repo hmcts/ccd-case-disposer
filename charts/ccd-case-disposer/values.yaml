@@ -31,6 +31,8 @@ java:
           alias: IDAM_CASE_DISPOSER_CLIENT_SECRET
         - name: ccd-case-disposer-s2s-secret
           alias: CCD_CASE_DISPOSER_IDAM_KEY
+        - name: ccd-definition-s2s-secret
+          alias: CCD_DEFINITION_STORE_S2S_SECRET
   environment:
     DELETE_CASE_TYPES:
     SIMULATED_CASE_TYPES:
