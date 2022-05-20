@@ -627,20 +627,7 @@ public class TestDataProvider {
         final SearchRequest searchRequest = new SearchRequest(indexName)
                 .source(searchSourceBuilder);
 
-        log.info("getAllDocuments(" + indexName + ")");
-        log.info("SearchReqest: " + searchRequest.toString());
-
-        log.info("elasticsearchClient URL: " +  parameterResolver.getElasticsearchHosts().toString());
-
-        log.info("elasticsearchClient.ping(RequestOptions.DEFAULT)");
-
-        elasticsearchClient.ping(RequestOptions.DEFAULT);
-
-        log.info("before elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT)");
-
         final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
-
-        log.info("after elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT)");
 
         return Arrays.stream(searchResponse.getHits().getHits())
                 .filter(hit -> indexName.startsWith(hit.getIndex()))
