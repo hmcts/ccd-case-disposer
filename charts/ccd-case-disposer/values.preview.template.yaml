@@ -130,18 +130,14 @@ ccd:
       devmemoryLimits: "2048Mi"
       keyVaults: [ ]
 
-#  ccd-user-profile-api:
-#    java:
-#      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
-#      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
-#      imagePullPolicy: Always
-#      environment:
-#        USER_PROFILE_DB_HOST: "{{ .Release.Name }}-postgresql"
-#        USER_PROFILE_DB_NAME: "{{ .Values.postgresql.postgresqlDatabase}}"
-#        USER_PROFILE_DB_USERNAME: "{{ .Values.postgresql.postgresqlUsername}}"
-#        USER_PROFILE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
-#        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified"
-#      keyVaults: [ ]
+  ccd-user-profile-api:
+    java:
+      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+      imagePullPolicy: Always
+      environment:
+        USER_PROFILE_DB_HOST: "${SERVICE_NAME}-postgresql"
+      keyVaults: [ ]
 
   ccd-data-store-api:
     java:
