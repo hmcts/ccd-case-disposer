@@ -602,6 +602,8 @@ public class TestDataProvider {
 
         caseTypes.forEach(ThrowingConsumer.unchecked(caseType -> {
             final String indexName = getIndex(caseType);
+            refreshIndex(indexName);
+
             final List<String> documents = getAllDocuments(indexName);
 
             documents.forEach(documentId -> {
