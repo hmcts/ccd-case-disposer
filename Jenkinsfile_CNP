@@ -47,6 +47,26 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   ]
 }
 
+/**
+ * Imports CCD definitions into specified environment.
+ *
+ * NOTE: It requires `bin/variables/load-${env}-environment-variables.sh` file to define environment specific URLs.
+ *
+ * @param env target environment
+ */
+def uploadCoreCaseDataDefinitions(env) {
+  dir("${WORKSPACE}/bin"){
+    if("preview" == env){
+      ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
+      sh """
+      eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
+      ./bin/add-roles.sh
+      ${WORKSPACE}/ccdImports/conversionScripts/importAllXLS-pipeline.sh ${ccdDefinitionFilePath}
+    """
+    }
+  }
+}
+
 withPipeline(type, product, component) {
   after('test') {
     // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
@@ -139,25 +159,5 @@ withPipeline(type, product, component) {
       reportFiles          : "index.html",
       reportName           : "ccd-case-disposer Functional Test Report"
     ]
-  }
-
-/**
- * Imports CCD definitions into specified environment.
- *
- * NOTE: It requires `bin/variables/load-${env}-environment-variables.sh` file to define environment specific URLs.
- *
- * @param env target environment
- */
-  def uploadCoreCaseDataDefinitions(env) {
-    dir("${WORKSPACE}/bin"){
-      if("preview" == env){
-        ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
-        sh """
-        eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
-        ./bin/add-roles.sh
-        ${WORKSPACE}/ccdImports/conversionScripts/importAllXLS-pipeline.sh ${ccdDefinitionFilePath}
-      """
-      }
-    }
   }
 }
