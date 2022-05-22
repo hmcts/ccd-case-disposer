@@ -18,10 +18,7 @@ def secrets = [
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
           secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
           secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
-          secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
-          secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
-          secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
-          secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET')
+          secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD')
   ]
 ]
 
@@ -34,7 +31,10 @@ def prSecrets = [
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
           secret('case-disposer-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
           secret('case-disposer-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
-          secret('case-disposer-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD')
+          secret('case-disposer-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
+          secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
+          secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+          secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET')
   ]
 ]
 

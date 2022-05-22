@@ -35,6 +35,8 @@ ccdUrl=${DEFINITION_STORE_HOST:-http://localhost:4451}
 
 echo "Creating CCD role: ${role}"
 
+echo "ccdUrl: ${DEFINITION_STORE_HOST}"
+
 echo "userToken: ${userToken}"
 
 echo "serviceToken: ${serviceToken}"
