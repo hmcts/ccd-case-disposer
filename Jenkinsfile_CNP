@@ -10,10 +10,6 @@ def component = "case-disposer"
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
-def vaultOverrides = [
-  'preview' : 'aat'
-]
-
 def secrets = [
   'ccd-${env}': [
           secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
@@ -22,7 +18,10 @@ def secrets = [
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
           secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
           secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
-          secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD')
+          secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
+          secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
+          secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+          secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET')
   ]
 ]
 
@@ -67,11 +66,13 @@ withPipeline(type, product, component) {
   onPR() {
     echo "Loading PR secrets"
     loadVaultSecrets(prSecrets)
+    env.ENV='preview'
   }
 
   onNonPR() {
     echo "Loading secrets"
     loadVaultSecrets(secrets)
+    env.ENV='aat'
   }
 
   after('akschartsinstall') {
@@ -85,6 +86,11 @@ withPipeline(type, product, component) {
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
     env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
+
+    // Load the CCD definitions here: (note URL is raw not blob).
+    // https://github.com/hmcts/ccd-test-definitions/tree/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel
+    // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/BEFTA_Master_Definition.xlsx
+    uploadCoreCaseDataDefinitions('preview')
 
     // For preview we might have to point to "develop" PR of data_store ES url and DB.
     // (or hardcode standard java chart username/password of postgres.)
@@ -133,5 +139,25 @@ withPipeline(type, product, component) {
       reportFiles          : "index.html",
       reportName           : "ccd-case-disposer Functional Test Report"
     ]
+  }
+
+/**
+ * Imports CCD definitions into specified environment.
+ *
+ * NOTE: It requires `bin/variables/load-${env}-environment-variables.sh` file to define environment specific URLs.
+ *
+ * @param env target environment
+ */
+  def uploadCoreCaseDataDefinitions(env) {
+    dir("${WORKSPACE}/bin"){
+      if("preview" == env){
+        ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
+        sh """
+        eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
+        ./bin/add-roles.sh
+        ${WORKSPACE}/ccdImports/conversionScripts/importAllXLS-pipeline.sh ${ccdDefinitionFilePath}
+      """
+      }
+    }
   }
 }

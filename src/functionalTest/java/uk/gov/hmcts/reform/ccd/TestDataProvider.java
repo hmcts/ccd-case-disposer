@@ -524,14 +524,8 @@ public class TestDataProvider {
         }
     }
 
-    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) throws IOException {
+    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) {
         globalSearchIndexCreator.createGlobalSearchIndex();
-
-        for (Map.Entry<String, List<Long>> entry : indexedData.entrySet()) {
-            String key = entry.getKey();
-            final String indexName = getIndex(key);
-            refreshIndex(indexName);
-        }
     }
 
     private void verifyDatabaseIsPopulated(final List<Long> rowIds) {
@@ -632,7 +626,6 @@ public class TestDataProvider {
                 .query(QueryBuilders.matchAllQuery());
         final SearchRequest searchRequest = new SearchRequest(indexName)
                 .source(searchSourceBuilder);
-
         final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, RequestOptions.DEFAULT);
 
         return Arrays.stream(searchResponse.getHits().getHits())
