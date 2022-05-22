@@ -27,12 +27,17 @@ esac
 
 binFolder=$(dirname "$0")
 
+echo ${binFolder}/idam-lease-user-token.sh "${DEFINITION_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net}" "${DEFINITION_IMPORTER_PASSWORD:-Pa55word11}"
 userToken=$(${binFolder}/idam-lease-user-token.sh "${DEFINITION_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net}" "${DEFINITION_IMPORTER_PASSWORD:-Pa55word11}")
 
 serviceToken=$(${binFolder}/idam-lease-service-token.sh)
 ccdUrl=${DEFINITION_STORE_HOST:-http://localhost:4451}
 
 echo "Creating CCD role: ${role}"
+
+echo "userToken: ${userToken}"
+
+echo "serviceToken: ${serviceToken}"
 
 curl --insecure --fail --show-error --silent --output /dev/null -X PUT \
   ${DEFINITION_STORE_HOST:-http://localhost:4451}/api/user-role \
