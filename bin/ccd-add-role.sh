@@ -27,7 +27,8 @@ esac
 
 binFolder=$(dirname "$0")
 
-userToken=$(${binFolder}/idam-lease-user-token.sh ${DEFINITION_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net} ${DEFINITION_IMPORTER_PASSWORD:-Pa55word11})
+userToken=$(${binFolder}/idam-lease-user-token.sh "${DEFINITION_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net}" "${DEFINITION_IMPORTER_PASSWORD:-Pa55word11}")
+
 serviceToken=$(${binFolder}/idam-lease-service-token.sh)
 ccdUrl=${DEFINITION_STORE_HOST:-http://localhost:4451}
 
