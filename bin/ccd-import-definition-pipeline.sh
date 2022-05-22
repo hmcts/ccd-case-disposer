@@ -8,9 +8,7 @@ filename=$(basename ${filepath})
 uploadFilename="$(date +"%Y%m%d-%H%M%S")-${filename}"
 echo filepath =$filepath
 
-echo Get User token
 userToken=$(${dir}/idam-lease-user-token.sh ${DEFINITION_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net} ${DEFINITION_IMPORTER_PASSWORD:-Password12})
-echo Get Service token
 serviceToken=$(${dir}/idam-lease-service-token.sh)
 
 echo DEFINITION_STORE_HOST = $DEFINITION_STORE_HOST

@@ -17,7 +17,7 @@ job:
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
-    DM_REMOTE_DOCS_DELETE_URL: http://dm-store-aat.service.core-compute-aat.internal/documents/delete
+    DM_REMOTE_DOCS_DELETE_URL: http://dm-store-${SERVICE_FQDN}/documents/delete
 global:
   jobKind: CronJob
 
@@ -66,12 +66,6 @@ logstash:
     es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
-#  environment:
-#    XPACK_MONITORING_ENABLED: false
-#    DATA_STORE_URL: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require
-#    DATA_STORE_USER: ${DATA_STORE_DB_USERNAME}
-#    DATA_STORE_PASS: ${DATA_STORE_DB_PASSWORD}
-#    ES_HOSTS: http://${SERVICE_NAME}-es-master:9200
 
 ccd:
   enabled: true
@@ -176,6 +170,41 @@ ccd:
       keyVaults: [ ]
       autoscaling:
         enabled: false
+
+  dm-store:
+    java:
+      image: hmctspublic.azurecr.io/dm/store:latest
+      ingressHost: dm-store-${SERVICE_FQDN}
+      readinessDelay: 60
+      secrets:
+        BLOB_ACCOUNT_NAME:
+          secretRef: storage-secret-{{ .Release.Name }}
+          key: storageAccountName
+        BLOB_ACCESS_KEY:
+          secretRef: storage-secret-{{ .Release.Name }}
+          key: accessKey
+        BLOB_SERVICE_ENDPOINT:
+          secretRef: storage-secret-{{ .Release.Name }}
+          key: primaryBlobServiceEndPoint
+      keyVaults: [ ]
+      environment:
+        # Endpoints
+        IDAM_USER_BASE_URI: https://idam-api.aat.platform.hmcts.net
+        IDAM_S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+        SPRING_DATASOURCE_URL: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/evidence?sslmode=require
+        SPRING_DATASOURCE_USERNAME: ${DATA_STORE_DB_USERNAME}
+        SPRING_DATASOURCE_PASSWORD: ${DATA_STORE_DB_PASSWORD}
+        REFORM_ENVIRONMENT: preview
+        PACKAGES_ENVIRONMENT: preview
+        ENABLE_DB_MIGRATE: 'true'
+        STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=$(BLOB_ACCOUNT_NAME);AccountKey=$(BLOB_ACCESS_KEY);EndpointSuffix=core.windows.net"
+        DOCUMENT_METADATA_UPDATE_MILLISECONDS: 1000
+        ENABLE_METADATA_MIGRATION: 'false'
+        STORAGE_CONTAINER_METADATA_CONTAINER_NAME: metadatamigration{{ .Release.Name }}
+      postgresql:
+        enabled: false
+    blobstorage:
+      enabled: true
 
   postgresql:
     service:

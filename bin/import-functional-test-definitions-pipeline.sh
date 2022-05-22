@@ -9,4 +9,3 @@ echo xlsToJsonFolder = $xlsToJsonFolder
 
 echo Importing BEFTA_Master_Definition.xlsx ....................
 ${dir}/ccd-import-definition-pipeline.sh "${xlsToJsonFolder}/BEFTA_Master_Definition.xlsx"
-
