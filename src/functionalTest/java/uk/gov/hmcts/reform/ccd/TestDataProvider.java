@@ -524,8 +524,14 @@ public class TestDataProvider {
         }
     }
 
-    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) {
+    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) throws IOException {
         globalSearchIndexCreator.createGlobalSearchIndex();
+
+        for (Map.Entry<String, List<Long>> entry : indexedData.entrySet()) {
+            String key = entry.getKey();
+            final String indexName = getIndex(key);
+            refreshIndex(indexName);
+        }
     }
 
     private void verifyDatabaseIsPopulated(final List<Long> rowIds) {
@@ -602,8 +608,6 @@ public class TestDataProvider {
 
         caseTypes.forEach(ThrowingConsumer.unchecked(caseType -> {
             final String indexName = getIndex(caseType);
-            refreshIndex(indexName);
-
             final List<String> documents = getAllDocuments(indexName);
 
             documents.forEach(documentId -> {
