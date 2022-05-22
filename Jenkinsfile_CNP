@@ -59,9 +59,9 @@ def uploadCoreCaseDataDefinitions(env) {
     if("preview" == env){
       ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
       sh """
-      eval \$(./variables/load-preview-environment-variables.sh ${CHANGE_ID})
-      ./bin/add-roles.sh
-      ${WORKSPACE}/ccdImports/conversionScripts/importAllXLS-pipeline.sh ${ccdDefinitionFilePath}
+      eval \$(./load-preview-environment-variables.sh ${CHANGE_ID})
+      ./add-roles.sh
+      ./import-functional-test-definitions-pipeline.sh ${ccdDefinitionFilePath}
     """
     }
   }
