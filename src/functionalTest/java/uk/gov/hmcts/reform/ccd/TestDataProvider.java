@@ -94,7 +94,7 @@ public class TestDataProvider {
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
         insertDataIntoDatabase(ccdDataSource, ccdScriptPath);
-        insertDataIntoDatabase(evidenceDataSource, emScriptPath);
+        //insertDataIntoDatabase(evidenceDataSource, emScriptPath);
         verifyDatabaseIsPopulated(rowIds);
         //verifyEvidenceDatabaseIsPopulated();
         verifyCaseDataAreInElasticsearch(indexedData);
