@@ -107,9 +107,8 @@ withPipeline(type, product, component) {
     env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
     env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
 
-    // Load the CCD definitions here: (note URL is raw not blob).
-    // https://github.com/hmcts/ccd-test-definitions/tree/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel
-    // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/BEFTA_Master_Definition.xlsx
+    // Load the CCD definitions here:
+    // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions('preview')
 
     // For preview we might have to point to "develop" PR of data_store ES url and DB.

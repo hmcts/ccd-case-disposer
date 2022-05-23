@@ -68,39 +68,28 @@ logstash:
     initialDelaySeconds: 90
 
 dm-store:
-  image:
-    repository: hmctspublic.azurecr.io/dm/store
-    tag: latest
-    pullPolicy: IfNotPresent
-  ingressHost: dm-store-${SERVICE_FQDN}
-  readinessDelay: 60
-  secrets:
-    BLOB_ACCOUNT_NAME:
-      secretRef: storage-secret-{{ .Release.Name }}
-      key: storageAccountName
-    BLOB_ACCESS_KEY:
-      secretRef: storage-secret-{{ .Release.Name }}
-      key: accessKey
-    BLOB_SERVICE_ENDPOINT:
-      secretRef: storage-secret-{{ .Release.Name }}
-      key: primaryBlobServiceEndPoint
-  keyVaults: [ ]
-  environment:
-    IDAM_USER_BASE_URI: https://idam-api.aat.platform.hmcts.net
-    IDAM_S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    SPRING_DATASOURCE_URL: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/evidence?sslmode=require
-    SPRING_DATASOURCE_USERNAME: ${DATA_STORE_DB_USERNAME}
-    SPRING_DATASOURCE_PASSWORD: ${DATA_STORE_DB_PASSWORD}
-    REFORM_ENVIRONMENT: preview
-    PACKAGES_ENVIRONMENT: preview
-    ENABLE_DB_MIGRATE: 'true'
-    STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=$(BLOB_ACCOUNT_NAME);AccountKey=$(BLOB_ACCESS_KEY);EndpointSuffix=core.windows.net"
-    DOCUMENT_METADATA_UPDATE_MILLISECONDS: 1000
-    ENABLE_METADATA_MIGRATION: 'false'
-    STORAGE_CONTAINER_METADATA_CONTAINER_NAME: metadatamigration{{ .Release.Name }}
-
-blobstorage:
-  enabled: true
+  java:
+    ingressHost: dm-store-${SERVICE_FQDN}
+    image: hmctspublic.azurecr.io/dm/store:latest
+    secrets:
+      STORAGE_ACCOUNT_NAME:
+        disabled: true
+      STORAGE_ACCOUNT_KEY:
+        disabled: true
+      STORAGE_CONTAINER_DOCUMENT_CONTAINER_NAME:
+        disabled: true
+    keyVaults:
+    environment:
+      IDAM_USER_BASE_URI: https://idam-api.aat.platform.hmcts.net
+      IDAM_S2S_BASE_URI: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/evidence?sslmode=require
+      SPRING_DATASOURCE_USERNAME: ${DATA_STORE_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATA_STORE_DB_PASSWORD}
+      ENABLE_DB_MIGRATE: 'true'
+      ENABLE_TTL: 'false'
+      ENABLE_AZURE_STORAGE_CONTAINER: 'false'
+      POSTGRES_STORAGE_ENABLED: 'true'
+      STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: 'DefaultEndpointsProtocol=https;AccountName=AAAAAAAAAAAAAAAA;AccountKey=AAAAAAAAAAAAAAAA;EndpointSuffix=core.windows.net'
 
 ccd:
   enabled: true

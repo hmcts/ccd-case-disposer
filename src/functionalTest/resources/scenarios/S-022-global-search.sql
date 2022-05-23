@@ -4,7 +4,7 @@ DELETE FROM case_data;
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification,
                        reference, resolved_ttl)
-VALUES (1, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (1, 'DPR_FT_MasterCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet",
          "SearchCriteria": {"classification":"PUBLIC",
@@ -30,5 +30,5 @@ VALUES (1, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "PUBLIC"
         }',
-        1504259907351111,
+        504259907351111,
         '2016-06-24 20:44:52.824');
