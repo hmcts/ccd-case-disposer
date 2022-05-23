@@ -12,7 +12,7 @@ VALUES ('DPR_FT_MasterCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "PUBLIC"
         }',
-        504259907353529,
+        1004259907353529,
         '2016-06-24 20:44:52.824');
 
 INSERT INTO case_data (case_type_id, jurisdiction, state, security_classification, data, data_classification,
@@ -24,6 +24,6 @@ VALUES ('DPR_FT_MultiplePages', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "PUBLIC"
         }',
-        504259907353528,
+        1004259907353528,
         '2016-06-24 20:44:52.824');
 

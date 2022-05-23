@@ -31,5 +31,5 @@ VALUES ('DPR_FT_MasterCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "PUBLIC"
         }',
-        504259907351111,
+        1004259907351111,
         '2016-06-24 20:44:52.824');
