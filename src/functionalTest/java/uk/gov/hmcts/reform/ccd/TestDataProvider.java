@@ -95,7 +95,7 @@ public class TestDataProvider {
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
         insertDataIntoDatabase(ccdDataSource, ccdScriptPath);
         //insertDataIntoDatabase(evidenceDataSource, emScriptPath);
-        verifyDatabaseIsPopulated(rowIds);
+        verifyDatabaseIsPopulatedByReference(rowIds);
         //verifyEvidenceDatabaseIsPopulated();
         verifyCaseDataAreInElasticsearch(indexedData);
     }
@@ -123,9 +123,18 @@ public class TestDataProvider {
         globalSearchIndexCreator.createGlobalSearchIndex();
     }
 
-    private void verifyDatabaseIsPopulated(final List<Long> rowIds) {
+    /*
+    private void verifyDatabaseIsPopulatedById(final List<Long> rowIds) {
         rowIds.forEach(item -> {
             Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findById(item);
+            assertThat(caseDataToDelete).isPresent();
+        });
+    }
+    */
+
+    private void verifyDatabaseIsPopulatedByReference(final List<Long> rowIds) {
+        rowIds.forEach(item -> {
+            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findByReference(item);
             assertThat(caseDataToDelete).isPresent();
         });
     }
@@ -232,7 +241,7 @@ public class TestDataProvider {
     protected void verifyDatabaseDeletion(final List<Long> rowIds) {
         final List<CaseDataEntity> all = caseDataRepository.findAll();
         final List<Long> actualRowIds = all.stream()
-                .map(CaseDataEntity::getId)
+                .map(CaseDataEntity::getReference)
                 .collect(Collectors.toUnmodifiableList());
 
         assertThat(actualRowIds)
