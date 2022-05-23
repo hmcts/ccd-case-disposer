@@ -19,7 +19,7 @@
   </suppress>
 
   <!-- Suppress until fixed -->
-  <suppress until="2022-05-25">
+  <suppress until="2022-06-25">
     <cve>CVE-2022-21724</cve>
   </suppress>
 
@@ -31,7 +31,7 @@
     <vulnerabilityName>CVE-2022-22965</vulnerabilityName>
   </suppress>
 
-  <suppress until="2022-05-25">
+  <suppress until="2022-06-25">
      <notes><![CDATA[
          Elastic search 6.4.2
      ]]></notes>
@@ -45,5 +45,11 @@
      <cve>CVE-2021-22137</cve>
      <cve>CVE-2021-22144</cve>
    </suppress>
+  <suppress until="2022-06-25">
+    <notes><![CDATA[
+   file name: spring-core-5.3.18.jar
+   ]]></notes>
+    <cve>CVE-2016-1000027</cve>
+  </suppress>
 
 </suppressions>

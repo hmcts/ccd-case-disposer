@@ -20,9 +20,6 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
-    @Value("${elasticsearch.global.search.index.enabled}")
-    private String isGlobalSearchEnabled;
-
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
@@ -60,10 +57,6 @@ public class DefaultParameterResolver implements ParameterResolver {
         return globalSearchIndexName;
     }
 
-    @Override
-    public boolean isGlobalSearchEnabled() {
-        return Boolean.parseBoolean(isGlobalSearchEnabled);
-    }
 
     @Override
     public String getCasesIndexType() {

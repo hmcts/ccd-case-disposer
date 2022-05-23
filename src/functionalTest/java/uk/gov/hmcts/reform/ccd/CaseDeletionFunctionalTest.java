@@ -30,7 +30,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
     }
 
     @ParameterizedTest
-    @MethodSource("provideCaseDeletionScenarios")
+    @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenarios(final String deletableCaseTypes,
                        final String deletableCaseTypesSimulation,
                        final String ccdScriptPath,
@@ -55,6 +55,4 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
-
-
 }

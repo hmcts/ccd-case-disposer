@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
+import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,73 +28,77 @@ public class DisposeCaseRemoteOperation {
 
     private final HttpClient httpClient;
 
-    private final ObjectMapper objectMapper;
-
     private final ParameterResolver parameterResolver;
+    private final Gson gson = new Gson();
+    private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
     @Autowired
     public DisposeCaseRemoteOperation(@Lazy final SecurityUtil securityUtil,
-                                    @Qualifier("httpClientDispose") final HttpClient httpClient,
-                                    @Qualifier("SimpleObjectMapper") final ObjectMapper objectMapper,
-                                    final ParameterResolver parameterResolver) {
+                                      @Qualifier("httpClientDispose") final HttpClient httpClient,
+                                      final ParameterResolver parameterResolver,
+                                      final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
         this.securityUtil = securityUtil;
         this.httpClient = httpClient;
-        this.objectMapper = objectMapper;
         this.parameterResolver = parameterResolver;
+        this.documentDeletionRecordHolder = documentDeletionRecordHolder;
     }
 
-    public void postDocumentsDelete(String caseRef) {
-
+    public void postDocumentsDelete(final String caseRef) {
         try {
-            String dmCaseDocumentsDeleteUrl = parameterResolver.getDocumentsDeleteUrl();
+            final String dmCaseDocumentsDeleteUrl = parameterResolver.getDocumentsDeleteUrl();
 
-            DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
+            final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
 
-            String requestBody = objectMapper.writeValueAsString(documentsDeleteRequest);
+            final String requestBody = gson.toJson(documentsDeleteRequest);
 
-            HttpResponse<String> documentsDeleteResponse = postDisposeRequest(dmCaseDocumentsDeleteUrl, requestBody);
+            final HttpResponse<String> documentsDeleteResponse = postDisposeRequest(dmCaseDocumentsDeleteUrl,
+                    requestBody);
 
             logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse);
 
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             final String errorMessage = String.format("Error deleting documents for case : %s", caseRef);
             log.error(errorMessage, ex);
             Thread.currentThread().interrupt();
             throw new DocumentDeletionException(errorMessage, ex);
         }
-
     }
 
-    private HttpResponse<String> postDisposeRequest(String url, String body) throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .header("Content-Type", "application/json")
-            .header("ServiceAuthorization", securityUtil.getServiceAuthorization())
-            .POST(HttpRequest.BodyPublishers.ofString(body))
-            .build();
+    private HttpResponse<String> postDisposeRequest(final String url, final String body) throws IOException,
+            InterruptedException {
+        final HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Content-Type", "application/json")
+                .header("ServiceAuthorization", securityUtil.getServiceAuthorization())
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
 
         return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
     }
 
-    private void logDocumentsDisposal(DocumentsDeletePostRequest documentsDeleteRequest,
-                                      HttpResponse<String> documentsDeleteResponse) throws JsonProcessingException {
+    private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
+                                      final HttpResponse<String> documentsDeleteResponse) {
 
-        String message;
+        final CaseDocumentsDeletionResults documentsDeletionResults =
+                gson.fromJson(documentsDeleteResponse.body(), CaseDocumentsDeletionResults.class);
 
-        CaseDocumentsDeletionResults documentsDeletionResults =
-            objectMapper.readValue(documentsDeleteResponse.body(), CaseDocumentsDeletionResults.class);
+        documentDeletionRecordHolder.setCaseDocumentsDeletionResults(documentsDeleteRequest.getCaseRef(),
+                documentsDeletionResults);
 
-        if (documentsDeletionResults.getCaseDocumentsFound() != documentsDeletionResults.getMarkedForDeletion()) {
-            message = "Case Documents Deletion ANOMALY: ";
-        } else {
-            message = "Case Documents Deletion CONFIRMATION: ";
-        }
+        final String message = getLogMessage(documentsDeletionResults);
 
         log.info(message + "Case Ref = {} - Documents found = {} - Documented Marked for deletion = {}",
-                 documentsDeleteRequest.getCaseRef(),
-                 documentsDeletionResults.getCaseDocumentsFound(),
-                 documentsDeletionResults.getMarkedForDeletion());
+                documentsDeleteRequest.getCaseRef(),
+                documentsDeletionResults.getCaseDocumentsFound(),
+                documentsDeletionResults.getMarkedForDeletion());
     }
 
+    private String getLogMessage(final CaseDocumentsDeletionResults documentsDeletionResults) {
+        if (!documentsDeletionResults.getCaseDocumentsFound()
+                .equals(documentsDeletionResults.getMarkedForDeletion())) {
+            return "Case Documents Deletion ANOMALY: ";
+        }
+        return "Case Documents Deletion CONFIRMATION: ";
+    }
 }
