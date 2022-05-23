@@ -24,7 +24,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class CaseDataElasticsearchOperations {
     private static final String CASE_REFERENCE_FIELD = "reference";
     private static final String SEARCH_FAILURES = "Search failures occurred";
-    private static final String ELASTIC_SEARCH_FAILURES = "Elasticsearch operation failures occurred";
+    private static final String ELASTICSEARCH_FAILURES = "Elasticsearch operation failures occurred";
 
     private final RestHighLevelClient elasticsearchClient;
     private final ParameterResolver parameterResolver;
@@ -65,7 +65,7 @@ public class CaseDataElasticsearchOperations {
                 throwError(SEARCH_FAILURES, searchFailures);
             }
             if (!isEmpty(bulkFailures)) {
-                throwError(ELASTIC_SEARCH_FAILURES, bulkFailures);
+                throwError(ELASTICSEARCH_FAILURES, bulkFailures);
             }
         } catch (final IOException e) {
             throw new ElasticsearchOperationException(e);
