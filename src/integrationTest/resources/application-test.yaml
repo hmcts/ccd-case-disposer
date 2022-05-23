@@ -25,3 +25,12 @@ elasticsearch:
 
 deletable.case.types: ${DELETE_CASE_TYPES:"deletable_case_type,bbb,ccc"}
 simulated.case.types: ${SIMULATED_CASE_TYPES:"deletable_case_type_simulation,ttt,yyy"}
+
+idam:
+  s2s-auth:
+    name: ccd_case_disposer
+    url: ${S2S_URL:http://localhost:4603}
+    secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
+
+
+dm.remote.documents-delete-url: http://localhost:4603/documents/delete

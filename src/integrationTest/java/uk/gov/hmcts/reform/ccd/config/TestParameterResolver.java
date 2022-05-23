@@ -27,16 +27,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.global.search.index.name}")
     private String globalSearchIndexName;
 
-
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
-    @Override
-    public List<String> getElasticsearchHosts() {
-        return elasticsearchHosts.stream()
-                .map(quotedHost -> quotedHost.replace("\"", "").strip())
-                .collect(toUnmodifiableList());
-    }
+    @Value("${dm.remote.documents-delete-url}")
+    private String dmRemoteDocumentsDeleteUrl;
 
     @Override
     public Integer getElasticsearchRequestTimeout() {
@@ -58,18 +53,11 @@ public class TestParameterResolver implements ParameterResolver {
         return casesIndexType;
     }
 
-    public String getCaseDefinitionHost() {
-        return null;
-    }
-
     @Override
-    public String getIdamUsername() {
-        return null;
-    }
-
-    @Override
-    public String getIdamPassword() {
-        return null;
+    public List<String> getElasticsearchHosts() {
+        return elasticsearchHosts.stream()
+                .map(quotedHost -> quotedHost.replace("\"", "").strip())
+                .collect(toUnmodifiableList());
     }
 
     @Override
@@ -98,5 +86,25 @@ public class TestParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public String getCaseDefinitionHost() {
+        return null;
+    }
+
+    @Override
+    public String getIdamUsername() {
+        return null;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return null;
+    }
+
+    @Override
+    public String getDocumentsDeleteUrl() {
+        return dmRemoteDocumentsDeleteUrl;
     }
 }

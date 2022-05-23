@@ -16,7 +16,6 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
@@ -50,13 +49,9 @@ public class TestDataProvider {
     private static final String CASE_REFERENCE_FIELD = "reference";
 
     private static final int EM_DB_INITIAL_DOCUMENTS = 6;
-    private static final String EM_DATABASE_SCRIPT = "scenarios/S-000-evidence-management-database-setup.sql";
 
     @Inject
     private RestHighLevelClient elasticsearchClient;
-
-    @Inject
-    private DataSource dataSource;
 
     @Inject
     @Qualifier("ccd")
@@ -91,7 +86,7 @@ public class TestDataProvider {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
 
-        createGlobalSearchIndex(indexedData);
+        createGlobalSearchIndex();
 
         resetIndices(indexedData.keySet());
 
@@ -123,7 +118,7 @@ public class TestDataProvider {
         }
     }
 
-    private void createGlobalSearchIndex(final Map<String, List<Long>> indexedData) {
+    private void createGlobalSearchIndex() {
         globalSearchIndexCreator.createGlobalSearchIndex();
     }
 
@@ -246,11 +241,11 @@ public class TestDataProvider {
     }
 
     protected void verifyEvidenceDatabaseDeletion(List<String> deletableDocumentIds) throws SQLException {
-        final List<String> documentsIds =  evidenceManagementDbHelper.getDocumentsIds(true);
+        final List<String> documentsIds = evidenceManagementDbHelper.getDocumentsIds(true);
 
         assertThat(documentsIds)
-            .isNotNull()
-            .containsExactlyInAnyOrderElementsOf(deletableDocumentIds);
+                .isNotNull()
+                .containsExactlyInAnyOrderElementsOf(deletableDocumentIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,

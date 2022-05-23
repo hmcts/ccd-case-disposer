@@ -4,12 +4,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.data.TestDataProvider;
-import uk.gov.hmcts.reform.idam.client.IdamApi;
 
 import java.util.List;
 import java.util.Map;
@@ -23,12 +20,6 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
     @Autowired
     private ApplicationExecutor executor;
 
-    @MockBean
-    private AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
-    private IdamApi idamApi;
-
 
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
@@ -39,6 +30,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
                        final Map<String, List<Long>> indexedData,
                        final List<Long> deletableEndStateRowIds,
                        final List<Long> simulatedEndStateRowIds,
+                       final List<Long> deletableCaseRefDocuments,
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
@@ -49,6 +41,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
+        verifyDocumentDeletion(deletableCaseRefDocuments);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }

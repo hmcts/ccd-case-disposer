@@ -32,3 +32,5 @@ idam:
     redirect_uri: http://ccd-case-disposer/oauth2redirect
 
 ccd.case-definition.host: ${DEFINITION_STORE_HOST:http://localhost:4451}
+
+dm.remote.documents-delete-url: ${DM_REMOTE_DOCS_DELETE_URL:http://localhost:4506/documents/delete}

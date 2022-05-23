@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.ccd.data;
 
-import uk.gov.hmcts.reform.ccd.config.es.TestElasticsearchContainer;
+import uk.gov.hmcts.reform.ccd.config.WireMockStubs;
+import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
 
@@ -14,7 +16,7 @@ import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CAS
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
 
-public class TestDataProvider extends TestElasticsearchContainer {
+public class TestDataProvider extends TestContainers {
 
     @Inject
     private SimulationTestUtils simulationTestUtils;
@@ -25,19 +27,29 @@ public class TestDataProvider extends TestElasticsearchContainer {
     @Inject
     private DatabaseTestUtils databaseTestUtils;
 
+    @Inject
+    private DocumentDeleteTestUtils documentDeleteTestUtils;
+
+    @Inject
+    private WireMockStubs wireMockStubs;
+
     protected void setupData(final String deletableCaseTypes,
                              final String deletableCaseTypesSimulation,
-                             final String scriptPath,
+                             final String ccdScriptPath,
                              final List<Long> rowIds,
                              final Map<String, List<Long>> indexedData) throws Exception {
 
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
 
+        wireMockStubs.setUpStubs(WIREMOCK_SERVER);
+
         elasticSearchTestUtils.resetIndices(indexedData.keySet());
         elasticSearchTestUtils.createElasticSearchIndex(indexedData);
 
-        databaseTestUtils.insertDataIntoDatabase(scriptPath);
+        databaseTestUtils.insertDataIntoDatabase(ccdScriptPath);
+        databaseTestUtils.insertDataIntoDatabase(ccdScriptPath);
+
         databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
         elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
     }
@@ -54,6 +66,11 @@ public class TestDataProvider extends TestElasticsearchContainer {
     protected void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
         simulationTestUtils.verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
+
+    protected void verifyDocumentDeletion(final List<Long> documentDeletionCaseRefs) {
+        documentDeleteTestUtils.verifyDocumentStoreDeletion(documentDeletionCaseRefs);
+    }
+
 
     private void setDeletableCaseTypes(final String value) {
         if (value != null) {

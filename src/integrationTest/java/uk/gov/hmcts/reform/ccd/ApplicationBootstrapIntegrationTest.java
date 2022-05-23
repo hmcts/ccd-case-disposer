@@ -8,7 +8,7 @@ import uk.gov.hmcts.reform.ccd.config.ApplicationConfiguration;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.config.es.GlobalSearchIndexChecker;
-import uk.gov.hmcts.reform.ccd.config.es.TestElasticsearchContainer;
+import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,12 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 )
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ApplicationBootstrapIntegrationTest extends TestElasticsearchContainer {
+class ApplicationBootstrapIntegrationTest extends TestContainers {
     private static final String FLAG = "true";
 
     @Test
     void testShouldBootstrapSpringContext() {
         assertThat(Boolean.valueOf(FLAG)).isTrue();
     }
-
 }
