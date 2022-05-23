@@ -69,7 +69,7 @@ logstash:
 
 dm-store:
   image:
-    repository: hmctspublic.azurecr.io/dm/store:latest
+    repository: hmctspublic.azurecr.io/dm/store
     tag: latest
     pullPolicy: IfNotPresent
   ingressHost: dm-store-${SERVICE_FQDN}
