@@ -51,7 +51,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
-        //verifyEvidenceDatabaseDeletion(deletableDocumentIds);
+        verifyEvidenceDatabaseDeletion(deletableDocumentIds);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
