@@ -38,9 +38,8 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${idam.api.password}")
     private String idamApiPassword;
 
-
-    @Value("${dm.remote.documents-delete-url}")
-    private String dmRemoteDocumentsDeleteUrl;
+    @Value("${ccd.document.store.host}")
+    private String documentStoreHost;
 
     @Override
     public List<String> getElasticsearchHosts() {
@@ -113,7 +112,7 @@ public class TestParameterResolver implements ParameterResolver {
     }
 
     @Override
-    public String getDocumentsDeleteUrl() {
-        return dmRemoteDocumentsDeleteUrl;
+    public String getDocumentStoreHost() {
+        return documentStoreHost;
     }
 }

@@ -21,7 +21,7 @@ class DefaultParameterResolverTest {
 
     private static final String DELETABLE_CASE_TYPES = "deletableCaseTypes";
 
-    private static final String DM_REMOTE_DOCUMENTS_DELETE_URl = "dmRemoteDocumentsDeleteUrl";
+    private static final String DOCUMENT_STORE_HOST = "documentStoreHost";
 
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
 
@@ -42,7 +42,7 @@ class DefaultParameterResolverTest {
                                      DELETABLE_CASE_TYPES, Arrays.asList("Case_Type_01"));
 
         ReflectionTestUtils.setField(defaultParameterResolver,
-                                     DM_REMOTE_DOCUMENTS_DELETE_URl, "http://localhost:4603/documents/delete");
+                DOCUMENT_STORE_HOST, "http://localhost:4603");
     }
 
     @Test
@@ -82,9 +82,9 @@ class DefaultParameterResolverTest {
 
     @Test
     @DisplayName("should get correct value for getDocumentsDeleteUrl")
-    void shouldGetCorrectValueForGetDocumentsDeleteUrl() {
-        assertThat(defaultParameterResolver.getDocumentsDeleteUrl(),
-                   is(equalTo("http://localhost:4603/documents/delete")));
+    void shouldGetCorrectValueForGetDocumentsHost() {
+        assertThat(defaultParameterResolver.getDocumentStoreHost(),
+                is(equalTo("http://localhost:4603")));
     }
 
 }

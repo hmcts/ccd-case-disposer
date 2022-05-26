@@ -19,6 +19,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
+
 @Service
 @Slf4j
 @Qualifier("DisposeCaseRemoteOperation")
@@ -29,8 +32,10 @@ public class DisposeCaseRemoteOperation {
     private final HttpClient httpClient;
 
     private final ParameterResolver parameterResolver;
-    private final Gson gson = new Gson();
+
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
+    private final Gson gson = new Gson();
+
 
     @Autowired
     public DisposeCaseRemoteOperation(@Lazy final SecurityUtil securityUtil,
@@ -45,7 +50,7 @@ public class DisposeCaseRemoteOperation {
 
     public void postDocumentsDelete(final String caseRef) {
         try {
-            final String dmCaseDocumentsDeleteUrl = parameterResolver.getDocumentsDeleteUrl();
+            final String dmCaseDocumentsDeleteUrl = parameterResolver.getDocumentStoreHost() + DELETE_DOCUMENT_PATH;
 
             final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
 
@@ -69,7 +74,7 @@ public class DisposeCaseRemoteOperation {
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .header("ServiceAuthorization", securityUtil.getServiceAuthorization())
+                .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
