@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 public class CaseDataView {
     private String caseType;
-    private Long caseId;
+    private Long caseRef;
     private String state;
     private List<Long> linkedCaseIds;
 }

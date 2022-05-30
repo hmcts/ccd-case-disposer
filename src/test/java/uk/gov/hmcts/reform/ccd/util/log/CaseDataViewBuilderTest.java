@@ -24,7 +24,7 @@ class CaseDataViewBuilderTest {
 
         assertThat(caseDataViews.size()).isEqualTo(4);
         assertThat(caseDataViews.get(0).getCaseType()).isEqualTo(DELETABLE_CASE_FAMILY.getRootCase().getCaseType());
-        assertThat(caseDataViews.get(0).getCaseId()).isEqualTo(DELETABLE_CASE_FAMILY.getRootCase().getId());
+        assertThat(caseDataViews.get(0).getCaseRef()).isEqualTo(DELETABLE_CASE_FAMILY.getRootCase().getId());
         assertThat(caseDataViews.get(0).getState()).isEqualTo(DELETED_STATE);
         assertThat(caseDataViews.get(0).getLinkedCaseIds().get(0))
                 .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(0).getId());
@@ -45,7 +45,7 @@ class CaseDataViewBuilderTest {
         assertThat(caseDataViews.size()).isEqualTo(3);
         assertThat(caseDataViews.get(0).getCaseType())
                 .isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getCaseType());
-        assertThat(caseDataViews.get(0).getCaseId()).isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getId());
+        assertThat(caseDataViews.get(0).getCaseRef()).isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getId());
         assertThat(caseDataViews.get(0).getState()).isEqualTo(SIMULATED_STATE);
         assertThat(caseDataViews.get(0).getLinkedCaseIds().get(0))
                 .isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(0).getId());
