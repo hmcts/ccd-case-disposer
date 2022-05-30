@@ -329,7 +329,7 @@ public class DeletionScenarios {
                         List.of(1L, 2L),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L, 1504259907353528L)),
                         List.of(1L, 2L),
-                        List.of(1L, 2L),
+                        List.of(1504259907353529L, 1504259907353528L),
                         emptyList(),
                         Map.of("FT_MultiplePages", emptyList()),
                         Map.of("FT_MultiplePages", List.of(1504259907353529L, 1504259907353528L))
@@ -342,7 +342,7 @@ public class DeletionScenarios {
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L), "FT_MultiplePages",
                                 List.of(1504259907353528L)),
                         List.of(2L),
-                        List.of(2L),
+                        List.of(1504259907353528L),
                         List.of(1504259907353529L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                         Map.of("FT_MultiplePages", List.of(1504259907353528L))

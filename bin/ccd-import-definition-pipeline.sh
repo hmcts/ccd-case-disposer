@@ -4,8 +4,8 @@ set -eu
 
 dir=$(dirname ${0})
 filepath=${1}
-filename=$(basename ${filepath})
-uploadFilename="$(date +"%Y%m%d-%H%M%S")-${filename}"
+filename=$(basename ${filepath})DISPOSER_Master_Definition.xlsx
+uploadFilename="DISPOSER_Master_Definition.xlsx"
 echo filepath =$filepath
 
 userToken=$(${dir}/idam-lease-user-token.sh ${DEFINITION_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net} ${DEFINITION_IMPORTER_PASSWORD:-Password12})

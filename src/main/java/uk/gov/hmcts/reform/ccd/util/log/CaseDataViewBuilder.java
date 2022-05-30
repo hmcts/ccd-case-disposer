@@ -21,16 +21,16 @@ public class CaseDataViewBuilder {
                                       final boolean isDeletable) {
         caseFamilies.forEach(family -> {
             final List<Long> linkedCaseIds = family.getLinkedCases().stream()
-                    .map(value -> value.getId())
+                    .map(value -> value.getReference())
                     .collect(toList());
             //Add the root case
             caseDataViews.add(new CaseDataView(family.getRootCase().getCaseType(),
-                    family.getRootCase().getId(),
+                    family.getRootCase().getReference(),
                     isDeletable ? DELETED_STATE : SIMULATED_STATE,
                     linkedCaseIds));
             //Add linked cases
             family.getLinkedCases().forEach(linkedCase -> caseDataViews.add(new CaseDataView(linkedCase.getCaseType(),
-                    linkedCase.getId(),
+                    linkedCase.getReference(),
                     isDeletable ? DELETED_STATE : SIMULATED_STATE,
                     emptyList())));
         });

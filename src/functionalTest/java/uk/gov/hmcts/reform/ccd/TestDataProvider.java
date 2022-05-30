@@ -123,14 +123,6 @@ public class TestDataProvider {
         globalSearchIndexCreator.createGlobalSearchIndex();
     }
 
-    /*
-    private void verifyDatabaseIsPopulatedById(final List<Long> rowIds) {
-        rowIds.forEach(item -> {
-            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findById(item);
-            assertThat(caseDataToDelete).isPresent();
-        });
-    }
-    */
 
     private void verifyDatabaseIsPopulatedByReference(final List<Long> rowIds) {
         rowIds.forEach(item -> {
