@@ -11,13 +11,12 @@ import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.AUTHORISATION_HEADER;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.GLOBAL_SEARCH_PATH;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @Service
 public class GlobalSearchIndexCreator {
-
-    private static final String GLOBAL_SEARCH_PATH = "/elastic-support/global-search/index";
-    private static final String SERVICE_AUTHORISATION_HEADER = "ServiceAuthorization";
-    private static final String AUTHORISATION_HEADER = "Authorization";
 
     @Inject
     private ParameterResolver parameterResolver;

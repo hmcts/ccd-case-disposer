@@ -25,5 +25,5 @@ public interface ParameterResolver {
 
     String getIdamPassword();
 
-    String getDocumentsDeleteUrl();
+    String getDocumentStoreHost();
 }
