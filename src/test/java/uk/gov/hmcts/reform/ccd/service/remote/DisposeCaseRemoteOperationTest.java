@@ -56,7 +56,7 @@ class DisposeCaseRemoteOperationTest {
     @BeforeEach
     void setUp() {
         doReturn("Bearer 12345").when(securityUtil).getServiceAuthorization();
-        doReturn("http://localhost/documents/delete").when(parameterResolver).getDocumentsDeleteUrl();
+        doReturn("http://localhost").when(parameterResolver).getDocumentStoreHost();
     }
 
     @Test

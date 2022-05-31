@@ -48,7 +48,6 @@ public class TestDataProvider extends TestContainers {
         elasticSearchTestUtils.createElasticSearchIndex(indexedData);
 
         databaseTestUtils.insertDataIntoDatabase(ccdScriptPath);
-        databaseTestUtils.insertDataIntoDatabase(ccdScriptPath);
 
         databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
         elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
