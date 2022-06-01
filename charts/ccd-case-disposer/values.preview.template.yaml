@@ -17,7 +17,7 @@ job:
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
-    DM_REMOTE_DOCS_DELETE_URL: http://dm-store-aat.service.core-compute-aat.internal/documents/delete
+    DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
 global:
   jobKind: CronJob
 

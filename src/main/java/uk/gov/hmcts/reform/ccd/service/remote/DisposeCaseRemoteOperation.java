@@ -52,6 +52,8 @@ public class DisposeCaseRemoteOperation {
         try {
             final String dmCaseDocumentsDeleteUrl = parameterResolver.getDocumentStoreHost() + DELETE_DOCUMENT_PATH;
 
+            log.info("Document delete url: ".concat(dmCaseDocumentsDeleteUrl));
+
             final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
 
             final String requestBody = gson.toJson(documentsDeleteRequest);
@@ -84,6 +86,11 @@ public class DisposeCaseRemoteOperation {
 
     private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
                                       final HttpResponse<String> documentsDeleteResponse) {
+
+        log.info("HttpResponse<String> documentsDeleteResponse: ".concat(documentsDeleteResponse.body()));
+        log.info("HttpResponse<String> documentsDeleteResponse toString(): "
+                .concat(documentsDeleteResponse.toString()));
+
 
         final CaseDocumentsDeletionResults documentsDeletionResults =
                 gson.fromJson(documentsDeleteResponse.body(), CaseDocumentsDeletionResults.class);

@@ -42,7 +42,7 @@ public class TestDataProvider {
 
         createGlobalSearchIndex();
 
-        //documentDeleteTestUtils.uploadDocument(deletableDocuments);
+        documentDeleteTestUtils.uploadDocument(deletableDocuments);
 
         elasticSearchTestUtils.resetIndices(indexedData.keySet());
 
