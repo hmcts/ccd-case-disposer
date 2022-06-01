@@ -52,6 +52,8 @@ public class DisposeCaseRemoteOperation {
         try {
             final String dmCaseDocumentsDeleteUrl = parameterResolver.getDocumentStoreHost() + DELETE_DOCUMENT_PATH;
 
+            log.info("Document delete url: ".concat(dmCaseDocumentsDeleteUrl));
+
             final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
 
             final String requestBody = gson.toJson(documentsDeleteRequest);
@@ -71,10 +73,17 @@ public class DisposeCaseRemoteOperation {
 
     private HttpResponse<String> postDisposeRequest(final String url, final String body) throws IOException,
             InterruptedException {
+
+        final String serviceAuth = securityUtil.getServiceAuthorization();
+
+        log.info("Service Token: " + serviceAuth);
+
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .header("Content-Type", "application/json")
-                .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
+                .header(SERVICE_AUTHORISATION_HEADER, serviceAuth)
+                //.header("user-id", "case.disposer.idam.system.user@gmail.com")
+                //.header("user-roles", "caseworker")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
@@ -84,6 +93,11 @@ public class DisposeCaseRemoteOperation {
 
     private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
                                       final HttpResponse<String> documentsDeleteResponse) {
+
+        log.info("HttpResponse<String> documentsDeleteResponse: ".concat(documentsDeleteResponse.body()));
+        log.info("HttpResponse<String> documentsDeleteResponse toString(): "
+                .concat(documentsDeleteResponse.toString()));
+
 
         final CaseDocumentsDeletionResults documentsDeletionResults =
                 gson.fromJson(documentsDeleteResponse.body(), CaseDocumentsDeletionResults.class);
