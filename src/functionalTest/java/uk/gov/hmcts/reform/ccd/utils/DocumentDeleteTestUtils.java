@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISAT
 
 
 @Component
+@Slf4j
 public class DocumentDeleteTestUtils {
 
     @Inject
@@ -50,6 +52,7 @@ public class DocumentDeleteTestUtils {
     }
 
     public void uploadDocument(final Map<Long, List<String>> deletableDocuments) {
+        log.info("Document delete url: ".concat(parameterResolver.getDocumentStoreHost() + DOCUMENT_PATH));
         deletableDocuments.entrySet()
                 .forEach(entry -> entry.getValue()
                         .forEach(filename -> {
@@ -66,7 +69,7 @@ public class DocumentDeleteTestUtils {
                                         .when()
                                         .post()
                                         .andReturn();
-
+                                log.info("Upload document response:" + response.asPrettyString());
                                 assertThat(response.getStatusCode()).isEqualTo(200);
 
                             } catch (final UnsupportedEncodingException e) {

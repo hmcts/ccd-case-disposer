@@ -33,4 +33,4 @@ idam:
     secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
 
 
-ccd.document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4603}
+ccd.document.store.host: http://localhost:4603
