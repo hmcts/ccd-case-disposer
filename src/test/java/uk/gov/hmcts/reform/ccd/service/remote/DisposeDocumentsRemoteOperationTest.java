@@ -31,9 +31,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@DisplayName("dispose case artifacts calls")
+@DisplayName("dispose case documents")
 @ExtendWith(MockitoExtension.class)
-class DisposeCaseRemoteOperationTest {
+class DisposeDocumentsRemoteOperationTest {
 
     @Captor
     ArgumentCaptor<HttpRequest> captor;
@@ -51,7 +51,7 @@ class DisposeCaseRemoteOperationTest {
     private ParameterResolver parameterResolver;
 
     @InjectMocks
-    private DisposeCaseRemoteOperation disposeCaseRemoteOperation;
+    private DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation;
 
     @BeforeEach
     void setUp() {
@@ -70,7 +70,7 @@ class DisposeCaseRemoteOperationTest {
 
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
-        disposeCaseRemoteOperation.postDocumentsDelete("1234567890123456");
+        disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
 
         verify(httpClient).send(captor.capture(), any());
 
@@ -100,7 +100,7 @@ class DisposeCaseRemoteOperationTest {
 
         when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
 
-        disposeCaseRemoteOperation.postDocumentsDelete("1234567890123456");
+        disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
 
         verify(httpClient).send(captor.capture(), any());
 

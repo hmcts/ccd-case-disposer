@@ -33,6 +33,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${ccd.document.store.host}")
     private String documentStoreHost;
 
+    @Value("${ccd.role.assignment.host}")
+    private String roleAssignmentHost;
+
     @Override
     public Integer getElasticsearchRequestTimeout() {
         return elasticsearchRequestTimeout;
@@ -106,5 +109,10 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getDocumentStoreHost() {
         return documentStoreHost;
+    }
+
+    @Override
+    public String getRoleAssignmentsHost() {
+        return roleAssignmentHost;
     }
 }

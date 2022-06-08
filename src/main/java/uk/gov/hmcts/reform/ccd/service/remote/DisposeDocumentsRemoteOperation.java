@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -19,13 +21,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @Service
 @Slf4j
-@Qualifier("DisposeCaseRemoteOperation")
-public class DisposeCaseRemoteOperation {
+@Qualifier("DisposeDocumentsRemoteOperation")
+public class DisposeDocumentsRemoteOperation {
+
+    private static final Logger logger = LoggerFactory.getLogger(DisposeDocumentsRemoteOperation.class);
 
     private final SecurityUtil securityUtil;
 
@@ -38,7 +44,7 @@ public class DisposeCaseRemoteOperation {
 
 
     @Autowired
-    public DisposeCaseRemoteOperation(@Lazy final SecurityUtil securityUtil,
+    public DisposeDocumentsRemoteOperation(@Lazy final SecurityUtil securityUtil,
                                       @Qualifier("httpClientDispose") final HttpClient httpClient,
                                       final ParameterResolver parameterResolver,
                                       final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
@@ -50,6 +56,8 @@ public class DisposeCaseRemoteOperation {
 
     public void postDocumentsDelete(final String caseRef) {
         try {
+            logger.info("Inside the Dispose Documents Remote Operation method");
+
             final String dmCaseDocumentsDeleteUrl = parameterResolver.getDocumentStoreHost() + DELETE_DOCUMENT_PATH;
 
             final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
@@ -73,7 +81,7 @@ public class DisposeCaseRemoteOperation {
             InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .header("Content-Type", "application/json")
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();

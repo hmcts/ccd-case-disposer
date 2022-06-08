@@ -1,0 +1,33 @@
+package uk.gov.hmcts.reform.ccd.util.log;
+
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.inject.Named;
+
+@Named
+@Getter
+public class RoleDeletionRecordHolder {
+    private List<Map<String, Integer>> roleDeletionRecordHolderList = new ArrayList<>();
+
+    public void setCaseRolesDeletionResults(final String caseRef,
+                                                final int caseRolesDeletionResults) {
+        roleDeletionRecordHolderList.add(Map.of(caseRef, caseRolesDeletionResults));
+    }
+
+    public int getCaseRolesDeletionResults(final String caseRef) {
+        if (!roleDeletionRecordHolderList.isEmpty()) {
+            final Optional<Map<String, Integer>> deletionResultsMap =
+                roleDeletionRecordHolderList.stream()
+                    .filter(roleHolderEntry -> roleHolderEntry.containsKey(caseRef))
+                    .findFirst();
+            if (deletionResultsMap.isPresent()) {
+                return deletionResultsMap.get().get(caseRef);
+            }
+        }
+        return 0;
+    }
+}
