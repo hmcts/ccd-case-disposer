@@ -102,9 +102,6 @@ logstash:
     01_input.conf: |
       input  {
         jdbc {
-          jdbc_connection_string => jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require
-          jdbc_user => ${DATA_STORE_DB_USERNAME}
-          jdbc_password => ${DATA_STORE_DB_PASSWORD}
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
@@ -224,6 +221,10 @@ logstash:
               timeout => 60
           }
       }
+  environment:
+    DB_URL: "jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require"
+    DB_USER: ${DATA_STORE_DB_USERNAME}
+    DB_PWD: ${DATA_STORE_DB_PASSWORD}
 
 ccd:
   enabled: true
