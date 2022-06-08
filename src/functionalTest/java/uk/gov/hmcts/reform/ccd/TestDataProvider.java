@@ -40,9 +40,9 @@ public class TestDataProvider {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
 
-        //createGlobalSearchIndex();
+        createGlobalSearchIndex();
 
-        documentDeleteTestUtils.uploadDocument(deletableDocuments);
+        //documentDeleteTestUtils.uploadDocument(deletableDocuments);
 
         elasticSearchTestUtils.resetIndices(indexedData.keySet());
 
