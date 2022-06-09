@@ -44,8 +44,8 @@ idam:
     url: ${IDAM_API_URL:http://localhost:5000}
   s2s-auth:
     name: ccd_case_disposer
-    url: ${S2S_URL:http://localhost:4502}
-    secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
+    url: ${IDAM_S2S_URL:http://localhost:4502}
+    secret: ${IDAM_KEY_CCD_CASE_DISPOSER:AAAAAAAAAAAAAAAA}
 
 azure:
   application-insights:

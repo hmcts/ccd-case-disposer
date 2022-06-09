@@ -103,6 +103,7 @@ withPipeline(type, product, component) {
     env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DATA_STORE_DB_HOST = "ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com"
+    env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
   }
 
   onNonPR() {
