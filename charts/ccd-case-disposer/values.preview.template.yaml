@@ -46,29 +46,6 @@ elasticsearch:
     discovery.type: single-node
     cluster.initial_master_nodes: ""
 
-#logstash:
-#  image:
-#    repository: hmctspublic.azurecr.io/ccd/logstash
-#    tag: latest
-#    pullPolicy: IfNotPresent
-#  logstashJavaOpts: -Xmx1g -Xms512M
-#  persistence:
-#    enabled: false
-#  volumeMounts:
-#    - name: pipeline
-#      mountPath: /usr/share/logstash/files
-#  elasticsearch:
-#    host: ${SERVICE_NAME}-es-master
-#    port: 9200
-#  configTpl:
-#    xpack.monitoring.enabled: "false"
-#    db.url: jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require
-#    db.user: ${DATA_STORE_DB_USERNAME}
-#    db.pwd: ${DATA_STORE_DB_PASSWORD}
-#    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
-#  livenessProbe:
-#    initialDelaySeconds: 90
-
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
   imageTag: "7.16.1"
