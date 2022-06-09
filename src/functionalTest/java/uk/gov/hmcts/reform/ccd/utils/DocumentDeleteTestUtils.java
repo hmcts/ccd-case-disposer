@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISAT
 
 
 @Component
+@Slf4j
 public class DocumentDeleteTestUtils {
 
     @Inject

@@ -20,14 +20,14 @@ public class DeletionScenarios {
                         Map.of("DPR_FT_MasterCaseType", List.of(1004259907353529L)),
                         List.of(1004259907353528L),
                         List.of(1004259907353528L),
-                        Map.of(1504259907353529L, List.of("jpg.jpg")),
+                        Map.of(1004259907353529L, List.of("jpg.jpg")),
                         Map.of("DPR_FT_MasterCaseType", List.of(1004259907353529L)),
                         Map.of("DPR_FT_MultiplePages", List.of(1004259907353528L))
                 )
         //Arguments.of(
         //"DPR_FT_MasterCaseType",
         //null,
-        //"scenarios/S-002-global-search.sql",
+        //"scenarios/S-002-global-search.sql",1504259907353529
         //List.of(1004259907351111L),
         //Map.of("global_search", List.of(1004259907351111L)),
         //emptyList(),

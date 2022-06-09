@@ -191,6 +191,10 @@ dependencies {
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.2.2'
 
+    implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.25.1'
+    implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.25.1'
+    implementation group: 'org.glassfish.jersey.core', name: 'jersey-common', version: '2.25.1'
+
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamClient
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
