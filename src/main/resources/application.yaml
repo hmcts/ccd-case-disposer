@@ -48,10 +48,6 @@ idam:
     name: ccd_case_disposer
     url: ${IDAM_S2S_URL:http://localhost:4502}
     secret: ${IDAM_KEY_CCD_CASE_DISPOSER:AAAAAAAAAAAAAAAA}
-  client:
-    id: ccd-case-disposer
-    secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
-    redirect_uri: http://ccd-case-disposer/oauth2redirect
 
 azure:
   application-insights:
