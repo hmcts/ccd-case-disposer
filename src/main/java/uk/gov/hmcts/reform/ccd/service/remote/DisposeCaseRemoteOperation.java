@@ -4,46 +4,31 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
-import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @Service
 @Slf4j
 @Qualifier("DisposeCaseRemoteOperation")
 public class DisposeCaseRemoteOperation {
 
-    private final SecurityUtil securityUtil;
-
-    private final HttpClient httpClient;
-
     private final ParameterResolver parameterResolver;
 
-    private DocumentDeletionRecordHolder documentDeletionRecordHolder;
+    private final RestClientBuilder restClientBuilder;
     private final Gson gson = new Gson();
-
+    private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
     @Autowired
-    public DisposeCaseRemoteOperation(@Lazy final SecurityUtil securityUtil,
-                                      @Qualifier("httpClientDispose") final HttpClient httpClient,
+    public DisposeCaseRemoteOperation(final RestClientBuilder restClientBuilder,
                                       final ParameterResolver parameterResolver,
                                       final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
-        this.securityUtil = securityUtil;
-        this.httpClient = httpClient;
+        this.restClientBuilder = restClientBuilder;
         this.parameterResolver = parameterResolver;
         this.documentDeletionRecordHolder = documentDeletionRecordHolder;
     }
@@ -56,8 +41,10 @@ public class DisposeCaseRemoteOperation {
 
             final String requestBody = gson.toJson(documentsDeleteRequest);
 
-            final HttpResponse<String> documentsDeleteResponse = postDisposeRequest(dmCaseDocumentsDeleteUrl,
-                    requestBody);
+            final String documentsDeleteResponse = restClientBuilder
+                    .postRequest(parameterResolver.getDocumentStoreHost(),
+                            DELETE_DOCUMENT_PATH,
+                            requestBody);
 
             logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse);
 
@@ -69,24 +56,12 @@ public class DisposeCaseRemoteOperation {
         }
     }
 
-    private HttpResponse<String> postDisposeRequest(final String url, final String body) throws IOException,
-            InterruptedException {
-        final HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-
-        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-    }
 
     private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
-                                      final HttpResponse<String> documentsDeleteResponse) {
+                                      final String documentsDeleteResponse) {
 
         final CaseDocumentsDeletionResults documentsDeletionResults =
-                gson.fromJson(documentsDeleteResponse.body(), CaseDocumentsDeletionResults.class);
+                gson.fromJson(documentsDeleteResponse, CaseDocumentsDeletionResults.class);
 
         documentDeletionRecordHolder.setCaseDocumentsDeletionResults(documentsDeleteRequest.getCaseRef(),
                 documentsDeletionResults);

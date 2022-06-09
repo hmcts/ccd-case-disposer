@@ -38,7 +38,7 @@ java:
     SIMULATED_CASE_TYPES:
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    DM_REMOTE_DOCS_DELETE_URL: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal/documents/delete
+    DOCUMENT_STORE_HOST: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DATA_STORE_DB_PORT: 5432
