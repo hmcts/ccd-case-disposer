@@ -92,7 +92,8 @@ public class CaseDeletionService {
     private void deleteCaseData(final CaseData caseData) {
         caseEventRepository.deleteByCaseDataId(caseData.getId());
         caseDataRepository.findById(caseData.getId()).ifPresent(caseDataRepository::delete);
-        disposeCaseRemoteOperation.postDocumentsDelete(caseData.getReference().toString());
+        // DTRJ
+        // disposeCaseRemoteOperation.postDocumentsDelete(caseData.getReference().toString());
         caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()), caseData.getReference());
     }
 
