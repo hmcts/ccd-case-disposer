@@ -58,6 +58,7 @@ public class DisposeCaseRemoteOperation {
         }
     }
 
+
     private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
                                       final String documentsDeleteResponse) {
 
