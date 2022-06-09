@@ -61,9 +61,6 @@ public class DisposeCaseRemoteOperation {
     private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
                                       final String documentsDeleteResponse) {
 
-        log.info("HttpResponse<String> documentsDeleteResponse: ".concat(documentsDeleteResponse.toString()));
-
-
         final CaseDocumentsDeletionResults documentsDeletionResults =
                 gson.fromJson(documentsDeleteResponse, CaseDocumentsDeletionResults.class);
 
