@@ -18,6 +18,7 @@ job:
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
+    ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
 global:
   jobKind: CronJob
 
@@ -66,6 +67,7 @@ logstash:
     es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
   livenessProbe:
     initialDelaySeconds: 90
+  depends_on: elasticsearch
 
 ccd:
   enabled: true
@@ -136,7 +138,6 @@ ccd:
   ccd-data-store-api:
     java:
       image: hmctspublic.azurecr.io/ccd/data-store-api:latest
-#      image: hmctspublic.azurecr.io/ccd/data-store-api:pr-1831
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
