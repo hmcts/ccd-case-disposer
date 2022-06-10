@@ -46,7 +46,7 @@ elasticsearch:
     discovery.type: single-node
     cluster.initial_master_nodes: ""
 
-logstash:
+dis-logstash:
   image:
     repository: "hmctspublic.azurecr.io/imported/logstash/logstash"
     tag: "7.16.1"
