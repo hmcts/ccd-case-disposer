@@ -25,9 +25,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 
-@DisplayName("dispose case artifacts calls")
+@DisplayName("dispose case documents")
 @ExtendWith(MockitoExtension.class)
-class DisposeCaseRemoteOperationTest {
+class DisposeDocumentsRemoteOperationTest {
 
     @Mock
     private RestClientBuilder restClientBuilder;
@@ -39,7 +39,7 @@ class DisposeCaseRemoteOperationTest {
     private ParameterResolver parameterResolver;
 
     @InjectMocks
-    private DisposeCaseRemoteOperation disposeCaseRemoteOperation;
+    private DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation;
 
     @BeforeEach
     void setUp() {
@@ -47,40 +47,36 @@ class DisposeCaseRemoteOperationTest {
     }
 
     @Test
-    @DisplayName("should post documents delete remote dispose request without anomaly")
     void shouldPostDocumentsDeleteRemoteDisposeRequestWithoutAnomaly() {
 
         final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
         final String jsonResponse = new Gson().toJson(new CaseDocumentsDeletionResults(1, 1));
 
-        when(restClientBuilder.postRequest("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest)).thenReturn(jsonResponse);
+        when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest)).thenReturn(jsonResponse);
 
-        disposeCaseRemoteOperation.postDocumentsDelete("1234567890123456");
+        disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
 
         verify(documentDeletionRecordHolder, times(1)).setCaseDocumentsDeletionResults(eq("1234567890123456"),
                 any(CaseDocumentsDeletionResults.class));
-        verify(restClientBuilder, times(1)).postRequest("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest);
+        verify(restClientBuilder, times(1)).postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest);
     }
 
     @Test
-    @DisplayName("should post documents delete remote dispose request without anomaly")
     void shouldThrowExceptionWhenRequestInvalid() {
         try {
             final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
 
             doThrow(new DocumentDeletionException("1234567890123456"))
                     .when(restClientBuilder)
-                    .postRequest("http://localhost", DELETE_DOCUMENT_PATH,
+                    .postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH,
                             jsonRequest);
 
-            disposeCaseRemoteOperation.postDocumentsDelete("1234567890123456");
+            disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
 
             fail("The method should have thrown DocumentDeletionException when request is invalid");
         } catch (final DocumentDeletionException documentDeletionException) {
             assertThat(documentDeletionException.getMessage())
                     .isEqualTo("Error deleting documents for case : 1234567890123456");
         }
-
-
     }
 }

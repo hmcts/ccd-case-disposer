@@ -19,9 +19,16 @@ class DefaultParameterResolverTest {
     private static final String CASE_INDEX_NAME_PATTERN = "casesIndexNamePattern";
     private static final String CASES_INDEX_TYPE = "casesIndexType";
 
+    private static final String GLOBAL_SEARCH_INDEX_NAME = "globalSearchIndexName";
+
+    private static final String IDAM_API_USERNAME = "idamApiUsername";
+    private static final String IDAM_API_PASSWORD = "idamApiPassword";
+
     private static final String DELETABLE_CASE_TYPES = "deletableCaseTypes";
+    private static final String DELETABLE_CASE_TYPE_SIMULATION = "deletableCaseTypeSimulation";
 
     private static final String DOCUMENT_STORE_HOST = "documentStoreHost";
+    private static final String ROLE_ASSIGNMENT_HOST = "roleAssignmentHost";
 
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
 
@@ -38,11 +45,22 @@ class DefaultParameterResolverTest {
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      CASES_INDEX_TYPE, "_doc");
 
+        ReflectionTestUtils.setField(defaultParameterResolver, GLOBAL_SEARCH_INDEX_NAME, "global_index_name");
+
+        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_USERNAME, "user@email.com");
+        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_PASSWORD, "Pa55w0rd");
+
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      DELETABLE_CASE_TYPES, Arrays.asList("Case_Type_01"));
 
         ReflectionTestUtils.setField(defaultParameterResolver,
+                                     DELETABLE_CASE_TYPE_SIMULATION, Arrays.asList("Case_Type_02"));
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
                 DOCUMENT_STORE_HOST, "http://localhost:4603");
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                                     ROLE_ASSIGNMENT_HOST, "http://localhost:4096");
     }
 
     @Test
@@ -74,6 +92,27 @@ class DefaultParameterResolverTest {
     }
 
     @Test
+    @DisplayName("should get correct value for getGlobalSearchIndexName")
+    void shouldGetCorrectValueForGetGlobalSearchIndexName() {
+        assertThat(defaultParameterResolver.getGlobalSearchIndexName(),
+                   is(equalTo("global_index_name")));
+    }
+
+    @Test
+    @DisplayName("should get correct value for getIdamUsername")
+    void shouldGetCorrectValueForGetIdamUsername() {
+        assertThat(defaultParameterResolver.getIdamUsername(),
+                   is(equalTo("user@email.com")));
+    }
+
+    @Test
+    @DisplayName("should get correct value for getIdamPassword")
+    void shouldGetCorrectValueForGetIdamPassword() {
+        assertThat(defaultParameterResolver.getIdamPassword(),
+                   is(equalTo("Pa55w0rd")));
+    }
+
+    @Test
     @DisplayName("should get correct value for getDeletableCaseTypes")
     void shouldGetCorrectValueForGetDeletableCaseTypes() {
         assertThat(defaultParameterResolver.getDeletableCaseTypes(),
@@ -81,10 +120,24 @@ class DefaultParameterResolverTest {
     }
 
     @Test
-    @DisplayName("should get correct value for getDocumentsDeleteUrl")
-    void shouldGetCorrectValueForGetDocumentsHost() {
+    @DisplayName("should get correct value for getDeletableCaseTypesSimulation")
+    void shouldGetCorrectValueForGetDeletableCaseTypesSimulation() {
+        assertThat(defaultParameterResolver.getDeletableCaseTypesSimulation(),
+                   is(equalTo(Arrays.asList("Case_Type_02"))));
+    }
+
+    @Test
+    @DisplayName("should get correct value for getDocumentStoreHost")
+    void shouldGetCorrectValueForGetDocumentStoreHost() {
         assertThat(defaultParameterResolver.getDocumentStoreHost(),
                 is(equalTo("http://localhost:4603")));
+    }
+
+    @Test
+    @DisplayName("should get correct value for getRoleAssignmentsHost")
+    void shouldGetCorrectValueForGetRoleAssignmentsHost() {
+        assertThat(defaultParameterResolver.getRoleAssignmentsHost(),
+                   is(equalTo("http://localhost:4096")));
     }
 
 }

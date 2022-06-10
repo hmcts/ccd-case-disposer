@@ -1,6 +1,4 @@
 spring:
-  main:
-    web-application-type: none
   config:
     import: "optional:configtree:/mnt/secrets/ccd/"
   application:
@@ -25,19 +23,20 @@ spring:
     enabled: false
 
 elasticsearch:
-  hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
-  request.timeout: ${ELASTIC_SEARCH_REQUEST_TIMEOUT:6000}
+  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
+  request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
   global.search:
     index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
   cases.index:
-    type: ${ELASTIC_SEARCH_CASE_INDEX_TYPE:_doc}
-    name.pattern: ${ELASTIC_SEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
+    type: ${ELASTICSEARCH_CASE_INDEX_TYPE:_doc}
+    name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
 
 
 deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
 
 ccd.document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
+ccd.role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
 
 idam:
   api:
@@ -48,6 +47,10 @@ idam:
     name: ccd_case_disposer
     url: ${IDAM_S2S_URL:http://localhost:4502}
     secret: ${IDAM_KEY_CCD_CASE_DISPOSER:AAAAAAAAAAAAAAAA}
+  client:
+    id: ccd-case-disposer
+    secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
+    redirect_uri: http://ccd-case-disposer/oauth2redirect
 
 azure:
   application-insights:

@@ -55,7 +55,7 @@ class RestClientBuilderTest {
         when(builder.post(Entity.json(requestBody))).thenReturn(response);
         when(response.readEntity(String.class)).thenReturn("Web client resposnse");
 
-        final String postResponse = restClientBuilder.postRequest("http://localhost:9090", "/delete", requestBody);
+        final String postResponse = restClientBuilder.postRequestWithServiceAuthHeader("http://localhost:9090", "/delete", requestBody);
 
         verify(response, times(1)).readEntity(String.class);
         assertThat(postResponse).isEqualTo("Web client resposnse");

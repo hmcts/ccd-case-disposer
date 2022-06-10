@@ -18,7 +18,7 @@ public class SecurityUtil {
     private ParameterResolver parameterResolver;
 
     @Autowired
-    public SecurityUtil(final AuthTokenGenerator authTokenGenerator,final IdamClient idamClient) {
+    public SecurityUtil(final AuthTokenGenerator authTokenGenerator, IdamClient idamClient) {
         this.authTokenGenerator = authTokenGenerator;
         this.idamClient = idamClient;
     }
@@ -27,10 +27,9 @@ public class SecurityUtil {
         return authTokenGenerator.generate();
     }
 
-
     public String getIdamClientToken() {
         return idamClient.getAccessToken(parameterResolver.getIdamUsername(),
-                parameterResolver.getIdamPassword());
+                                         parameterResolver.getIdamPassword());
     }
 
 }

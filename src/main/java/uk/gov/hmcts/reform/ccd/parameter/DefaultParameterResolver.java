@@ -26,6 +26,12 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.global.search.index.name}")
     private String globalSearchIndexName;
 
+    @Value("${idam.api.username}")
+    private String idamApiUsername;
+
+    @Value("${idam.api.password}")
+    private String idamApiPassword;
+
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
@@ -34,6 +40,9 @@ public class DefaultParameterResolver implements ParameterResolver {
 
     @Value("${ccd.document.store.host}")
     private String documentStoreHost;
+
+    @Value("${ccd.role.assignment.host}")
+    private String roleAssignmentHost;
 
     @Override
     public List<String> getElasticsearchHosts() {
@@ -53,14 +62,28 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public String getCasesIndexType() {
+        return casesIndexType;
+    }
+
+    @Override
     public String getGlobalSearchIndexName() {
         return globalSearchIndexName;
     }
 
+    @Override
+    public String getCaseDefinitionHost() {
+        return null;
+    }
 
     @Override
-    public String getCasesIndexType() {
-        return casesIndexType;
+    public String getIdamUsername() {
+        return idamApiUsername;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return idamApiPassword;
     }
 
     @Override
@@ -84,22 +107,12 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
-    public String getCaseDefinitionHost() {
-        return null;
-    }
-
-    @Override
-    public String getIdamUsername() {
-        return null;
-    }
-
-    @Override
-    public String getIdamPassword() {
-        return null;
-    }
-
-    @Override
     public String getDocumentStoreHost() {
         return documentStoreHost;
+    }
+
+    @Override
+    public String getRoleAssignmentsHost() {
+        return roleAssignmentHost;
     }
 }
