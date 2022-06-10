@@ -30,7 +30,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
                        final Map<String, List<Long>> indexedData,
                        final List<Long> deletableEndStateRowIds,
                        final List<Long> simulatedEndStateRowIds,
-                       final List<Long> deletableCaseRefDocuments,
+                       final List<Long> deletableCaseRefs,
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
@@ -41,7 +41,8 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
-        verifyDocumentDeletion(deletableCaseRefDocuments);
+        verifyDocumentDeletion(deletableCaseRefs);
+        verifyRoleDeletion(deletableCaseRefs);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }

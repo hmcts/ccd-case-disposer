@@ -38,14 +38,21 @@ deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
 
 ccd.document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
+ccd.role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
 
 idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
+    username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
   s2s-auth:
     name: ccd_case_disposer
     url: ${S2S_URL:http://localhost:4502}
     secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
+  client:
+    id: ccd-case-disposer
+    secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
+    redirect_uri: http://ccd-case-disposer/oauth2redirect
 
 azure:
   application-insights:

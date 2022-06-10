@@ -26,4 +26,6 @@ public interface ParameterResolver {
     String getIdamPassword();
 
     String getDocumentStoreHost();
+
+    String getRoleAssignmentsHost();
 }
