@@ -41,6 +41,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${ccd.document.store.host}")
     private String documentStoreHost;
 
+    @Value("${ccd.role.assignment.host}")
+    private String roleAssignmentHost;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -114,5 +117,10 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getDocumentStoreHost() {
         return documentStoreHost;
+    }
+
+    @Override
+    public String getRoleAssignmentsHost() {
+        return roleAssignmentHost;
     }
 }

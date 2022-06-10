@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
 
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @Service
@@ -26,9 +28,9 @@ public class RestClientBuilder {
         getClient();
     }
 
-    public String postRequest(final String baseUrl,
-                              final String path,
-                              final String body) {
+    public String postRequestWithServiceAuthHeader(final String baseUrl,
+                                                   final String path,
+                                                   final String body) {
 
         return client.register(new LoggingFeature())
                 .target(baseUrl)
@@ -37,6 +39,19 @@ public class RestClientBuilder {
                 .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
                 .post(Entity.json(body))
                 .readEntity(String.class);
+    }
+
+    public Response postRequestWithAllHeaders(final String baseUrl,
+                                              final String path,
+                                              final String body) {
+
+        return client.register(new LoggingFeature())
+                .target(baseUrl)
+                .path(path)
+                .request()
+                .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
+                .header(AUTHORISATION_HEADER, securityUtil.getIdamClientToken())
+                .post(Entity.json(body));
     }
 
     private Client getClient() {
