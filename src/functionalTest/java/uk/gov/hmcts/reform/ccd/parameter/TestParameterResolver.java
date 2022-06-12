@@ -26,9 +26,6 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.global.search.index.name}")
     private String globalSearchIndexName;
 
-    @Value("${elasticsearch.global.search.index.enabled}")
-    private String isGlobalSearchEnabled;
-
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
@@ -41,9 +38,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${idam.api.password}")
     private String idamApiPassword;
 
+    @Value("${ccd.document.store.host}")
+    private String documentStoreHost;
 
-    @Value("${dm.remote.documents-delete-url}")
-    private String dmRemoteDocumentsDeleteUrl;
+    @Value("${ccd.role.assignment.host}")
+    private String roleAssignmentHost;
 
     @Override
     public List<String> getElasticsearchHosts() {
@@ -67,10 +66,6 @@ public class TestParameterResolver implements ParameterResolver {
         return globalSearchIndexName;
     }
 
-    @Override
-    public boolean isGlobalSearchEnabled() {
-        return Boolean.parseBoolean(isGlobalSearchEnabled);
-    }
 
     @Override
     public String getCasesIndexType() {
@@ -120,7 +115,12 @@ public class TestParameterResolver implements ParameterResolver {
     }
 
     @Override
-    public String getDocumentsDeleteUrl() {
-        return this.dmRemoteDocumentsDeleteUrl;
+    public String getDocumentStoreHost() {
+        return documentStoreHost;
+    }
+
+    @Override
+    public String getRoleAssignmentsHost() {
+        return roleAssignmentHost;
     }
 }

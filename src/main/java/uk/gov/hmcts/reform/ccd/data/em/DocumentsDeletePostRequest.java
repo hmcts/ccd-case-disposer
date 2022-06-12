@@ -11,7 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class DocumentsDeletePostRequest implements Serializable {
 
-    public static final long serialVersionUID = 432973322;
+    private static final long serialVersionUID = 432973322;
 
     private String caseRef;
 }

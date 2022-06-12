@@ -1,12 +1,7 @@
 spring:
-
 datasource:
   ccd:
     jdbcUrl: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5055}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
-    username: ${DATA_STORE_DB_USERNAME:ccd}
-    password: ${DATA_STORE_DB_PASSWORD:ccd}
-  evidence:
-    jdbcUrl: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5055}/evidence${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
     username: ${DATA_STORE_DB_USERNAME:ccd}
     password: ${DATA_STORE_DB_PASSWORD:ccd}
 
@@ -32,3 +27,5 @@ idam:
     redirect_uri: http://ccd-case-disposer/oauth2redirect
 
 ccd.case-definition.host: ${DEFINITION_STORE_HOST:http://localhost:4451}
+
+ccd.document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
