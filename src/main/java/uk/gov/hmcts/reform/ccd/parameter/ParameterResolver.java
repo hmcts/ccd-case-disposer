@@ -11,8 +11,6 @@ public interface ParameterResolver {
 
     String getGlobalSearchIndexName();
 
-    boolean isGlobalSearchEnabled();
-
     String getCasesIndexType();
 
     List<String> getDeletableCaseTypes();
@@ -27,5 +25,7 @@ public interface ParameterResolver {
 
     String getIdamPassword();
 
-    String getDocumentsDeleteUrl();
+    String getDocumentStoreHost();
+
+    String getRoleAssignmentsHost();
 }

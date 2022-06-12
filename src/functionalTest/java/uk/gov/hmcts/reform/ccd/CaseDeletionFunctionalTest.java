@@ -30,31 +30,28 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
     }
 
     @ParameterizedTest
-    @MethodSource("provideCaseDeletionScenarios")
+    @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenarios(final String deletableCaseTypes,
                        final String deletableCaseTypesSimulation,
-                       final String ccdScriptPath,
-                       final String emScriptPath,
+                       final String scriptPath,
                        final List<Long> initialStateRowIds,
                        final Map<String, List<Long>> indexedData,
                        final List<Long> deletableEndStateRowIds,
                        final List<Long> simulatedEndStateRowIds,
-                       final List<String> deletableDocumentIds,
+                       final Map<Long, List<String>> deletableDocuments,
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
-        setupData(deletableCaseTypes, deletableCaseTypesSimulation, ccdScriptPath, emScriptPath,
-                  initialStateRowIds, indexedData);
+        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments,
+                initialStateRowIds, indexedData);
 
         // WHEN
         executor.execute();
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
-        verifyEvidenceDatabaseDeletion(deletableDocumentIds);
+        verifyDocumentDeletion(deletableDocuments);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
-
-
 }

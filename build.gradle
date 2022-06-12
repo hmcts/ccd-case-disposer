@@ -9,6 +9,7 @@ plugins {
     id 'org.sonarqube' version '3.3'
     id 'uk.gov.hmcts.java' version '0.12.2'
     id 'io.freefair.lombok' version '5.3.0'
+    id 'org.flywaydb.flyway' version '8.2.2'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -69,7 +70,10 @@ task integration(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     failFast = true
+    mustRunAfter test
 }
+
+check.dependsOn integration
 
 pmd {
     toolVersion = "6.18.0"
@@ -159,6 +163,7 @@ def versions = [
         idamClient    : '2.0.1',
         s2sClient     : '4.0.3',
         commonsIo     : '2.7',
+        wiremock      : '2.21.0',
         springBoot    : springBoot.class.package.implementationVersion
 ]
 
@@ -172,7 +177,7 @@ ext.libraries = [
         ]
 ]
 
-ext['spring-framework.version'] = '5.3.19'
+ext['spring-framework.version'] = '5.3.20'
 ext['log4j2.version'] = '2.17.1'
 ext['jackson.version'] = '2.13.2'
 
@@ -184,8 +189,11 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
     implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
 
+    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.2.2'
+
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamClient
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
 
     implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4'
     implementation group: 'javax.inject', name: 'javax.inject', version: '1'
@@ -224,6 +232,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
+    testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: versions.wiremock
 
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
 

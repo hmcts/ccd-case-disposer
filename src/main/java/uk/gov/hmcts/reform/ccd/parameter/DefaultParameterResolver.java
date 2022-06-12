@@ -20,14 +20,17 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
-    @Value("${elasticsearch.global.search.index.enabled}")
-    private String isGlobalSearchEnabled;
-
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
     @Value("${elasticsearch.global.search.index.name}")
     private String globalSearchIndexName;
+
+    @Value("${idam.api.username}")
+    private String idamApiUsername;
+
+    @Value("${idam.api.password}")
+    private String idamApiPassword;
 
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
@@ -35,8 +38,11 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("#{'${simulated.case.types}'.split(',')}")
     private List<String> deletableCaseTypeSimulation;
 
-    @Value("${dm.remote.documents-delete-url}")
-    private String dmRemoteDocumentsDeleteUrl;
+    @Value("${ccd.document.store.host}")
+    private String documentStoreHost;
+
+    @Value("${ccd.role.assignment.host}")
+    private String roleAssignmentHost;
 
     @Override
     public List<String> getElasticsearchHosts() {
@@ -56,18 +62,28 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public String getCasesIndexType() {
+        return casesIndexType;
+    }
+
+    @Override
     public String getGlobalSearchIndexName() {
         return globalSearchIndexName;
     }
 
     @Override
-    public boolean isGlobalSearchEnabled() {
-        return Boolean.parseBoolean(isGlobalSearchEnabled);
+    public String getCaseDefinitionHost() {
+        return null;
     }
 
     @Override
-    public String getCasesIndexType() {
-        return casesIndexType;
+    public String getIdamUsername() {
+        return idamApiUsername;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return idamApiPassword;
     }
 
     @Override
@@ -91,22 +107,12 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
-    public String getCaseDefinitionHost() {
-        return null;
+    public String getDocumentStoreHost() {
+        return documentStoreHost;
     }
 
     @Override
-    public String getIdamUsername() {
-        return null;
-    }
-
-    @Override
-    public String getIdamPassword() {
-        return null;
-    }
-
-    @Override
-    public String getDocumentsDeleteUrl() {
-        return dmRemoteDocumentsDeleteUrl;
+    public String getRoleAssignmentsHost() {
+        return roleAssignmentHost;
     }
 }
