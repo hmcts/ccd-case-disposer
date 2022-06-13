@@ -47,10 +47,9 @@ elasticsearch:
     cluster.initial_master_nodes: ""
 
 logstash:
-  image:
-    repository: "hmctspublic.azurecr.io/imported/logstash/logstash"
-    tag: "7.16.1"
-    pullPolicy: "Always"
+  image: "hmctspublic.azurecr.io/imported/logstash/logstash"
+  imageTag: "7.16.1"
+  imagePullPolicy: "Always"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
