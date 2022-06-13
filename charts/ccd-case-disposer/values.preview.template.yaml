@@ -21,10 +21,8 @@ job:
 global:
   jobKind: CronJob
 
-elastic:
-  enabled: true
-
 elasticsearch:
+  enabled: true
   ingressHost: es-${SERVICE_FQDN}
   clusterName: "es"
   imageTag: "7.11.1"
@@ -47,6 +45,7 @@ elasticsearch:
     cluster.initial_master_nodes: ""
 
 logstash:
+  enabled: true
   image:
     repository: "hmctspublic.azurecr.io/imported/logstash/logstash"
     tag: "7.16.1"
@@ -204,6 +203,7 @@ logstash:
       }
 
 ccd-definition-store-api:
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
     ingressHost: ccd-definition-store-${SERVICE_FQDN}
@@ -227,6 +227,7 @@ ccd-definition-store-api:
     keyVaults: [ ]
 
 ccd-user-profile-api:
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
     ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
@@ -236,6 +237,7 @@ ccd-user-profile-api:
     keyVaults: [ ]
 
 ccd-data-store-api:
+  enabled: true
   java:
     image: hmctspublic.azurecr.io/ccd/data-store-api:latest
     ingressHost: ccd-data-store-api-${SERVICE_FQDN}
@@ -273,6 +275,12 @@ ccd-data-store-api:
       enabled: false
 
 postgresql:
+  enabled: true
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      cpu: 25m
   initdbScripts:
     init.sql: |-
       CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
