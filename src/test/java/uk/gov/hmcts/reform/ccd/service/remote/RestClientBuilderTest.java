@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
-import org.glassfish.jersey.logging.LoggingFeature;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -47,7 +46,6 @@ class RestClientBuilderTest {
         setField(restClientBuilder, "client", client);
 
         doReturn("Bearer 12345").when(securityUtil).getServiceAuthorization();
-        when(client.register(any(LoggingFeature.class))).thenReturn(client);
         when(client.target(any(String.class))).thenReturn(webTarget);
         when(webTarget.path(any(String.class))).thenReturn(webTarget);
         when(webTarget.request()).thenReturn(builder);

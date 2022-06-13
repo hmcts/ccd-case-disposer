@@ -18,7 +18,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_H
 public class RestClientBuilder {
 
     private static final int CLIENT_READ_TIMEOUT = 30000;
-    private static final int CLIENT_CONNECT_TIMEOUT = 5000;
+    private static final int CLIENT_CONNECT_TIMEOUT = 50000;
 
     private final SecurityUtil securityUtil;
     private Client client;
@@ -32,7 +32,7 @@ public class RestClientBuilder {
                                                    final String path,
                                                    final String body) {
 
-        return client.register(new LoggingFeature())
+        return client
                 .target(baseUrl)
                 .path(path)
                 .request()
@@ -45,7 +45,7 @@ public class RestClientBuilder {
                                               final String path,
                                               final String body) {
 
-        return client.register(new LoggingFeature())
+        return client
                 .target(baseUrl)
                 .path(path)
                 .request()
@@ -60,7 +60,9 @@ public class RestClientBuilder {
                     .property(ClientProperties.READ_TIMEOUT, CLIENT_READ_TIMEOUT)
                     .property(ClientProperties.CONNECT_TIMEOUT, CLIENT_CONNECT_TIMEOUT);
 
-            client = ClientBuilder.newClient(clientConfig);
+            client = ClientBuilder
+                    .newClient(clientConfig)
+                    .register(new LoggingFeature());
 
             return client;
         }
