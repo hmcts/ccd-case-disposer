@@ -69,7 +69,7 @@ public class DocumentDeleteTestUtils {
                                         .when()
                                         .post()
                                         .andReturn();
-                                log.info("Upload document response:" + response.asPrettyString());
+
                                 assertThat(response.getStatusCode()).isEqualTo(200);
 
                             } catch (final UnsupportedEncodingException e) {
