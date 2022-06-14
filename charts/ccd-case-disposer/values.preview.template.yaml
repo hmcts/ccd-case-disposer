@@ -7,6 +7,7 @@ job:
   startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
   environment:
+    AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
     DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
@@ -33,6 +34,13 @@ elasticsearch:
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
+  extraEnvs:
+    - name: discovery.type
+      value: single-node
+    - name: cluster.initial_master_nodes
+      value: ""
+    - name: action.auto_create_index
+      value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
   persistence:
     enabled: false
   ingress:
@@ -42,15 +50,11 @@ elasticsearch:
     path: /
     hosts:
       - es-${SERVICE_FQDN}
-  environment:
-    action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
-    discovery.type: single-node
-    cluster.initial_master_nodes: ""
 
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
   imageTag: "7.16.1"
-  imagePullPolicy: "Always"
+  imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
@@ -199,7 +203,7 @@ logstash:
               index => "%{[index_id]}"
               document_type => "_doc"
               document_id => "%{id}"
-              timeout => 60
+              timeout => 120
           }
       }
 
