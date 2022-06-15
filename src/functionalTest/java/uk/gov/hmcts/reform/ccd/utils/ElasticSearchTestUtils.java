@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
+import org.awaitility.Duration;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.with;
 import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
@@ -53,6 +55,8 @@ public class ElasticSearchTestUtils {
     private void verifyCaseDataAreDeletedInElasticsearch(final Map<String, List<Long>> deletedFromIndexed) {
         deletedFromIndexed.forEach((key, value) -> {
             final String indexName = getIndexName(key);
+
+            with().await().atLeast(Duration.FIVE_SECONDS);
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
                 refreshIndex(indexName);
@@ -110,11 +114,15 @@ public class ElasticSearchTestUtils {
         indexedData.forEach((key, value) -> {
             final String indexName = getIndexName(key);
 
+            with().await().atLeast(Duration.FIVE_SECONDS);
+
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
                 with()
                         .await()
                         .untilAsserted(() -> {
                             refreshIndex(indexName);
+
+                            await().until(findCaseByReference(indexName, caseReference)::isPresent);
                             final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
 
                             assertThat(actualCaseReference)

@@ -10,7 +10,6 @@ elasticsearch:
   request.timeout: ${ELASTIC_SEARCH_REQUEST_TIMEOUT:6000}
   cases.index.name.pattern: ${ELASTIC_SEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
   global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
-  global.search.index.enabled: ${GLOBAL_SEARCH_ENABLED:true}
 
 idam:
   api:
