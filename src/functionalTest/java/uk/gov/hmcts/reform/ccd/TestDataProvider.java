@@ -40,7 +40,7 @@ public class TestDataProvider {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
 
-        //createGlobalSearchIndex();
+        createGlobalSearchIndex();
 
         documentDeleteTestUtils.uploadDocument(deletableDocuments);
 
@@ -52,7 +52,8 @@ public class TestDataProvider {
         databaseTestUtils.insertDataIntoDatabase(scriptPath);
 
         databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
-        elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
+
+        //elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
     }
 
     protected void verifyDatabaseDeletion(final List<Long> rowIds) {

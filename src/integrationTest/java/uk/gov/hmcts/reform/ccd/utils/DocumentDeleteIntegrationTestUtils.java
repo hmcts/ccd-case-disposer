@@ -12,7 +12,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
 
 @Component
-public class DocumentDeleteTestUtils {
+public class DocumentDeleteIntegrationTestUtils {
 
     @Inject
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;

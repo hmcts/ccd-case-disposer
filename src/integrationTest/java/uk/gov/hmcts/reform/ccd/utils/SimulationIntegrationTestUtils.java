@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
-public class SimulationTestUtils {
+public class SimulationIntegrationTestUtils {
 
     @Inject
     private CaseDataViewHolder caseDataViewHolder;

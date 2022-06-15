@@ -28,7 +28,7 @@ public class DeletionScenarios {
         //Arguments.of(
         //"DPR_FT_MasterCaseType",
         //null,
-        //"scenarios/S-002-global-search.sql",1504259907353529
+        //"scenarios/S-002-global-search.sql",
         //List.of(1004259907351111L),
         //Map.of("global_search", List.of(1004259907351111L)),
         //emptyList(),

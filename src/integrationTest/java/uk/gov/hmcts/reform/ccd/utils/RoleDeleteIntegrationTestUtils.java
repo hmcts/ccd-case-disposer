@@ -10,7 +10,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
 
 @Component
-public class RoleDeleteTestUtils {
+public class RoleDeleteIntegrationTestUtils {
 
     @Inject
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
