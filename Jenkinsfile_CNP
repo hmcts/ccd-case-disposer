@@ -68,13 +68,13 @@ def uploadCoreCaseDataDefinitions(env) {
       ./add-roles.sh
       ./import-functional-test-definitions-pipeline.sh ${ccdDefinitionFilePath}
     """
-    } else if("aat" == env){
-      ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
-      sh """
-      eval \$(./load-aat-environment-variables.sh)
-      ./add-roles.sh
-      ./import-functional-test-definitions-pipeline.sh ${ccdDefinitionFilePath}
-    """
+    //} else if("aat" == env){
+    //  ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
+    //  sh """
+    //  eval \$(./load-aat-environment-variables.sh)
+    //  ./add-roles.sh
+    //  ./import-functional-test-definitions-pipeline.sh ${ccdDefinitionFilePath}
+    //"""
     }
   }
 }
