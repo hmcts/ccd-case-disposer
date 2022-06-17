@@ -22,13 +22,9 @@ public class CaseDataViewHolder {
     }
 
     public Set<Long> getSimulatedCaseIds() {
-        return getCaseIds(simulatedCaseDataViews);
-    }
-
-    private Set<Long> getCaseIds(final List<CaseDataView> caseDataViews) {
         final Set<Long> deletableCaseIds = new HashSet<>();
-        caseDataViews.forEach(deletedCaseDataView ->
-                deletableCaseIds.addAll(Stream.of(List.of(deletedCaseDataView.getCaseId()),
+        simulatedCaseDataViews.forEach(deletedCaseDataView ->
+                deletableCaseIds.addAll(Stream.of(List.of(deletedCaseDataView.getCaseRef()),
                                 deletedCaseDataView.getLinkedCaseIds())
                         .flatMap(Collection::stream)
                         .collect(toSet())));

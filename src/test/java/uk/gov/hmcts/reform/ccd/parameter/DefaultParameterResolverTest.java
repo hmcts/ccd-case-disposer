@@ -14,8 +14,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 class DefaultParameterResolverTest {
 
-    private static final String ELASTICSEARCH_HOSTS = "elasticsearchHosts";
-    private static final String ELASTICSEARCH_REQUEST_TIMEOUT = "elasticsearchRequestTimeout";
+    private static final String ELASTIC_SEARCH_HOSTS = "elasticsearchHosts";
+    private static final String ELASTIC_SEARCH_REQUEST_TIMEOUT = "elasticsearchRequestTimeout";
     private static final String CASE_INDEX_NAME_PATTERN = "casesIndexNamePattern";
     private static final String CASES_INDEX_TYPE = "casesIndexType";
 
@@ -37,9 +37,9 @@ class DefaultParameterResolverTest {
     public void initMock() {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
-                                     ELASTICSEARCH_HOSTS, Arrays.asList("http://localhost:9200"));
+                                     ELASTIC_SEARCH_HOSTS, Arrays.asList("http://localhost:9200"));
         ReflectionTestUtils.setField(defaultParameterResolver,
-                                     ELASTICSEARCH_REQUEST_TIMEOUT, 6000);
+                                     ELASTIC_SEARCH_REQUEST_TIMEOUT, 6000);
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      CASE_INDEX_NAME_PATTERN, "%s_cases");
         ReflectionTestUtils.setField(defaultParameterResolver,

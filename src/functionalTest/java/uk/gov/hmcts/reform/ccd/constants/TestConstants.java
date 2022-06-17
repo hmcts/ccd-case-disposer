@@ -9,7 +9,7 @@ public class TestConstants {
     public static final String SERVICE_AUTHORISATION_HEADER = "ServiceAuthorization";
     public static final String AUTHORISATION_HEADER = "Authorization";
     public static final String FILES_FOLDER = "files/";
-    public static final String DOCUMENT_STORE_USER = "test12@test.com";
+    public static final String DOCUMENT_STORE_USER = "case.disposer.idam.system.user@gmail.com";
 
     private TestConstants() {
     }

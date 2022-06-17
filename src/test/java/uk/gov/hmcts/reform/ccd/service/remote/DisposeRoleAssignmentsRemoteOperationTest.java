@@ -1,46 +1,35 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
-import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
-import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import javax.ws.rs.core.Response;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_ROLE_PATH;
 
 @DisplayName("dispose case role assignments")
 @ExtendWith(MockitoExtension.class)
 class DisposeRoleAssignmentsRemoteOperationTest {
 
-    @Captor
-    ArgumentCaptor<HttpRequest> captor;
-
     @Mock
-    private HttpClient httpClient;
-
-    @Mock
-    private SecurityUtil securityUtil;
+    private RestClientBuilder restClientBuilder;
 
     @Mock
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
@@ -54,33 +43,48 @@ class DisposeRoleAssignmentsRemoteOperationTest {
     @Test
     @SuppressWarnings("unchecked")
     @DisplayName("should post role assignment delete remote dispose request")
-    void shouldPostRoleAssignmentsDeleteRemoteDisposeRequest() throws IOException, InterruptedException {
+    void shouldPostRoleAssignmentsDeleteRemoteDisposeRequest() {
 
-        doReturn("http://localhost")
-            .when(parameterResolver).getRoleAssignmentsHost();
+        final Gson gson = new Gson();
+        final Response response = mock(Response.class);
 
-        doReturn("Bearer 1234567890").when(securityUtil).getIdamClientToken();
-        doReturn("Bearer 12345").when(securityUtil).getServiceAuthorization();
+        final String caseRef = "1234567890123456";
+        final RoleAssignmentsDeletePostRequest roleAssignmentsDeleteRequest =
+                new RoleAssignmentsDeletePostRequest(caseRef);
 
-        HttpResponse httpResponse = mock(HttpResponse.class);
+        doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+        when(response.getStatus()).thenReturn(200);
 
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        final String requestBody = gson.toJson(roleAssignmentsDeleteRequest);
 
-        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete("1234567890123456");
+        when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestBody)).thenReturn(response);
 
-        verify(httpClient).send(captor.capture(), any());
+        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
 
-        assertThat(captor.getValue().uri().getPath(), is(equalTo("/am/role-assignments/query/delete")));
-        assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
-        assertThat(captor.getValue().headers().map().get("Authorization").get(0), is(equalTo("Bearer 1234567890")));
-        assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 12345")));
-        assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
-
-        HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
-        assertThat(bodyPublisher.contentLength(), is(equalTo(66L)));
-
-        verify(roleDeletionRecordHolder, times(1))
-            .setCaseRolesDeletionResults(eq("1234567890123456"), anyInt());
+        verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
+                200);
+        verify(restClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost",
+                DELETE_ROLE_PATH,
+                requestBody);
     }
 
+    @Test
+    void shouldThrowExceptionWhenRequestInvalid() {
+        try {
+            final String caseRef = "1234567890123456";
+            final String jsonRequest = new Gson().toJson(new RoleAssignmentsDeletePostRequest("1234567890123456"));
+            doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+
+            doThrow(new RoleAssignmentDeletionException(caseRef))
+                    .when(restClientBuilder)
+                    .postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, jsonRequest);
+
+            disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+
+            fail("The method should have thrown DocumentDeletionException when request is invalid");
+        } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {
+            assertThat(roleAssignmentDeletionException.getMessage())
+                    .isEqualTo("Error deleting role assignments for case : 1234567890123456");
+        }
+    }
 }

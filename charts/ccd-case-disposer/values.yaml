@@ -31,12 +31,20 @@ java:
           alias: IDAM_CASE_DISPOSER_CLIENT_SECRET
         - name: ccd-case-disposer-s2s-secret
           alias: CCD_CASE_DISPOSER_IDAM_KEY
+        - name: ccd-definition-s2s-secret
+          alias: CCD_DEFINITION_STORE_S2S_SECRET
   environment:
     DELETE_CASE_TYPES:
     SIMULATED_CASE_TYPES:
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    DOCUMENT_STORE_HOST: http://document-management-store-app-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DOCUMENT_STORE_HOST: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
+    DEFINITION_STORE_HOST: http://ccd-definition-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    DATA_STORE_DB_PORT: 5432
+    DATA_STORE_DB_NAME: ccd_data_store
+    DATA_STORE_DB_OPTIONS: "?sslmode=require"
+    ELASTIC_SEARCH_ENABLED: true
   global:
     jobKind: CronJob

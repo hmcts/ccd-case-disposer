@@ -55,12 +55,16 @@ public class ElasticSearchTestUtils {
             final String indexName = getIndexName(key);
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
-                refreshIndex(indexName);
-                final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
-
+                Thread.sleep(10000);
                 with()
                         .await()
-                        .untilAsserted(() -> assertThat(actualCaseReference).isNotPresent());
+                        .untilAsserted(() -> {
+                            refreshIndex(indexName);
+                            Thread.sleep(10000);
+                            final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
+
+                            assertThat(actualCaseReference).isNotPresent();
+                        });
             }));
         });
     }
@@ -111,10 +115,13 @@ public class ElasticSearchTestUtils {
             final String indexName = getIndexName(key);
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
+                Thread.sleep(10000);
                 with()
                         .await()
                         .untilAsserted(() -> {
+
                             refreshIndex(indexName);
+                            Thread.sleep(10000);
                             final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
 
                             assertThat(actualCaseReference)

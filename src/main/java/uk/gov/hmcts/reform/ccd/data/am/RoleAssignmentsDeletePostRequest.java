@@ -18,5 +18,4 @@ public class RoleAssignmentsDeletePostRequest {
                                           .attributes(Collections.singletonMap("caseId", Arrays.asList(caseRef)))
                                           .build());
     }
-
 }

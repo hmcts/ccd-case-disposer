@@ -27,7 +27,7 @@ public class DatabaseTestUtils {
 
     public void verifyDatabaseIsPopulated(final List<Long> rowIds) {
         rowIds.forEach(item -> {
-            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findById(item);
+            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findByReference(item);
             assertThat(caseDataToDelete).isPresent();
         });
     }
@@ -35,7 +35,7 @@ public class DatabaseTestUtils {
     public void verifyDatabaseDeletion(final List<Long> rowIds) {
         final List<CaseDataEntity> all = caseDataRepository.findAll();
         final List<Long> actualRowIds = all.stream()
-                .map(CaseDataEntity::getId)
+                .map(CaseDataEntity::getReference)
                 .collect(Collectors.toUnmodifiableList());
 
         assertThat(actualRowIds)

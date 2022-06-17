@@ -3,8 +3,6 @@ spring:
     import: "optional:configtree:/mnt/secrets/ccd/"
   application:
     name: Case Disposer
-  main:
-    web-application-type: none
   jpa:
     database: postgresql
     show-sql: ${SHOW_SQL:true}
@@ -47,8 +45,8 @@ idam:
     password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
   s2s-auth:
     name: ccd_case_disposer
-    url: ${S2S_URL:http://localhost:4502}
-    secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
+    url: ${IDAM_S2S_URL:http://localhost:4502}
+    secret: ${IDAM_KEY_CCD_CASE_DISPOSER:AAAAAAAAAAAAAAAA}
   client:
     id: ccd-case-disposer
     secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}

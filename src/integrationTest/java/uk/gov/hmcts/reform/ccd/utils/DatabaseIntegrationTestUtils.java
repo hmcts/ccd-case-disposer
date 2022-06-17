@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
-public class DatabaseTestUtils {
+public class DatabaseIntegrationTestUtils {
 
     @Inject
     private DataSource dataSource;

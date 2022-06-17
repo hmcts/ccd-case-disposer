@@ -10,15 +10,36 @@ def component = "case-disposer"
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
-def vaultOverrides = [
-  'preview' : 'aat'
-]
-
 def secrets = [
   'ccd-${env}': [
           secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
           secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
-          secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET')
+          secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
+          secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
+          secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
+          secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
+          secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
+          secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
+          secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+          secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
+          secret('ccd-ELASTIC-SEARCH-URL', 'ELASTIC_SEARCH_HOSTS'),
+          secret('ccd-ELASTIC-SEARCH-DATA-NODES-URL', 'ELASTIC_SEARCH_DATA_NODES_HOSTS')
+  ]
+]
+
+def prSecrets = [
+  'ccd-aat': [
+          secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
+          secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
+          secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
+          secret('ccd-case-disposer-s2s-secret', 'IDAM_KEY_CCD_CASE_DISPOSER'),
+          secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
+          secret('case-disposer-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
+          secret('case-disposer-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
+          secret('case-disposer-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
+          secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
+          secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
+          secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET')
   ]
 ]
 
@@ -29,6 +50,33 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
    version    : '',
    envVariable: envVar
   ]
+}
+
+/**
+ * Imports CCD definitions into specified environment.
+ *
+ * NOTE: It requires `bin/variables/load-${env}-environment-variables.sh` file to define environment specific URLs.
+ *
+ * @param env target environment
+ */
+def uploadCoreCaseDataDefinitions(env) {
+  dir("${WORKSPACE}/bin"){
+    if("preview" == env){
+      ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
+      sh """
+      eval \$(./load-preview-environment-variables.sh ${CHANGE_ID})
+      ./add-roles.sh
+      ./import-functional-test-definitions-pipeline.sh ${ccdDefinitionFilePath}
+    """
+    } else if("aat" == env){
+      ccdDefinitionFilePath = "${WORKSPACE}/src/functionalTest/resources/ccd-test-definitions"
+      sh """
+      eval \$(./load-aat-environment-variables.sh)
+      ./add-roles.sh
+      ./import-functional-test-definitions-pipeline.sh ${ccdDefinitionFilePath}
+    """
+    }
+  }
 }
 
 withPipeline(type, product, component) {
@@ -47,36 +95,51 @@ withPipeline(type, product, component) {
   disableLegacyDeployment()
   nonServiceApp()
 
-  after('akschartsinstall') {
-    echo "Overriding vault environment"
-    overrideVaultEnvironments(vaultOverrides)
-    echo "Loading the secrets again"
+  onPR() {
+    echo "Loading PR secrets"
+    loadVaultSecrets(prSecrets)
+    env.ENV='preview'
+    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.DEFINITION_STORE_HOST = "http://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.DATA_STORE_DB_HOST = "ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com"
+    env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+  }
+
+  onNonPR() {
+    echo "Loading secrets"
     loadVaultSecrets(secrets)
+    env.ENV='aat'
+    env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+    env.DATA_STORE_DB_HOST = "ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com"
+    env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
+    env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+  }
 
+  after('akschartsinstall') {
     // Set required environment variables to run functional tests apart from one in vaults.
-    env.DATA_STORE_DB_HOST = "ccd-case-disposer-${env.BRANCH_NAME}-postgresql-0.ccd.svc.cluster.local"
-    env.DATA_STORE_DB_PORT = "5432"
-    env.DATA_STORE_DB_NAME = "data-store"
-    env.DATA_STORE_DB_USERNAME = "hmcts"
-    env.DATA_STORE_DB_PASSWORD = "hmcts"
-    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-${env.BRANCH_NAME}.service.core-compute-preview.internal"
-    // For preview we might have to point to "develop" PR of data_store ES url and DB.
-    // (or hardcode standard java chart username/password of postgres.)
+    env.ELASTIC_SEARCH_ENABLED = true
+    env.DATA_STORE_DB_PORT = '5432'
+    env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
+    env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+    env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
+    env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
+    env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
 
-    // test if Elasticsearch is reachable
-    // sh "nc -zv es-ccd-case-disposer-${env.BRANCH_NAME}.service.core-compute-preview.internal 80"
-    // Above aline is temporarily disabled to fix the master pipeline. The logic per environment for the URL formations should be corrected by the feature team.
+    // Load the CCD definitions here:
+    // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
+    uploadCoreCaseDataDefinitions(env.ENV)
 
-    //  BLOCKED BY https://tools.hmcts.net/jira/browse/RDM-13045 and https://tools.hmcts.net/jira/browse/DTSPO-6431
-    //    // test if Postgres is reachable
-    //    sh "nc -zv ccd-case-disposer-${env.BRANCH_NAME}-postgresql-0.ccd.svc.cluster.local 5432"
-    //
-    //    echo "Verifying that functional test run correctly"
-    //    try {
-    //      builder.gradle('functional')
-    //    } finally {
-    //      junit '**/test-results/**/*.xml'
-    //    }
+    // Execute functional tests
+    echo "Just waiting a while to ensure that the pod has run the job"
+    sh "sleep 30s"
+    echo "Verifying that functional test run correctly"
+    try {
+      builder.gradle('functional')
+    } finally {
+      junit '**/test-results/**/*.xml'
+    }
   }
 
   after('functionalTest:preview') {
