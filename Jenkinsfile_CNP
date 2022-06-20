@@ -99,6 +99,7 @@ withPipeline(type, product, component) {
     echo "Loading PR secrets"
     loadVaultSecrets(prSecrets)
     env.ENV='preview'
+    env.CREATE_GLOBAL_SEARCH=true
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
