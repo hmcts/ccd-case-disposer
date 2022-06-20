@@ -26,6 +26,7 @@ idam:
     redirect_uri: http://ccd-case-disposer/oauth2redirect
 
 ccd.case-definition.host: ${DEFINITION_STORE_HOST:http://localhost:4451}
-
 ccd.document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
 ccd.role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
+
+create.global.search: ${CREATE_GLOBAL_SEARCH:false}
