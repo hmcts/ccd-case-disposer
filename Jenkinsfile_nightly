@@ -53,7 +53,7 @@ withNightlyPipeline(type, product, component) {
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
-  enableFullFunctionalTest()
+  //enableFullFunctionalTest()
   //enableSecurityScan()
   //enableMutationTest()
   //enableFortifyScan()
@@ -85,15 +85,15 @@ withNightlyPipeline(type, product, component) {
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
     echo "Verifying that functional test run correctly"
-//    try {
-//      echo "Before running func tests..."
-//      //builder.gradle('functional')
-//      builder.gradleWithOutput('functional')
-//      echo "After running func tests..."
-//    } finally {
-//      junit '**/test-results/**/*.xml'
-//      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/**'
-//    }
+    try {
+      echo "Before running func tests..."
+      //builder.gradle('functional')
+      builder.gradleWithOutput('functional')
+      echo "After running func tests..."
+    } finally {
+      junit '**/test-results/**/*.xml'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/**'
+    }
   }
 
   enableSlackNotifications('#lau-builds')
