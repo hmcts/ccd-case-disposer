@@ -16,7 +16,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "ccd"
-def component = "ccd-case-disposer"
+def component = "case-disposer"
 
 def secrets = [
   'ccd-${env}': [
