@@ -30,7 +30,7 @@ java:
         - name: idam-case-disposer-client-secret
           alias: IDAM_CASE_DISPOSER_CLIENT_SECRET
         - name: ccd-case-disposer-s2s-secret
-          alias: CCD_CASE_DISPOSER_IDAM_KEY
+          alias: IDAM_KEY_CCD_CASE_DISPOSER
         - name: ccd-definition-s2s-secret
           alias: CCD_DEFINITION_STORE_S2S_SECRET
   environment:
