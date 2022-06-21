@@ -12,6 +12,8 @@ properties([
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 def type = "java"
 def product = "ccd"
 def component = "ccd-case-disposer"
