@@ -8,9 +8,9 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
@@ -32,15 +32,19 @@ public class DatabaseTestUtils {
         });
     }
 
-    public void verifyDatabaseDeletion(final List<Long> rowIds) {
-        final List<CaseDataEntity> all = caseDataRepository.findAll();
-        final List<Long> actualRowIds = all.stream()
-                .map(CaseDataEntity::getReference)
-                .collect(Collectors.toUnmodifiableList());
+    public void verifyDatabaseDeletion(final List<Long> initialRowIds,
+                                       final List<Long> endStateRows) {
+        final List<Long> databaseEndStateRowIds = new ArrayList<>();
+        initialRowIds.forEach(item -> {
+            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findByReference(item);
+            if (caseDataToDelete.isPresent()) {
+                databaseEndStateRowIds.add(caseDataToDelete.get().getReference());
+            }
+        });
 
-        assertThat(actualRowIds)
-                .isNotNull()
-                .containsExactlyInAnyOrderElementsOf(rowIds);
+        assertThat(databaseEndStateRowIds.size())
+                .isEqualTo(endStateRows.size());
+        assertThat(databaseEndStateRowIds).containsExactlyInAnyOrderElementsOf(endStateRows);
     }
 
     public void insertDataIntoDatabase(final String scriptPath) throws SQLException {
