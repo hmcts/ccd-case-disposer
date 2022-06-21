@@ -4,6 +4,10 @@ ccd:
   enabled: false
 
 java:
+  memoryRequests: "1024Mi"
+  cpuRequests: "500m"
+  memoryLimits: "2048Mi"
+  cpuLimits: "1500m"
   image: 'https://hmctspublic.azurecr.io/ccd/ccd-case-disposer:latest'
   kind: CronJob
   schedule: "0 22 * * *"
