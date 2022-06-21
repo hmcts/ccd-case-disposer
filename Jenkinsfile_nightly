@@ -49,11 +49,10 @@ GradleBuilder builder = new GradleBuilder(this, product)
 withNightlyPipeline(type, product, component) {
   env.Rules = params.SecurityRules
   loadVaultSecrets(secrets)
-
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
-  //enableFullFunctionalTest()
+
   //enableSecurityScan()
   //enableMutationTest()
   //enableFortifyScan()
@@ -66,6 +65,7 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'builds/reports/pitest/**/*'
   }
 
+  enableFullFunctionalTest()
   before('fullFunctionalTest') {
     echo "Loading the secrets"
     loadVaultSecrets(secrets)
