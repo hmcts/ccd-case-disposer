@@ -26,7 +26,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
     static void setup() {
         Awaitility.setDefaultPollInterval(0, TimeUnit.MILLISECONDS);
         Awaitility.setDefaultPollDelay(Duration.FIVE_SECONDS);
-        Awaitility.setDefaultTimeout(30, TimeUnit.SECONDS);
+        Awaitility.setDefaultTimeout(60, TimeUnit.SECONDS);
     }
 
     @ParameterizedTest
@@ -51,7 +51,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         // THEN
         verifyDatabaseDeletion(initialStateRowIds,deletableEndStateRowIds);
         verifyDocumentDeletion(deletableDocuments);
-        //verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
 }

@@ -19,7 +19,8 @@ INSERT INTO case_data (case_type_id, jurisdiction, state, security_classificatio
                        reference, resolved_ttl)
 VALUES ('DPR_FT_MultiplePages', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
-          "PersonFirstName": "Janet"
+          "PersonFirstName": "Janet",
+          "CaseAccessCategory": "Civil/Standard/Legal"
         }',
         '{
           "PersonFirstName": "PUBLIC"
