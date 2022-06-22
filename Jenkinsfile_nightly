@@ -16,10 +16,11 @@ import uk.gov.hmcts.contino.GradleBuilder
 
 def type = "java"
 def product = "ccd"
-def component = "ccd-case-disposer"
+def component = "case-disposer"
 
 def secrets = [
   'ccd-${env}': [
+    secret('AppInsightsInstrumentationKey', 'azure.application-insights.instrumentation-key'),
     secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
     secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
     secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
@@ -28,8 +29,6 @@ def secrets = [
     secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
     secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
     secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
-    secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
-    secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
     secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
     secret('ccd-ELASTIC-SEARCH-URL', 'ELASTIC_SEARCH_HOSTS'),
     secret('ccd-ELASTIC-SEARCH-DATA-NODES-URL', 'ELASTIC_SEARCH_DATA_NODES_HOSTS')
@@ -50,11 +49,10 @@ GradleBuilder builder = new GradleBuilder(this, product)
 withNightlyPipeline(type, product, component) {
   env.Rules = params.SecurityRules
   loadVaultSecrets(secrets)
-
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
-  enableFullFunctionalTest()
+
   //enableSecurityScan()
   //enableMutationTest()
   //enableFortifyScan()
@@ -67,6 +65,7 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'builds/reports/pitest/**/*'
   }
 
+  enableFullFunctionalTest()
   before('fullFunctionalTest') {
     echo "Loading the secrets"
     loadVaultSecrets(secrets)
@@ -84,12 +83,16 @@ withNightlyPipeline(type, product, component) {
 
     // Execute functional tests
     echo "Just waiting a while to ensure that the pod has run the job"
-    sh "sleep 60s"
+    sh "sleep 120s"
     echo "Verifying that functional test run correctly"
     try {
-      builder.gradle('functional')
+      echo "Before running func tests..."
+      //builder.gradle('functional')
+      builder.gradleWithOutput('functional')
+      echo "After running func tests..."
     } finally {
       junit '**/test-results/**/*.xml'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/**'
     }
   }
 
