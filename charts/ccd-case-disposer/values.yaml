@@ -3,7 +3,7 @@ elastic:
 ccd:
   enabled: false
 
-java:
+job:
   image: 'https://hmctspublic.azurecr.io/ccd/ccd-case-disposer:latest'
   kind: CronJob
   schedule: "0 22 * * *"
