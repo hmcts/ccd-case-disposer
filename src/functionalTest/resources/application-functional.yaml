@@ -1,9 +1,19 @@
+management:
+  endpoint:
+    health:
+      show-details: "always"
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, info, prometheus
+
 spring:
-datasource:
-  ccd:
-    jdbcUrl: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5055}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
-    username: ${DATA_STORE_DB_USERNAME:ccd}
-    password: ${DATA_STORE_DB_PASSWORD:ccd}
+  datasource:
+    ccd:
+      jdbcUrl: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5055}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
+      username: ${DATA_STORE_DB_USERNAME:ccd}
+      password: ${DATA_STORE_DB_PASSWORD:ccd}
 
 elasticsearch:
   hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}

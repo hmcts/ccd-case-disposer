@@ -1,5 +1,12 @@
-app-insights:
-  dev-mode: off
+management:
+  endpoint:
+    health:
+      show-details: "always"
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, info, prometheus
 
 spring:
   datasource:
@@ -39,6 +46,16 @@ idam:
     id: ccd-case-disposer
     secret: idam-case-disposer-client-secret
     redirect_uri: http://ccd-case-disposer/oauth2redirect
+
+application-insights:
+  default:
+    modules:
+      WebSyntheticRequestTelemetryInitializer:
+        enabled: false
+
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:"Test"}
 
 ccd.document.store.host: http://localhost:4603
 ccd.role.assignment.host: http://localhost:4603
