@@ -59,9 +59,9 @@ idam:
 #    modules:
 #      WebSyntheticRequestTelemetryInitializer:
 #        enabled: false
-
-azure:
-  application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
+#
+#azure:
+#  application-insights:
+#    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
 
 smoke.test.enabled: false
