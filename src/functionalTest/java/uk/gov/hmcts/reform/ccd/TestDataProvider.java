@@ -53,7 +53,7 @@ public class TestDataProvider {
 
         databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
 
-        //elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
+        elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
     }
 
     protected void verifyDatabaseDeletion(final List<Long> initialRowIds,
