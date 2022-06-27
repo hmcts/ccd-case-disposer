@@ -7,7 +7,7 @@ job:
   startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
   environment:
-    AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "2dcb834e-768e-4429-9050-ab15af959995"
+    APPINSIGHTS_INSTRUMENTATIONKEY: "53974935-9ebc-4f32-8b70-2889041e4469"
     DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}

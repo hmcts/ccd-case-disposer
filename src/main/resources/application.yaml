@@ -54,11 +54,11 @@ idam:
     secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
     redirect_uri: http://ccd-case-disposer/oauth2redirect
 
-application-insights:
-  default:
-    modules:
-      WebSyntheticRequestTelemetryInitializer:
-        enabled: false
+#application-insights:
+#  default:
+#    modules:
+#      WebSyntheticRequestTelemetryInitializer:
+#        enabled: false
 
 azure:
   application-insights:
