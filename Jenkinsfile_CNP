@@ -7,6 +7,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "ccd"
 def component = "case-disposer"
+def branchesToSync = ['demo','perftest']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
@@ -95,6 +96,7 @@ withPipeline(type, product, component) {
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
+  syncBranchesWithMaster(branchesToSync)
 
   onPR() {
     echo "Loading PR secrets"

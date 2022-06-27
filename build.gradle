@@ -154,17 +154,18 @@ repositories {
 }
 
 def versions = [
-        junit         : '5.7.2',
-        junitPlatform : '1.7.2',
-        reformLogging : '5.1.9',
-        elasticsearch : '7.17.1',
-        testcontainers: '1.16.0',
-        restAssured   : '4.4.0',
-        idamClient    : '2.0.1',
-        s2sClient     : '4.0.3',
-        commonsIo     : '2.7',
-        wiremock      : '2.21.0',
-        springBoot    : springBoot.class.package.implementationVersion
+     junit               : '5.7.2',
+     junitPlatform       : '1.7.2',
+     reformLogging       : '5.1.9',
+     elasticsearch       : '7.17.1',
+     testcontainers      : '1.16.0',
+     restAssured         : '4.4.0',
+     idamClient          : '2.0.1',
+     s2sClient           : '4.0.3',
+     commonsIo           : '2.7',
+     wiremock            : '2.21.0',
+     springFramework     : '5.3.18',
+     springBoot          : springBoot.class.package.implementationVersion
 ]
 
 ext.libraries = [
@@ -190,6 +191,8 @@ dependencies {
     implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
 
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.2.2'
+
+    implementation group: 'org.springframework', name:'spring-webmvc', version: versions.springFramework
 
     implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.25.1'
     implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '2.25.1'

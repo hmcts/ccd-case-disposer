@@ -1,6 +1,3 @@
-app-insights:
-  dev-mode: off
-
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
@@ -39,6 +36,16 @@ idam:
     id: ccd-case-disposer
     secret: idam-case-disposer-client-secret
     redirect_uri: http://ccd-case-disposer/oauth2redirect
+
+application-insights:
+  default:
+    modules:
+      WebSyntheticRequestTelemetryInitializer:
+        enabled: false
+
+azure:
+  application-insights:
+    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:"Test"}
 
 ccd.document.store.host: http://localhost:4603
 ccd.role.assignment.host: http://localhost:4603
