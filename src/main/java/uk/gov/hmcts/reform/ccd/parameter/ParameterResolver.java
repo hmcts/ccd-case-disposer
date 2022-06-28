@@ -25,6 +25,12 @@ public interface ParameterResolver {
 
     String getIdamPassword();
 
+    String getIdamS2SHost();
+
+    String getCcdDataName();
+
+    String getCcdDataSecret();
+
     String getDocumentStoreHost();
 
     String getRoleAssignmentsHost();
