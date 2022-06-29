@@ -1,4 +1,6 @@
 spring:
+  main:
+    web-application-type: none
   config:
     import: "optional:configtree:/mnt/secrets/ccd/"
   application:
@@ -23,7 +25,7 @@ spring:
     enabled: false
 
 elasticsearch:
-  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
+  hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
   request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
   global.search:
     index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
@@ -52,9 +54,14 @@ idam:
     secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
     redirect_uri: http://ccd-case-disposer/oauth2redirect
 
-azure:
-  application-insights:
-    web.enabled: false
-    instrumentation-key: ${ccd.AppInsightsInstrumentationKey:00000000-0000-0000-0000-000000000000}
+#application-insights:
+#  default:
+#    modules:
+#      WebSyntheticRequestTelemetryInitializer:
+#        enabled: false
+#
+#azure:
+#  application-insights:
+#    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
 
 smoke.test.enabled: false
