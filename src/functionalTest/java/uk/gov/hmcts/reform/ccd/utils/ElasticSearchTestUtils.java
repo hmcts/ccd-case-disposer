@@ -51,7 +51,6 @@ public class ElasticSearchTestUtils {
     }
 
     private void verifyCaseDataAreDeletedInElasticsearch(final Map<String, List<Long>> deletedFromIndexed) {
-        if (!isPreview()) {
             deletedFromIndexed.forEach((key, value) -> {
                 final String indexName = getIndexName(key);
 
@@ -69,7 +68,6 @@ public class ElasticSearchTestUtils {
                             });
                 }));
             });
-        }
     }
 
     public List<String> getAllDocuments(final String indexName) throws IOException {
@@ -114,7 +112,6 @@ public class ElasticSearchTestUtils {
     }
 
     public void verifyCaseDataAreInElasticsearch(final Map<String, List<Long>> indexedData) {
-        if (!isPreview()) {
             indexedData.forEach((key, value) -> {
                 final String indexName = getIndexName(key);
 
@@ -135,7 +132,6 @@ public class ElasticSearchTestUtils {
                             });
                 }));
             });
-        }
     }
 
     private Optional<Long> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
@@ -176,13 +172,4 @@ public class ElasticSearchTestUtils {
         }
         return caseType;
     }
-
-    private boolean isPreview() {
-        final Optional<String> env = Optional.ofNullable(System.getenv("ENV"));
-        if (env.isPresent() && env.get().equals("preview")) {
-            return true;
-        }
-        return false;
-    }
-
 }
