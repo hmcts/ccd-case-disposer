@@ -102,7 +102,6 @@ sonarqube {
         property "sonar.projectKey", "uk.gov.hmcts.reform:ccd-case-disposer"
         property "sonar.coverage.jacoco.xmlReportPaths", "${jacocoTestReport.reports.xml.destination.path}"
         property "sonar.coverage.exclusions", "**/ccd/ApplicationBootstrap.java"
-        property "sonar.exclusions", "**/parameter/*.java,**/config/*.java,**/dao/*.java,**/util/DefaultSnooper.java"
     }
 }
 
