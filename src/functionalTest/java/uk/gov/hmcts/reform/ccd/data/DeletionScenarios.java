@@ -18,7 +18,7 @@ public class DeletionScenarios {
                         "scenarios/S-001-simulated-and-deletable-case-types.sql",
                         List.of(1004259907353529L, 1004259907353528L),
                         Map.of("DPR_FT_MasterCaseType", List.of(1004259907353529L),
-                                "DPR_FT_MultiplePages",List.of(1004259907353528L)),
+                                "DPR_FT_MultiplePages", List.of(1004259907353528L)),
                         List.of(1004259907353528L),
                         List.of(1004259907353528L),
                         Map.of(1004259907353529L, List.of("jpg.jpg")),

@@ -7,6 +7,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "ccd"
 def component = "case-disposer"
+def branchesToSync = ['demo','perftest']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
@@ -15,6 +16,7 @@ def secrets = [
           secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
           secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
           secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
+          secret('ccd-case-disposer-s2s-secret', 'IDAM_KEY_CCD_CASE_DISPOSER'),
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
           secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
           secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
@@ -94,6 +96,7 @@ withPipeline(type, product, component) {
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
+  syncBranchesWithMaster(branchesToSync)
 
   onPR() {
     echo "Loading PR secrets"
@@ -128,13 +131,13 @@ withPipeline(type, product, component) {
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
 
+    echo "Just waiting a while to ensure that the pod has run the job"
+    sh "sleep 120s"
     // Load the CCD definitions here:
     // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)
 
     // Execute functional tests
-    echo "Just waiting a while to ensure that the pod has run the job"
-    sh "sleep 30s"
     echo "Verifying that functional test run correctly"
     try {
       builder.gradle('functional')
