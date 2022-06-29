@@ -17,7 +17,7 @@ logging:
     org.springframework: INFO
 
 elasticsearch:
-  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:4578"}
+  hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:4578"}
   global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
 
 deletable.case.types: ${DELETE_CASE_TYPES:"deletable_case_type,bbb,ccc"}
