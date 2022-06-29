@@ -3,15 +3,17 @@ package uk.gov.hmcts.reform.ccd.service;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.hmcts.reform.ccd.data.dao.CaseDataRepository;
-import uk.gov.hmcts.reform.ccd.data.dao.CaseEventRepository;
-import uk.gov.hmcts.reform.ccd.data.dao.CaseLinkRepository;
+import uk.gov.hmcts.reform.ccd.config.es.CaseDataElasticsearchOperations;
+import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
+import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
+import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
-import uk.gov.hmcts.reform.ccd.data.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.remote.DisposeDocumentsRemoteOperation;
+import uk.gov.hmcts.reform.ccd.service.remote.DisposeRoleAssignmentsRemoteOperation;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
 
 import java.util.List;
@@ -25,6 +27,8 @@ public class CaseDeletionService {
     private final CaseDataRepository caseDataRepository;
     private final CaseEventRepository caseEventRepository;
     private final CaseLinkRepository caseLinkRepository;
+    private final DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation;
+    private final DisposeRoleAssignmentsRemoteOperation disposeRoleAssignmentsRemoteOperation;
     private final CaseDataElasticsearchOperations caseDataElasticsearchOperations;
     private final ParameterResolver parameterResolver;
     private final Snooper snooper;
@@ -33,12 +37,16 @@ public class CaseDeletionService {
     public CaseDeletionService(final CaseDataRepository caseDataRepository,
                                final CaseEventRepository caseEventRepository,
                                final CaseLinkRepository caseLinkRepository,
+                               final DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation,
+                               final DisposeRoleAssignmentsRemoteOperation disposeRoleAssignmentsRemoteOperation,
                                final CaseDataElasticsearchOperations caseDataElasticsearchOperations,
                                final ParameterResolver parameterResolver,
                                final Snooper snooper) {
         this.caseDataRepository = caseDataRepository;
         this.caseEventRepository = caseEventRepository;
         this.caseLinkRepository = caseLinkRepository;
+        this.disposeDocumentsRemoteOperation = disposeDocumentsRemoteOperation;
+        this.disposeRoleAssignmentsRemoteOperation = disposeRoleAssignmentsRemoteOperation;
         this.caseDataElasticsearchOperations = caseDataElasticsearchOperations;
         this.parameterResolver = parameterResolver;
         this.snooper = snooper;
@@ -87,8 +95,9 @@ public class CaseDeletionService {
 
     private void deleteCaseData(final CaseData caseData) {
         caseEventRepository.deleteByCaseDataId(caseData.getId());
-        caseDataRepository.findById(caseData.getId())
-            .ifPresent(caseDataRepository::delete);
+        caseDataRepository.findById(caseData.getId()).ifPresent(caseDataRepository::delete);
+        disposeDocumentsRemoteOperation.postDocumentsDelete(caseData.getReference().toString());
+        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseData.getReference().toString());
         caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()), caseData.getReference());
     }
 

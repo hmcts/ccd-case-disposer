@@ -24,29 +24,34 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @BeforeAll
     static void setup() {
-        Awaitility.setDefaultPollInterval(1, TimeUnit.SECONDS);
+        Awaitility.setDefaultPollInterval(0, TimeUnit.MILLISECONDS);
         Awaitility.setDefaultPollDelay(Duration.FIVE_SECONDS);
         Awaitility.setDefaultTimeout(30, TimeUnit.SECONDS);
     }
 
     @ParameterizedTest
-    @MethodSource("provideCaseDeletionScenarios")
+    @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenarios(final String deletableCaseTypes,
+                       final String deletableCaseTypesSimulation,
                        final String scriptPath,
                        final List<Long> initialStateRowIds,
                        final Map<String, List<Long>> indexedData,
-                       final List<Long> endStateRowIds,
+                       final List<Long> deletableEndStateRowIds,
+                       final List<Long> simulatedEndStateRowIds,
+                       final Map<Long, List<String>> deletableDocuments,
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
-        setupData(deletableCaseTypes, scriptPath, initialStateRowIds, indexedData);
+        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments,
+                initialStateRowIds, indexedData);
 
         // WHEN
         executor.execute();
 
         // THEN
-        verifyDatabaseDeletion(endStateRowIds);
+        verifyDatabaseDeletion(initialStateRowIds,deletableEndStateRowIds);
+        verifyDocumentDeletion(deletableDocuments);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+        verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
-
 }
