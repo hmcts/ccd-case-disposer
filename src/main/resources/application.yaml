@@ -25,7 +25,7 @@ spring:
     enabled: false
 
 elasticsearch:
-  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
+  hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
   request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
   global.search:
     index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
