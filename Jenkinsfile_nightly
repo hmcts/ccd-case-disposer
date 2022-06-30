@@ -46,14 +46,25 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 GradleBuilder builder = new GradleBuilder(this, product)
 
 withNightlyPipeline(type, product, component) {
+  // Set required environment variables to run functional tests apart from one in vaults.
+  env.ELASTIC_SEARCH_ENABLED = true
+  env.DATA_STORE_DB_PORT = '5432'
+  env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
+  env.DATA_STORE_DB_HOST = 'ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com'
+  env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+  env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
+  env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
+  env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
+  env.DEFINITION_STORE_HOST = 'http://ccd-definition-store-api-aat.service.core-compute-aat.internal'
   env.Rules = params.SecurityRules
+
   loadVaultSecrets(secrets)
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
-
-  //enableSecurityScan()
-  //enableMutationTest()
+  enableMutationTest()
+  enableFullFunctionalTest()
+  enableSlackNotifications('#lau-builds')
   //enableFortifyScan()
 
   after('fortify-scan') {
@@ -61,28 +72,21 @@ withNightlyPipeline(type, product, component) {
   }
 
   after('mutationTest') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'builds/reports/pitest/**/*'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
   }
 
-  enableFullFunctionalTest()
+  after('securityScan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+  }
+
   before('fullFunctionalTest') {
     echo "Loading the secrets"
     loadVaultSecrets(secrets)
 
-    // Set required environment variables to run functional tests apart from one in vaults.
-    env.ELASTIC_SEARCH_ENABLED = true
-    env.DATA_STORE_DB_PORT = '5432'
-    env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
-    env.DATA_STORE_DB_HOST = 'ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com'
-    env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
-    env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
-    env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
-    env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
-    env.DEFINITION_STORE_HOST = 'http://ccd-definition-store-api-aat.service.core-compute-aat.internal'
 
     // Execute functional tests
     echo "Just waiting a while to ensure that the pod has run the job"
-    sh "sleep 120s"
+    sh "sleep 30s"
     echo "Verifying that functional test run correctly"
     try {
       echo "Before running func tests..."
@@ -94,6 +98,4 @@ withNightlyPipeline(type, product, component) {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/**'
     }
   }
-
-  enableSlackNotifications('#lau-builds')
 }
