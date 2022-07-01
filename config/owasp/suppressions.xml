@@ -10,11 +10,15 @@
   </suppress>
   <!--End of false positives section -->
 
-  <suppress>
-    <notes>
-      https://tools.hmcts.net/jira/browse/CCD-2918
-    </notes>
-    <cve>CVE-2022-21724</cve>
-  </suppress>
+  <!--Please add all the temporary suppression under the below section-->
+	  <suppress>
+	    <notes>Temporary Suppression
+	      CVE-2022-21724 refer https://tools.hmcts.net/jira/browse/CCD-2918
+	      CVE-2022-33915 refer https://tools.hmcts.net/jira/browse/CCD-3442
+	    </notes>
+	    <cve>CVE-2022-21724</cve>
+  	  <cve>CVE-2022-33915</cve>
+	  </suppress>
+	<!--End of temporary suppression section -->
 
 </suppressions>
