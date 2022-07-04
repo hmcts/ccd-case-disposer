@@ -7,5 +7,5 @@ xlsToJsonFolder=${1}
 
 echo xlsToJsonFolder = $xlsToJsonFolder
 
-echo Importing DISPOSER_Master_Definition.xlsx ....................
+echo Importing DISPOSER_Master_Definition_new.xlsx ....................
 ${dir}/ccd-import-definition-pipeline.sh "${xlsToJsonFolder}/DISPOSER_Master_Definition.xlsx"
