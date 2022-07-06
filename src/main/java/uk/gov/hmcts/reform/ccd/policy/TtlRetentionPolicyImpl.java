@@ -13,6 +13,6 @@ public class TtlRetentionPolicyImpl implements RetentionPolicy {
 
     private boolean isExpired(final LocalDate caseTtl) {
         final LocalDate today = LocalDate.now();
-        return caseTtl != null ? caseTtl.isBefore(today) : false;
+        return caseTtl != null && caseTtl.isBefore(today);
     }
 }
