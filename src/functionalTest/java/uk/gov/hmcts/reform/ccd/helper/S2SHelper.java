@@ -1,25 +1,43 @@
 package uk.gov.hmcts.reform.ccd.helper;
 
-import feign.Feign;
 import feign.jackson.JacksonEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.ServiceAuthTokenGenerator;
 
+import javax.inject.Named;
+
+import static feign.Feign.builder;
+
+@Named
 public class S2SHelper {
 
-    private final ServiceAuthTokenGenerator tokenGenerator;
+    @Value("${idam.s2s-auth.url}")
+    private String s2sUrl;
 
-    public S2SHelper(final String s2sUrl, final String secret, final String microservice) {
-        final ServiceAuthorisationApi serviceAuthorisationApi = Feign.builder()
-            .encoder(new JacksonEncoder())
-            .contract(new SpringMvcContract())
-            .target(ServiceAuthorisationApi.class, s2sUrl);
+    @Value("${ccd-data.secret}")
+    private String secret;
 
-        this.tokenGenerator = new ServiceAuthTokenGenerator(secret, microservice, serviceAuthorisationApi);
-    }
+    @Value("${ccd-data.name}")
+    private String microservice;
+
+    private ServiceAuthTokenGenerator tokenGenerator;
 
     public String getToken() {
+        if (tokenGenerator == null) {
+            final ServiceAuthorisationApi serviceAuthorisationApi = getServiceAuthorisationApi();
+            this.tokenGenerator = new ServiceAuthTokenGenerator(secret, microservice, serviceAuthorisationApi);
+
+            return tokenGenerator.generate();
+        }
         return tokenGenerator.generate();
+    }
+
+    private ServiceAuthorisationApi getServiceAuthorisationApi() {
+        return builder()
+                .encoder(new JacksonEncoder())
+                .contract(new SpringMvcContract())
+                .target(ServiceAuthorisationApi.class, s2sUrl);
     }
 }

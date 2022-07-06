@@ -106,20 +106,6 @@ public class TestParameterResolver implements ParameterResolver {
         return null;
     }
 
-    @Override
-    public String getIdamS2SHost() {
-        return null;
-    }
-
-    @Override
-    public String getCcdDataName() {
-        return null;
-    }
-
-    @Override
-    public String getCcdDataSecret() {
-        return null;
-    }
 
     @Override
     public String getDocumentStoreHost() {

@@ -136,7 +136,7 @@ withPipeline(type, product, component) {
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
     // Load the CCD definitions here:
-    // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition_new.xlsx
+    // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)
 
     // Execute functional tests

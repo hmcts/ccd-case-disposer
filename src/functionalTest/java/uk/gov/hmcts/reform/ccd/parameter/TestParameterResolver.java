@@ -38,15 +38,6 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${idam.api.password}")
     private String idamApiPassword;
 
-    @Value("${idam.s2s-auth.url}")
-    private String idamS2SHost;
-
-    @Value("${ccd-data.name}")
-    private String ccdDataName;
-
-    @Value("${ccd-data.secret}")
-    private String ccdDataSecret;
-
     @Value("${ccd.document.store.host}")
     private String documentStoreHost;
 
@@ -75,7 +66,6 @@ public class TestParameterResolver implements ParameterResolver {
         return globalSearchIndexName;
     }
 
-
     @Override
     public String getCasesIndexType() {
         return casesIndexType;
@@ -93,21 +83,6 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getIdamPassword() {
         return idamApiPassword;
-    }
-
-    @Override
-    public String getIdamS2SHost() {
-        return idamS2SHost;
-    }
-
-    @Override
-    public String getCcdDataName() {
-        return ccdDataName;
-    }
-
-    @Override
-    public String getCcdDataSecret() {
-        return ccdDataSecret;
     }
 
     @Override

@@ -4,7 +4,7 @@ import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtil;
+import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class TestDataProvider {
     private DocumentDeleteTestUtils documentDeleteTestUtils;
 
     @Inject
-    private RoleDeleteTestUtil roleDeleteTestUtils;
+    private RoleDeleteTestUtils roleDeleteTestUtils;
 
     @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;

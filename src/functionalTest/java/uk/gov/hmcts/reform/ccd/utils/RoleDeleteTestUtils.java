@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.helper.S2SHelper;
@@ -23,16 +22,19 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_ASSIGNMENT_PA
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @Component
-public class RoleDeleteTestUtil {
+public class RoleDeleteTestUtils {
 
     @Inject
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
 
-    @Autowired
+    @Inject
     private SecurityUtils securityUtils;
 
     @Inject
     private ParameterResolver parameterResolver;
+
+    @Inject
+    private S2SHelper s2SHelper;
 
     @Inject
     private FileUtils fileUtils;
@@ -40,7 +42,7 @@ public class RoleDeleteTestUtil {
     public void verifyRoleAssignmentDeletion(final Map<Long, List<String>> deletableRoles) {
         deletableRoles.entrySet().forEach(entry -> {
             final int caseRolesDeletionActualResults = roleDeletionRecordHolder
-                .getCaseRolesDeletionResults(Long.toString(entry.getKey()));
+                    .getCaseRolesDeletionResults(Long.toString(entry.getKey()));
 
             assertThat(caseRolesDeletionActualResults).isEqualTo(HttpStatus.OK.value());
         });
@@ -48,32 +50,28 @@ public class RoleDeleteTestUtil {
 
     public void createRoleAssignment(final Map<Long, List<String>> deletableRoles) {
 
-        S2SHelper ccdDataTokenGenerator = new S2SHelper(parameterResolver.getIdamS2SHost(),
-                                                        parameterResolver.getCcdDataSecret(),
-                                                        parameterResolver.getCcdDataName());
-
         deletableRoles.entrySet()
-            .forEach(entry -> entry.getValue()
-                .forEach(fileName -> {
-                    try {
-                        final Response response = RestAssured
-                            .given()
-                            .relaxedHTTPSValidation()
-                            .baseUri(parameterResolver.getRoleAssignmentsHost() + ROLE_ASSIGNMENT_PATH)
-                            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                            .header(SERVICE_AUTHORISATION_HEADER, ccdDataTokenGenerator.getToken())
-                            .header(AUTHORISATION_HEADER, securityUtils.getIdamClientToken())
-                            .body(fileUtils.getJsonFromFile(fileName))
-                            .when()
-                            .post()
-                            .andReturn();
+                .forEach(entry -> entry.getValue()
+                        .forEach(fileName -> {
+                            try {
+                                final Response response = RestAssured
+                                        .given()
+                                        .relaxedHTTPSValidation()
+                                        .baseUri(parameterResolver.getRoleAssignmentsHost() + ROLE_ASSIGNMENT_PATH)
+                                        .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                                        .header(SERVICE_AUTHORISATION_HEADER, s2SHelper.getToken())
+                                        .header(AUTHORISATION_HEADER, securityUtils.getIdamClientToken())
+                                        .body(fileUtils.getJsonFromFile(fileName))
+                                        .when()
+                                        .post()
+                                        .andReturn();
 
-                        assertThat(response.getStatusCode()).isEqualTo(201);
+                                assertThat(response.getStatusCode()).isEqualTo(201);
 
-                    } catch (final IOException e) {
-                        e.printStackTrace();
-                    }
-                }));
+                            } catch (final IOException e) {
+                                e.printStackTrace();
+                            }
+                        }));
     }
 
 }
