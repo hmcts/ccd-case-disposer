@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.mockito.Mockito.doReturn;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_TODAY_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.NON_DELETABLE_CASE_DATA_WITH_MISSING_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.NON_DELETABLE_CASE_DATA_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.TODAY;
 
@@ -73,6 +74,7 @@ class CaseTypeRetentionPolicyImplTest {
         return Stream.of(
             Arguments.of(List.of(TestData.DELETABLE_CASE_TYPE), DELETABLE_CASE_DATA_WITH_TODAY_TTL, false),
             Arguments.of(List.of(TestData.DELETABLE_CASE_TYPE), NON_DELETABLE_CASE_DATA_WITH_PAST_TTL, true),
+            Arguments.of(List.of(TestData.DELETABLE_CASE_TYPE), NON_DELETABLE_CASE_DATA_WITH_MISSING_TTL, true),
             Arguments.of(emptyList(), DELETABLE_CASE_DATA_WITH_TODAY_TTL, true)
         );
     }
