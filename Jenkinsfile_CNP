@@ -7,6 +7,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 def type = "java"
 def product = "ccd"
 def component = "case-disposer"
+def branchesToSync = ['demo','perftest']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
@@ -95,6 +96,7 @@ withPipeline(type, product, component) {
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
+  syncBranchesWithMaster(branchesToSync)
 
   onPR() {
     echo "Loading PR secrets"
@@ -129,13 +131,13 @@ withPipeline(type, product, component) {
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
 
+    echo "Just waiting a while to ensure that the pod has run the job"
+    sh "sleep 120s"
     // Load the CCD definitions here:
     // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)
 
     // Execute functional tests
-    echo "Just waiting a while to ensure that the pod has run the job"
-    sh "sleep 30s"
     echo "Verifying that functional test run correctly"
     try {
       builder.gradle('functional')
