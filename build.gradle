@@ -76,6 +76,12 @@ task integration(type: Test) {
     mustRunAfter test
 }
 
+task fortifyScan(type: JavaExec)  {
+  main = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
+  classpath += sourceSets.test.runtimeClasspath
+  jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+}
+
 check.dependsOn integration
 
 pmd {
@@ -285,8 +291,9 @@ dependencies {
     testCompile group: 'org.pitest', name: 'pitest', version: versions.pitest
     testCompile group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
     testCompile 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
+    testCompile 'com.github.hmcts:fortify-client:1.2.1:all'
 
-    integrationTestImplementation sourceSets.main.runtimeClasspath
+  integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath
 
     functionalTestImplementation sourceSets.main.runtimeClasspath
