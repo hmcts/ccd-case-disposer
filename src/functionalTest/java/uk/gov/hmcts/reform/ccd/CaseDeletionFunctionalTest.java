@@ -39,10 +39,11 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                        final List<Long> deletableEndStateRowIds,
                        final List<Long> simulatedEndStateRowIds,
                        final Map<Long, List<String>> deletableDocuments,
+                       final Map<Long, List<String>> deletableRoles,
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
-        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments,
+        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
                 initialStateRowIds, indexedData);
 
         // WHEN
@@ -51,6 +52,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         // THEN
         verifyDatabaseDeletion(initialStateRowIds,deletableEndStateRowIds);
         verifyDocumentDeletion(deletableDocuments);
+        verifyRoleDeletion(deletableRoles);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }

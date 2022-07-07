@@ -106,6 +106,7 @@ public class TestParameterResolver implements ParameterResolver {
         return null;
     }
 
+
     @Override
     public String getDocumentStoreHost() {
         return documentStoreHost;

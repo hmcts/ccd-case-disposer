@@ -22,6 +22,7 @@ public class DeletionScenarios {
                         List.of(1004259907353528L),
                         List.of(1004259907353528L),
                         Map.of(1004259907353529L, List.of("jpg.jpg")),
+                        Map.of(1004259907353529L, List.of("S-001-role-assignment-for-case.json")),
                         Map.of("DPR_FT_MasterCaseType", List.of(1004259907353529L)),
                         Map.of("DPR_FT_MultiplePages", List.of(1004259907353528L))
                 )
