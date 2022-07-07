@@ -72,18 +72,18 @@ public class DeletionScenarios {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
-                        List.of(1L, 2L, 3L, 4L),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
-                                "FT_MultiplePages", List.of(1504259907353526L)
+                        List.of(1L, 2L, 3L, 4L, 5L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L, 1504259907353526L),
+                                "FT_MultiplePages", List.of(1504259907353525L)
                         ),
-                        List.of(3L, 4L),
+                        List.of(3L, 4L, 5L),
                         emptyList(),
                         List.of(1504259907353528L, 1504259907353529L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
                                 "FT_MultiplePages", emptyList()
                         ),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353527L),
-                                "FT_MultiplePages", List.of(1504259907353526L)
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353526L),
+                                "FT_MultiplePages", List.of(1504259907353525L)
                         )
                 ),
                 // Scenario 6
@@ -92,16 +92,16 @@ public class DeletionScenarios {
                         null,
                         "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
                         List.of(1L, 2L, 3L, 4L),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L),
-                                "FT_MultiplePages", List.of(1504259907353526L)
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L, 1504259907353529L, 1504259907353526L),
+                                "FT_MultiplePages", List.of(1504259907353525L)
                         ),
-                        List.of(3L),
+                        List.of(3L, 4L),
                         emptyList(),
-                        List.of(1504259907353528L, 1504259907353529L, 1504259907353526L),
+                        List.of(1504259907353528L, 1504259907353529L, 1504259907353525L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353528L, 1504259907353529L),
-                                "FT_MultiplePages", List.of(1504259907353526L)
+                                "FT_MultiplePages", List.of(1504259907353525L)
                         ),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353527L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353526L),
                                 "FT_MultiplePages", emptyList()
                         )
                 ),
@@ -239,17 +239,17 @@ public class DeletionScenarios {
                         "FT_MasterCaseType",
                         null,
                         "scenarios/S-013-cases-due-deletion-linked-to-third-level-deep-nondeletable-case.sql",
-                        List.of(1L, 2L, 3L, 4L),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                        List.of(1L, 2L, 3L, 4L, 5L, 6L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L, 1504259907353525L, 1504259907353524L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         ),
-                        List.of(1L, 2L, 3L, 4L),
+                        List.of(1L, 2L, 3L, 4L, 5L, 6L),
                         emptyList(),
                         emptyList(),
                         Map.of("FT_MasterCaseType", emptyList(),
                                 "FT_MultiplePages", emptyList()
                         ),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L),
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L, 1504259907353528L, 1504259907353527L, 1504259907353525L, 1504259907353524L),
                                 "FT_MultiplePages", List.of(1504259907353526L)
                         )
                 ),
