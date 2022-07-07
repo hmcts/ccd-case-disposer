@@ -40,11 +40,6 @@ public class DisposeDocumentsRemoteOperation {
 
             final String requestBody = gson.toJson(documentsDeleteRequest);
 
-            log.info("*** DEBUG ***");
-            log.info("Host: {}", parameterResolver.getDocumentStoreHost());
-            log.info("Path: {}", DELETE_DOCUMENT_PATH);
-            log.info("RequestBody: {}", requestBody);
-
             final String documentsDeleteResponse = restClientBuilder
                     .postRequestWithServiceAuthHeader(parameterResolver.getDocumentStoreHost(),
                             DELETE_DOCUMENT_PATH,
