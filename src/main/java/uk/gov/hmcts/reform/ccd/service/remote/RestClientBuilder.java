@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
@@ -11,6 +11,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
+import static org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT;
+import static org.glassfish.jersey.client.ClientProperties.READ_TIMEOUT;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
@@ -54,11 +56,12 @@ public class RestClientBuilder {
                 .post(Entity.json(body));
     }
 
-    private Client getClient() {
+    @VisibleForTesting
+    protected Client getClient() {
         if (client == null) {
             final ClientConfig clientConfig = new ClientConfig()
-                    .property(ClientProperties.READ_TIMEOUT, CLIENT_READ_TIMEOUT)
-                    .property(ClientProperties.CONNECT_TIMEOUT, CLIENT_CONNECT_TIMEOUT);
+                    .property(READ_TIMEOUT, CLIENT_READ_TIMEOUT)
+                    .property(CONNECT_TIMEOUT, CLIENT_CONNECT_TIMEOUT);
 
             client = ClientBuilder
                     .newClient(clientConfig)
