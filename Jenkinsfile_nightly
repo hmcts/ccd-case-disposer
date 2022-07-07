@@ -30,7 +30,8 @@ def secrets = [
     secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
     secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
     secret('ccd-ELASTIC-SEARCH-URL', 'ELASTIC_SEARCH_HOSTS'),
-    secret('ccd-ELASTIC-SEARCH-DATA-NODES-URL', 'ELASTIC_SEARCH_DATA_NODES_HOSTS')
+    secret('ccd-ELASTIC-SEARCH-DATA-NODES-URL', 'ELASTIC_SEARCH_DATA_NODES_HOSTS'),
+    secret('ccd-data-s2s-secret', 'IDAM_KEY_CCD_DATA_STORE')
   ]
 ]
 
