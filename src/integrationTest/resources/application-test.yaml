@@ -26,8 +26,8 @@ simulated.case.types: ${SIMULATED_CASE_TYPES:"deletable_case_type_simulation,ttt
 idam:
   api:
     url: http://localhost:4603
-    username: case.disposer.idam.system.user@gmail.com
-    password: Pa55word11
+    username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
   s2s-auth:
     name: ccd_case_disposer
     url: http://localhost:4603
