@@ -19,8 +19,8 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_H
 @Service
 public class RestClientBuilder {
 
-    private static final int CLIENT_READ_TIMEOUT = 30000;
-    private static final int CLIENT_CONNECT_TIMEOUT = 50000;
+    private static final int CLIENT_READ_TIMEOUT = 60000;
+    private static final int CLIENT_CONNECT_TIMEOUT = 60000;
 
     private final SecurityUtil securityUtil;
     private Client client;
