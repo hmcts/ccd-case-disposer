@@ -96,7 +96,7 @@ class RestClientBuilderTest {
         final RestClientBuilder restClientBuilder = new RestClientBuilder(securityUtil);
         final Client client = restClientBuilder.getClient();
 
-        assertThat(client.getConfiguration().getProperty(READ_TIMEOUT)).isEqualTo(30000);
-        assertThat(client.getConfiguration().getProperty(CONNECT_TIMEOUT)).isEqualTo(50000);
+        assertThat(client.getConfiguration().getProperty(READ_TIMEOUT)).isEqualTo(60000);
+        assertThat(client.getConfiguration().getProperty(CONNECT_TIMEOUT)).isEqualTo(60000);
     }
 }
