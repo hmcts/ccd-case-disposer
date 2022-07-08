@@ -67,7 +67,7 @@ public class DisposeDocumentsRemoteOperation {
 
             final String message = getLogMessage(documentsDeletionResults);
 
-            log.info(message + "Case Ref = {} - Documents found = {} - Documented Marked for deletion = {}",
+            log.info(message + "Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
                     documentsDeleteRequest.getCaseRef(),
                     documentsDeletionResults.getCaseDocumentsFound(),
                     documentsDeletionResults.getMarkedForDeletion());

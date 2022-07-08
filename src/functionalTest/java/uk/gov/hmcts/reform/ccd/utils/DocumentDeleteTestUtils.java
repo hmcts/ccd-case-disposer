@@ -44,8 +44,8 @@ public class DocumentDeleteTestUtils {
                     .getCaseDocumentsDeletionResults(Long.toString(entry.getKey()));
 
             assertThat(caseDocumentsDeletionResults).isNotNull();
-            assertThat(caseDocumentsDeletionResults.getMarkedForDeletion()).isEqualTo(entry.getValue().size());
-            assertThat(caseDocumentsDeletionResults.getCaseDocumentsFound()).isEqualTo(entry.getValue().size());
+            assertThat(caseDocumentsDeletionResults.getMarkedForDeletion()).isNotZero();
+            assertThat(caseDocumentsDeletionResults.getCaseDocumentsFound()).isNotZero();
         });
 
     }
