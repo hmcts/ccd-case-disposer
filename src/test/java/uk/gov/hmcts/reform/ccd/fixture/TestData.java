@@ -59,6 +59,8 @@ public interface TestData {
             new CaseData(1000L, 1000L, DELETABLE_CASE_TYPE, YESTERDAY, 1000L, null);
     CaseData NON_DELETABLE_CASE_DATA_WITH_PAST_TTL =
             new CaseData(21L, 21L, NON_DELETABLE_CASE_TYPE, YESTERDAY, 21L, null);
+    CaseData NON_DELETABLE_CASE_DATA_WITH_MISSING_TTL =
+        new CaseData(22L, 22L, NON_DELETABLE_CASE_TYPE, null, 22L, null);
     CaseFamily NON_DELETABLE_CASE_FAMILY = new CaseFamily(NON_DELETABLE_CASE_DATA_WITH_PAST_TTL,
             asList(NON_DELETABLE_CASE_DATA_WITH_PAST_TTL,
                     NON_DELETABLE_CASE_DATA_WITH_PAST_TTL));
@@ -90,6 +92,7 @@ public interface TestData {
             .build();
     CaseData DELETABLE_CASE_DATA_WITH_FUTURE_TTL = new CaseData(3L, 3L, DELETABLE_CASE_TYPE, TOMORROW, 3L, null);
     CaseData LINKED_CASE_DATA_R101 = new CaseData(101L, 101L, DELETABLE_CASE_TYPE, TOMORROW, 101L, null);
+    CaseData LINKED_CASE_DATA_MISSING_TTL_R102 = new CaseData(102L, 102L, DELETABLE_CASE_TYPE, null, 101L, null);
     CaseDataEntity DELETABLE_CASE_ENTITY_WITH_TODAY_TTL = new CaseDataEntityBuilder(2L)
             .withReference(2L)
             .withCaseType(DELETABLE_CASE_TYPE)

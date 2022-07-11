@@ -21,8 +21,8 @@ class DefaultParameterResolverTest {
 
     private static final String GLOBAL_SEARCH_INDEX_NAME = "globalSearchIndexName";
 
-    private static final String IDAM_API_USERNAME = "idamApiUsername";
-    private static final String IDAM_API_PASSWORD = "idamApiPassword";
+    private static final String IDAM_API_USER_FIELD = "idamApiUsername";
+    private static final String IDAM_API_PWD_FIELD = "idamApiPassword";
 
     private static final String DELETABLE_CASE_TYPES = "deletableCaseTypes";
     private static final String DELETABLE_CASE_TYPE_SIMULATION = "deletableCaseTypeSimulation";
@@ -47,8 +47,8 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver, GLOBAL_SEARCH_INDEX_NAME, "global_index_name");
 
-        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_USERNAME, "user@email.com");
-        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_PASSWORD, "Pa55w0rd");
+        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_USER_FIELD, "user@email.com");
+        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_PWD_FIELD, "Pa55w0rd");
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      DELETABLE_CASE_TYPES, Arrays.asList("Case_Type_01"));

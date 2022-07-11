@@ -86,6 +86,7 @@ public class DefaultParameterResolver implements ParameterResolver {
         return idamApiPassword;
     }
 
+
     @Override
     public List<String> getDeletableCaseTypes() {
         return deletableCaseTypes.stream()

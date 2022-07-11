@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,30 @@ class DisposeDocumentsRemoteOperationTest {
         } catch (final DocumentDeletionException documentDeletionException) {
             assertThat(documentDeletionException.getMessage())
                     .isEqualTo("Error deleting documents for case : 1234567890123456");
+        }
+    }
+
+    @Test
+    void shouldThrowExceptionWhenResponseIsUnableToMapToObject() {
+        try {
+            final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
+            final String jsonResponse = new Gson().toJson(new CaseDocumentsDeletionResults(1, 1));
+
+            doThrow(new JsonSyntaxException("Unable to map document post response to object"))
+                    .when(documentDeletionRecordHolder)
+                    .setCaseDocumentsDeletionResults(eq("1234567890123456"),
+                            any(CaseDocumentsDeletionResults.class));
+
+            when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest))
+                    .thenReturn(jsonResponse);
+
+            disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
+
+            fail("The method should have thrown JsonParseException when request is invalid");
+        } catch (final DocumentDeletionException documentDeletionException) {
+            assertThat(documentDeletionException.getCause().getMessage())
+                    .contains("Unable to map json to object document deletion endpoint response due to following "
+                            + "endpoint response:");
         }
     }
 }

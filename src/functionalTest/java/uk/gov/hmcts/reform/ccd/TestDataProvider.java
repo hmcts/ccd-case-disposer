@@ -4,6 +4,7 @@ import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
 
 import java.util.List;
@@ -28,6 +29,9 @@ public class TestDataProvider {
     private DocumentDeleteTestUtils documentDeleteTestUtils;
 
     @Inject
+    private RoleDeleteTestUtils roleDeleteTestUtils;
+
+    @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;
 
 
@@ -35,6 +39,7 @@ public class TestDataProvider {
                              final String deletableCaseTypesSimulation,
                              final String scriptPath,
                              final Map<Long, List<String>> deletableDocuments,
+                             final Map<Long, List<String>> deletableRoles,
                              final List<Long> rowIds,
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
@@ -43,6 +48,7 @@ public class TestDataProvider {
         createGlobalSearchIndex();
 
         documentDeleteTestUtils.uploadDocument(deletableDocuments);
+        roleDeleteTestUtils.createRoleAssignment(deletableRoles);
 
         elasticSearchTestUtils.resetIndices(indexedData.keySet());
 
@@ -74,6 +80,9 @@ public class TestDataProvider {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
     }
 
+    protected void verifyRoleDeletion(final Map<Long, List<String>> deletableRoles) {
+        roleDeleteTestUtils.verifyRoleAssignmentDeletion(deletableRoles);
+    }
 
     private void setDeletableCaseTypes(final String value) {
         if (value != null) {

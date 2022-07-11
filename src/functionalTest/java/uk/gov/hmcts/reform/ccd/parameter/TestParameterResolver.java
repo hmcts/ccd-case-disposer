@@ -66,7 +66,6 @@ public class TestParameterResolver implements ParameterResolver {
         return globalSearchIndexName;
     }
 
-
     @Override
     public String getCasesIndexType() {
         return casesIndexType;
