@@ -27,7 +27,7 @@ public class RestClientBuilder {
 
     public RestClientBuilder(final SecurityUtil securityUtil) {
         this.securityUtil = securityUtil;
-        getClient();
+        client = getClient();
     }
 
     public String postRequestWithServiceAuthHeader(final String baseUrl,
@@ -58,17 +58,12 @@ public class RestClientBuilder {
 
     @VisibleForTesting
     protected Client getClient() {
-        if (client == null) {
-            final ClientConfig clientConfig = new ClientConfig()
-                    .property(READ_TIMEOUT, CLIENT_READ_TIMEOUT)
-                    .property(CONNECT_TIMEOUT, CLIENT_CONNECT_TIMEOUT);
+        final ClientConfig clientConfig = new ClientConfig()
+                .property(READ_TIMEOUT, CLIENT_READ_TIMEOUT)
+                .property(CONNECT_TIMEOUT, CLIENT_CONNECT_TIMEOUT);
 
-            client = ClientBuilder
-                    .newClient(clientConfig)
-                    .register(new LoggingFeature());
-
-            return client;
-        }
-        return client;
+        return ClientBuilder
+                .newClient(clientConfig)
+                .register(new LoggingFeature());
     }
 }

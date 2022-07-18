@@ -7,7 +7,6 @@ spring:
     name: Case Disposer
   jpa:
     database: postgresql
-    show-sql: ${SHOW_SQL:true}
     hibernate:
       ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQL95Dialect
