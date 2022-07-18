@@ -60,6 +60,7 @@ test {
     failFast = true
 }
 
+
 task functional(type: Test) {
     description = "Runs functional tests"
     group = "Verification"
@@ -81,6 +82,14 @@ task fortifyScan(type: JavaExec)  {
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
+
+task checkoutDataStoreMigrationScripts (type: Exec){
+   executable "src/integrationTest/resources/scripts/checkout-datastore-db-scripts.sh"
+   outputs.upToDateWhen { false }
+}
+
+//**** Uncomment this line to checkout latest data-store-api migration scripts *****
+//integration.dependsOn(checkoutDataStoreMigrationScripts)
 
 check.dependsOn integration
 
@@ -234,8 +243,6 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
     implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
 
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '8.2.2'
-
     implementation group: 'org.springframework', name:'spring-webmvc', version: versions.springFramework
 
     implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '2.25.1'
@@ -284,6 +291,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: versions.wiremock
+    testCompile group: 'org.flywaydb', name: 'flyway-core', version: '8.2.2'
 
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
 
