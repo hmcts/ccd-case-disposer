@@ -52,3 +52,5 @@ azure:
 
 ccd.document.store.host: http://localhost:4603
 ccd.role.assignment.host: http://localhost:4603
+
+app.insights.log.size: 250
