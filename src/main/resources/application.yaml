@@ -64,3 +64,5 @@ idam:
 #    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
 
 smoke.test.enabled: false
+
+app.insights.log.size: 250

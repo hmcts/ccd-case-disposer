@@ -5,7 +5,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 
 public class LogConstants {
-    public static final String SUMMARY_HEADING_STRING = "\r\nCase Disposer Deletion Summary : ";
+    public static final String SUMMARY_HEADING_STRING = "\r\nCase Disposer Deletion Summary %s of %s : ";
     public static final String TOTAL_CASES_STRING = "\r\nTotal cases : ";
     public static final String DELETED_CASES_STRING = "\r\nDeleted cases : ";
     public static final String SIMULATED_CASES_STRING = "\r\nSimulated cases : ";

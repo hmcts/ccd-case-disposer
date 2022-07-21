@@ -36,6 +36,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${ccd.role.assignment.host}")
     private String roleAssignmentHost;
 
+    @Value("${app.insights.log.size}")
+    private Integer appInsightsLogSize;
+
     @Override
     public Integer getElasticsearchRequestTimeout() {
         return elasticsearchRequestTimeout;
@@ -115,5 +118,10 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getRoleAssignmentsHost() {
         return roleAssignmentHost;
+    }
+
+    @Override
+    public Integer getAppInsightsLogSize() {
+        return appInsightsLogSize;
     }
 }
