@@ -35,4 +35,4 @@ ccd.role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
 
 create.global.search: ${CREATE_GLOBAL_SEARCH:false}
 
-app.insights.log.size: 250
+app.insights.log.size: ${CASE_DISPOSER_SUMMARY_LOG_SIZE:250}
