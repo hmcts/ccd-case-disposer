@@ -22,7 +22,7 @@ import javax.inject.Named;
 
 @Named
 @Slf4j
-public class CaseDeletionSimulationService {
+public class CaseDeletionLoggingService {
 
     private final TableTextBuilder tableTextBuilder;
     private final CaseDataViewBuilder caseDataViewBuilder;
@@ -31,11 +31,11 @@ public class CaseDeletionSimulationService {
     private final SummaryStringLogBuilder summaryStringLogBuilder;
 
     @Inject
-    public CaseDeletionSimulationService(final TableTextBuilder tableTextBuilder,
-                                         final CaseDataViewBuilder caseDataViewBuilder,
-                                         final CaseDataViewHolder caseDataViewHolder,
-                                         final ParameterResolver parameterResolver,
-                                         final SummaryStringLogBuilder summaryStringLogBuilder) {
+    public CaseDeletionLoggingService(final TableTextBuilder tableTextBuilder,
+                                      final CaseDataViewBuilder caseDataViewBuilder,
+                                      final CaseDataViewHolder caseDataViewHolder,
+                                      final ParameterResolver parameterResolver,
+                                      final SummaryStringLogBuilder summaryStringLogBuilder) {
         this.tableTextBuilder = tableTextBuilder;
         this.caseDataViewBuilder = caseDataViewBuilder;
         this.caseDataViewHolder = caseDataViewHolder;
@@ -51,25 +51,39 @@ public class CaseDeletionSimulationService {
         final List<List<CaseDataView>> caseViewPartition = Lists.partition(caseDataViews,
                 parameterResolver.getAppInsightsLogSize());
 
-        final AtomicInteger partCounter = new AtomicInteger(0);
+        if (!caseViewPartition.isEmpty()) {
+            final AtomicInteger partCounter = new AtomicInteger(0);
 
-        caseViewPartition.forEach(caseViewListPartition -> {
-            final String summaryString = summaryStringLogBuilder.buildSummaryString(deletedLinkedFamilies,
-                    simulatedLinkedFamilies,
-                    partCounter.incrementAndGet(),
-                    caseViewPartition.size());
+            caseViewPartition.forEach(caseViewListPartition -> {
+                final String summaryString = summaryStringLogBuilder.buildSummaryString(deletedLinkedFamilies,
+                        simulatedLinkedFamilies,
+                        partCounter.incrementAndGet(),
+                        caseViewPartition.size());
 
-            final TextTable textTable = tableTextBuilder.buildTextTable(caseViewListPartition);
+                final ByteArrayOutputStream outputStream = buildTextTable(caseViewListPartition);
 
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            final PrintStream printStream = new PrintStream(outputStream, true);
-
-            textTable.printTable(printStream, 0);
-
-            log.info(summaryString.concat(outputStream.toString()));
-        });
-
+                log.info(summaryString.concat(outputStream.toString()));
+            });
+        } else {
+            logDataIfNoDeletableOrSimulatedCasesFound();
+        }
         caseDataViewHolder.setUpData(caseDataViews);
+    }
+
+    private ByteArrayOutputStream buildTextTable(final List<CaseDataView> caseViewListPartition) {
+        final TextTable textTable = tableTextBuilder.buildTextTable(caseViewListPartition);
+
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        final PrintStream printStream = new PrintStream(outputStream, true);
+
+        textTable.printTable(printStream, 0);
+        return outputStream;
+    }
+
+    private void logDataIfNoDeletableOrSimulatedCasesFound() {
+        final String summaryString = summaryStringLogBuilder
+                .buildSummaryString(0, 0, 0, 0, 0);
+        log.info(summaryString);
     }
 
     private List<CaseDataView> buildCaseDataViews(final List<CaseFamily> deletedLinkedFamilies,

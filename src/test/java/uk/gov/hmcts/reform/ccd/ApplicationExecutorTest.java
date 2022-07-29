@@ -47,7 +47,7 @@ class ApplicationExecutorTest {
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseFamiliesFilter).getDeletableCasesOnly(emptyList());
-        verify(caseDeletionResolver).simulateCaseDeletion(emptyList());
+        verify(caseDeletionResolver).logCaseDeletion(emptyList());
     }
 
     @Test
@@ -77,12 +77,12 @@ class ApplicationExecutorTest {
                 .when(caseFindingService).findCasesDueDeletion();
         doReturn(caseDataList)
                 .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).simulateCaseDeletion(anyList());
+        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList());
 
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(2)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).simulateCaseDeletion(anyList());
+        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList());
     }
 }

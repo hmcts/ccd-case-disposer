@@ -23,7 +23,7 @@ class CaseDeletionResolverTest {
     private CaseFamiliesFilter caseFamiliesFilter;
 
     @Mock
-    private CaseDeletionSimulationService caseDeletionSimulationService;
+    private CaseDeletionLoggingService caseDeletionLoggingService;
 
     @InjectMocks
     private CaseDeletionResolver caseDeletionResolver;
@@ -31,11 +31,11 @@ class CaseDeletionResolverTest {
     @Test
     void shouldSimulateCaseDeletion() {
         final List<CaseFamily> linkedFamilies = asList(DELETABLE_CASE_FAMILY_SIMULATION);
-        caseDeletionResolver.simulateCaseDeletion(linkedFamilies);
+        caseDeletionResolver.logCaseDeletion(linkedFamilies);
 
         verify(caseFamiliesFilter, times(1)).getDeletableCasesOnly(linkedFamilies);
         verify(caseFamiliesFilter, times(1)).geSimulationCasesOnly(linkedFamilies);
-        verify(caseDeletionSimulationService, times(1))
+        verify(caseDeletionLoggingService, times(1))
                 .logCaseFamilies(anyList(), anyList());
     }
 }
