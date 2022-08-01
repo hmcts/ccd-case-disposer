@@ -68,7 +68,7 @@ public class CaseDeletionService {
             log.info("Deleted case.reference:: {}", rootCaseData.getReference());
         } catch (Exception e) { // Catch all exception
             final String errorMessage = String.format("Could not delete case.reference:: %s",
-                                                      rootCaseData.getReference());
+                    rootCaseData.getReference());
             snooper.snoop(errorMessage, e);
             throw new CaseDeletionException(errorMessage, e);
         }
@@ -83,11 +83,11 @@ public class CaseDeletionService {
             log.info("About to delete linked case.reference:: {}", caseData.getReference());
             final CaseLinkPrimaryKey caseLinkPrimaryKey = new CaseLinkPrimaryKey(parentCaseId, caseData.getId());
             caseLinkRepository.findById(caseLinkPrimaryKey)
-                .ifPresent(caseLinkRepository::delete);
+                    .ifPresent(caseLinkRepository::delete);
             log.info("Deleted linked case.reference:: {}", caseData.getReference());
         } catch (Exception e) { // Catch all exception
             final String errorMessage = String.format("Could not delete linked case.reference:: %s",
-                                                      caseData.getReference());
+                    caseData.getReference());
             snooper.snoop(errorMessage, e);
             throw new CaseDeletionException(errorMessage, e);
         }

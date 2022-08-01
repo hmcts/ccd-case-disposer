@@ -11,22 +11,22 @@ import javax.inject.Named;
 @Named
 public class CaseDeletionResolver {
 
-    private final CaseDeletionSimulationService caseDeletionSimulationService;
+    private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseFamiliesFilter caseFamiliesFilter;
 
     @Inject
-    public CaseDeletionResolver(final CaseDeletionSimulationService caseDeletionSimulationService,
+    public CaseDeletionResolver(final CaseDeletionLoggingService caseDeletionLoggingService,
                                 final CaseFamiliesFilter caseFamiliesFilter) {
-        this.caseDeletionSimulationService = caseDeletionSimulationService;
+        this.caseDeletionLoggingService = caseDeletionLoggingService;
         this.caseFamiliesFilter = caseFamiliesFilter;
     }
 
-    public void simulateCaseDeletion(final List<CaseFamily> linkedFamilies) {
+    public void logCaseDeletion(final List<CaseFamily> linkedFamilies) {
         final List<CaseFamily> deletableLinkedFamilies = caseFamiliesFilter.getDeletableCasesOnly(linkedFamilies);
 
         final List<CaseFamily> deletableLinkedFamiliesSimulation =
                 caseFamiliesFilter.geSimulationCasesOnly(linkedFamilies);
 
-        caseDeletionSimulationService.logCaseFamilies(deletableLinkedFamilies, deletableLinkedFamiliesSimulation);
+        caseDeletionLoggingService.logCaseFamilies(deletableLinkedFamilies, deletableLinkedFamiliesSimulation);
     }
 }

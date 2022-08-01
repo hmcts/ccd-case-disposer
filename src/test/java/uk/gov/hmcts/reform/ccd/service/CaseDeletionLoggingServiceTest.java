@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewHolder;
 import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -25,10 +26,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY_SIMULATION;
-import static uk.gov.hmcts.reform.ccd.util.LogConstants.SUMMARY_HEADING_STRING;
 
 @ExtendWith(MockitoExtension.class)
-class CaseDeletionSimulationServiceTest {
+class CaseDeletionLoggingServiceTest {
 
     @Spy
     private TableTextBuilder tableTextBuilder;
@@ -42,11 +42,11 @@ class CaseDeletionSimulationServiceTest {
     @Mock
     private ParameterResolver parameterResolver;
 
-    @Mock
+    @Spy
     private SummaryStringLogBuilder summaryStringLogBuilder;
 
     @InjectMocks
-    private CaseDeletionSimulationService caseDeletionSimulationService;
+    private CaseDeletionLoggingService caseDeletionLoggingService;
 
     @Test
     void shouldLogCaseFamilies() {
@@ -56,14 +56,7 @@ class CaseDeletionSimulationServiceTest {
         final List<CaseFamily> simulationCaseFamily = asList(DELETABLE_CASE_FAMILY_SIMULATION);
 
         when(parameterResolver.getAppInsightsLogSize()).thenReturn(7);
-        when(summaryStringLogBuilder.buildSummaryString(anyList(),
-                anyList(),
-                anyInt(),
-                anyInt()))
-                .thenReturn(String.format(SUMMARY_HEADING_STRING, 1,
-                        7));
-
-        caseDeletionSimulationService.logCaseFamilies(deletableCaseFamily, simulationCaseFamily);
+        caseDeletionLoggingService.logCaseFamilies(deletableCaseFamily, simulationCaseFamily);
 
         verify(tableTextBuilder, times(1)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
@@ -75,5 +68,25 @@ class CaseDeletionSimulationServiceTest {
         assertThat(caseDataViewHolder.getSimulatedCaseIds())
                 .isNotNull()
                 .containsExactlyInAnyOrder(30L, 31L);
+    }
+
+    @Test
+    void shouldLogWithNoDeletableOrSimulatedCasesFound() {
+
+        final List<CaseFamily> deletableCaseFamily = Collections.emptyList();
+
+        final List<CaseFamily> simulationCaseFamily = Collections.emptyList();
+
+        when(parameterResolver.getAppInsightsLogSize()).thenReturn(7);
+
+        caseDeletionLoggingService.logCaseFamilies(deletableCaseFamily, simulationCaseFamily);
+
+        verify(tableTextBuilder, times(0)).buildTextTable(anyList());
+        verify(summaryStringLogBuilder, times(1))
+                .buildSummaryString(0, 0, 0, 0, 0);
+        verify(caseDataViewHolder, times(1)).setUpData(Collections.emptyList());
+        verify(caseDataViewBuilder, times(2)).buildCaseDataViewList(anyList(), anyList(), anyBoolean());
+
+        assertThat(caseDataViewHolder.getSimulatedCaseIds()).isEmpty();
     }
 }

@@ -26,14 +26,14 @@ public class SummaryStringLogBuilder {
         final int simulatedCases = countCaseFamilies(simulatedLinkedFamilies);
         final int totalCases = deletedCases + simulatedCases;
 
-        return getSummaryString(deletedCases, simulatedCases, totalCases, partCounter, totalSize);
+        return buildSummaryString(deletedCases, simulatedCases, totalCases, partCounter, totalSize);
     }
 
-    private String getSummaryString(final int deleted,
-                                    final int simulated,
-                                    final int total,
-                                    final int partCounter,
-                                    final int totalSize) {
+    public String buildSummaryString(final int deleted,
+                                     final int simulated,
+                                     final int total,
+                                     final int partCounter,
+                                     final int totalSize) {
 
         final StringBuilder stringBuilder = new StringBuilder(String.format(SUMMARY_HEADING_STRING, partCounter,
                 totalSize));
