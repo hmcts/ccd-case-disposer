@@ -11,6 +11,7 @@ import javax.inject.Named;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.CR_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_CASES_STRING;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SUMMARY_HEADING_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.TOTAL_CASES_STRING;
@@ -20,17 +21,20 @@ public class SummaryStringLogBuilder {
 
     public String buildSummaryString(final List<CaseFamily> deletedLinkedFamilies,
                                      final List<CaseFamily> simulatedLinkedFamilies,
+                                     final List<CaseFamily> failedLinkedFamilies,
                                      final int partCounter,
                                      final int totalSize) {
         final int deletedCases = countCaseFamilies(deletedLinkedFamilies);
         final int simulatedCases = countCaseFamilies(simulatedLinkedFamilies);
-        final int totalCases = deletedCases + simulatedCases;
+        final int failedCases = countCaseFamilies(failedLinkedFamilies);
+        final int totalCases = deletedCases + simulatedCases + failedCases;
 
-        return buildSummaryString(deletedCases, simulatedCases, totalCases, partCounter, totalSize);
+        return buildSummaryString(deletedCases, simulatedCases, failedCases, totalCases, partCounter, totalSize);
     }
 
     public String buildSummaryString(final int deleted,
                                      final int simulated,
+                                     final int failed,
                                      final int total,
                                      final int partCounter,
                                      final int totalSize) {
@@ -43,6 +47,7 @@ public class SummaryStringLogBuilder {
                 .append(TOTAL_CASES_STRING).append(total)
                 .append(DELETED_CASES_STRING).append(deleted)
                 .append(SIMULATED_CASES_STRING).append(simulated)
+                .append(FAILED_CASES_STRING).append(failed)
                 .append(CR_STRING);
         return stringBuilder.toString();
     }

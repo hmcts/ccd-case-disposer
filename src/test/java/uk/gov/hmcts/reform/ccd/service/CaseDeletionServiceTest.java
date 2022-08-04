@@ -14,18 +14,17 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
-import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.DisposeDocumentsRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.DisposeRoleAssignmentsRemoteOperation;
+import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
 
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,6 +62,8 @@ class CaseDeletionServiceTest {
     private CaseDataElasticsearchOperations caseDataElasticsearchOperations;
     @Mock
     private ParameterResolver parameterResolver;
+    @Mock
+    private FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
     @Mock
     private Snooper snooper;
 
@@ -145,11 +146,8 @@ class CaseDeletionServiceTest {
         final Throwable thrown = catchThrowable(() -> underTest.deleteCase(caseFamily));
 
         // THEN
-        assertThat(thrown)
-            .isInstanceOf(CaseDeletionException.class)
-            .hasMessageStartingWith("Could not delete case.reference:: 1");
-
         verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(Exception.class));
+        verify(failedToDeleteCaseFamilyHolder).addCaseFamily(caseFamily);
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
         verifyNoInteractions(caseDataRepository);
         verifyNoInteractions(caseLinkRepository);
@@ -164,7 +162,7 @@ class CaseDeletionServiceTest {
             .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
         doNothing().when(caseLinkRepository).delete(any(CaseLinkEntity.class));
 
-        underTest.deleteLinkedCases(List.of(linkedCaseData1, linkedCaseData2));
+        underTest.deleteLinkedCases(defaultCaseFamily);
 
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
@@ -227,15 +225,12 @@ class CaseDeletionServiceTest {
         doThrow(IllegalArgumentException.class).when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
 
         // WHEN
-        final Throwable thrown = catchThrowable(() -> underTest.deleteLinkedCases(List.of(linkedCaseData1)));
+        final Throwable thrown = catchThrowable(() -> underTest.deleteLinkedCases(defaultCaseFamily));
 
         // THEN
-        assertThat(thrown)
-            .isInstanceOf(CaseDeletionException.class)
-            .hasMessageStartingWith("Could not delete linked case.reference:: 10");
-
         verify(snooper).snoop(eq("Could not delete linked case.reference:: 10"), any(Exception.class));
-        verify(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
+        verify(caseLinkRepository, times(2)).findById(any(CaseLinkPrimaryKey.class));
+        verify(failedToDeleteCaseFamilyHolder, times(2)).addCaseFamily(defaultCaseFamily);
         verifyNoMoreInteractions(caseLinkRepository);
     }
 }
