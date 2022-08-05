@@ -51,10 +51,9 @@ public class DisposeRoleAssignmentsRemoteOperation {
 
             logRoleAssignmentsDisposal(caseRef, roleAssignmentsDeleteResponse);
 
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             final String errorMessage = String.format("Error deleting role assignments for case : %s", caseRef);
             log.error(errorMessage, ex);
-            Thread.currentThread().interrupt();
             throw new RoleAssignmentDeletionException(errorMessage, ex);
         }
     }

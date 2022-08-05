@@ -50,7 +50,6 @@ public class DisposeDocumentsRemoteOperation {
         } catch (final Exception ex) {
             final String errorMessage = String.format("Error deleting documents for case : %s", caseRef);
             log.error(errorMessage, ex);
-            Thread.currentThread().interrupt();
             throw new DocumentDeletionException(errorMessage, ex);
         }
     }

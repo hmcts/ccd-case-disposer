@@ -96,11 +96,11 @@ public class CaseDeletionService {
     }
 
     private void deleteCaseData(final CaseData caseData) {
-        caseEventRepository.deleteByCaseDataId(caseData.getId());
-        caseDataRepository.findById(caseData.getId()).ifPresent(caseDataRepository::delete);
         disposeDocumentsRemoteOperation.postDocumentsDelete(caseData.getReference().toString());
         disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseData.getReference().toString());
         caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()), caseData.getReference());
+        caseEventRepository.deleteByCaseDataId(caseData.getId());
+        caseDataRepository.findById(caseData.getId()).ifPresent(caseDataRepository::delete);
     }
 
     private String getIndex(final String caseType) {

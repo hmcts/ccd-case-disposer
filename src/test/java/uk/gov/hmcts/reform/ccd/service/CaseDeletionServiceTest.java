@@ -141,19 +141,21 @@ class CaseDeletionServiceTest {
         // GIVEN
         final CaseFamily caseFamily = new CaseFamily(caseData, emptyList());
         doThrow(IllegalArgumentException.class).when(caseEventRepository).deleteByCaseDataId(anyLong());
+        doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
         // WHEN
-        final Throwable thrown = catchThrowable(() -> underTest.deleteCase(caseFamily));
+        catchThrowable(() -> underTest.deleteCase(caseFamily));
 
         // THEN
         verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(Exception.class));
         verify(failedToDeleteCaseFamilyHolder).addCaseFamily(caseFamily);
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
+        verify(disposeDocumentsRemoteOperation).postDocumentsDelete(anyString());
+        verify(disposeRoleAssignmentsRemoteOperation).postRoleAssignmentsDelete(anyString());
+        verify(caseDataElasticsearchOperations).deleteByReference(anyString(),anyLong());
+
         verifyNoInteractions(caseDataRepository);
         verifyNoInteractions(caseLinkRepository);
-        verifyNoInteractions(disposeDocumentsRemoteOperation);
-        verifyNoInteractions(disposeRoleAssignmentsRemoteOperation);
-        verifyNoInteractions(caseDataElasticsearchOperations);
     }
 
     @Test
