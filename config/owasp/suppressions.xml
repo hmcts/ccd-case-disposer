@@ -19,7 +19,6 @@
         CVE-2022-22978 refer https://tools.hmcts.net/jira/browse/CCD-3513
         CVE-2022-22971 refer https://tools.hmcts.net/jira/browse/CCD-3522
         CVE-2022-22970 refer https://tools.hmcts.net/jira/browse/CCD-3523
-        CVE-2022-31197 refer https://tools.hmcts.net/jira/browse/CCD-3603
 	    </notes>
 	    <cve>CVE-2022-21724</cve>
   	  <cve>CVE-2022-33915</cve>
@@ -27,7 +26,6 @@
   	  <cve>CVE-2022-22978</cve>
   	  <cve>CVE-2022-22971</cve>
   	  <cve>CVE-2022-22970</cve>
-      <cve>CVE-2022-31197</cve>
 	  </suppress>
 	<!--End of temporary suppression section -->
 
