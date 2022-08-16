@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.SummaryStringLogBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
-import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewHolder;
+import uk.gov.hmcts.reform.ccd.util.log.SimulatedCaseDataViewHolder;
 import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
 import java.io.ByteArrayOutputStream;
@@ -20,33 +20,40 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
+
 @Named
 @Slf4j
 public class CaseDeletionLoggingService {
 
     private final TableTextBuilder tableTextBuilder;
     private final CaseDataViewBuilder caseDataViewBuilder;
-    private final CaseDataViewHolder caseDataViewHolder;
+    private final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder;
     private final ParameterResolver parameterResolver;
     private final SummaryStringLogBuilder summaryStringLogBuilder;
 
     @Inject
     public CaseDeletionLoggingService(final TableTextBuilder tableTextBuilder,
                                       final CaseDataViewBuilder caseDataViewBuilder,
-                                      final CaseDataViewHolder caseDataViewHolder,
+                                      final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder,
                                       final ParameterResolver parameterResolver,
                                       final SummaryStringLogBuilder summaryStringLogBuilder) {
         this.tableTextBuilder = tableTextBuilder;
         this.caseDataViewBuilder = caseDataViewBuilder;
-        this.caseDataViewHolder = caseDataViewHolder;
+        this.simulatedCaseDataViewHolder = simulatedCaseDataViewHolder;
         this.parameterResolver = parameterResolver;
         this.summaryStringLogBuilder = summaryStringLogBuilder;
     }
 
     public void logCaseFamilies(final List<CaseFamily> deletedLinkedFamilies,
-                                final List<CaseFamily> simulatedLinkedFamilies) {
+                                final List<CaseFamily> simulatedLinkedFamilies,
+                                final List<CaseFamily> failedLinkedFamilies) {
 
-        final List<CaseDataView> caseDataViews = buildCaseDataViews(deletedLinkedFamilies, simulatedLinkedFamilies);
+        final List<CaseDataView> caseDataViews = buildCaseDataViews(deletedLinkedFamilies,
+                simulatedLinkedFamilies,
+                failedLinkedFamilies);
 
         final List<List<CaseDataView>> caseViewPartition = Lists.partition(caseDataViews,
                 parameterResolver.getAppInsightsLogSize());
@@ -57,6 +64,7 @@ public class CaseDeletionLoggingService {
             caseViewPartition.forEach(caseViewListPartition -> {
                 final String summaryString = summaryStringLogBuilder.buildSummaryString(deletedLinkedFamilies,
                         simulatedLinkedFamilies,
+                        failedLinkedFamilies,
                         partCounter.incrementAndGet(),
                         caseViewPartition.size());
 
@@ -67,7 +75,7 @@ public class CaseDeletionLoggingService {
         } else {
             logDataIfNoDeletableOrSimulatedCasesFound();
         }
-        caseDataViewHolder.setUpData(caseDataViews);
+        simulatedCaseDataViewHolder.setUpData(caseDataViews);
     }
 
     private ByteArrayOutputStream buildTextTable(final List<CaseDataView> caseViewListPartition) {
@@ -82,16 +90,18 @@ public class CaseDeletionLoggingService {
 
     private void logDataIfNoDeletableOrSimulatedCasesFound() {
         final String summaryString = summaryStringLogBuilder
-                .buildSummaryString(0, 0, 0, 0, 0);
+                .buildSummaryString(0, 0,0, 0, 0, 0);
         log.info(summaryString);
     }
 
     private List<CaseDataView> buildCaseDataViews(final List<CaseFamily> deletedLinkedFamilies,
-                                                  final List<CaseFamily> simulatedLinkedFamilies) {
+                                                  final List<CaseFamily> simulatedLinkedFamilies,
+                                                  final List<CaseFamily> failedLinkedFamilies) {
         final List<CaseDataView> caseDataViews = new ArrayList<>();
 
-        caseDataViewBuilder.buildCaseDataViewList(deletedLinkedFamilies, caseDataViews, true);
-        caseDataViewBuilder.buildCaseDataViewList(simulatedLinkedFamilies, caseDataViews, false);
+        caseDataViewBuilder.buildCaseDataViewList(deletedLinkedFamilies, caseDataViews, DELETED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(simulatedLinkedFamilies, caseDataViews, SIMULATED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(failedLinkedFamilies, caseDataViews, FAILED_STATE);
 
         return caseDataViews;
     }

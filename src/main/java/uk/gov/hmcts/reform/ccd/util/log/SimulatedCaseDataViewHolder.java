@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toSet;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 
 @Named
-public class CaseDataViewHolder {
+public class SimulatedCaseDataViewHolder {
     private List<CaseDataView> simulatedCaseDataViews;
 
     public void setUpData(final List<CaseDataView> caseDataViews) {
