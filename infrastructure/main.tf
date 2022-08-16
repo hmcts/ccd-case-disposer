@@ -90,16 +90,18 @@ data "azurerm_virtual_network" "aks_preview_vnet" {
   resource_group_name = "cft-preview-network-rg"
 }
 
-data "azurerm_subnet" "aks-00-preview" {
+data "azurerm_subnet" "aks-01-preview" {
   provider             = azurerm.aks-preview
-  name                 = "aks-00"
+  name                 = "aks-preview-01"
   virtual_network_name = data.azurerm_virtual_network.aks_preview_vnet.name
   resource_group_name  = data.azurerm_virtual_network.aks_preview_vnet.resource_group_name
 }
 
-data "azurerm_subnet" "aks-01-preview" {
+data "azurerm_subnet" "aks-00-preview" {
   provider             = azurerm.aks-preview
-  name                 = "aks-01"
+  name                 = "aks-preview-00"
   virtual_network_name = data.azurerm_virtual_network.aks_preview_vnet.name
   resource_group_name  = data.azurerm_virtual_network.aks_preview_vnet.resource_group_name
 }
+
+
