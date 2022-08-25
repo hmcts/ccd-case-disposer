@@ -29,5 +29,7 @@ public interface ParameterResolver {
 
     String getRoleAssignmentsHost();
 
+    Boolean getCheckCaseRolesExist();
+
     Integer getAppInsightsLogSize();
 }

@@ -38,4 +38,19 @@ public class TestConstants {
             Map.entry("1504259907351111", HttpStatus.OK.value()),
             Map.entry("1504259907350000", HttpStatus.OK.value())
     );
+
+    public static Map<String, Integer> ROLE_QUERY = Map.ofEntries(
+        Map.entry("1504259907353529", HttpStatus.OK.value()),
+        Map.entry("1504259907353528", HttpStatus.OK.value()),
+        Map.entry("1504259907353526", HttpStatus.OK.value()),
+        Map.entry("1504259907353525", HttpStatus.OK.value()),
+        Map.entry("1504259907353524", HttpStatus.OK.value()),
+        Map.entry("1504259907353523", HttpStatus.OK.value()),
+        Map.entry("1504259907353522", HttpStatus.OK.value()),
+        Map.entry("1504259907353519", HttpStatus.OK.value()),
+        Map.entry("1504259907353518", HttpStatus.OK.value()),
+        Map.entry("1504259907353527", HttpStatus.OK.value()),
+        Map.entry("1504259907351111", HttpStatus.OK.value()),
+        Map.entry("1504259907350000", HttpStatus.OK.value())
+    );
 }

@@ -50,7 +50,11 @@ azure:
   application-insights:
     instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:"Test"}
 
-ccd.document.store.host: http://localhost:4603
-ccd.role.assignment.host: http://localhost:4603
+ccd:
+  document.store:
+    host: ${DOCUMENT_STORE_HOST:http://localhost:4603}
+  role.assignment:
+    host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4603}
+    check-case-roles-exist: true
 
 app.insights.log.size: 250
