@@ -13,7 +13,6 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QueryResponse {
     private UUID id;
-    private String actorIdType;
     private String roleName;
     private Map<String, JsonNode> attributes;
 }

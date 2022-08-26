@@ -4,13 +4,11 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.gson.Gson;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsDeletePostRequest;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsQueryPostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsResponse;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 
 import java.util.Collections;
-import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
@@ -33,10 +31,7 @@ public class WireMockStubs {
     private RoleAssignmentsResponse roleAssignmentsResponse = new RoleAssignmentsResponse();
 
     public void setUpStubs(final WireMockServer wireMockServer) {
-        QueryResponse queryResponse = new QueryResponse();
-        queryResponse.setId(UUID.randomUUID());
-        roleAssignmentsResponse.setRoleAssignmentResponse(Collections.singletonList(queryResponse));
-
+        roleAssignmentsResponse.setRoleAssignmentResponse(Collections.singletonList(new QueryResponse()));
         setupDeleteDocumentsStub(wireMockServer);
         setupDeleteRolesStub(wireMockServer);
         setupQueryRolesStub(wireMockServer);
@@ -58,7 +53,7 @@ public class WireMockStubs {
         ROLE_DELETE.entrySet().forEach(entry ->
                 wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
                         .withRequestBody(equalToJson(new Gson()
-                                .toJson(new RoleAssignmentsDeletePostRequest(entry.getKey()))))
+                                .toJson(new RoleAssignmentsRequest(entry.getKey()))))
                         .willReturn(aResponse()
                                 .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                 .withStatus(200))));
@@ -68,7 +63,7 @@ public class WireMockStubs {
         ROLE_QUERY.entrySet().forEach(entry ->
                wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
                           .withRequestBody(equalToJson(new Gson()
-                          .toJson(new RoleAssignmentsQueryPostRequest(entry.getKey()))))
+                          .toJson(new RoleAssignmentsRequest(entry.getKey()))))
                           .willReturn(aResponse()
                                           .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                           .withBody(new Gson()
