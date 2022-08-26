@@ -4,8 +4,11 @@ import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsQueryPostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsResponse;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
@@ -13,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 import javax.ws.rs.core.Response;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_ROLE_PATH;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;
 
 @Service
 @Slf4j
@@ -39,22 +43,65 @@ public class DisposeRoleAssignmentsRemoteOperation {
     public void postRoleAssignmentsDelete(String caseRef) {
 
         try {
-            final RoleAssignmentsDeletePostRequest roleAssignmentsDeleteRequest =
+            if (!parameterResolver.getCheckCaseRolesExist()
+                ||
+                (parameterResolver.getCheckCaseRolesExist() && hasRoleAssignments(caseRef))) {
+
+                final RoleAssignmentsDeletePostRequest roleAssignmentsDeleteRequest =
                     new RoleAssignmentsDeletePostRequest(caseRef);
 
-            final String requestBody = gson.toJson(roleAssignmentsDeleteRequest);
+                final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
 
-            final Response roleAssignmentsDeleteResponse = restClientBuilder
+                final Response roleAssignmentsDeleteResponse = restClientBuilder
                     .postRequestWithAllHeaders(parameterResolver.getRoleAssignmentsHost(),
-                            DELETE_ROLE_PATH,
-                            requestBody);
+                                               DELETE_ROLE_PATH, requestDeleteBody);
 
-            logRoleAssignmentsDisposal(caseRef, roleAssignmentsDeleteResponse);
+                logRoleAssignmentsDisposal(caseRef, roleAssignmentsDeleteResponse);
+                roleAssignmentsDeleteResponse.close();
+            }
 
         } catch (final Exception ex) {
             final String errorMessage = String.format("Error deleting role assignments for case : %s", caseRef);
             log.error(errorMessage, ex);
             throw new RoleAssignmentDeletionException(errorMessage, ex);
+        }
+    }
+
+    private boolean hasRoleAssignments(String caseRef) {
+
+        final RoleAssignmentsQueryPostRequest roleAssignmentsQueryRequest =
+            new RoleAssignmentsQueryPostRequest(caseRef);
+
+        final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
+
+        final Response roleAssignmentsQueryResponse = restClientBuilder
+            .postRequestWithRoleAssignmentFetchContentType(parameterResolver.getRoleAssignmentsHost(),
+                                                           QUERY_ROLE_PATH, requestQueryBody);
+
+        if (roleAssignmentsQueryResponse.getStatus() == HttpStatus.OK.value()) {
+            RoleAssignmentsResponse roleAssignmentsResponse =
+                roleAssignmentsQueryResponse.readEntity(RoleAssignmentsResponse.class);
+
+            if (roleAssignmentsResponse != null
+                && !roleAssignmentsResponse.getRoleAssignmentResponse().isEmpty()
+                && roleAssignmentsResponse.getRoleAssignmentResponse().get(0).getId() != null
+            ) {
+                log.info("Found {} role(s) for case : {}, calling AM role(s) delete endpoint to remove.",
+                         roleAssignmentsResponse.getRoleAssignmentResponse().size(), caseRef);
+                roleAssignmentsQueryResponse.close();
+                return true;
+
+            } else {
+                log.info("No roles found for case : {}, skipping AM roles delete endpoint.", caseRef);
+                logRoleAssignmentsDisposal(caseRef, roleAssignmentsQueryResponse);
+                roleAssignmentsQueryResponse.close();
+                return false;
+            }
+
+        } else {
+            logRoleAssignmentsDisposal(caseRef, roleAssignmentsQueryResponse);
+            roleAssignmentsQueryResponse.close();
+            throw new RoleAssignmentDeletionException("Unable to get case assignment roles.");
         }
     }
 

@@ -44,6 +44,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${ccd.role.assignment.host}")
     private String roleAssignmentHost;
 
+    @Value("${ccd.role.assignment.check-case-roles-exist}")
+    private Boolean checkCaseRolesExist;
+
     @Value("${app.insights.log.size}")
     private Integer appInsightsLogSize;
 
@@ -124,6 +127,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getRoleAssignmentsHost() {
         return roleAssignmentHost;
+    }
+
+    @Override
+    public Boolean getCheckCaseRolesExist() {
+        return checkCaseRolesExist;
     }
 
     @Override
