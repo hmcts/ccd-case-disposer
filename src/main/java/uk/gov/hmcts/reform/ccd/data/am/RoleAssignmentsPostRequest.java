@@ -9,10 +9,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RoleAssignmentsRequest {
+public class RoleAssignmentsPostRequest {
     private List<QueryRequest> queryRequests;
 
-    public RoleAssignmentsRequest(String caseRef) {
+    public RoleAssignmentsPostRequest(String caseRef) {
         queryRequests = Arrays.asList(QueryRequest
                                           .builder()
                                           .attributes(Collections.singletonMap("caseId", Arrays.asList(caseRef)))

@@ -4,8 +4,8 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.gson.Gson;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsRequest;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsResponse;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 
 import java.util.Collections;
@@ -28,7 +28,7 @@ public class WireMockStubs {
     private static final String ROLES_DELETE_PATH = "/am/role-assignments/query/delete";
     private static final String ROLES_QUERY_PATH = "/am/role-assignments/query";
 
-    private RoleAssignmentsResponse roleAssignmentsResponse = new RoleAssignmentsResponse();
+    private RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
 
     public void setUpStubs(final WireMockServer wireMockServer) {
         roleAssignmentsResponse.setRoleAssignmentResponse(Collections.singletonList(new QueryResponse()));
@@ -53,7 +53,7 @@ public class WireMockStubs {
         ROLE_DELETE.entrySet().forEach(entry ->
                 wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
                         .withRequestBody(equalToJson(new Gson()
-                                .toJson(new RoleAssignmentsRequest(entry.getKey()))))
+                                .toJson(new RoleAssignmentsPostRequest(entry.getKey()))))
                         .willReturn(aResponse()
                                 .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                 .withStatus(200))));
@@ -63,7 +63,7 @@ public class WireMockStubs {
         ROLE_QUERY.entrySet().forEach(entry ->
                wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
                           .withRequestBody(equalToJson(new Gson()
-                          .toJson(new RoleAssignmentsRequest(entry.getKey()))))
+                          .toJson(new RoleAssignmentsPostRequest(entry.getKey()))))
                           .willReturn(aResponse()
                                           .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                           .withBody(new Gson()

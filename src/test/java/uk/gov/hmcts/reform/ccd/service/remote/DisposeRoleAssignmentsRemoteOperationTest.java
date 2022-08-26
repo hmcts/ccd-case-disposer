@@ -8,8 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsRequest;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsResponse;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
@@ -56,8 +56,8 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         final Response response = mock(Response.class);
 
         final String caseRef = "1234567890123456";
-        final RoleAssignmentsRequest roleAssignmentsDeleteRequest =
-            new RoleAssignmentsRequest(caseRef);
+        final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+            new RoleAssignmentsPostRequest(caseRef);
 
         doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
         doReturn(false).when(parameterResolver).getCheckCaseRolesExist();
@@ -87,13 +87,13 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         final Response qResponse = mock(Response.class);
 
         final String caseRef = "1234567890123456";
-        final RoleAssignmentsRequest roleAssignmentsDeleteRequest =
-            new RoleAssignmentsRequest(caseRef);
+        final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+            new RoleAssignmentsPostRequest(caseRef);
 
-        final RoleAssignmentsRequest roleAssignmentsQueryRequest =
-            new RoleAssignmentsRequest(caseRef);
+        final RoleAssignmentsPostRequest roleAssignmentsQueryRequest =
+            new RoleAssignmentsPostRequest(caseRef);
 
-        RoleAssignmentsResponse roleAssignmentsResponse = new RoleAssignmentsResponse();
+        RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
         QueryResponse queryResponse = new QueryResponse();
         queryResponse.setId(UUID.randomUUID());
         roleAssignmentsResponse.setRoleAssignmentResponse(Collections.singletonList(queryResponse));
@@ -103,7 +103,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
         when(dResponse.getStatus()).thenReturn(200);
         when(qResponse.getStatus()).thenReturn(200);
-        when(qResponse.readEntity(RoleAssignmentsResponse.class)).thenReturn(roleAssignmentsResponse);
+        when(qResponse.readEntity(RoleAssignmentsPostResponse.class)).thenReturn(roleAssignmentsResponse);
 
         final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
         final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
@@ -132,17 +132,17 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         final Response qResponse = mock(Response.class);
 
         final String caseRef = "1234567890123456";
-        final RoleAssignmentsRequest roleAssignmentsQueryRequest =
-            new RoleAssignmentsRequest(caseRef);
+        final RoleAssignmentsPostRequest roleAssignmentsQueryRequest =
+            new RoleAssignmentsPostRequest(caseRef);
 
-        RoleAssignmentsResponse roleAssignmentsResponse = new RoleAssignmentsResponse();
+        RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
         roleAssignmentsResponse.setRoleAssignmentResponse(Collections.EMPTY_LIST);
 
         doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
         doReturn(true).when(parameterResolver).getCheckCaseRolesExist();
 
         when(qResponse.getStatus()).thenReturn(200);
-        when(qResponse.readEntity(RoleAssignmentsResponse.class)).thenReturn(roleAssignmentsResponse);
+        when(qResponse.readEntity(RoleAssignmentsPostResponse.class)).thenReturn(roleAssignmentsResponse);
 
         final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
 
@@ -185,7 +185,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
     void shouldThrowExceptionWhenDeleteRequestInvalid() {
         try {
             final String caseRef = "1234567890123456";
-            final String jsonRequest = new Gson().toJson(new RoleAssignmentsRequest("1234567890123456"));
+            final String jsonRequest = new Gson().toJson(new RoleAssignmentsPostRequest("1234567890123456"));
             doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
             doReturn(false).when(parameterResolver).getCheckCaseRolesExist();
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RoleAssignmentsResponse {
+public class RoleAssignmentsPostResponse {
     @JsonProperty("roleAssignmentResponse")
     private List<QueryResponse> roleAssignmentResponse;
 }
