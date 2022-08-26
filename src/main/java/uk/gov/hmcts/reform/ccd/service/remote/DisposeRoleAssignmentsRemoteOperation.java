@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsQueryPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsResponse;
@@ -82,8 +83,7 @@ public class DisposeRoleAssignmentsRemoteOperation {
             RoleAssignmentsResponse roleAssignmentsResponse =
                 roleAssignmentsQueryResponse.readEntity(RoleAssignmentsResponse.class);
 
-            if (roleAssignmentsResponse != null
-                && !roleAssignmentsResponse.getRoleAssignmentResponse().isEmpty()
+            if (!CollectionUtils.isEmpty(roleAssignmentsResponse.getRoleAssignmentResponse())
                 && roleAssignmentsResponse.getRoleAssignmentResponse().get(0).getId() != null
             ) {
                 log.info("Found {} role(s) for case : {}, calling AM role(s) delete endpoint to remove.",

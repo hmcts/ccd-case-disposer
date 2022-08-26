@@ -162,11 +162,33 @@ class DisposeRoleAssignmentsRemoteOperationTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenRequestInvalid() {
+    void shouldThrowExceptionWhenQueryRequestInvalid() {
+        try {
+            final Response response = mock(Response.class);
+            final String caseRef = "1234567890123456";
+            doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+            doReturn(true).when(parameterResolver).getCheckCaseRolesExist();
+
+            when(response.getStatus()).thenReturn(500);
+
+            when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"), eq(QUERY_ROLE_PATH), anyString())).thenReturn(response);
+
+            disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+
+            fail("The method should have thrown DocumentDeletionException when request is invalid");
+        } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {
+            assertThat(roleAssignmentDeletionException.getMessage())
+                .isEqualTo("Error deleting role assignments for case : 1234567890123456");
+        }
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeleteRequestInvalid() {
         try {
             final String caseRef = "1234567890123456";
             final String jsonRequest = new Gson().toJson(new RoleAssignmentsDeletePostRequest("1234567890123456"));
             doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+            doReturn(false).when(parameterResolver).getCheckCaseRolesExist();
 
             doThrow(new RoleAssignmentDeletionException(caseRef))
                     .when(restClientBuilder)
