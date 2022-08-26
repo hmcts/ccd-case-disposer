@@ -57,7 +57,7 @@ public class WireMockStubs {
         ROLE_QUERY.entrySet().forEach(entry ->
                wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
                           .withRequestBody(equalToJson(new Gson()
-                                                           .toJson(new RoleAssignmentsQueryPostRequest(entry.getKey()))))
+                          .toJson(new RoleAssignmentsQueryPostRequest(entry.getKey()))))
                           .willReturn(aResponse()
                                           .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                           .withStatus(200))));
