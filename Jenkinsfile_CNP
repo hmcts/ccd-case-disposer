@@ -111,6 +111,7 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_HOST = "ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
   onNonPR() {
@@ -121,6 +122,7 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_HOST = "ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+    env.CORE_CASE_DATA_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
   }
 
   after('akschartsinstall') {
@@ -132,6 +134,7 @@ withPipeline(type, product, component) {
     env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.CORE_CASE_DATA_API_URL = 'http://ccd-data-store-api-aat.service.core-compute-aat.internal'
 
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"

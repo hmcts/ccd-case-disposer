@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.ccd;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.helper.CcdClientHelper;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
-import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.CcdDatastoreTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
@@ -11,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
@@ -23,7 +27,7 @@ public class TestDataProvider {
     private ElasticSearchTestUtils elasticSearchTestUtils;
 
     @Inject
-    private DatabaseTestUtils databaseTestUtils;
+    private CcdDatastoreTestUtils ccdDatastoreTestUtils;
 
     @Inject
     private DocumentDeleteTestUtils documentDeleteTestUtils;
@@ -34,53 +38,77 @@ public class TestDataProvider {
     @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;
 
+    @Inject
+    private CcdClientHelper ccdClientHelper;
+
+    @Autowired
+    private ApplicationExecutor executor;
+
 
     protected void setupData(final String deletableCaseTypes,
                              final String deletableCaseTypesSimulation,
-                             final String scriptPath,
-                             final Map<Long, List<String>> deletableDocuments,
-                             final Map<Long, List<String>> deletableRoles,
-                             final List<Long> rowIds,
-                             final Map<String, List<Long>> indexedData) throws Exception {
-        System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
-        System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
+                             final Map<String, Integer> initialStateNumberOfDatastoreRecords,
+                             final Map<String, String> deletableDocuments,
+                             final Map<String, String> deletableRoles) throws Exception {
+
+        cleanUpTheData(deletableCaseTypes, deletableCaseTypesSimulation);
 
         createGlobalSearchIndex();
 
-        documentDeleteTestUtils.uploadDocument(deletableDocuments);
-        roleDeleteTestUtils.createRoleAssignment(deletableRoles);
-
-        elasticSearchTestUtils.resetIndices(indexedData.keySet());
-
+        clearUpSystemProperties();
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
 
-        databaseTestUtils.insertDataIntoDatabase(scriptPath);
+        ccdDatastoreTestUtils.insertDataIntoCcdDatastore(initialStateNumberOfDatastoreRecords);
+        ccdDatastoreTestUtils.verifyCcdDatastoreIsPopulated(initialStateNumberOfDatastoreRecords);
 
-        databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
+        documentDeleteTestUtils.uploadDocument(deletableDocuments);
 
-        elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
+        roleDeleteTestUtils.createRoleAssignment(deletableRoles);
+
+        elasticSearchTestUtils.resetIndices(initialStateNumberOfDatastoreRecords.keySet());
+        elasticSearchTestUtils.verifyElasticsearchRecords(initialStateNumberOfDatastoreRecords);
     }
 
-    protected void verifyDatabaseDeletion(final List<Long> initialRowIds,
-                                          final List<Long> endStateRowIds) {
-        databaseTestUtils.verifyDatabaseDeletion(initialRowIds,endStateRowIds);
+    private void clearUpSystemProperties() {
+        System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
+        System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
     }
 
-    protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
-                                               final Map<String, List<Long>> notDeletedFromIndexed) {
-        elasticSearchTestUtils.verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+    private void cleanUpTheData(String deletableCaseTypes,
+                                String deletableCaseTypesSimulation) {
+        clearUpSystemProperties();
+        setDeletableCaseTypes(String.join(",", deletableCaseTypes, deletableCaseTypesSimulation));
+
+        executor.execute();
+
+        final List<CaseDetails> deletableCasesByCaseType = ccdClientHelper
+                .getCasesByCaseType(deletableCaseTypes);
+
+        final List<CaseDetails> simulatedCasesByCaseType = ccdClientHelper
+                .getCasesByCaseType(deletableCaseTypesSimulation);
+
+        assertThat(deletableCasesByCaseType.size()).isEqualTo(0);
+        assertThat(simulatedCasesByCaseType.size()).isEqualTo(0);
     }
 
-    protected void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
-        simulationTestUtils.verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+    protected void verifyDatabaseDeletion(final Map<String, Integer> endStateNumberOfDatastoreRecords) {
+        ccdDatastoreTestUtils.verifyCcdDatastoreDeletion(endStateNumberOfDatastoreRecords);
     }
 
-    protected void verifyDocumentDeletion(final Map<Long, List<String>> deletableDocuments) {
+    protected void verifyElasticsearchDeletion(final Map<String, Integer> endStateNumberOfDatastoreRecords) {
+        elasticSearchTestUtils.verifyElasticsearchRecords(endStateNumberOfDatastoreRecords);
+    }
+
+    protected void verifyDatabaseDeletionSimulation(final Map<String, Integer> endStateNumberOfDatastoreRecords) {
+        simulationTestUtils.verifyDatabaseDeletionSimulation(endStateNumberOfDatastoreRecords);
+    }
+
+    protected void verifyDocumentDeletion(final Map<String, String> deletableDocuments) {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
     }
 
-    protected void verifyRoleDeletion(final Map<Long, List<String>> deletableRoles) {
+    protected void verifyRoleDeletion(final Map<String, String> deletableRoles) {
         roleDeleteTestUtils.verifyRoleAssignmentDeletion(deletableRoles);
     }
 

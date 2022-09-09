@@ -1,13 +1,10 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
 import com.pivovarit.function.ThrowingConsumer;
-import com.pivovarit.function.ThrowingFunction;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest;
@@ -36,7 +33,6 @@ import static org.elasticsearch.client.RequestOptions.DEFAULT;
 public class ElasticSearchTestUtils {
 
     private static final String INDEX_TYPE = "_doc";
-    private static final String CASE_REFERENCE_FIELD = "reference";
 
     @Inject
     private RestHighLevelClient elasticsearchClient;
@@ -44,32 +40,29 @@ public class ElasticSearchTestUtils {
     @Inject
     private ParameterResolver parameterResolver;
 
-    public void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
-                                            final Map<String, List<Long>> notDeletedFromIndexed) {
-        verifyCaseDataAreDeletedInElasticsearch(deletedFromIndexed);
-        verifyCaseDataAreInElasticsearch(notDeletedFromIndexed);
+    public void verifyElasticsearchRecords(final Map<String, Integer> numberOfElasticSearchRecords) {
+        if (!isPreview()) {
+            numberOfElasticSearchRecords.entrySet().forEach(ThrowingConsumer.unchecked(entry ->
+                    with().await().untilAsserted(() -> {
+                        Thread.sleep(10000);
+                        final String indexName = getIndexName(entry.getKey());
+                        refreshIndex(indexName);
+                        final long totalNumberOfRecordsByIndexName = findTotalNumberOfRecordsByIndexName(indexName);
+                        assertThat(totalNumberOfRecordsByIndexName).isEqualTo(Long.valueOf(entry.getValue()));
+                    })));
+        }
     }
 
-    private void verifyCaseDataAreDeletedInElasticsearch(final Map<String, List<Long>> deletedFromIndexed) {
-        if (!isPreview()) {
-            deletedFromIndexed.forEach((key, value) -> {
-                final String indexName = getIndexName(key);
+    private long findTotalNumberOfRecordsByIndexName(final String caseIndex) throws IOException {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder().from(0);
 
-                value.forEach(ThrowingConsumer.unchecked(caseReference -> {
-                    Thread.sleep(10000);
-                    with()
-                            .await()
-                            .untilAsserted(() -> {
-                                refreshIndex(indexName);
-                                Thread.sleep(10000);
-                                final Optional<Long> actualCaseReference = findCaseByReference(indexName,
-                                        caseReference);
+        final SearchRequest searchRequest = new SearchRequest(caseIndex)
+                .types(INDEX_TYPE)
+                .source(searchSourceBuilder);
 
-                                assertThat(actualCaseReference).isNotPresent();
-                            });
-                }));
-            });
-        }
+        final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, DEFAULT);
+
+        return Arrays.stream(searchResponse.getHits().getHits()).count();
     }
 
     public List<String> getAllDocuments(final String indexName) throws IOException {
@@ -113,56 +106,6 @@ public class ElasticSearchTestUtils {
         }
     }
 
-    public void verifyCaseDataAreInElasticsearch(final Map<String, List<Long>> indexedData) {
-        if (!isPreview()) {
-            indexedData.forEach((key, value) -> {
-                final String indexName = getIndexName(key);
-
-                value.forEach(ThrowingConsumer.unchecked(caseReference -> {
-                    Thread.sleep(10000);
-                    with()
-                            .await()
-                            .untilAsserted(() -> {
-
-                                refreshIndex(indexName);
-                                Thread.sleep(10000);
-                                final Optional<Long> actualCaseReference = findCaseByReference(indexName,
-                                        caseReference);
-
-                                assertThat(actualCaseReference)
-                                        .isPresent()
-                                        .hasValue(caseReference);
-                            });
-                }));
-            });
-        }
-    }
-
-    private Optional<Long> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(QueryBuilders.termQuery(CASE_REFERENCE_FIELD, caseReference))
-                .from(0);
-
-        final SearchRequest searchRequest = new SearchRequest(caseIndex)
-                .types(INDEX_TYPE)
-                .source(searchSourceBuilder);
-
-        final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, DEFAULT);
-        final Optional<String> first = Arrays.stream(searchResponse.getHits().getHits())
-                .map(SearchHit::getId)
-                .findFirst();
-
-        return first.map(ThrowingFunction.unchecked(id -> {
-            final GetRequest getRequest = new GetRequest(caseIndex, INDEX_TYPE, id);
-            final GetResponse getResponse = elasticsearchClient.get(getRequest, DEFAULT);
-
-            if (!getResponse.isExists()) {
-                return null;
-            }
-            final Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
-            return (Long) sourceAsMap.get(CASE_REFERENCE_FIELD);
-        }));
-    }
 
     private void refreshIndex(final String index) throws IOException {
         final RefreshRequest request = new RefreshRequest(index);

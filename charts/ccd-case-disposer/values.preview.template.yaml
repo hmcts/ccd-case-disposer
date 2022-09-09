@@ -8,7 +8,6 @@ job:
   concurrencyPolicy: Forbid
   environment:
     APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
-    DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
     DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
@@ -20,6 +19,7 @@ job:
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
 global:
   jobKind: CronJob
 

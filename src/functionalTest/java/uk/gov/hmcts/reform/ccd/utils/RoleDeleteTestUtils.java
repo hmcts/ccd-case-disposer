@@ -2,11 +2,16 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.exception.CaseDisposerFunctionalTestException;
 import uk.gov.hmcts.reform.ccd.helper.S2SHelper;
 import uk.gov.hmcts.reform.ccd.helper.SecurityUtils;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.util.log.DataStoreRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
 import java.io.IOException;
@@ -28,6 +33,9 @@ public class RoleDeleteTestUtils {
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
 
     @Inject
+    private DataStoreRecordHolder dataStoreRecordHolder;
+
+    @Inject
     private SecurityUtils securityUtils;
 
     @Inject
@@ -39,39 +47,56 @@ public class RoleDeleteTestUtils {
     @Inject
     private FileUtils fileUtils;
 
-    public void verifyRoleAssignmentDeletion(final Map<Long, List<String>> deletableRoles) {
+    public void verifyRoleAssignmentDeletion(final Map<String, String> deletableRoles) {
         deletableRoles.entrySet().forEach(entry -> {
-            final int caseRolesDeletionActualResults = roleDeletionRecordHolder
-                    .getCaseRolesDeletionResults(Long.toString(entry.getKey()));
 
-            assertThat(caseRolesDeletionActualResults).isEqualTo(HttpStatus.OK.value());
+            final List<String> deletedCaseIdList = dataStoreRecordHolder.getDatastoreCases().get(entry.getKey());
+
+            deletedCaseIdList.forEach(caseId -> {
+                final int caseRolesDeletionActualResults = roleDeletionRecordHolder
+                        .getCaseRolesDeletionResults(caseId);
+
+                assertThat(caseRolesDeletionActualResults).isEqualTo(HttpStatus.OK.value());
+            });
         });
     }
 
-    public void createRoleAssignment(final Map<Long, List<String>> deletableRoles) {
+    public void createRoleAssignment(final Map<String, String> deletableRoles) {
+        deletableRoles.entrySet().forEach(entry -> dataStoreRecordHolder.getDatastoreCases().get(entry.getKey())
+                .forEach(caseId -> {
+                    final Response response = RestAssured
+                            .given()
+                            .relaxedHTTPSValidation()
+                            .baseUri(parameterResolver.getRoleAssignmentsHost() + ROLE_ASSIGNMENT_PATH)
+                            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                            .header(SERVICE_AUTHORISATION_HEADER, s2SHelper.getToken())
+                            .header(AUTHORISATION_HEADER, securityUtils.getIdamClientToken())
+                            .body(createJsonString(entry.getValue(), caseId))
+                            .when()
+                            .post()
+                            .andReturn();
 
-        deletableRoles.entrySet()
-                .forEach(entry -> entry.getValue()
-                        .forEach(fileName -> {
-                            try {
-                                final Response response = RestAssured
-                                        .given()
-                                        .relaxedHTTPSValidation()
-                                        .baseUri(parameterResolver.getRoleAssignmentsHost() + ROLE_ASSIGNMENT_PATH)
-                                        .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                                        .header(SERVICE_AUTHORISATION_HEADER, s2SHelper.getToken())
-                                        .header(AUTHORISATION_HEADER, securityUtils.getIdamClientToken())
-                                        .body(fileUtils.getJsonFromFile(fileName))
-                                        .when()
-                                        .post()
-                                        .andReturn();
+                    assertThat(response.getStatusCode()).isEqualTo(201);
+                })
+        );
+    }
 
-                                assertThat(response.getStatusCode()).isEqualTo(201);
+    private String createJsonString(final String fileName,
+                                    final String caseId) {
+        try {
+            final String jsonFromFile = fileUtils.getJsonFromFile(fileName);
 
-                            } catch (final IOException e) {
-                                e.printStackTrace();
-                            }
-                        }));
+            final JSONObject jsonObject = new JSONObject(jsonFromFile);
+            final JSONArray jsonObjectForState = jsonObject.getJSONArray("requestedRoles");
+            final JSONObject attributes = jsonObjectForState.getJSONObject(0).getJSONObject("attributes");
+
+            attributes.put("caseId", caseId);
+            return jsonObject.toString();
+        } catch (IOException | JSONException e) {
+            throw new CaseDisposerFunctionalTestException("Unable to create role assignment json string", e);
+        }
+
+
     }
 
 }

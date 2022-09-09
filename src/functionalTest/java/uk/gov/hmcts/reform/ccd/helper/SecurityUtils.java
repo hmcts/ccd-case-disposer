@@ -5,28 +5,34 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 @Service
 public class SecurityUtils {
 
-    private final AuthTokenGenerator authTokenGenerator;
-    private final IdamClient idamClient;
+    private String serviceAuthorization;
+    private String clientToken;
+    private UserDetails userDetails;
 
     @Autowired
-    private ParameterResolver parameterResolver;
-
-    @Autowired
-    public SecurityUtils(final AuthTokenGenerator authTokenGenerator, IdamClient idamClient) {
-        this.authTokenGenerator = authTokenGenerator;
-        this.idamClient = idamClient;
+    public SecurityUtils(final AuthTokenGenerator authTokenGenerator,
+                         final IdamClient idamClient,
+                         final ParameterResolver parameterResolver) {
+        this.serviceAuthorization = authTokenGenerator.generate();
+        this.clientToken = idamClient.getAccessToken(parameterResolver.getIdamUsername(),
+                parameterResolver.getIdamPassword());
+        this.userDetails = idamClient.getUserDetails(clientToken);
     }
 
     public String getServiceAuthorization() {
-        return authTokenGenerator.generate();
+        return serviceAuthorization;
     }
 
     public String getIdamClientToken() {
-        return idamClient.getAccessToken(parameterResolver.getIdamUsername(),
-                parameterResolver.getIdamPassword());
+        return clientToken;
+    }
+
+    public UserDetails getUserDetails() {
+        return userDetails;
     }
 }

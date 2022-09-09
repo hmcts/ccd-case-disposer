@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.helper.SecurityUtils;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.util.log.DataStoreRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.io.UnsupportedEncodingException;
@@ -30,6 +31,9 @@ public class DocumentDeleteTestUtils {
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
     @Inject
+    private DataStoreRecordHolder dataStoreRecordHolder;
+
+    @Inject
     private SecurityUtils securityUtils;
 
     @Inject
@@ -38,41 +42,46 @@ public class DocumentDeleteTestUtils {
     @Inject
     private FileUtils fileUtils;
 
-    public void verifyDocumentStoreDeletion(final Map<Long, List<String>> deletableDocuments) {
+    public void verifyDocumentStoreDeletion(final Map<String, String> deletableDocuments) {
         deletableDocuments.entrySet().forEach(entry -> {
-            final CaseDocumentsDeletionResults caseDocumentsDeletionResults = documentDeletionRecordHolder
-                    .getCaseDocumentsDeletionResults(Long.toString(entry.getKey()));
+            final List<String> deletedDocumentCaseRefList =
+                    dataStoreRecordHolder.getDatastoreCases().get(entry.getKey());
 
-            assertThat(caseDocumentsDeletionResults).isNotNull();
-            assertThat(caseDocumentsDeletionResults.getMarkedForDeletion()).isNotZero();
-            assertThat(caseDocumentsDeletionResults.getCaseDocumentsFound()).isNotZero();
+            deletedDocumentCaseRefList.forEach(deletedDocumentCaseRef -> {
+                final CaseDocumentsDeletionResults caseDocumentsDeletionResults = documentDeletionRecordHolder
+                        .getCaseDocumentsDeletionResults(deletedDocumentCaseRef);
+
+                assertThat(caseDocumentsDeletionResults).isNotNull();
+                assertThat(caseDocumentsDeletionResults.getMarkedForDeletion()).isNotZero();
+                assertThat(caseDocumentsDeletionResults.getCaseDocumentsFound()).isNotZero();
+            });
         });
-
     }
 
-    public void uploadDocument(final Map<Long, List<String>> deletableDocuments) {
-        deletableDocuments.entrySet()
-                .forEach(entry -> entry.getValue()
-                        .forEach(filename -> {
-                            try {
-                                final Response response = RestAssured
-                                        .given()
-                                        .relaxedHTTPSValidation()
-                                        .baseUri(parameterResolver.getDocumentStoreHost() + DOCUMENT_PATH)
-                                        .header(SERVICE_AUTHORISATION_HEADER, securityUtils.getServiceAuthorization())
-                                        .header("user-id", DOCUMENT_STORE_USER)
-                                        .multiPart("files", fileUtils.getResourceFile(filename), IMAGE_JPEG_VALUE)
-                                        .multiPart("classification", "PUBLIC")
-                                        .multiPart("metadata[case_id]", Long.toString(entry.getKey()))
-                                        .when()
-                                        .post()
-                                        .andReturn();
+    public void uploadDocument(final Map<String, String> deletableDocuments) {
+        deletableDocuments.entrySet().forEach(entry -> dataStoreRecordHolder.getDatastoreCases().get(entry.getKey())
+                .forEach(caseId -> {
+                    try {
+                        final Response response = RestAssured
+                                .given()
+                                .relaxedHTTPSValidation()
+                                .baseUri(parameterResolver.getDocumentStoreHost() + DOCUMENT_PATH)
+                                .header(SERVICE_AUTHORISATION_HEADER, securityUtils.getServiceAuthorization())
+                                .header("user-id", DOCUMENT_STORE_USER)
+                                .multiPart("files", fileUtils.getResourceFile(entry.getValue()),
+                                        IMAGE_JPEG_VALUE)
+                                .multiPart("classification", "PUBLIC")
+                                .multiPart("metadata[case_id]", caseId)
+                                .when()
+                                .post()
+                                .andReturn();
 
-                                assertThat(response.getStatusCode()).isEqualTo(200);
+                        assertThat(response.getStatusCode()).isEqualTo(200);
 
-                            } catch (final UnsupportedEncodingException e) {
-                                e.printStackTrace();
-                            }
-                        }));
+                    } catch (final UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                })
+        );
     }
 }

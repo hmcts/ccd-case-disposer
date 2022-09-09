@@ -251,6 +251,7 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamClient
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
+    implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.9.1'
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.9.0'
 
     implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4'

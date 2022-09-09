@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -33,27 +32,23 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenarios(final String deletableCaseTypes,
                        final String deletableCaseTypesSimulation,
-                       final String scriptPath,
-                       final List<Long> initialStateRowIds,
-                       final Map<String, List<Long>> indexedData,
-                       final List<Long> deletableEndStateRowIds,
-                       final List<Long> simulatedEndStateRowIds,
-                       final Map<Long, List<String>> deletableDocuments,
-                       final Map<Long, List<String>> deletableRoles,
-                       final Map<String, List<Long>> deletedFromIndexed,
-                       final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
+                       final Map<String, Integer> initialStateNumberOfDatastoreRecords,
+                       final Map<String, Integer> endStateNumberOfDatastoreRecords,
+                       final Map<String, String> deletableDocuments,
+                       final Map<String, String> deletableRoles) throws Exception {
         // GIVEN
-        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
-                initialStateRowIds, indexedData);
+        setupData(deletableCaseTypes, deletableCaseTypesSimulation, initialStateNumberOfDatastoreRecords,
+                deletableDocuments, deletableRoles);
+
 
         // WHEN
         executor.execute();
 
         // THEN
-        verifyDatabaseDeletion(initialStateRowIds,deletableEndStateRowIds);
+        verifyDatabaseDeletion(endStateNumberOfDatastoreRecords);
         verifyDocumentDeletion(deletableDocuments);
         verifyRoleDeletion(deletableRoles);
-        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
-        verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+        verifyElasticsearchDeletion(endStateNumberOfDatastoreRecords);
+        verifyDatabaseDeletionSimulation(endStateNumberOfDatastoreRecords);
     }
 }
