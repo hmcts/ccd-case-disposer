@@ -10,9 +10,9 @@ job:
     APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
+    DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
     DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
     DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD}
-    DATA_STORE_DB_OPTIONS: "?sslmode=require"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
@@ -20,6 +20,8 @@ job:
     DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     CORE_CASE_DATA_API_URL: http://${SERVICE_NAME}-ccd-data-store-api
+    IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
 global:
   jobKind: CronJob
 
@@ -233,7 +235,7 @@ ccd:
   global:
     ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
     ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
-    ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
+    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
@@ -241,6 +243,8 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     enableKeyVaults: true
     devMode: true
+    postgresUsername: ${DATA_STORE_DB_USERNAME}
+    postgresPassword: ${DATA_STORE_DB_PASSWORD}
 
   ccd-definition-store-api:
     java:
@@ -251,13 +255,11 @@ ccd:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-        DEFINITION_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
         DEFINITION_STORE_DB_NAME: ccd_definition_store
         DEFINITION_STORE_DB_PORT: 5432
-        DEFINITION_STORE_DB_USERNAME: "${DATA_STORE_DB_USERNAME}"
-        DEFINITION_STORE_DB_PASSWORD: "${DATA_STORE_DB_PASSWORD}"
         DEFINITION_STORE_DB_USE_SSL: "true"
         DEFINITION_STORE_IDAM_KEY: "${CCD_DEFINITION_STORE_S2S_SECRET}"
+        WELSH_TRANSLATION_ENABLED: "false"
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_document_am_api,ccd_case_disposer
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
@@ -282,12 +284,8 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
-        DATA_STORE_DB_PORT: 5432
         DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
-        DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
-        DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD}
-        DATA_STORE_DB_OPTIONS: "?sslmode=require"
+        DATA_STORE_DB_USE_SSL: "true"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -318,3 +316,13 @@ ccd:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}.
         service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    primary:
+      initdb:
+        user: ${DATA_STORE_DB_USERNAME}
+        password: ${DATA_STORE_DB_PASSWORD}
+        scripts:
+          init.sql: |-
+            CREATE DATABASE "ccd_data_store" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_definition_store" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
