@@ -4,7 +4,7 @@
 
 ## Purpose
 
-This micro-service disposes off case records after a certain period of inactivity after a significant business event
+This micro-service disposes off case records after a certain period of inactivity after a significant business event.
 
 ## Getting Started
 
