@@ -11,8 +11,8 @@ job:
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
     DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
-    DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
-    DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD}
+    DATA_STORE_DB_USERNAME: "hmcts"
+    DATA_STORE_DB_PASSWORD: "hmcts"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
@@ -243,8 +243,8 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     enableKeyVaults: true
     devMode: true
-    postgresUsername: ${DATA_STORE_DB_USERNAME}
-    postgresPassword: ${DATA_STORE_DB_PASSWORD}
+    postgresUsername: hmcts
+    postgresPassword: hmcts
 
   ccd-definition-store-api:
     java:
@@ -316,13 +316,14 @@ ccd:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}.
         service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    auth:
+      username: hmcts
+      password: hmcts
     primary:
       initdb:
-        user: ${DATA_STORE_DB_USERNAME}
-        password: ${DATA_STORE_DB_PASSWORD}
         scripts:
           init.sql: |-
-            CREATE DATABASE "ccd_data_store" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "ccd_definition_store" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH OWNER = ${DATA_STORE_DB_USERNAME} ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
