@@ -258,6 +258,7 @@ ccd:
         DEFINITION_STORE_DB_NAME: ccd_definition_store
         DEFINITION_STORE_DB_PORT: 5432
         DEFINITION_STORE_DB_USE_SSL: "true"
+        DEFINITION_STORE_DB_OPTIONS: "?sslmode=allow"
         DEFINITION_STORE_IDAM_KEY: "${CCD_DEFINITION_STORE_S2S_SECRET}"
         WELSH_TRANSLATION_ENABLED: "false"
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -284,8 +285,11 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
-        DATA_STORE_DB_USE_SSL: "true"
+        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DATA_STORE_DB_NAME: ccd_data_store
+        DATA_STORE_DB_USERNAME: hmcts
+        DATA_STORE_DB_PASSWORD: hmcts
+        DATA_STORE_DB_OPTIONS: "?sslmode=allow"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -321,8 +325,10 @@ ccd:
       password: hmcts
     primary:
       initdb:
+        user: "postgres"
         scripts:
           init.sql: |-
+            CREATE ROLE hmcts WITH LOGIN PASSWORD 'hmcts';
             CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
