@@ -9,7 +9,7 @@ job:
   environment:
     APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
     DATA_STORE_DB_PORT: 5432
-    DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
+    DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
     DATA_STORE_DB_USERNAME: "hmcts"
     DATA_STORE_DB_PASSWORD: "hmcts"
@@ -315,20 +315,16 @@ ccd:
         enabled: false
 
   postgresql:
-    service:
-      type: LoadBalancer
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}.
-        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    enabled: true
+    image:
+      tag: '11.3.0'
     auth:
       username: hmcts
       password: hmcts
     primary:
       initdb:
-        user: "postgres"
         scripts:
           init.sql: |-
-            CREATE ROLE hmcts WITH LOGIN PASSWORD 'hmcts';
             CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
             CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
