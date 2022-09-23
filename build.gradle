@@ -217,9 +217,10 @@ def versions = [
      s2sClient           : '4.0.3',
      commonsIo           : '2.7',
      wiremock            : '2.21.0',
-     gradlePitest      : '1.6.0',
-     pitest            : '1.6.3',
-     sonarPitest       : '0.5',
+     lombok              : '1.18.20',
+     gradlePitest        : '1.6.0',
+     pitest              : '1.6.3',
+     sonarPitest         : '0.5',
      springFramework     : '5.3.20',
      springBoot          : springBoot.class.package.implementationVersion
 ]
@@ -278,8 +279,9 @@ dependencies {
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.7.Final'
     runtime group: 'org.postgresql', name: 'postgresql', version: '42.4.1'
 
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+    implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: versions.elasticsearch

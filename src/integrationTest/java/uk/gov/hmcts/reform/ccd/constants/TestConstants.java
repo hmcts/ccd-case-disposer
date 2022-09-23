@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.ccd.constants;
 
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
+import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
+import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 
 import java.util.Map;
 
@@ -53,4 +55,31 @@ public class TestConstants {
         Map.entry("1504259907351111", HttpStatus.OK.value()),
         Map.entry("1504259907350000", HttpStatus.OK.value())
     );
+    public static Map<String, CaseActionPostRequestResponse> LAU_QUERY = Map.ofEntries(
+            Map.entry("1504259907353529", buildCaseActionPostRequest("1504259907353529")),
+            Map.entry("1504259907353528", buildCaseActionPostRequest("1504259907353528")),
+            Map.entry("1504259907353526", buildCaseActionPostRequest("1504259907353526")),
+            Map.entry("1504259907353525", buildCaseActionPostRequest("1504259907353525")),
+            Map.entry("1504259907353524", buildCaseActionPostRequest("1504259907353524")),
+            Map.entry("1504259907353523", buildCaseActionPostRequest("1504259907353523")),
+            Map.entry("1504259907353522", buildCaseActionPostRequest("1504259907353522")),
+            Map.entry("1504259907353519", buildCaseActionPostRequest("1504259907353519")),
+            Map.entry("1504259907353518", buildCaseActionPostRequest("1504259907353518")),
+            Map.entry("1504259907353527", buildCaseActionPostRequest("1504259907353527")),
+            Map.entry("1504259907351111", buildCaseActionPostRequest("1504259907351111")),
+            Map.entry("1504259907350000", buildCaseActionPostRequest("1504259907350000"))
+    );
+
+
+
+    private static CaseActionPostRequestResponse buildCaseActionPostRequest(final String caseRef) {
+        return new CaseActionPostRequestResponse(ActionLog.builder()
+                .userId("123")
+                .caseAction("DELETE")
+                .caseTypeId("FT_MasterCaseType")
+                .caseRef(caseRef)
+                .caseJurisdictionId("BEFTA_MASTER")
+                .timestamp("2021-08-23T22:20:05.023Z")
+                .build());
+    }
 }

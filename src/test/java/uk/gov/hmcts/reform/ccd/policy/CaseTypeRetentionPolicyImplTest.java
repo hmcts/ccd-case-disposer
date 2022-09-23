@@ -44,7 +44,7 @@ class CaseTypeRetentionPolicyImplTest {
     @Test
     void testShouldRaiseNullPointerExceptionWhenCaseTypeIsNull() {
         // GIVEN
-        final CaseData caseData = new CaseData(2L, 2L, null, TODAY, 2L, null);
+        final CaseData caseData = new CaseData(2L, 2L, null,null, TODAY, 2L, null);
 
         // WHEN/THEN
         assertThatNullPointerException().isThrownBy(() -> underTest.mustRetain(caseData));

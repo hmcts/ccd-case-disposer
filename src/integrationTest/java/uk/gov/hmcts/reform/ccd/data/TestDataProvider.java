@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.LauIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RoleDeleteIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationIntegrationTestUtils;
 
@@ -33,6 +34,9 @@ public class TestDataProvider extends TestContainers {
 
     @Inject
     private RoleDeleteIntegrationTestUtils roleDeleteIntegrationTestUtils;
+
+    @Inject
+    private LauIntegrationTestUtils lauIntegrationTestUtils;
 
     @Inject
     private WireMockStubs wireMockStubs;
@@ -76,6 +80,10 @@ public class TestDataProvider extends TestContainers {
 
     protected void verifyRoleDeletion(final List<Long> roleDeletionCaseRefs) {
         roleDeleteIntegrationTestUtils.verifyRoleAssignmentDeletion(roleDeletionCaseRefs);
+    }
+
+    protected void verifyLauLogs(final List<Long> roleDeletionCaseRefs) {
+        lauIntegrationTestUtils.verifyLauLogs(roleDeletionCaseRefs);
     }
 
     private void setDeletableCaseTypes(final String value) {

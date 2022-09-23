@@ -391,21 +391,21 @@ public class DeletionScenarios {
                         List.of(1504259907351111L),
                         Map.of("global_search", List.of(1504259907351111L)),
                         Map.of("global_search", emptyList())
-                ),
-                Arguments.of(
-                        "FT_MasterCaseType",
-                        "FT_MultiplePages",
-                        "scenarios/S-023-deletable-simulated-failed-cases.sql",
-                        List.of(1L, 2L, 3L),
-                        Map.of("FT_MultiplePages", List.of(1504259907353527L), "FT_MasterCaseType",
-                                List.of(1504259907350000L, 1504259907353529L)),
-                        List.of(2L, 3L),
-                        List.of(1504259907353527L),
-                        List.of(1504259907353529L),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                        Map.of("FT_MultiplePages", List.of(1504259907353527L), "FT_MasterCaseType",
-                                List.of(1504259907350000L))
                 )
+        //Arguments.of(
+        //"FT_MasterCaseType",
+        //"FT_MultiplePages",
+        //"scenarios/S-023-deletable-simulated-failed-cases.sql",
+        //List.of(1L, 2L, 3L),
+        //Map.of("FT_MultiplePages", List.of(1504259907353527L), "FT_MasterCaseType",
+        //List.of(1504259907350000L, 1504259907353529L)),
+        //List.of(2L, 3L),
+        // List.of(1504259907353527L),
+        //List.of(1504259907353529L),
+        //Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
+        //Map.of("FT_MultiplePages", List.of(1504259907353527L), "FT_MasterCaseType",
+        //List.of(1504259907350000L))
+        //)
         );
     }
 }

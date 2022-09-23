@@ -56,6 +56,7 @@ class ApplicationExecutorTest {
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
+                DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
                 null
@@ -64,6 +65,7 @@ class ApplicationExecutorTest {
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getReference(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getCaseType(),
+                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getJurisdiction(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getResolvedTtl(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
                 null

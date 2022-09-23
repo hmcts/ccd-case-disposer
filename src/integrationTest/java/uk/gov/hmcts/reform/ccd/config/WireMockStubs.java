@@ -11,11 +11,13 @@ import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static feign.form.ContentProcessor.CONTENT_TYPE_HEADER;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.LAU_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_QUERY;
 
@@ -27,6 +29,7 @@ public class WireMockStubs {
     private static final String DOCUMENTS_DELETE_PATH = "/documents/delete";
     private static final String ROLES_DELETE_PATH = "/am/role-assignments/query/delete";
     private static final String ROLES_QUERY_PATH = "/am/role-assignments/query";
+    private static final String LAU_SAVE_PATH = "/audit/caseAction";
 
     private RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
 
@@ -35,6 +38,18 @@ public class WireMockStubs {
         setupDeleteDocumentsStub(wireMockServer);
         setupDeleteRolesStub(wireMockServer);
         setupQueryRolesStub(wireMockServer);
+        setupLauStub(wireMockServer);
+    }
+
+    private void setupLauStub(final WireMockServer wireMockServer) {
+        LAU_QUERY.entrySet().forEach(entry ->
+                wireMockServer.stubFor(post(urlPathMatching(LAU_SAVE_PATH))
+                        .withRequestBody(containing(entry.getKey()))
+                        .willReturn(aResponse()
+                                .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+                                .withBody(new Gson()
+                                        .toJson(entry.getValue()))
+                                .withStatus(201))));
     }
 
     private void setupDeleteDocumentsStub(final WireMockServer wireMockServer) {

@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.DisposeDocumentsRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.DisposeRoleAssignmentsRemoteOperation;
+import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
 
@@ -29,6 +30,7 @@ public class CaseDeletionService {
     private final CaseLinkRepository caseLinkRepository;
     private final DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation;
     private final DisposeRoleAssignmentsRemoteOperation disposeRoleAssignmentsRemoteOperation;
+    private final LogAndAuditRemoteOperation logAndAuditRemoteOperation;
     private final CaseDataElasticsearchOperations caseDataElasticsearchOperations;
     private final ParameterResolver parameterResolver;
     private final Snooper snooper;
@@ -40,6 +42,7 @@ public class CaseDeletionService {
                                final CaseLinkRepository caseLinkRepository,
                                final DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation,
                                final DisposeRoleAssignmentsRemoteOperation disposeRoleAssignmentsRemoteOperation,
+                               final LogAndAuditRemoteOperation logAndAuditRemoteOperation,
                                final CaseDataElasticsearchOperations caseDataElasticsearchOperations,
                                final ParameterResolver parameterResolver,
                                FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder,
@@ -49,6 +52,7 @@ public class CaseDeletionService {
         this.caseLinkRepository = caseLinkRepository;
         this.disposeDocumentsRemoteOperation = disposeDocumentsRemoteOperation;
         this.disposeRoleAssignmentsRemoteOperation = disposeRoleAssignmentsRemoteOperation;
+        this.logAndAuditRemoteOperation = logAndAuditRemoteOperation;
         this.caseDataElasticsearchOperations = caseDataElasticsearchOperations;
         this.failedToDeleteCaseFamilyHolder = failedToDeleteCaseFamilyHolder;
         this.parameterResolver = parameterResolver;
@@ -96,6 +100,7 @@ public class CaseDeletionService {
     }
 
     private void deleteCaseData(final CaseData caseData) {
+        logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
         disposeDocumentsRemoteOperation.postDocumentsDelete(caseData.getReference().toString());
         disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseData.getReference().toString());
         caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()), caseData.getReference());
