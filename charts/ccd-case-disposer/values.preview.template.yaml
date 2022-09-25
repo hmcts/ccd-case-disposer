@@ -1,11 +1,11 @@
-java:
+job:
   # Don't modify below here
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  # kind: CronJob
-  # schedule: "*/20 * * * *"
-  # startingDeadlineSeconds: 180
-  # concurrencyPolicy: Forbid
+  kind: CronJob
+  schedule: "*/20 * * * *"
+  startingDeadlineSeconds: 180
+  concurrencyPolicy: Forbid
   environment:
     APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
     DATA_STORE_DB_PORT: 5432
@@ -25,8 +25,8 @@ java:
     DISPOSER_WAIT_PERIOD: 5
     DELETE_CASE_TYPES: DPR_FT_MasterCaseType
     SIMULATED_CASE_TYPES: DPR_FT_MultiplePages
-#global:
-#  jobKind: CronJob
+global:
+  jobKind: CronJob
 
 elastic:
   enabled: true
