@@ -38,9 +38,6 @@ def prSecrets = [
           secret('ccd-case-disposer-s2s-secret', 'IDAM_KEY_CCD_CASE_DISPOSER'),
           secret('ccd-data-s2s-secret', 'IDAM_KEY_CCD_DATA_STORE'),
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
-          secret('case-disposer-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
-          secret('case-disposer-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
-          secret('case-disposer-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
           secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
           secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
           secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET')
