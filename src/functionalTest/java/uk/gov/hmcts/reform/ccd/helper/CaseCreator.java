@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.helper;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -17,6 +18,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.UPDATE_CASE_EVENT;
 import static uk.gov.hmcts.reform.ccd.helper.ObjectMapperBuilder.caseData;
 
 @Component
+@Slf4j
 public class CaseCreator {
 
     @Inject
@@ -29,6 +31,7 @@ public class CaseCreator {
     private CcdClientHelper ccdClientHelper;
 
     public void createCase(final String caseType) {
+        log.info("Creating a case");
         final StartEventResponse startEventResponse = ccdClientHelper.getStartEventResponse(caseType);
 
         final CaseDataContent caseDataContent = createCaseDataContent(startEventResponse);
@@ -38,6 +41,8 @@ public class CaseCreator {
         dataStoreEventCreator.createDataStoreEvent(caseDetails, caseType, UPDATE_CASE_EVENT);
 
         dataStoreRecordHolder.addRecord(caseDetails.getCaseTypeId(), Long.toString(caseDetails.getId()));
+
+        log.info("Creating a end");
     }
 
     private CaseDataContent createCaseDataContent(final StartEventResponse eventResponse) {

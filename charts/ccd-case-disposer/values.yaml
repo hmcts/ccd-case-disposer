@@ -50,7 +50,7 @@ job:
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
-    DATA_STORE_DB_OPTIONS: "?sslmode=require"
+    #DATA_STORE_DB_OPTIONS: "?sslmode=require"
     ELASTIC_SEARCH_ENABLED: true
   global:
     jobKind: CronJob

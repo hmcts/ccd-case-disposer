@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.ccd.helper.CcdClientHelper;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.utils.CcdDatastoreTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
@@ -10,14 +8,13 @@ import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
 
-import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
+@Slf4j
 public class TestDataProvider {
 
     @Inject
@@ -38,12 +35,6 @@ public class TestDataProvider {
     @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;
 
-    @Inject
-    private CcdClientHelper ccdClientHelper;
-
-    @Autowired
-    private ApplicationExecutor executor;
-
 
     protected void setupData(final String deletableCaseTypes,
                              final String deletableCaseTypesSimulation,
@@ -51,9 +42,7 @@ public class TestDataProvider {
                              final Map<String, String> deletableDocuments,
                              final Map<String, String> deletableRoles) throws Exception {
 
-        cleanUpTheData(deletableCaseTypes, deletableCaseTypesSimulation);
-
-        createGlobalSearchIndex();
+        //createGlobalSearchIndex();
 
         clearUpSystemProperties();
         setDeletableCaseTypes(deletableCaseTypes);
@@ -75,22 +64,6 @@ public class TestDataProvider {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
     }
 
-    private void cleanUpTheData(String deletableCaseTypes,
-                                String deletableCaseTypesSimulation) {
-        clearUpSystemProperties();
-        setDeletableCaseTypes(String.join(",", deletableCaseTypes, deletableCaseTypesSimulation));
-
-        executor.execute();
-
-        final List<CaseDetails> deletableCasesByCaseType = ccdClientHelper
-                .getCasesByCaseType(deletableCaseTypes);
-
-        final List<CaseDetails> simulatedCasesByCaseType = ccdClientHelper
-                .getCasesByCaseType(deletableCaseTypesSimulation);
-
-        assertThat(deletableCasesByCaseType.size()).isEqualTo(0);
-        assertThat(simulatedCasesByCaseType.size()).isEqualTo(0);
-    }
 
     protected void verifyDatabaseDeletion(final Map<String, Integer> endStateNumberOfDatastoreRecords) {
         ccdDatastoreTestUtils.verifyCcdDatastoreDeletion(endStateNumberOfDatastoreRecords);
@@ -100,8 +73,8 @@ public class TestDataProvider {
         elasticSearchTestUtils.verifyElasticsearchRecords(endStateNumberOfDatastoreRecords);
     }
 
-    protected void verifyDatabaseDeletionSimulation(final Map<String, Integer> endStateNumberOfDatastoreRecords) {
-        simulationTestUtils.verifyDatabaseDeletionSimulation(endStateNumberOfDatastoreRecords);
+    protected void verifyDatabaseDeletionSimulation() {
+        simulationTestUtils.verifyDatabaseDeletionSimulation();
     }
 
     protected void verifyDocumentDeletion(final Map<String, String> deletableDocuments) {
