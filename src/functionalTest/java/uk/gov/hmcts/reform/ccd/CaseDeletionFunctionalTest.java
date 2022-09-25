@@ -5,6 +5,7 @@ import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
@@ -16,6 +17,9 @@ import java.util.concurrent.TimeUnit;
 @ActiveProfiles("functional")
 @SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
 class CaseDeletionFunctionalTest extends TestDataProvider {
+
+    @Autowired
+    private ApplicationExecutor executor;
 
     @BeforeAll
     static void setup() {
@@ -36,6 +40,8 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         setupData(deletableCaseTypes, deletableCaseTypesSimulation, initialStateNumberOfDatastoreRecords,
                 deletableDocuments, deletableRoles);
 
+        // WHEN
+        executor.execute();
 
         // THEN
         verifyDatabaseDeletion(endStateNumberOfDatastoreRecords);
