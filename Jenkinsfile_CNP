@@ -109,7 +109,7 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_USERNAME="hmcts"
     env.DATA_STORE_DB_PASSWORD="hmcts"
     env.DATA_STORE_DB_NAME="ccd_data_store"
-    env.DATA_STORE_DB_OPTIONS='?sslmode=allow'
+    env.DATA_STORE_DB_OPTIONS='?sslmode=disable'
     //env.DATA_STORE_DB_HOST="postgresql-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DATA_STORE_DB_HOST="10.101.128.35"
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
