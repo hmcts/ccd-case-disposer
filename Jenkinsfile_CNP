@@ -3,6 +3,7 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.pipeline.TeamConfig
 import uk.gov.hmcts.contino.Kubectl
 
 def type = "java"
@@ -122,7 +123,7 @@ withPipeline(type, product, component) {
     // Get LB IP address for DB
     def kubectl = new Kubectl(this, subscription, namespace)
     kubectl.login()
-    def postgresInstanceName = "ccd-case-disposer-pr-130-postgresql"
+    def postgresInstanceName = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql"
     def pgLbIpAddress = kubectl.getServiceLoadbalancerIP(postgresInstanceName)
 
     // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $4}'"
