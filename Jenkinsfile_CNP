@@ -116,13 +116,6 @@ withPipeline(type, product, component) {
     //env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.CORE_CASE_DATA_API_URL = "http://ccd-case-disposer-pr-${CHANGE_ID}-ccd-data-store-api"
 
-    // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $4}'"
-
-    env.DATA_STORE_DB_HOST = sh (
-        script: 'kubectl get svc -n ccd | grep pr-130-postgresql\\s | awk \'{print $4}\'',
-        returnStdout: true
-    ).trim()
-
     //env.DATA_STORE_DB_HOST = sh "kubectl get svc -n ccd | grep pr-130-postgresql\\s | awk '{print $4}'"
   }
 
@@ -152,6 +145,16 @@ withPipeline(type, product, component) {
     // Load the CCD definitions here:
     // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)
+
+    // If preview set DB LB IP Address
+    if("preview" == env.ENV){
+        // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $4}'"
+        env.DATA_STORE_DB_HOST = sh (
+            script: 'kubectl get svc -n ccd | grep pr-130-postgresql\\s | awk \'{print $4}\'',
+            returnStdout: true
+        ).trim()
+
+    }
 
     // Execute functional tests
     echo "Verifying that functional test run correctly"
