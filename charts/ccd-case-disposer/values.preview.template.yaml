@@ -326,7 +326,7 @@ ccd:
         ports:
           postgresql: 5432
         type: LoadBalancer
-        loadBalancerIP: 10.101.128.35
+        # loadBalancerIP: 10.101.128.35
         annotations:
           external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
           service.beta.kubernetes.io/azure-load-balancer-internal: "true"
