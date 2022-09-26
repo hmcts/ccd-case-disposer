@@ -117,7 +117,13 @@ withPipeline(type, product, component) {
     env.CORE_CASE_DATA_API_URL = "http://ccd-case-disposer-pr-${CHANGE_ID}-ccd-data-store-api"
 
     // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $4}'"
-    env.DATA_STORE_DB_HOST = sh "kubectl get svc -n ccd | grep pr-130-postgresql\\s | awk '{print $4}'"
+
+    env.DATA_STORE_DB_HOST = sh (
+        script: "kubectl get svc -n ccd | grep pr-130-postgresql\\s | awk '{print $4}'",
+        returnStdout: true
+    ).trim()
+
+    //env.DATA_STORE_DB_HOST = sh "kubectl get svc -n ccd | grep pr-130-postgresql\\s | awk '{print $4}'"
   }
 
   onNonPR() {
