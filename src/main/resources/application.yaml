@@ -72,3 +72,5 @@ idam:
 smoke.test.enabled: false
 
 app.insights.log.size: ${CASE_DISPOSER_SUMMARY_LOG_SIZE:250}
+
+log.and.audit.enabled: ${LOG_AND_AUDIT_ENABLED:false}

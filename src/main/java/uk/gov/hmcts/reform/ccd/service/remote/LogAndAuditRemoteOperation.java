@@ -48,19 +48,22 @@ public class LogAndAuditRemoteOperation {
     }
 
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
-        try {
-            final CaseActionPostRequestResponse caseActionPostRequestResponse = buildCaseActionPostRequest(caseData);
-            final String logAndAuditPostResponse =
-                    restClientBuilder.postRequestWithServiceAuthHeader(parameterResolver.getLogAndAuditHost(),
-                            LAU_SAVE_PATH,
-                            gson.toJson(caseActionPostRequestResponse));
+        if (parameterResolver.isLogAndAuditEnabled()) {
+            try {
+                final CaseActionPostRequestResponse caseActionPostRequestResponse =
+                        buildCaseActionPostRequest(caseData);
+                final String logAndAuditPostResponse =
+                        restClientBuilder.postRequestWithServiceAuthHeader(parameterResolver.getLogAndAuditHost(),
+                                LAU_SAVE_PATH,
+                                gson.toJson(caseActionPostRequestResponse));
 
-            logResponse(logAndAuditPostResponse);
-        } catch (final Exception exception) {
-            final String errorMessage = String.format("Error posting to Log and Audit for case : %s",
-                    caseData.getReference());
-            log.error(errorMessage, exception);
-            throw new LogAndAuditException(errorMessage, exception);
+                logResponse(logAndAuditPostResponse);
+            } catch (final Exception exception) {
+                final String errorMessage = String.format("Error posting to Log and Audit for case : %s",
+                        caseData.getReference());
+                log.error(errorMessage, exception);
+                throw new LogAndAuditException(errorMessage, exception);
+            }
         }
     }
 

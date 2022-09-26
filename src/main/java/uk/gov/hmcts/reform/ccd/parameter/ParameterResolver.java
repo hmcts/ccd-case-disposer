@@ -34,4 +34,6 @@ public interface ParameterResolver {
     Boolean getCheckCaseRolesExist();
 
     Integer getAppInsightsLogSize();
+
+    Boolean isLogAndAuditEnabled();
 }

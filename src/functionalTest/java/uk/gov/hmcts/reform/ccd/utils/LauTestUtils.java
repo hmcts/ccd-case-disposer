@@ -12,13 +12,13 @@ import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
-public class LauIntegrationTestUtils {
-
-    @Inject
-    private LauRecordHolder lauRecordHolder;
+public class LauTestUtils {
 
     @Inject
     private ParameterResolver parameterResolver;
+
+    @Inject
+    private LauRecordHolder lauRecordHolder;
 
     public void verifyLauLogs(final List<Long> caseRefs) {
         if (parameterResolver.isLogAndAuditEnabled()) {

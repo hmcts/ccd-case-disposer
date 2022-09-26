@@ -60,3 +60,4 @@ ccd:
     host: http://localhost:4603
 
 app.insights.log.size: 250
+log.and.audit.enabled: true
