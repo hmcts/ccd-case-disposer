@@ -3,6 +3,8 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.Kubectl
+import uk.gov.hmcts.pipeline.TeamConfig
 
 def type = "java"
 def product = "ccd"
@@ -147,15 +149,23 @@ withPipeline(type, product, component) {
     uploadCoreCaseDataDefinitions(env.ENV)
 
     // If preview set DB LB IP Address
-    echo "Entering kubectlGetSvcCmd code"
     if("preview" == env.ENV){
+        def subscription = env.SUBSCRIPTION_NAME
+        def namespace = new TeamConfig(this).getNameSpace(product)
+        def kubectl = new Kubectl(this, subscription, namespace)
+        kubectl.login()
+
+        String postgresInstanceName = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql"
+        echo "postgresInstanceName : ${postgresInstanceName}"
+        env.DATA_STORE_DB_HOST = kubectl.getServiceLoadbalancerIP(postgresInstanceName)
+
         // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $4}'"
-        String kubectlGetSvcCmd = "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\\\s | awk '{print \$4}\'"
-        echo "kubectlGetSvcCmd : ${kubectlGetSvcCmd}"
-        env.DATA_STORE_DB_HOST = sh (
-            script: "${kubectlGetSvcCmd}",
-            returnStdout: true
-        ).trim()
+        //String kubectlGetSvcCmd = "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\\\s | awk '{print \$4}\'"
+        //echo "kubectlGetSvcCmd : ${kubectlGetSvcCmd}"
+        //env.DATA_STORE_DB_HOST = sh (
+        //    script: "${kubectlGetSvcCmd}",
+        //    returnStdout: true
+        //).trim()
         echo "DATA_STORE_DB_HOST : ${env.DATA_STORE_DB_HOST}"
     }
 
