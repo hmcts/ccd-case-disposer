@@ -3,6 +3,7 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.Kubectl
 
 def type = "java"
 def product = "ccd"
@@ -108,9 +109,6 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_NAME="ccd_data_store"
     env.DATA_STORE_DB_OPTIONS='?sslmode=allow'
     env.DATA_STORE_DB_PORT = '5432'
-    //env.DATA_STORE_DB_HOST="postgresql-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $3}'"
-    env.DATA_STORE_DB_HOST="10.101.128.35"
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
@@ -118,6 +116,15 @@ withPipeline(type, product, component) {
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     //env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.CORE_CASE_DATA_API_URL = "http://ccd-case-disposer-pr-${CHANGE_ID}-ccd-data-store-api"
+
+    // Get LB IP address for DB
+    def kubectl = new Kubectl(this, subscription, namespace)
+    kubectl.login()
+    def postgresInstanceName = "ccd-case-disposer-pr-130-postgresql"
+    def pgLbIpAddress = kubectl.getServiceLoadbalancerIP(postgresInstanceName)
+
+    // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $4}'"
+    env.DATA_STORE_DB_HOST= ${pgLbIpAddress};
   }
 
   onNonPR() {
