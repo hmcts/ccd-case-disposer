@@ -9,6 +9,8 @@ def type = "java"
 def product = "ccd"
 def component = "case-disposer"
 def branchesToSync = ['demo','perftest']
+def subscription = env.SUBSCRIPTION_NAME
+def namespace = new TeamConfig(this).getNameSpace(product)
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
