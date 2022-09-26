@@ -116,9 +116,8 @@ withPipeline(type, product, component) {
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     //env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    env.CORE_CASE_DATA_API_URL = "http://ccd-case-disposer-pr-${CHANGE_ID}-ccd-data-store-api"
-
-    //env.DATA_STORE_DB_HOST = sh "kubectl get svc -n ccd | grep pr-130-postgresql\\s | awk '{print $4}'"
+    //env.CORE_CASE_DATA_API_URL = "http://ccd-case-disposer-pr-${CHANGE_ID}-ccd-data-store-api"
+    env.CCD_DATA_API_URL="http://ccd-data-store-api-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
   }
 
   onNonPR() {
@@ -155,11 +154,8 @@ withPipeline(type, product, component) {
         def namespace = new TeamConfig(this).getNameSpace(product)
         def kubectl = new Kubectl(this, subscription, namespace)
         kubectl.login()
-
         String postgresInstanceName = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql"
-        echo "postgresInstanceName : ${postgresInstanceName}"
         env.DATA_STORE_DB_HOST = kubectl.getServiceLoadbalancerIP(postgresInstanceName)
-        echo "DATA_STORE_DB_HOST : ${env.DATA_STORE_DB_HOST}"
       }
     }
 
