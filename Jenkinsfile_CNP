@@ -109,13 +109,15 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_OPTIONS='?sslmode=allow'
     env.DATA_STORE_DB_PORT = '5432'
     //env.DATA_STORE_DB_HOST="postgresql-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $3}'"
     env.DATA_STORE_DB_HOST="10.101.128.35"
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
-    env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    //env.CORE_CASE_DATA_API_URL = "https://ccd-data-store-api-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.CORE_CASE_DATA_API_URL = "http://ccd-case-disposer-pr-${CHANGE_ID}-ccd-data-store-api"
   }
 
   onNonPR() {
@@ -139,7 +141,6 @@ withPipeline(type, product, component) {
     env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
-
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
     // Load the CCD definitions here:
