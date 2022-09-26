@@ -150,12 +150,13 @@ withPipeline(type, product, component) {
     echo "Entering kubectlGetSvcCmd code"
     if("preview" == env.ENV){
         // Need to use something like the following to pull this value out - "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\s | awk '{print $4}'"
-        String kubectlGetSvcCmd = "kubectl get svc -n ccd | grep pr-130-postgresql\\\\s | awk '{print \$4}\'"
+        String kubectlGetSvcCmd = "kubectl get svc -n ccd | grep pr-${CHANGE_ID}-postgresql\\\\s | awk '{print \$4}\'"
         echo "kubectlGetSvcCmd : ${kubectlGetSvcCmd}"
         env.DATA_STORE_DB_HOST = sh (
             script: "${kubectlGetSvcCmd}",
             returnStdout: true
         ).trim()
+        echo "DATA_STORE_DB_HOST : ${env.DATA_STORE_DB_HOST}"
     }
 
     // Execute functional tests
