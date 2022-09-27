@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.config.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
 
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -100,12 +102,16 @@ public class CaseDeletionService {
     }
 
     private void deleteCaseData(final CaseData caseData) {
-        logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
-        disposeDocumentsRemoteOperation.postDocumentsDelete(caseData.getReference().toString());
-        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseData.getReference().toString());
-        caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()), caseData.getReference());
-        caseEventRepository.deleteByCaseDataId(caseData.getId());
-        caseDataRepository.findById(caseData.getId()).ifPresent(caseDataRepository::delete);
+        final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
+        if (caseDataEntity.isPresent()) {
+            logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
+            disposeDocumentsRemoteOperation.postDocumentsDelete(caseData.getReference().toString());
+            disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseData.getReference().toString());
+            caseDataElasticsearchOperations.deleteByReference(getIndex(caseData.getCaseType()),
+                    caseData.getReference());
+            caseEventRepository.deleteByCaseDataId(caseData.getId());
+            caseDataRepository.delete(caseDataEntity.get());
+        }
     }
 
     private String getIndex(final String caseType) {

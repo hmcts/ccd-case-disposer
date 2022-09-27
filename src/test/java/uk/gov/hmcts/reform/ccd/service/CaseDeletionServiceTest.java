@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -156,6 +157,7 @@ class CaseDeletionServiceTest {
         final CaseFamily caseFamily = new CaseFamily(caseData, emptyList());
         doThrow(IllegalArgumentException.class).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
+        doReturn(Optional.of(mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
 
         // WHEN
         catchThrowable(() -> underTest.deleteCase(caseFamily));
@@ -169,7 +171,6 @@ class CaseDeletionServiceTest {
         verify(logAndAuditRemoteOperation).postCaseDeletionToLogAndAudit(any(CaseData.class));
         verify(caseDataElasticsearchOperations).deleteByReference(anyString(),anyLong());
 
-        verifyNoInteractions(caseDataRepository);
         verifyNoInteractions(caseLinkRepository);
     }
 
