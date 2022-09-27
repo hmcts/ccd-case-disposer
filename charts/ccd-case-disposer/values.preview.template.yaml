@@ -12,7 +12,7 @@ job:
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_USERNAME: hmcts
-    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password }}"
+    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -244,7 +244,7 @@ ccd:
     enableKeyVaults: true
     devMode: true
     postgresUsername: hmcts
-    postgresPassword: "{{ .Values.postgresql.auth.password }}"
+    postgresPassword: "{{ .Values.postgresql.postgresqlPassword}}"
 
   ccd-definition-store-api:
     java:
