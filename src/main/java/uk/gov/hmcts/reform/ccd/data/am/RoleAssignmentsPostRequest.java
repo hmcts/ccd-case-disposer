@@ -9,11 +9,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class RoleAssignmentsDeletePostRequest {
-    private List<RoleAssignmentsQueryRequest> queryRequests;
+public class RoleAssignmentsPostRequest {
+    private List<QueryRequest> queryRequests;
 
-    public RoleAssignmentsDeletePostRequest(String caseRef) {
-        queryRequests = Arrays.asList(RoleAssignmentsQueryRequest
+    public RoleAssignmentsPostRequest(String caseRef) {
+        queryRequests = Arrays.asList(QueryRequest
                                           .builder()
                                           .attributes(Collections.singletonMap("caseId", Arrays.asList(caseRef)))
                                           .build());

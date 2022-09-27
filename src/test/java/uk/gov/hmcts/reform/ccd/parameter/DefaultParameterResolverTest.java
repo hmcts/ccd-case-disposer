@@ -30,6 +30,8 @@ class DefaultParameterResolverTest {
     private static final String DOCUMENT_STORE_HOST = "documentStoreHost";
     private static final String ROLE_ASSIGNMENT_HOST = "roleAssignmentHost";
 
+    private static final String ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST = "checkCaseRolesExist";
+
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
 
     @Before
@@ -61,6 +63,9 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      ROLE_ASSIGNMENT_HOST, "http://localhost:4096");
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                                     ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST, true);
     }
 
     @Test
@@ -138,6 +143,13 @@ class DefaultParameterResolverTest {
     void shouldGetCorrectValueForGetRoleAssignmentsHost() {
         assertThat(defaultParameterResolver.getRoleAssignmentsHost(),
                    is(equalTo("http://localhost:4096")));
+    }
+
+    @Test
+    @DisplayName("should get correct value for checkCaseRolesExist")
+    void shouldGetCorrectValueForGetCheckCaseRolesExist() {
+        assertThat(defaultParameterResolver.getCheckCaseRolesExist(),
+                   is(equalTo(Boolean.TRUE)));
     }
 
 }

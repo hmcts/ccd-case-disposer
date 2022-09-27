@@ -27,6 +27,7 @@ elastic:
   enabled: true
 
 elasticsearch:
+  nameOverride: ${SERVICE_NAME}-es
   ingressHost: es-${SERVICE_FQDN}
   clusterName: "es"
   imageTag: "7.11.1"

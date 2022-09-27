@@ -12,7 +12,7 @@ import java.util.Map;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RoleAssignmentsQueryRequest {
+public class QueryRequest {
 
     private Map<String, List<String>> attributes;
 

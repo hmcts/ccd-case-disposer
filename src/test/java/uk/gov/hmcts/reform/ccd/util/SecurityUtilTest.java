@@ -1,17 +1,18 @@
 package uk.gov.hmcts.reform.ccd.util;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.exception.IdamAuthTokenGenerationException;
+import uk.gov.hmcts.reform.ccd.exception.ServiceAuthTokenGenerationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
@@ -32,7 +33,6 @@ class SecurityUtilTest {
     private SecurityUtil securityUtil;
 
     @Test
-    @DisplayName("Should return a auth tokens")
     void shouldGetServiceAuthorization() {
 
         setField(securityUtil, "parameterResolver", parameterResolver);
@@ -45,8 +45,43 @@ class SecurityUtilTest {
 
         invokeMethod(securityUtil, "generateTokens");
 
-        assertThat(securityUtil.getServiceAuthorization(), is("7gf364fg367f67"));
-        assertThat(securityUtil.getIdamClientToken(), is("Bearer 123"));
+        assertThat(securityUtil.getServiceAuthorization()).isEqualTo("7gf364fg367f67");
+        assertThat(securityUtil.getIdamClientToken()).isEqualTo("Bearer 123");
     }
 
+
+    @Test
+    void shouldThrowServiceAuthTokenGenerationException() {
+        try {
+            setField(securityUtil, "parameterResolver", parameterResolver);
+            doThrow(new ServiceAuthTokenGenerationException("1234567890123456"))
+                    .when(serviceTokenGenerator).generate();
+
+            invokeMethod(securityUtil, "generateTokens");
+
+        } catch (final ServiceAuthTokenGenerationException serviceAuthTokenGenerationException) {
+            assertThat(serviceAuthTokenGenerationException.getMessage())
+                    .contains("Case disposer is unable to generate service auth token due to error -");
+        }
+    }
+
+    @Test
+    void shouldThrowIdamAuthTokenGenerationException() {
+        try {
+            setField(securityUtil, "parameterResolver", parameterResolver);
+
+            when(serviceTokenGenerator.generate()).thenReturn("7gf364fg367f67");
+            when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
+            when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
+
+            doThrow(new IdamAuthTokenGenerationException("1234567890123456"))
+                    .when(idamClient).getAccessToken("JohnTerry", "Chelsea123");
+
+            invokeMethod(securityUtil, "generateTokens");
+
+        } catch (final IdamAuthTokenGenerationException idamAuthTokenGenerationException) {
+            assertThat(idamAuthTokenGenerationException.getMessage())
+                    .contains("Case disposer is unable to generate IDAM token due to error -");
+        }
+    }
 }

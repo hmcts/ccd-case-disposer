@@ -23,14 +23,14 @@ elasticsearch:
   hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:4578"}
   global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
 
-deletable.case.types: ${DELETE_CASE_TYPES:"deletable_case_type,bbb,ccc"}
-simulated.case.types: ${SIMULATED_CASE_TYPES:"deletable_case_type_simulation,ttt,yyy"}
+deletable.case.types: "deletable_case_type,bbb,ccc"
+simulated.case.types: "deletable_case_type_simulation,ttt,yyy"
 
 idam:
   api:
     url: http://localhost:4603
     username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
-    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:}
   s2s-auth:
     name: ccd_case_disposer
     url: http://localhost:4603
@@ -48,7 +48,13 @@ application-insights:
 
 azure:
   application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:"Test"}
+    instrumentation-key: appinsights_key
 
-ccd.document.store.host: http://localhost:4603
-ccd.role.assignment.host: http://localhost:4603
+ccd:
+  document.store:
+    host: http://localhost:4603
+  role.assignment:
+    host: http://localhost:4603
+    check-case-roles-exist: true
+
+app.insights.log.size: 250

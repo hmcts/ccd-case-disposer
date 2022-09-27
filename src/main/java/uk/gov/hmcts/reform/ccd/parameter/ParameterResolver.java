@@ -28,4 +28,8 @@ public interface ParameterResolver {
     String getDocumentStoreHost();
 
     String getRoleAssignmentsHost();
+
+    Boolean getCheckCaseRolesExist();
+
+    Integer getAppInsightsLogSize();
 }

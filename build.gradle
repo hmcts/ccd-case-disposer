@@ -7,7 +7,7 @@ plugins {
     id 'org.owasp.dependencycheck' version '6.2.2'
     id 'com.github.ben-manes.versions' version '0.39.0'
     id 'org.sonarqube' version '3.3'
-    id 'uk.gov.hmcts.java' version '0.12.2'
+    id 'uk.gov.hmcts.java' version '0.12.27'
     id 'io.freefair.lombok' version '5.3.0'
     id 'org.flywaydb.flyway' version '8.2.2'
     id "info.solidsoft.pitest" version '1.7.4'
@@ -160,6 +160,9 @@ dependencyManagement {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
         }
+        dependencySet(group: 'org.yaml', version: '1.31') {
+            entry 'snakeyaml'
+        }
     }
 }
 
@@ -216,7 +219,7 @@ def versions = [
      gradlePitest      : '1.6.0',
      pitest            : '1.6.3',
      sonarPitest       : '0.5',
-     springFramework     : '5.3.18',
+     springFramework     : '5.3.20',
      springBoot          : springBoot.class.package.implementationVersion
 ]
 
@@ -262,6 +265,7 @@ dependencies {
     configurations {
         compile.exclude module: 'spring-boot-starter-logging'
     }
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.5.7'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
@@ -271,7 +275,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.10'
 
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.7.Final'
-    runtime group: 'org.postgresql', name: 'postgresql', version: '42.3.3'
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.4.1'
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
