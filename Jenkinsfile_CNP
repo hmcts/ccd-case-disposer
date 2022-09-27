@@ -154,6 +154,15 @@ withPipeline(type, product, component) {
       }
     }
 
+    echo "Database Values:"
+    echo "env.DATA_STORE_DB_HOST = ${env.DATA_STORE_DB_HOST}"
+    echo "env.DATA_STORE_DB_OPTIONS = ${env.DATA_STORE_DB_OPTIONS}"
+    echo "env.DATA_STORE_DB_PORT = ${env.DATA_STORE_DB_PORT}"
+    echo "env.DATA_STORE_DB_NAME = ${env.DATA_STORE_DB_NAME}"
+
+    // test if Postgres is reachable
+    sh "nc -zv ${env.DATA_STORE_DB_HOST} ${env.DATA_STORE_DB_PORT}"
+
     // Execute functional tests
     echo "Verifying that functional test run correctly"
     try {
