@@ -89,7 +89,7 @@ logstash:
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/ccd_data_store?sslmode=allow"
           jdbc_user => "hmcts"
-          jdbc_password => "{{ .Values.postgresql.auth.password }}"
+          jdbc_password => "javapassword"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
