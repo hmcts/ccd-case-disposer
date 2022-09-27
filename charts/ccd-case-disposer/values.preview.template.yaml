@@ -8,18 +8,20 @@ job:
   concurrencyPolicy: Forbid
   environment:
     APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
-    DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
+    DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
     DATA_STORE_DB_PORT: 5432
-    DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
-    DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
-    DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD}
-    DATA_STORE_DB_OPTIONS: "?sslmode=require"
+    DATA_STORE_DB_NAME: ccd_data_store
+    DATA_STORE_DB_USERNAME: hmcts
+    DATA_STORE_DB_PASSWORD: hmcts
+    DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
 global:
   jobKind: CronJob
 
@@ -85,9 +87,9 @@ logstash:
     01_input.conf: |
       input  {
         jdbc {
-          jdbc_connection_string => "jdbc:postgresql://ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com:5432/${DATA_STORE_DB_NAME}?sslmode=require"
-          jdbc_user => "${DATA_STORE_DB_USERNAME}"
-          jdbc_password => "${DATA_STORE_DB_PASSWORD}"
+          jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/ccd_data_store?sslmode=allow"
+          jdbc_user => "hmcts"
+          jdbc_password => "hmcts"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
@@ -233,7 +235,7 @@ ccd:
   global:
     ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
     ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
-    ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
+    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
@@ -241,6 +243,8 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     enableKeyVaults: true
     devMode: true
+    postgresUsername: hmcts
+    postgresPassword: hmcts
 
   ccd-definition-store-api:
     java:
@@ -249,15 +253,15 @@ ccd:
       imagePullPolicy: Always
       environment:
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        ELASTIC_SEARCH_HOST: "${SERVICE_NAME}-es-master"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-        DEFINITION_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
+        DEFINITION_STORE_DB_HOST: "${SERVICE_NAME}-postgresql"
         DEFINITION_STORE_DB_NAME: ccd_definition_store
         DEFINITION_STORE_DB_PORT: 5432
-        DEFINITION_STORE_DB_USERNAME: "${DATA_STORE_DB_USERNAME}"
-        DEFINITION_STORE_DB_PASSWORD: "${DATA_STORE_DB_PASSWORD}"
         DEFINITION_STORE_DB_USE_SSL: "true"
+        DEFINITION_STORE_DB_OPTIONS: "?sslmode=allow"
         DEFINITION_STORE_IDAM_KEY: "${CCD_DEFINITION_STORE_S2S_SECRET}"
+        WELSH_TRANSLATION_ENABLED: "false"
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_document_am_api,ccd_case_disposer
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
@@ -282,12 +286,10 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com
+        DATA_STORE_DB_HOST: "${SERVICE_NAME}-postgresql"
         DATA_STORE_DB_PORT: 5432
-        DATA_STORE_DB_NAME: ${DATA_STORE_DB_NAME}
-        DATA_STORE_DB_USERNAME: ${DATA_STORE_DB_USERNAME}
-        DATA_STORE_DB_PASSWORD: ${DATA_STORE_DB_PASSWORD}
-        DATA_STORE_DB_OPTIONS: "?sslmode=require"
+        DATA_STORE_DB_NAME: "ccd_data_store"
+        DATA_STORE_DB_OPTIONS: "?sslmode=allow"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -313,8 +315,26 @@ ccd:
         enabled: false
 
   postgresql:
-    service:
-      type: LoadBalancer
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}.
-        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    enabled: true
+    image:
+      tag: '11.16.0'
+    auth:
+      username: hmcts
+      password: hmcts
+    primary:
+      service:
+        ports:
+          postgresql: 5432
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      initdb:
+        scripts:
+          init.sql: |-
+            CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      persistence:
+        enabled: false

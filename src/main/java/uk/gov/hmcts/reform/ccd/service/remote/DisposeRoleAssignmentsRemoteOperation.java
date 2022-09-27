@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsDeletePostRequest;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsQueryPostRequest;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsResponse;
+import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
@@ -47,8 +47,8 @@ public class DisposeRoleAssignmentsRemoteOperation {
                 ||
                 (parameterResolver.getCheckCaseRolesExist() && hasRoleAssignments(caseRef))) {
 
-                final RoleAssignmentsDeletePostRequest roleAssignmentsDeleteRequest =
-                    new RoleAssignmentsDeletePostRequest(caseRef);
+                final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+                    new RoleAssignmentsPostRequest(caseRef);
 
                 final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
 
@@ -69,8 +69,8 @@ public class DisposeRoleAssignmentsRemoteOperation {
 
     private boolean hasRoleAssignments(String caseRef) {
 
-        final RoleAssignmentsQueryPostRequest roleAssignmentsQueryRequest =
-            new RoleAssignmentsQueryPostRequest(caseRef);
+        final RoleAssignmentsPostRequest roleAssignmentsQueryRequest =
+            new RoleAssignmentsPostRequest(caseRef);
 
         final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
 
@@ -79,12 +79,10 @@ public class DisposeRoleAssignmentsRemoteOperation {
                                                            QUERY_ROLE_PATH, requestQueryBody);
 
         if (roleAssignmentsQueryResponse.getStatus() == HttpStatus.OK.value()) {
-            RoleAssignmentsResponse roleAssignmentsResponse =
-                roleAssignmentsQueryResponse.readEntity(RoleAssignmentsResponse.class);
+            RoleAssignmentsPostResponse roleAssignmentsResponse =
+                roleAssignmentsQueryResponse.readEntity(RoleAssignmentsPostResponse.class);
 
-            if (roleAssignmentsResponse != null
-                && !roleAssignmentsResponse.getRoleAssignmentResponse().isEmpty()
-                && roleAssignmentsResponse.getRoleAssignmentResponse().get(0).getId() != null
+            if (!CollectionUtils.isEmpty(roleAssignmentsResponse.getRoleAssignmentResponse())
             ) {
                 log.info("Found {} role(s) for case : {}, calling AM role(s) delete endpoint to remove.",
                          roleAssignmentsResponse.getRoleAssignmentResponse().size(), caseRef);
