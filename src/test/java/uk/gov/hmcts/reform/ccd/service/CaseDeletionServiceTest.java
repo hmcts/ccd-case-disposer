@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.DisposeDocumentsRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.DisposeRoleAssignmentsRemoteOperation;
-import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
 
@@ -62,8 +61,6 @@ class CaseDeletionServiceTest {
     @Mock
     private DisposeRoleAssignmentsRemoteOperation disposeRoleAssignmentsRemoteOperation;
     @Mock
-    private LogAndAuditRemoteOperation logAndAuditRemoteOperation;
-    @Mock
     private CaseDataElasticsearchOperations caseDataElasticsearchOperations;
     @Mock
     private ParameterResolver parameterResolver;
@@ -101,7 +98,6 @@ class CaseDeletionServiceTest {
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(disposeDocumentsRemoteOperation).postDocumentsDelete(anyString());
         doNothing().when(disposeRoleAssignmentsRemoteOperation).postRoleAssignmentsDelete(anyString());
-        doNothing().when(logAndAuditRemoteOperation).postCaseDeletionToLogAndAudit(any(CaseData.class));
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
@@ -113,7 +109,6 @@ class CaseDeletionServiceTest {
         verify(caseDataRepository).delete(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
         verify(disposeDocumentsRemoteOperation).postDocumentsDelete(anyString());
         verify(disposeRoleAssignmentsRemoteOperation).postRoleAssignmentsDelete(anyString());
-        verify(logAndAuditRemoteOperation).postCaseDeletionToLogAndAudit(any(CaseData.class));
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
     }
 
@@ -132,7 +127,6 @@ class CaseDeletionServiceTest {
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(disposeDocumentsRemoteOperation).postDocumentsDelete(anyString());
         doNothing().when(disposeRoleAssignmentsRemoteOperation).postRoleAssignmentsDelete(anyString());
-        doNothing().when(logAndAuditRemoteOperation).postCaseDeletionToLogAndAudit(any(CaseData.class));
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
@@ -145,7 +139,6 @@ class CaseDeletionServiceTest {
         verify(caseDataRepository, times(3)).delete(any(CaseDataEntity.class));
         verify(disposeDocumentsRemoteOperation, times(3)).postDocumentsDelete(anyString());
         verify(disposeRoleAssignmentsRemoteOperation, times(3)).postRoleAssignmentsDelete(anyString());
-        verify(logAndAuditRemoteOperation, times(3)).postCaseDeletionToLogAndAudit(any(CaseData.class));
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 10L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 11L);
@@ -168,7 +161,6 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
         verify(disposeDocumentsRemoteOperation).postDocumentsDelete(anyString());
         verify(disposeRoleAssignmentsRemoteOperation).postRoleAssignmentsDelete(anyString());
-        verify(logAndAuditRemoteOperation).postCaseDeletionToLogAndAudit(any(CaseData.class));
         verify(caseDataElasticsearchOperations).deleteByReference(anyString(),anyLong());
 
         verifyNoInteractions(caseLinkRepository);
@@ -215,7 +207,6 @@ class CaseDeletionServiceTest {
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(disposeDocumentsRemoteOperation).postDocumentsDelete(anyString());
         doNothing().when(disposeRoleAssignmentsRemoteOperation).postRoleAssignmentsDelete(anyString());
-        doNothing().when(logAndAuditRemoteOperation).postCaseDeletionToLogAndAudit(any(CaseData.class));
         doNothing().when(caseDataElasticsearchOperations).deleteByReference(anyString(), anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
 
@@ -233,7 +224,6 @@ class CaseDeletionServiceTest {
         verify(caseDataRepository, times(3)).delete(any(CaseDataEntity.class));
         verify(disposeDocumentsRemoteOperation, times(3)).postDocumentsDelete(anyString());
         verify(disposeRoleAssignmentsRemoteOperation, times(3)).postRoleAssignmentsDelete(anyString());
-        verify(logAndAuditRemoteOperation, times(3)).postCaseDeletionToLogAndAudit(any(CaseData.class));
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 1L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 10L);
         verify(caseDataElasticsearchOperations).deleteByReference(EXPECTED_INDEX, 11L);
