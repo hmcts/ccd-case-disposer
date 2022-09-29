@@ -318,8 +318,8 @@ ccd:
     enabled: true
     ingressHost: "${SERVICE_FQDN}"
     auth:
-      username: "${DATA_STORE_DB_USERNAME}"
-      password: "${DATA_STORE_DB_PASSWORD}"
+      username: hmcts
+      password: hmcts
     image:
       registry: hmctspublic.azurecr.io
       repository: imported/bitnami/postgresql
