@@ -234,7 +234,7 @@ ext.libraries = [
 ext['spring-framework.version'] = '5.3.20'
 ext['log4j2.version'] = '2.17.1'
 ext['jackson.version'] = '2.13.2'
-ext['snakeyaml.version'] = '1.31'
+ext['snakeyaml.version'] = '1.32'
 
 dependencies {
     compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
