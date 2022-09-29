@@ -12,7 +12,7 @@ job:
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_USERNAME: "javapostgres"
-    DATA_STORE_DB_PASSWORD: "{{ Values.global.postgresql.auth.postgresPassword}}"
+    DATA_STORE_DB_PASSWORD: "{{ .Values.global.postgresql.auth.postgresPassword}}"
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
