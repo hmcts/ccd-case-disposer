@@ -11,8 +11,8 @@ job:
     DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
-    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username}}"
-    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password}}"
+    DATA_STORE_DB_USERNAME: "hmcts"
+    DATA_STORE_DB_PASSWORD: "hmcts"
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -243,8 +243,8 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     enableKeyVaults: true
     devMode: true
-    postgresUsername: "{{ .Values.postgresql.auth.username}}"
-    postgresPassword: "{{ .Values.postgresql.auth.password}}"
+    postgresUsername: "hmcts"
+    postgresPassword: "hmcts"
 
   ccd-definition-store-api:
     java:
@@ -316,14 +316,11 @@ ccd:
 
   postgresql:
     enabled: true
-    ingressHost: "${SERVICE_FQDN}"
+    image:
+      tag: '11.16.0'
     auth:
       username: hmcts
       password: hmcts
-    image:
-      registry: hmctspublic.azurecr.io
-      repository: imported/bitnami/postgresql
-      tag: '11.6.0'
     primary:
       service:
         ports:
@@ -334,9 +331,9 @@ ccd:
       initdb:
         scripts:
           init.sql: |-
-            CREATE DATABASE "ccd_data_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "ccd_definition_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
       persistence:
         enabled: false
