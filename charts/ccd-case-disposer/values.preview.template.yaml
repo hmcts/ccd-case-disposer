@@ -12,7 +12,7 @@ job:
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_USERNAME: hmcts
-    DATA_STORE_DB_PASSWORD: hmcts
+    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.postgresqlPassword}}"
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -89,7 +89,7 @@ logstash:
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/ccd_data_store?sslmode=allow"
           jdbc_user => "hmcts"
-          jdbc_password => "hmcts"
+          jdbc_password => "javapassword"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
@@ -244,7 +244,7 @@ ccd:
     enableKeyVaults: true
     devMode: true
     postgresUsername: hmcts
-    postgresPassword: hmcts
+    postgresPassword: "{{ .Values.postgresql.postgresqlPassword}}"
 
   ccd-definition-store-api:
     java:
@@ -320,7 +320,6 @@ ccd:
       tag: '11.16.0'
     auth:
       username: hmcts
-      password: hmcts
     primary:
       service:
         ports:
