@@ -11,8 +11,8 @@ job:
     DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
-    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.username }}"
-    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.password }}"
+    DATA_STORE_DB_USERNAME: "{{ .Values.postgresql.auth.postgresPassword }}"
+    DATA_STORE_DB_PASSWORD: "{{ .Values.postgresql.auth.postgresPassword }}"
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -210,6 +210,28 @@ logstash:
           }
       }
 
+postgresql:
+  enabled: true
+  ingressHost: "${SERVICE_FQDN}"
+  image:
+    tag: '11.16.0'
+  primary:
+    service:
+      ports:
+        postgresql: 5432
+      type: LoadBalancer
+      annotations:
+        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    initdb:
+      scripts:
+        init.sql: |-
+          CREATE DATABASE "ccd_data_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "ccd_definition_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "user-profile" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+          CREATE DATABASE "role_assignment" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+    persistence:
+      enabled: false
+
 ccd:
   enabled: true
   ccd:
@@ -222,7 +244,7 @@ ccd:
     apiGatewayWeb:
       enabled: false
     postgresql:
-      enabled: true
+      enabled: false
     s2s:
       enabled: false
     elastic:
@@ -314,24 +336,4 @@ ccd:
       autoscaling:
         enabled: false
 
-  postgresql:
-    enabled: true
-    image:
-      tag: '11.16.0'
-    primary:
-      service:
-        ports:
-          postgresql: 5432
-        type: LoadBalancer
-        annotations:
-          external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
-          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-      initdb:
-        scripts:
-          init.sql: |-
-            CREATE DATABASE "ccd_data_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "ccd_definition_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      persistence:
-        enabled: false
+
