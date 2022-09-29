@@ -105,7 +105,7 @@ withPipeline(type, product, component) {
     env.ENV = 'preview'
     env.CREATE_GLOBAL_SEARCH = true
     env.DATA_STORE_DB_USERNAME = "hmcts"
-    env.DATA_STORE_DB_PASSWORD = "javapassword"
+    env.DATA_STORE_DB_PASSWORD = "hmcts"
     env.DATA_STORE_DB_NAME = "ccd_data_store"
     env.DATA_STORE_DB_OPTIONS = '?sslmode=allow'
     env.DATA_STORE_DB_PORT = '5432'

@@ -11,8 +11,8 @@ job:
     DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: ccd_data_store
-    DATA_STORE_DB_USERNAME: "javapostgres"
-    DATA_STORE_DB_PASSWORD: "javapassword"
+    DATA_STORE_DB_USERNAME: "hmcts"
+    DATA_STORE_DB_PASSWORD: "hmcts"
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
@@ -88,8 +88,8 @@ logstash:
       input  {
         jdbc {
           jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/ccd_data_store?sslmode=allow"
-          jdbc_user => "javapostgres"
-          jdbc_password => "javapassword"
+          jdbc_user => "hmcts"
+          jdbc_password => "hmcts"
           jdbc_validate_connection => true
           jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
           jdbc_driver_class => "org.postgresql.Driver"
@@ -222,14 +222,7 @@ ccd:
     apiGatewayWeb:
       enabled: false
     postgresql:
-      enabled: true
-      primary:
-        service:
-          ports:
-            postgresql: 5432
-          type: LoadBalancer
-          annotations:
-            service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      enabled: false
     s2s:
       enabled: false
     elastic:
@@ -250,8 +243,8 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     enableKeyVaults: true
     devMode: true
-    postgresUsername: "javapostgres"
-    postgresPassword: "javapassword"
+    postgresUsername: "hmcts"
+    postgresPassword: "hmcts"
 
   ccd-definition-store-api:
     java:
@@ -321,24 +314,29 @@ ccd:
       autoscaling:
         enabled: false
 
-#  postgresql:
-#    enabled: true
-#    ingressHost: "${SERVICE_FQDN}"
-#    image:
-#      tag: '11.16.0'
-#    primary:
-#      service:
-#        ports:
-#          postgresql: 5432
-#        type: LoadBalancer
-#        annotations:
-#          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-#      initdb:
-#        scripts:
-#          init.sql: |-
-#            CREATE DATABASE "ccd_data_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-#            CREATE DATABASE "ccd_definition_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-#            CREATE DATABASE "user-profile" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-#            CREATE DATABASE "role_assignment" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-#      persistence:
-#        enabled: false
+  postgresql:
+    enabled: true
+    ingressHost: "${SERVICE_FQDN}"
+    auth:
+      username: "hmcts"
+      password: "${DATA_STORE_DB_PASSWORD}"
+    image:
+      registry: hmctspublic.azurecr.io
+      repository: imported/bitnami/postgresql
+      tag: '11.6.0'
+    primary:
+      service:
+        ports:
+          postgresql: 5432
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      initdb:
+        scripts:
+          init.sql: |-
+            CREATE DATABASE "ccd_data_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_definition_store" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      persistence:
+        enabled: false
