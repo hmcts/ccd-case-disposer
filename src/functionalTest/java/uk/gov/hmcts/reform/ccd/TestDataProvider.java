@@ -4,11 +4,13 @@ import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.LauTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.inject.Inject;
 
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
@@ -30,6 +32,9 @@ public class TestDataProvider {
 
     @Inject
     private RoleDeleteTestUtils roleDeleteTestUtils;
+
+    @Inject
+    private LauTestUtils lauTestUtils;
 
     @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;
@@ -82,6 +87,10 @@ public class TestDataProvider {
 
     protected void verifyRoleDeletion(final Map<Long, List<String>> deletableRoles) {
         roleDeleteTestUtils.verifyRoleAssignmentDeletion(deletableRoles);
+    }
+
+    protected void verifyLauLogs(final Set<Long> roleDeletionCaseRefs) {
+        lauTestUtils.verifyLauLogs(roleDeletionCaseRefs);
     }
 
     private void setDeletableCaseTypes(final String value) {

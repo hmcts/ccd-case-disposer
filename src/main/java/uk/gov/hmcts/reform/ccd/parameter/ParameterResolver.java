@@ -29,7 +29,11 @@ public interface ParameterResolver {
 
     String getRoleAssignmentsHost();
 
+    String getLogAndAuditHost();
+
     Boolean getCheckCaseRolesExist();
 
     Integer getAppInsightsLogSize();
+
+    Boolean isLogAndAuditEnabled();
 }

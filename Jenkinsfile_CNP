@@ -104,6 +104,7 @@ withPipeline(type, product, component) {
     loadVaultSecrets(prSecrets)
     env.ENV = 'preview'
     env.CREATE_GLOBAL_SEARCH = true
+    env.LOG_AND_AUDIT_ENABLED = true
     env.DATA_STORE_DB_USERNAME = "hmcts"
     env.DATA_STORE_DB_PASSWORD = "hmcts"
     env.DATA_STORE_DB_NAME = "ccd_data_store"
@@ -114,6 +115,7 @@ withPipeline(type, product, component) {
     env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+    env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
   }
 
   onNonPR() {
@@ -126,15 +128,18 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_HOST = "ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+    env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
   }
 
   after('akschartsinstall') {
     // Set required environment variables to run functional tests apart from one in vaults.
     env.ELASTIC_SEARCH_ENABLED = true
+    env.LOG_AND_AUDIT_ENABLED = true
     env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
     env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
 
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"

@@ -34,6 +34,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -42,6 +43,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.INDEX_NAME_PATTERN;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.JURISDICTION;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_ENTITY_10;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_ENTITY_11;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.YESTERDAY;
@@ -72,9 +74,15 @@ class CaseDeletionServiceTest {
 
     private static final String EXPECTED_INDEX = String.format(INDEX_NAME_PATTERN, DELETABLE_CASE_TYPE);
 
-    private final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, null);
-    private final CaseData linkedCaseData1 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, caseData);
-    private final CaseData linkedCaseData2 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, YESTERDAY, 1L, caseData);
+    private final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE,JURISDICTION, YESTERDAY, 1L, null);
+    private final CaseData linkedCaseData1 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, JURISDICTION,
+            YESTERDAY,
+            1L,
+            caseData);
+    private final CaseData linkedCaseData2 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE,JURISDICTION,
+            YESTERDAY,
+            1L,
+            caseData);
 
     private final CaseLinkEntity caseLinkEntity1 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L).build();
     private final CaseLinkEntity caseLinkEntity2 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 11L).build();
@@ -142,6 +150,7 @@ class CaseDeletionServiceTest {
         final CaseFamily caseFamily = new CaseFamily(caseData, emptyList());
         doThrow(IllegalArgumentException.class).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doReturn(INDEX_NAME_PATTERN).when(parameterResolver).getCasesIndexNamePattern();
+        doReturn(Optional.of(mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
 
         // WHEN
         catchThrowable(() -> underTest.deleteCase(caseFamily));
@@ -154,7 +163,6 @@ class CaseDeletionServiceTest {
         verify(disposeRoleAssignmentsRemoteOperation).postRoleAssignmentsDelete(anyString());
         verify(caseDataElasticsearchOperations).deleteByReference(anyString(),anyLong());
 
-        verifyNoInteractions(caseDataRepository);
         verifyNoInteractions(caseLinkRepository);
     }
 

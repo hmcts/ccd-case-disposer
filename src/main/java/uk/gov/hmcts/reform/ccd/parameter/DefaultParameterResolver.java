@@ -44,6 +44,12 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${ccd.role.assignment.host}")
     private String roleAssignmentHost;
 
+    @Value("${ccd.log.and.audit.host}")
+    private String logAndAuditHost;
+
+    @Value("${log.and.audit.enabled}")
+    private Boolean isLogAndAuditEnabled;
+
     @Value("${ccd.role.assignment.check-case-roles-exist}")
     private Boolean checkCaseRolesExist;
 
@@ -129,7 +135,17 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public String getLogAndAuditHost() {
+        return logAndAuditHost;
+    }
+
+    @Override
     public Integer getAppInsightsLogSize() {
         return appInsightsLogSize;
+    }
+
+    @Override
+    public Boolean isLogAndAuditEnabled() {
+        return isLogAndAuditEnabled;
     }
 }

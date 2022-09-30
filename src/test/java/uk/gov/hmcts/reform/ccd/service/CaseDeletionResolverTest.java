@@ -4,14 +4,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
+import uk.gov.hmcts.reform.ccd.util.LogAndAuditCaseFilter;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +36,12 @@ class CaseDeletionResolverTest {
     @Mock
     private FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
 
+    @Mock
+    private LogAndAuditRemoteOperation logAndAuditRemoteOperation;
+
+    @Spy
+    private LogAndAuditCaseFilter logAndAuditCaseFilter;
+
     @InjectMocks
     private CaseDeletionResolver caseDeletionResolver;
 
@@ -45,6 +56,8 @@ class CaseDeletionResolverTest {
         when(failedToDeleteCaseFamilyHolder.getCaseRefs()).thenReturn(caseRefs);
         when(caseFamiliesFilter.filterSuccessfulCaseFamiliesByCaseRef(linkedFamilies, caseRefs))
                 .thenReturn(filteredCases);
+        when(caseFamiliesFilter.getDeletableCasesOnly(filteredCases))
+                .thenReturn(filteredCases);
 
         caseDeletionResolver.logCaseDeletion(linkedFamilies);
 
@@ -53,5 +66,7 @@ class CaseDeletionResolverTest {
         verify(caseFamiliesFilter, times(1)).geSimulationCasesOnly(filteredCases);
         verify(caseDeletionLoggingService, times(1))
                 .logCaseFamilies(anyList(), anyList(), anyList());
+
+        verify(logAndAuditRemoteOperation, times(2)).postCaseDeletionToLogAndAudit(any(CaseData.class));
     }
 }
