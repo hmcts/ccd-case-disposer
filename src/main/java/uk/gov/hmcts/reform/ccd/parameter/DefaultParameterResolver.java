@@ -44,6 +44,18 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${ccd.role.assignment.host}")
     private String roleAssignmentHost;
 
+    @Value("${ccd.log.and.audit.host}")
+    private String logAndAuditHost;
+
+    @Value("${log.and.audit.enabled}")
+    private Boolean isLogAndAuditEnabled;
+
+    @Value("${ccd.role.assignment.check-case-roles-exist}")
+    private Boolean checkCaseRolesExist;
+
+    @Value("${app.insights.log.size}")
+    private Integer appInsightsLogSize;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -113,7 +125,27 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public Boolean getCheckCaseRolesExist() {
+        return checkCaseRolesExist;
+    }
+
+    @Override
     public String getRoleAssignmentsHost() {
         return roleAssignmentHost;
+    }
+
+    @Override
+    public String getLogAndAuditHost() {
+        return logAndAuditHost;
+    }
+
+    @Override
+    public Integer getAppInsightsLogSize() {
+        return appInsightsLogSize;
+    }
+
+    @Override
+    public Boolean isLogAndAuditEnabled() {
+        return isLogAndAuditEnabled;
     }
 }

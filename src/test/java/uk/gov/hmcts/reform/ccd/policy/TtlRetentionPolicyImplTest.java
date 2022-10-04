@@ -30,7 +30,7 @@ class TtlRetentionPolicyImplTest {
     @Test
     void testShouldReturnTrueWhenDateIsNull() {
         // GIVEN
-        final CaseData caseData = new CaseData(2L, 2L, DELETABLE_CASE_TYPE, null, 2L, null);
+        final CaseData caseData = new CaseData(2L, 2L, DELETABLE_CASE_TYPE,null, null, 2L, null);
 
         // WHEN/THEN
         assertThat(underTest.mustRetain(caseData))
