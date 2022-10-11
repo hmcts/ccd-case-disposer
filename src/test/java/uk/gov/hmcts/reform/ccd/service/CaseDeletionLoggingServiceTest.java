@@ -61,7 +61,7 @@ class CaseDeletionLoggingServiceTest {
 
         verify(tableTextBuilder, times(1)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
-                .buildSummaryString(anyList(), anyList(), anyList(), anyInt(), anyInt());
+                .buildSummaryString(anyList(), anyInt(), anyInt());
         verify(simulatedCaseDataViewHolder, times(1)).setUpData(anyList());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
 

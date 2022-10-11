@@ -1,32 +1,33 @@
 package uk.gov.hmcts.reform.ccd.util;
 
-import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.inject.Named;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.CR_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_CASES_STRING;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_CASES_STRING;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_CASES_STRING;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SUMMARY_HEADING_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.TOTAL_CASES_STRING;
 
 @Named
 public class SummaryStringLogBuilder {
 
-    public String buildSummaryString(final List<CaseFamily> deletedLinkedFamilies,
-                                     final List<CaseFamily> simulatedLinkedFamilies,
-                                     final List<CaseFamily> failedLinkedFamilies,
+    public String buildSummaryString(final List<CaseDataView> caseDataViews,
                                      final int partCounter,
                                      final int totalSize) {
-        final int deletedCases = countCaseFamilies(deletedLinkedFamilies);
-        final int simulatedCases = countCaseFamilies(simulatedLinkedFamilies);
-        final int failedCases = countCaseFamilies(failedLinkedFamilies);
+        final int deletedCases = countCaseFamilies(caseDataViews, DELETED_STATE);
+        final int simulatedCases = countCaseFamilies(caseDataViews,SIMULATED_STATE);
+        final int failedCases = countCaseFamilies(caseDataViews,FAILED_STATE);
         final int totalCases = deletedCases + simulatedCases + failedCases;
 
         return buildSummaryString(deletedCases, simulatedCases, failedCases, totalCases, partCounter, totalSize);
@@ -52,11 +53,9 @@ public class SummaryStringLogBuilder {
         return stringBuilder.toString();
     }
 
-    private int countCaseFamilies(final List<CaseFamily> caseFamilies) {
-        final AtomicInteger atomicInteger = new AtomicInteger();
-        //Add 1 for root cases
-        caseFamilies.forEach(caseFamily -> atomicInteger.addAndGet(caseFamily.getLinkedCases().size() + 1));
-
-        return atomicInteger.get();
+    private int countCaseFamilies(final List<CaseDataView> caseDataViews, final String state) {
+        return caseDataViews.stream()
+                .filter(caseDataView -> caseDataView.getState().equals(state))
+                .collect(Collectors.toList()).size();
     }
 }

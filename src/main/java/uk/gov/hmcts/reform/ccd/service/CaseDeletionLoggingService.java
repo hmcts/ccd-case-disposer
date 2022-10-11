@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -62,9 +64,7 @@ public class CaseDeletionLoggingService {
             final AtomicInteger partCounter = new AtomicInteger(0);
 
             caseViewPartition.forEach(caseViewListPartition -> {
-                final String summaryString = summaryStringLogBuilder.buildSummaryString(deletedLinkedFamilies,
-                        simulatedLinkedFamilies,
-                        failedLinkedFamilies,
+                final String summaryString = summaryStringLogBuilder.buildSummaryString(caseDataViews,
                         partCounter.incrementAndGet(),
                         caseViewPartition.size());
 
@@ -103,6 +103,13 @@ public class CaseDeletionLoggingService {
         caseDataViewBuilder.buildCaseDataViewList(simulatedLinkedFamilies, caseDataViews, SIMULATED_STATE);
         caseDataViewBuilder.buildCaseDataViewList(failedLinkedFamilies, caseDataViews, FAILED_STATE);
 
+        removeCaseDataViewDuplicates(caseDataViews);
+
         return caseDataViews;
+    }
+
+    private void removeCaseDataViewDuplicates(final List<CaseDataView> caseDataViews) {
+        final Set<Long> nameSet = new HashSet<>();
+        caseDataViews.removeIf(e -> (!nameSet.add(e.getCaseRef())));
     }
 }
