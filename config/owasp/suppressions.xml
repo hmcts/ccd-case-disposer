@@ -14,8 +14,6 @@
 	  <suppress>
 	    <notes>Temporary Suppression
         CVE-2022-25857 refer https://tools.hmcts.net/jira/browse/CCD-3658
-        CVE-2022-42003 refer https://tools.hmcts.net/jira/browse/CCD-3776
- 			  CVE-2022-42004 refer https://tools.hmcts.net/jira/browse/CCD-3776
 	    </notes>
       <cve>CVE-2022-25857</cve>
 	  </suppress>
