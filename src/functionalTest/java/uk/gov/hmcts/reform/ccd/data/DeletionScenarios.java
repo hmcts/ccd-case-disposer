@@ -38,6 +38,7 @@ public class DeletionScenarios {
                         emptyList(),
                         emptyList(),
                         emptyMap(),
+                        emptyMap(),
                         Map.of("global_search", List.of(1004259907351111L)),
                         Map.of("global_search", emptyList())
                 )
