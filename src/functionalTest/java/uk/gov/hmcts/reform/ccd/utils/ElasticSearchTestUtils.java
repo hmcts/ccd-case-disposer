@@ -114,28 +114,26 @@ public class ElasticSearchTestUtils {
     }
 
     public void verifyCaseDataAreInElasticsearch(final Map<String, List<Long>> indexedData) {
-        if (!isPreview()) {
-            indexedData.forEach((key, value) -> {
-                final String indexName = getIndexName(key);
+        indexedData.forEach((key, value) -> {
+            final String indexName = getIndexName(key);
 
-                value.forEach(ThrowingConsumer.unchecked(caseReference -> {
-                    Thread.sleep(10000);
-                    with()
-                            .await()
-                            .untilAsserted(() -> {
+            value.forEach(ThrowingConsumer.unchecked(caseReference -> {
+                Thread.sleep(10000);
+                with()
+                        .await()
+                        .untilAsserted(() -> {
 
-                                refreshIndex(indexName);
-                                Thread.sleep(10000);
-                                final Optional<Long> actualCaseReference = findCaseByReference(indexName,
-                                        caseReference);
+                            refreshIndex(indexName);
+                            Thread.sleep(10000);
+                            final Optional<Long> actualCaseReference = findCaseByReference(indexName,
+                                    caseReference);
 
-                                assertThat(actualCaseReference)
-                                        .isPresent()
-                                        .hasValue(caseReference);
-                            });
-                }));
-            });
-        }
+                            assertThat(actualCaseReference)
+                                    .isPresent()
+                                    .hasValue(caseReference);
+                        });
+            }));
+        });
     }
 
     private Optional<Long> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
@@ -176,13 +174,4 @@ public class ElasticSearchTestUtils {
         }
         return caseType;
     }
-
-    private boolean isPreview() {
-        final Optional<String> env = Optional.ofNullable(System.getenv("ENV"));
-        if (env.isPresent() && env.get().equals("preview")) {
-            return true;
-        }
-        return false;
-    }
-
 }
