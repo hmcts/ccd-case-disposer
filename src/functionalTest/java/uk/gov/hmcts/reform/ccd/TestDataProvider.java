@@ -69,7 +69,7 @@ public class TestDataProvider {
 
     protected void verifyDatabaseDeletion(final List<Long> initialRowIds,
                                           final List<Long> endStateRowIds) {
-        databaseTestUtils.verifyDatabaseDeletion(initialRowIds,endStateRowIds);
+        databaseTestUtils.verifyDatabaseDeletion(initialRowIds, endStateRowIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
@@ -89,7 +89,7 @@ public class TestDataProvider {
         roleDeleteTestUtils.verifyRoleAssignmentDeletion(deletableRoles);
     }
 
-    protected void verifyLauLogs(final Set<Long> roleDeletionCaseRefs) {
+    protected void verifyLauLogs(final Set<String> roleDeletionCaseRefs) {
         lauTestUtils.verifyLauLogs(roleDeletionCaseRefs);
     }
 
