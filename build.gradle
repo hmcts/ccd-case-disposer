@@ -224,7 +224,8 @@ def versions = [
      pitest              : '1.6.3',
      sonarPitest         : '0.5',
      springFramework     : '5.3.20',
-     springBoot          : springBoot.class.package.implementationVersion
+     springBoot          : springBoot.class.package.implementationVersion,
+     jackson             : '2.14.0-rc1'
 ]
 
 ext.libraries = [
@@ -239,12 +240,12 @@ ext.libraries = [
 
 ext['spring-framework.version'] = '5.3.20'
 ext['log4j2.version'] = '2.17.1'
-ext['jackson.version'] = '2.13.2'
+ext['jackson.version'] = '2.14.0-rc1'
 
 dependencies {
-    compile "com.fasterxml.jackson.core:jackson-databind:2.13.2.2"
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.13.2'
-    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: '2.13.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: versions.jackson
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: versions.jackson
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-jaxb-annotations', version: versions.jackson
 
     implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
     implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
