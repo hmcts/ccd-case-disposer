@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
+import java.util.Optional;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +30,7 @@ public class GlobalSearchIndexCreator {
     private SecurityUtils securityUtils;
 
     public void createGlobalSearchIndex() {
-        if (createGlobalSearch.equals("true")) {
+        if (createGlobalSearch.equals("true") && isPreview()) {
             final Response response = RestAssured
                     .given()
                     .relaxedHTTPSValidation()
@@ -43,5 +44,13 @@ public class GlobalSearchIndexCreator {
 
             assertThat(response.getStatusCode()).isEqualTo(201);
         }
+    }
+
+    private boolean isPreview() {
+        final Optional<String> env = Optional.ofNullable(System.getenv("ENV"));
+        if (env.isPresent() && env.get().equals("preview")) {
+            return true;
+        }
+        return false;
     }
 }
