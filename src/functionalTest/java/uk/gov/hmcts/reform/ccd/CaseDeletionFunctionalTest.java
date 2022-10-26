@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -50,10 +51,10 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         executor.execute();
 
         // THEN
-        verifyDatabaseDeletion(initialStateRowIds,deletableEndStateRowIds);
+        verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
         verifyDocumentDeletion(deletableDocuments);
         verifyRoleDeletion(deletableRoles);
-        verifyLauLogs(deletableDocuments.keySet());
+        verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
