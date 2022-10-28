@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> {
@@ -15,4 +16,6 @@ public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> 
         + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")
     List<CaseDataEntity> findExpiredCases(@Param("queryCaseTypes") List<String> queryCaseTypes);
 
+    @Query("SELECT c FROM CaseDataEntity c WHERE c.reference = :queryCaseReference")
+    Optional<CaseDataEntity> findByReference(@Param("queryCaseReference") Long queryCaseReference);
 }

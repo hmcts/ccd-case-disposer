@@ -59,6 +59,19 @@ class CaseDataElasticsearchOperationsTest {
     }
 
     @Test
+    void testShouldIgnoreDeleteByQueryRequestIfGlobalSearchNotDefined() throws Exception {
+        doReturn(bulkByScrollResponse).when(elasticsearchClient)
+            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+
+        doReturn(false).when(globalSearchIndexChecker).isGlobalSearchExist();
+
+        underTest.deleteByReference(CASE_INDEX, CASE_REFERENCE);
+
+        verify(elasticsearchClient, times(1))
+            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+    }
+
+    @Test
     void testShouldRaiseSearchFailuresWhenDeleteByReference() throws Exception {
         doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
         doReturn(bulkByScrollResponse).when(elasticsearchClient)

@@ -2,11 +2,12 @@ package uk.gov.hmcts.reform.ccd.data;
 
 import uk.gov.hmcts.reform.ccd.config.WireMockStubs;
 import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
-import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.DatabaseIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.ElasticSearchIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.LauIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.RoleDeleteIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.SimulationIntegrationTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -20,19 +21,22 @@ import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CAS
 public class TestDataProvider extends TestContainers {
 
     @Inject
-    private SimulationTestUtils simulationTestUtils;
+    private SimulationIntegrationTestUtils simulationIntegrationTestUtils;
 
     @Inject
-    private ElasticSearchTestUtils elasticSearchTestUtils;
+    private ElasticSearchIntegrationTestUtils elasticSearchIntegrationTestUtils;
 
     @Inject
-    private DatabaseTestUtils databaseTestUtils;
+    private DatabaseIntegrationTestUtils databaseIntegrationTestUtils;
 
     @Inject
-    private DocumentDeleteTestUtils documentDeleteTestUtils;
+    private DocumentDeleteIntegrationTestUtils documentDeleteIntegrationTestUtils;
 
     @Inject
-    private RoleDeleteTestUtils roleDeleteTestUtils;
+    private RoleDeleteIntegrationTestUtils roleDeleteIntegrationTestUtils;
+
+    @Inject
+    private LauIntegrationTestUtils lauIntegrationTestUtils;
 
     @Inject
     private WireMockStubs wireMockStubs;
@@ -48,34 +52,38 @@ public class TestDataProvider extends TestContainers {
 
         wireMockStubs.setUpStubs(WIREMOCK_SERVER);
 
-        elasticSearchTestUtils.resetIndices(indexedData.keySet());
-        elasticSearchTestUtils.createElasticSearchIndex(indexedData);
+        elasticSearchIntegrationTestUtils.resetIndices(indexedData.keySet());
+        elasticSearchIntegrationTestUtils.createElasticSearchIndex(indexedData);
 
-        databaseTestUtils.insertDataIntoDatabase(ccdScriptPath);
+        databaseIntegrationTestUtils.insertDataIntoDatabase(ccdScriptPath);
 
-        databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
-        elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
+        databaseIntegrationTestUtils.verifyDatabaseIsPopulated(rowIds);
+        elasticSearchIntegrationTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
     }
 
     protected void verifyDatabaseDeletion(final List<Long> rowIds) {
-        databaseTestUtils.verifyDatabaseDeletion(rowIds);
+        databaseIntegrationTestUtils.verifyDatabaseDeletion(rowIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
                                                final Map<String, List<Long>> notDeletedFromIndexed) {
-        elasticSearchTestUtils.verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+        elasticSearchIntegrationTestUtils.verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
     }
 
     protected void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
-        simulationTestUtils.verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+        simulationIntegrationTestUtils.verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
 
     protected void verifyDocumentDeletion(final List<Long> documentDeletionCaseRefs) {
-        documentDeleteTestUtils.verifyDocumentStoreDeletion(documentDeletionCaseRefs);
+        documentDeleteIntegrationTestUtils.verifyDocumentStoreDeletion(documentDeletionCaseRefs);
     }
 
     protected void verifyRoleDeletion(final List<Long> roleDeletionCaseRefs) {
-        roleDeleteTestUtils.verifyRoleAssignmentDeletion(roleDeletionCaseRefs);
+        roleDeleteIntegrationTestUtils.verifyRoleAssignmentDeletion(roleDeletionCaseRefs);
+    }
+
+    protected void verifyLauLogs(final List<Long> roleDeletionCaseRefs) {
+        lauIntegrationTestUtils.verifyLauLogs(roleDeletionCaseRefs);
     }
 
     private void setDeletableCaseTypes(final String value) {

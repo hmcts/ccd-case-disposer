@@ -9,6 +9,7 @@ public class CaseData {
     Long id;
     Long reference;
     String caseType;
+    String jurisdiction;
     LocalDate resolvedTtl;
     Long familyId;
     CaseData parentCase;

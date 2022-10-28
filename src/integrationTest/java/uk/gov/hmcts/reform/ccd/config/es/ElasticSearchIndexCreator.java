@@ -11,7 +11,7 @@ import org.elasticsearch.xcontent.XContentType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
-import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.ElasticSearchIntegrationTestUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,14 +28,14 @@ public class ElasticSearchIndexCreator {
     private RestHighLevelClient elasticsearchClient;
 
     @Inject
-    private ElasticSearchTestUtils elasticSearchTestUtils;
+    private ElasticSearchIntegrationTestUtils elasticSearchIntegrationTestUtils;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void insertDataIntoElasticsearch(final String indexName, final List<Long> caseRefs) throws IOException {
-        final String caseIndex = elasticSearchTestUtils.getIndexName(indexName);
+        final String caseIndex = elasticSearchIntegrationTestUtils.getIndexName(indexName);
         final List<CaseDataEntity> caseDataEntities = buildCaseDataEntity(
-                elasticSearchTestUtils.getIndexName(indexName),
+                elasticSearchIntegrationTestUtils.getIndexName(indexName),
                 caseRefs);
         final BulkRequest bulkRequest = buildBulkRequest(caseIndex, caseDataEntities);
 

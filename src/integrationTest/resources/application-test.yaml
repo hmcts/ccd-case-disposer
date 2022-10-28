@@ -1,6 +1,3 @@
-app-insights:
-  dev-mode: off
-
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
@@ -8,6 +5,9 @@ spring:
   flyway:
     locations: classpath:db/migration
     enabled: true
+    out-ofrder: true
+    ignore-missing-migrations: true
+    baseline-version: 0001
 
 flyway:
   noop:
@@ -20,21 +20,44 @@ logging:
     org.springframework: INFO
 
 elasticsearch:
-  hosts: ${ELASTICSEARCH_DATA_NODES_HOSTS:"http://localhost:4578"}
+  hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:4578"}
   global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
 
-deletable.case.types: ${DELETE_CASE_TYPES:"deletable_case_type,bbb,ccc"}
-simulated.case.types: ${SIMULATED_CASE_TYPES:"deletable_case_type_simulation,ttt,yyy"}
+deletable.case.types: "deletable_case_type,bbb,ccc"
+simulated.case.types: "deletable_case_type_simulation,ttt,yyy"
 
 idam:
   api:
-    url: ${IDAM_API_URL:http://localhost:4603}
+    url: http://localhost:4603
     username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
-    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:}
   s2s-auth:
     name: ccd_case_disposer
-    url: ${S2S_URL:http://localhost:4603}
-    secret: ${CCD_CASE_DISPOSER_IDAM_KEY:AAAAAAAAAAAAAAAA}
+    url: http://localhost:4603
+    secret: AAAAAAAAAAAAAAAA
+  client:
+    id: ccd-case-disposer
+    secret: idam-case-disposer-client-secret
+    redirect_uri: http://ccd-case-disposer/oauth2redirect
 
-ccd.document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4603}
-ccd.role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4603}
+application-insights:
+  default:
+    modules:
+      WebSyntheticRequestTelemetryInitializer:
+        enabled: false
+
+azure:
+  application-insights:
+    instrumentation-key: appinsights_key
+
+ccd:
+  document.store:
+    host: http://localhost:4603
+  role.assignment:
+    host: http://localhost:4603
+    check-case-roles-exist: true
+  log.and.audit:
+    host: http://localhost:4603
+
+app.insights.log.size: 250
+log.and.audit.enabled: true
