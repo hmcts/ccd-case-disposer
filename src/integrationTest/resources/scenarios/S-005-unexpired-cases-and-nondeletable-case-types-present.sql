@@ -39,7 +39,7 @@ VALUES (3, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (4, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (4, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -47,5 +47,17 @@ VALUES (4, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
          "PersonFirstName": "PUBLIC"
        }',
        1504259907353526,
+       null
+);
+
+INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
+VALUES (5, 'FT_MultiplePages', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+        '{
+          "PersonFirstName": "Janet"
+        }',
+       '{
+         "PersonFirstName": "PUBLIC"
+       }',
+       1504259907353525,
        '2016-06-24 20:44:52.824'
 );

@@ -3,7 +3,7 @@ elastic:
 ccd:
   enabled: false
 
-java:
+job:
   image: 'https://hmctspublic.azurecr.io/ccd/ccd-case-disposer:latest'
   kind: CronJob
   schedule: "0 22 * * *"
@@ -23,6 +23,10 @@ java:
           alias: DATA_STORE_DB_PASSWORD
         - name: ccd-ELASTIC-SEARCH-DATA-NODES-URL
           alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
+        - name: ccd-ELASTIC-SEARCH-URL
+          alias: ELASTIC_SEARCH_HOSTS
+        - name: ccd-ELASTIC-SEARCH-PASSWORD
+          alias: ELASTIC_SEARCH_PASSWORD
         - name: idam-case-disposer-system-user-username
           alias: IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME
         - name: idam-case-disposer-system-user-password
@@ -31,6 +35,8 @@ java:
           alias: IDAM_CASE_DISPOSER_CLIENT_SECRET
         - name: ccd-case-disposer-s2s-secret
           alias: IDAM_KEY_CCD_CASE_DISPOSER
+        - name: ccd-data-s2s-secret
+          alias: IDAM_KEY_CCD_DATA_STORE
         - name: ccd-definition-s2s-secret
           alias: CCD_DEFINITION_STORE_S2S_SECRET
   environment:

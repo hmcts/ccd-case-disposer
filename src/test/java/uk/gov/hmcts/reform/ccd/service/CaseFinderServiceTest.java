@@ -39,6 +39,7 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA4_WITH
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA5_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_TODAY_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_MISSING_TTL_R102;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_R10;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_R100;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.LINKED_CASE_DATA_R101;
@@ -191,7 +192,7 @@ class CaseFinderServiceTest {
         final List<CaseData> linkedCases2 = List.of(LINKED_CASE_DATA_R11);
         final List<CaseData> linkedCases3 = List.of(LINKED_CASE_DATA_R12);
         final List<CaseData> linkedCases4 = List.of(LINKED_CASE_DATA_R10, LINKED_CASE_DATA_R11);
-        final List<CaseData> linkedCases5 = List.of(LINKED_CASE_DATA_R101);
+        final List<CaseData> linkedCases5 = List.of(LINKED_CASE_DATA_R101, LINKED_CASE_DATA_MISSING_TTL_R102);
         final List<CaseData> linkedCases6 = List.of(LINKED_CASE_DATA_R10);
         final List<CaseData> linkedCases7 = List.of(LINKED_CASE_DATA_R12);
         final List<CaseData> linkedCases8 = List.of(LINKED_CASE_DATA_R11, LINKED_CASE_DATA_R12);
@@ -229,8 +230,9 @@ class CaseFinderServiceTest {
 
                     assertThat(actualCaseIds)
                             .isNotEmpty()
-                            .hasSize(13)
-                            .hasSameElementsAs(List.of(1L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 91L, 92L, 100L, 101L, 1000L));
+                            .hasSize(14)
+                            .hasSameElementsAs(
+                                List.of(1L, 6L, 7L, 8L, 9L, 10L, 11L, 12L, 91L, 92L, 100L, 101L, 102L, 1000L));
                 });
     }
 
@@ -267,7 +269,7 @@ class CaseFinderServiceTest {
 
     @Test
     void testFindCasesDueDeletionShouldReturnEmpty() {
-        final List<CaseData> linkedCases = List.of(LINKED_CASE_DATA_R101);
+        final List<CaseData> linkedCases = List.of(LINKED_CASE_DATA_R101, LINKED_CASE_DATA_MISSING_TTL_R102);
         final CaseFamily caseFamily = new CaseFamily(DELETABLE_CASE_DATA5_WITH_PAST_TTL, linkedCases);
 
         final List<CaseFamily> deletableCaseFamilies = List.of(caseFamily);

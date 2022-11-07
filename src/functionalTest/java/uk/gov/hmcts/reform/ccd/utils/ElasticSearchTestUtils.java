@@ -61,7 +61,8 @@ public class ElasticSearchTestUtils {
                         .untilAsserted(() -> {
                             refreshIndex(indexName);
                             Thread.sleep(10000);
-                            final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
+                            final Optional<Long> actualCaseReference = findCaseByReference(indexName,
+                                    caseReference);
 
                             assertThat(actualCaseReference).isNotPresent();
                         });
@@ -122,7 +123,8 @@ public class ElasticSearchTestUtils {
 
                             refreshIndex(indexName);
                             Thread.sleep(10000);
-                            final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
+                            final Optional<Long> actualCaseReference = findCaseByReference(indexName,
+                                    caseReference);
 
                             assertThat(actualCaseReference)
                                     .isPresent()
@@ -170,5 +172,4 @@ public class ElasticSearchTestUtils {
         }
         return caseType;
     }
-
 }

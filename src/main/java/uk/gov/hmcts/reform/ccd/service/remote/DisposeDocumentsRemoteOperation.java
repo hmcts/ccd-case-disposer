@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -26,8 +27,8 @@ public class DisposeDocumentsRemoteOperation {
 
     @Autowired
     public DisposeDocumentsRemoteOperation(final RestClientBuilder restClientBuilder,
-                                      final ParameterResolver parameterResolver,
-                                      final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
+                                           final ParameterResolver parameterResolver,
+                                           final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
         this.restClientBuilder = restClientBuilder;
         this.parameterResolver = parameterResolver;
         this.documentDeletionRecordHolder = documentDeletionRecordHolder;
@@ -49,7 +50,6 @@ public class DisposeDocumentsRemoteOperation {
         } catch (final Exception ex) {
             final String errorMessage = String.format("Error deleting documents for case : %s", caseRef);
             log.error(errorMessage, ex);
-            Thread.currentThread().interrupt();
             throw new DocumentDeletionException(errorMessage, ex);
         }
     }
@@ -57,19 +57,27 @@ public class DisposeDocumentsRemoteOperation {
 
     private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
                                       final String documentsDeleteResponse) {
+        try {
+            final CaseDocumentsDeletionResults documentsDeletionResults =
+                    gson.fromJson(documentsDeleteResponse, CaseDocumentsDeletionResults.class);
 
-        final CaseDocumentsDeletionResults documentsDeletionResults =
-                gson.fromJson(documentsDeleteResponse, CaseDocumentsDeletionResults.class);
+            documentDeletionRecordHolder.setCaseDocumentsDeletionResults(documentsDeleteRequest.getCaseRef(),
+                    documentsDeletionResults);
 
-        documentDeletionRecordHolder.setCaseDocumentsDeletionResults(documentsDeleteRequest.getCaseRef(),
-                documentsDeletionResults);
+            final String message = getLogMessage(documentsDeletionResults);
 
-        final String message = getLogMessage(documentsDeletionResults);
+            log.info(message + "Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
+                    documentsDeleteRequest.getCaseRef(),
+                    documentsDeletionResults.getCaseDocumentsFound(),
+                    documentsDeletionResults.getMarkedForDeletion());
 
-        log.info(message + "Case Ref = {} - Documents found = {} - Documented Marked for deletion = {}",
-                documentsDeleteRequest.getCaseRef(),
-                documentsDeletionResults.getCaseDocumentsFound(),
-                documentsDeletionResults.getMarkedForDeletion());
+        } catch (final JsonParseException jsonParseException) {
+            final String errorMessage = "Unable to map json to object document deletion endpoint response due"
+                    + " to following endpoint response: ".concat(documentsDeleteResponse);
+            log.error(errorMessage);
+            throw new DocumentDeletionException(errorMessage);
+        }
+
     }
 
     private String getLogMessage(final CaseDocumentsDeletionResults documentsDeletionResults) {

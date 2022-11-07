@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.parameter;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.exception.DuplicateCaseTypeException;
 
@@ -8,6 +9,7 @@ import javax.annotation.PostConstruct;
 
 import static java.util.stream.Collectors.toList;
 
+@Slf4j
 @Configuration
 public class DeletableCaseTypePropertyInterceptor {
 
@@ -28,6 +30,8 @@ public class DeletableCaseTypePropertyInterceptor {
                 .collect(toList());
 
         if (!duplicateCaseTypes.isEmpty()) {
+            log.error("Found duplicate deletable case type in "
+                    + "application.yaml: " + duplicateCaseTypes);
             throw new DuplicateCaseTypeException("Found duplicate deletable case type in "
                     + "application.yaml: " + duplicateCaseTypes);
         }
