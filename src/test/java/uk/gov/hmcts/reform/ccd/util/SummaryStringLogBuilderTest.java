@@ -1,30 +1,43 @@
 package uk.gov.hmcts.reform.ccd.util;
 
 import org.junit.jupiter.api.Test;
-import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY_SIMULATION;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 
 class SummaryStringLogBuilderTest {
 
     @Test
     void shouldReturnDeletionSummaryString() {
-        final List<CaseFamily> deletableCaseFamily = asList(DELETABLE_CASE_FAMILY);
+        final CaseDataView caseDataView1 = new CaseDataView(null, 333L, DELETED_STATE, Arrays.asList(111L, 456L));
+        final CaseDataView caseDataView = new CaseDataView(null, 111L, DELETED_STATE, new ArrayList<>());
 
-        final List<CaseFamily> simulationCaseFamily = asList(DELETABLE_CASE_FAMILY_SIMULATION);
+        final CaseDataView caseDataView2 = new CaseDataView(null, 222L, SIMULATED_STATE, Arrays.asList(111L));
+        final CaseDataView caseDataView3 = new CaseDataView(null, 111L, SIMULATED_STATE, new ArrayList<>());
+
+        final CaseDataView caseDataView4 = new CaseDataView(null, 444L, FAILED_STATE, Arrays.asList(555L));
+        final CaseDataView caseDataView5 = new CaseDataView(null, 555L, FAILED_STATE, new ArrayList<>());
+
+        final List<CaseDataView> caseDataViews = Arrays.asList(caseDataView, caseDataView1, caseDataView2,
+                caseDataView3, caseDataView4, caseDataView5);
+
 
         final SummaryStringLogBuilder summaryStringLogBuilder = new SummaryStringLogBuilder();
         final String buildSummaryString = summaryStringLogBuilder
-                .buildSummaryString(deletableCaseFamily, simulationCaseFamily, 1, 7);
+                .buildSummaryString(caseDataViews, 1, 1);
 
-        assertThat(buildSummaryString).contains("Case Disposer Deletion Summary 1 of 7");
-        assertThat(buildSummaryString).contains("Total cases : 7");
-        assertThat(buildSummaryString).contains("Simulated cases : 3");
-        assertThat(buildSummaryString).contains("Deleted cases : 4");
+        assertThat(buildSummaryString).contains("Case Disposer Deletion Summary 1 of 1");
+
+        assertThat(buildSummaryString).contains("Total cases : 6");
+        assertThat(buildSummaryString).contains("Deleted cases : 2");
+        assertThat(buildSummaryString).contains("Simulated cases : 2");
+        assertThat(buildSummaryString).contains("Failed cases : 2");
     }
 }

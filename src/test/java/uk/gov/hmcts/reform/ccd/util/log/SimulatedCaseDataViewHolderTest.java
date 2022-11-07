@@ -13,8 +13,10 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY_SIMULATION;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 
-class CaseDataViewHolderTest {
+class SimulatedCaseDataViewHolderTest {
 
     @Test
     void shouldGetSimulationCaseIdsOnly() {
@@ -23,17 +25,17 @@ class CaseDataViewHolderTest {
 
         final List<CaseDataView> caseDataViews = new ArrayList<>();
 
-        new CaseDataViewBuilder().buildCaseDataViewList(deletableCaseFamily, caseDataViews, true);
-        new CaseDataViewBuilder().buildCaseDataViewList(simulationCaseFamily, caseDataViews, false);
+        new CaseDataViewBuilder().buildCaseDataViewList(deletableCaseFamily, caseDataViews, DELETED_STATE);
+        new CaseDataViewBuilder().buildCaseDataViewList(simulationCaseFamily, caseDataViews, SIMULATED_STATE);
 
-        final CaseDataViewHolder caseDataViewHolder = new CaseDataViewHolder();
-        caseDataViewHolder.setUpData(caseDataViews);
+        final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder = new SimulatedCaseDataViewHolder();
+        simulatedCaseDataViewHolder.setUpData(caseDataViews);
 
         final Set<Long> expectedIds = Sets.newHashSet(DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getId(),
                 DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(0).getId(),
                 DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(1).getId());
 
-        assertThat(caseDataViewHolder.getSimulatedCaseIds())
+        assertThat(simulatedCaseDataViewHolder.getSimulatedCaseIds())
                 .isNotNull()
                 .containsExactlyInAnyOrderElementsOf(expectedIds);
     }

@@ -50,7 +50,6 @@ public class DisposeDocumentsRemoteOperation {
         } catch (final Exception ex) {
             final String errorMessage = String.format("Error deleting documents for case : %s", caseRef);
             log.error(errorMessage, ex);
-            Thread.currentThread().interrupt();
             throw new DocumentDeletionException(errorMessage, ex);
         }
     }
@@ -73,8 +72,10 @@ public class DisposeDocumentsRemoteOperation {
                     documentsDeletionResults.getMarkedForDeletion());
 
         } catch (final JsonParseException jsonParseException) {
-            throw new DocumentDeletionException("Unable to map json to object document deletion endpoint response due"
-                    + " to following endpoint response: ".concat(documentsDeleteResponse));
+            final String errorMessage = "Unable to map json to object document deletion endpoint response due"
+                    + " to following endpoint response: ".concat(documentsDeleteResponse);
+            log.error(errorMessage);
+            throw new DocumentDeletionException(errorMessage);
         }
 
     }

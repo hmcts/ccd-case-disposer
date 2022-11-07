@@ -120,6 +120,7 @@ public class CaseFamilyTreeService {
                                         entity.getId(),
                                         entity.getReference(),
                                         entity.getCaseType(),
+                                        entity.getJurisdiction(),
                                         entity.getResolvedTtl(),
                                         linkedEntities.getFamilyId(),
                                         caseNode
@@ -176,6 +177,7 @@ public class CaseFamilyTreeService {
                 caseNode.getId(),
                 caseNode.getReference(),
                 caseNode.getCaseType(),
+                caseNode.getJurisdiction(),
                 caseNode.getResolvedTtl(),
                 caseNode.getId(),
                 null

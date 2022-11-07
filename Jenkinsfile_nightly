@@ -2,7 +2,8 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 05 * * *')]),
+  //CCD-3539 (Stop running Nightly builds on weekends). Original schedule was 'H 05 * * *'
+  pipelineTriggers([cron('H 05 * * 1-5')]),
   parameters([
     string(name: 'SecurityRules',
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
@@ -49,6 +50,7 @@ GradleBuilder builder = new GradleBuilder(this, product)
 withNightlyPipeline(type, product, component) {
   // Set required environment variables to run functional tests apart from one in vaults.
   env.ELASTIC_SEARCH_ENABLED = true
+  env.LOG_AND_AUDIT_ENABLED = true
   env.DATA_STORE_DB_PORT = '5432'
   env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
   env.DATA_STORE_DB_HOST = 'ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com'
@@ -57,6 +59,7 @@ withNightlyPipeline(type, product, component) {
   env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
   env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
   env.DEFINITION_STORE_HOST = 'http://ccd-definition-store-api-aat.service.core-compute-aat.internal'
+  env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
   env.Rules = params.SecurityRules
 
   loadVaultSecrets(secrets)
