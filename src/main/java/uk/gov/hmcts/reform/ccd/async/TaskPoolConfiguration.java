@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.concurent;
+package uk.gov.hmcts.reform.ccd.async;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
