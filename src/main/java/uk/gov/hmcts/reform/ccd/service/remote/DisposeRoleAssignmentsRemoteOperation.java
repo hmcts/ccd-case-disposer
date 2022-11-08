@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
@@ -52,9 +53,7 @@ public class DisposeRoleAssignmentsRemoteOperation {
 
                 final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
 
-                final Response roleAssignmentsDeleteResponse = restClientBuilder
-                    .postRequestWithAllHeaders(parameterResolver.getRoleAssignmentsHost(),
-                                               DELETE_ROLE_PATH, requestDeleteBody);
+                final Response roleAssignmentsDeleteResponse = deleteRoleAssignment(requestDeleteBody);
 
                 logRoleAssignmentsDisposal(caseRef, roleAssignmentsDeleteResponse);
                 roleAssignmentsDeleteResponse.close();
@@ -105,5 +104,12 @@ public class DisposeRoleAssignmentsRemoteOperation {
 
     private void logRoleAssignmentsDisposal(final String caseRef, final Response roleAssignmentsDeleteResponse) {
         roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef, roleAssignmentsDeleteResponse.getStatus());
+    }
+
+    @Async
+    Response deleteRoleAssignment(final String requestDeleteBody) {
+        return restClientBuilder
+                .postRequestWithAllHeaders(parameterResolver.getRoleAssignmentsHost(),
+                        DELETE_ROLE_PATH, requestDeleteBody);
     }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.data;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
@@ -19,4 +20,6 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
     @Query("FROM CaseLinkEntity WHERE linked_case_id IN :queryLinkedCases")
     List<CaseLinkEntity> findAllByLinkedCaseId(@Param("queryLinkedCases") final List<Long> linkedCaseIds);
 
+    @Async
+    void delete(CaseLinkEntity caseLinkEntity);
 }

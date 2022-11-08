@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
@@ -13,9 +14,12 @@ import java.util.Optional;
 public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> {
 
     @Query("SELECT c FROM CaseDataEntity c WHERE c.resolvedTtl < CURRENT_DATE "
-        + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")
+            + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")
     List<CaseDataEntity> findExpiredCases(@Param("queryCaseTypes") List<String> queryCaseTypes);
 
     @Query("SELECT c FROM CaseDataEntity c WHERE c.reference = :queryCaseReference")
     Optional<CaseDataEntity> findByReference(@Param("queryCaseReference") Long queryCaseReference);
+
+    @Async
+    void delete(final CaseDataEntity caseDataEntity);
 }

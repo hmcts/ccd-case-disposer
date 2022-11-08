@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.with;
 
 @Component
 public class DatabaseIntegrationTestUtils {
@@ -33,14 +34,17 @@ public class DatabaseIntegrationTestUtils {
     }
 
     public void verifyDatabaseDeletion(final List<Long> rowIds) {
-        final List<CaseDataEntity> all = caseDataRepository.findAll();
-        final List<Long> actualRowIds = all.stream()
-                .map(CaseDataEntity::getId)
-                .collect(Collectors.toUnmodifiableList());
+        with().await()
+                .untilAsserted(() -> {
+                    final List<CaseDataEntity> all = caseDataRepository.findAll();
+                    final List<Long> actualRowIds = all.stream()
+                            .map(CaseDataEntity::getId)
+                            .collect(Collectors.toUnmodifiableList());
 
-        assertThat(actualRowIds)
-                .isNotNull()
-                .containsExactlyInAnyOrderElementsOf(rowIds);
+                    assertThat(actualRowIds)
+                            .isNotNull()
+                            .containsExactlyInAnyOrderElementsOf(rowIds);
+                });
     }
 
     public void insertDataIntoDatabase(final String scriptPath) throws SQLException {
