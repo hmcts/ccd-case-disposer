@@ -85,4 +85,51 @@ class CaseFamiliesFilterTest {
         assertThat(deletableCasesOnly.get(0).getLinkedCases().get(1).getCaseType())
                 .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(1).getCaseType());
     }
+
+    @Test
+    void shouldFilterUndeletbaleFromDeletableCases() {
+        final List<CaseFamily> caseFamilies = asList(DELETABLE_CASE_FAMILY,
+                DELETABLE_CASE_FAMILY_SIMULATION);
+
+        final List<List<Long>> failedToDeleteCaseRefs = of(of(1L, 4L), of(7L, 8L, 9L));
+
+        final List<CaseFamily> successfulCaseFamilies = caseFamiliesFilter
+                .filterSuccessfulCaseFamiliesByCaseRef(caseFamilies, failedToDeleteCaseRefs);
+
+        assertThat(successfulCaseFamilies.size()).isEqualTo(1);
+        assertThat(successfulCaseFamilies.get(0).getRootCase().getId()).isEqualTo(30L);
+        assertThat(successfulCaseFamilies.get(0).getRootCase().getReference()).isEqualTo(30L);
+
+        assertThat(successfulCaseFamilies.get(0).getLinkedCases().get(0).getId()).isEqualTo(30L);
+        assertThat(successfulCaseFamilies.get(0).getLinkedCases().get(0).getReference()).isEqualTo(30L);
+
+        assertThat(successfulCaseFamilies.get(0).getLinkedCases().get(1).getId()).isEqualTo(31L);
+        assertThat(successfulCaseFamilies.get(0).getLinkedCases().get(1).getReference()).isEqualTo(31L);
+    }
+
+    @Test
+    void shouldNotFilterCases() {
+        final List<CaseFamily> caseFamilies = asList(DELETABLE_CASE_FAMILY,
+                DELETABLE_CASE_FAMILY_SIMULATION);
+
+        final List<List<Long>> failedToDeleteCaseRefs = of(of(5L, 6L), of(7L, 8L, 9L));
+
+        final List<CaseFamily> successfulCaseFamilies = caseFamiliesFilter
+                .filterSuccessfulCaseFamiliesByCaseRef(caseFamilies, failedToDeleteCaseRefs);
+
+        assertThat(successfulCaseFamilies.size()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldFilterAllCases() {
+        final List<CaseFamily> caseFamilies = asList(DELETABLE_CASE_FAMILY,
+                DELETABLE_CASE_FAMILY_SIMULATION);
+
+        final List<List<Long>> failedToDeleteCaseRefs = of(of(1L, 4L), of(30L, 31L));
+
+        final List<CaseFamily> successfulCaseFamilies = caseFamiliesFilter
+                .filterSuccessfulCaseFamiliesByCaseRef(caseFamilies, failedToDeleteCaseRefs);
+
+        assertThat(successfulCaseFamilies.size()).isEqualTo(0);
+    }
 }

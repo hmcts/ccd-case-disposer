@@ -23,8 +23,38 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.name.pattern}")
     private String casesIndexNamePattern;
 
+    @Value("${elasticsearch.global.search.index.name}")
+    private String globalSearchIndexName;
+
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
+
+    @Value("${ccd.case-definition.host}")
+    private String caseDefinitionHost;
+
+    @Value("${idam.api.username}")
+    private String idamApiUsername;
+
+    @Value("${idam.api.password}")
+    private String idamApiPassword;
+
+    @Value("${ccd.document.store.host}")
+    private String documentStoreHost;
+
+    @Value("${ccd.role.assignment.host}")
+    private String roleAssignmentHost;
+
+    @Value("${ccd.log.and.audit.host}")
+    private String logAndAuditHost;
+
+    @Value("${log.and.audit.enabled}")
+    private Boolean isLogAndAuditEnabled;
+
+    @Value("${ccd.role.assignment.check-case-roles-exist}")
+    private Boolean checkCaseRolesExist;
+
+    @Value("${app.insights.log.size}")
+    private Integer appInsightsLogSize;
 
     @Override
     public List<String> getElasticsearchHosts() {
@@ -44,8 +74,27 @@ public class TestParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
+    }
+
+    @Override
     public String getCasesIndexType() {
         return casesIndexType;
+    }
+
+    public String getCaseDefinitionHost() {
+        return caseDefinitionHost;
+    }
+
+    @Override
+    public String getIdamUsername() {
+        return idamApiUsername;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return idamApiPassword;
     }
 
     @Override
@@ -74,5 +123,35 @@ public class TestParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(toUnmodifiableList());
+    }
+
+    @Override
+    public String getDocumentStoreHost() {
+        return documentStoreHost;
+    }
+
+    @Override
+    public String getRoleAssignmentsHost() {
+        return roleAssignmentHost;
+    }
+
+    @Override
+    public String getLogAndAuditHost() {
+        return logAndAuditHost;
+    }
+
+    @Override
+    public Boolean getCheckCaseRolesExist() {
+        return checkCaseRolesExist;
+    }
+
+    @Override
+    public Integer getAppInsightsLogSize() {
+        return appInsightsLogSize;
+    }
+
+    @Override
+    public Boolean isLogAndAuditEnabled() {
+        return isLogAndAuditEnabled;
     }
 }

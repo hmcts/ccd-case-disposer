@@ -9,6 +9,8 @@ public interface ParameterResolver {
 
     String getCasesIndexNamePattern();
 
+    String getGlobalSearchIndexName();
+
     String getCasesIndexType();
 
     List<String> getDeletableCaseTypes();
@@ -16,4 +18,22 @@ public interface ParameterResolver {
     List<String> getDeletableCaseTypesSimulation();
 
     List<String> getAllDeletableCaseTypes();
+
+    String getCaseDefinitionHost();
+
+    String getIdamUsername();
+
+    String getIdamPassword();
+
+    String getDocumentStoreHost();
+
+    String getRoleAssignmentsHost();
+
+    String getLogAndAuditHost();
+
+    Boolean getCheckCaseRolesExist();
+
+    Integer getAppInsightsLogSize();
+
+    Boolean isLogAndAuditEnabled();
 }

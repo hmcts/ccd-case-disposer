@@ -5,7 +5,8 @@
   {
     "fileMatch": ["\\Chart.yaml$"],
     "aliases": {
-      "hmctspublic": "https://hmctspublic.azurecr.io/helm/v1/repo/"
+      "hmctspublic": "https://hmctspublic.azurecr.io/helm/v1/repo/",
+      "elasticpublic": "https://helm.elastic.co"
     }
   }
 }

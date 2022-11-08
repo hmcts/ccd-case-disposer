@@ -23,11 +23,38 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
+    @Value("${elasticsearch.global.search.index.name}")
+    private String globalSearchIndexName;
+
+    @Value("${idam.api.username}")
+    private String idamApiUsername;
+
+    @Value("${idam.api.password}")
+    private String idamApiPassword;
+
     @Value("#{'${deletable.case.types}'.split(',')}")
     private List<String> deletableCaseTypes;
 
     @Value("#{'${simulated.case.types}'.split(',')}")
     private List<String> deletableCaseTypeSimulation;
+
+    @Value("${ccd.document.store.host}")
+    private String documentStoreHost;
+
+    @Value("${ccd.role.assignment.host}")
+    private String roleAssignmentHost;
+
+    @Value("${ccd.log.and.audit.host}")
+    private String logAndAuditHost;
+
+    @Value("${log.and.audit.enabled}")
+    private Boolean isLogAndAuditEnabled;
+
+    @Value("${ccd.role.assignment.check-case-roles-exist}")
+    private Boolean checkCaseRolesExist;
+
+    @Value("${app.insights.log.size}")
+    private Integer appInsightsLogSize;
 
     @Override
     public List<String> getElasticsearchHosts() {
@@ -52,6 +79,27 @@ public class DefaultParameterResolver implements ParameterResolver {
     }
 
     @Override
+    public String getGlobalSearchIndexName() {
+        return globalSearchIndexName;
+    }
+
+    @Override
+    public String getCaseDefinitionHost() {
+        return null;
+    }
+
+    @Override
+    public String getIdamUsername() {
+        return idamApiUsername;
+    }
+
+    @Override
+    public String getIdamPassword() {
+        return idamApiPassword;
+    }
+
+
+    @Override
     public List<String> getDeletableCaseTypes() {
         return deletableCaseTypes.stream()
                 .map(quotedItem -> quotedItem.replace("\"", "").strip())
@@ -69,5 +117,35 @@ public class DefaultParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getDocumentStoreHost() {
+        return documentStoreHost;
+    }
+
+    @Override
+    public Boolean getCheckCaseRolesExist() {
+        return checkCaseRolesExist;
+    }
+
+    @Override
+    public String getRoleAssignmentsHost() {
+        return roleAssignmentHost;
+    }
+
+    @Override
+    public String getLogAndAuditHost() {
+        return logAndAuditHost;
+    }
+
+    @Override
+    public Integer getAppInsightsLogSize() {
+        return appInsightsLogSize;
+    }
+
+    @Override
+    public Boolean isLogAndAuditEnabled() {
+        return isLogAndAuditEnabled;
     }
 }

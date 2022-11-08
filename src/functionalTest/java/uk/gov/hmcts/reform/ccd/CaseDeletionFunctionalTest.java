@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -24,13 +25,13 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @BeforeAll
     static void setup() {
-        Awaitility.setDefaultPollInterval(1, TimeUnit.SECONDS);
+        Awaitility.setDefaultPollInterval(0, TimeUnit.MILLISECONDS);
         Awaitility.setDefaultPollDelay(Duration.FIVE_SECONDS);
         Awaitility.setDefaultTimeout(30, TimeUnit.SECONDS);
     }
 
     @ParameterizedTest
-    @MethodSource("provideCaseDeletionScenarios")
+    @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenarios(final String deletableCaseTypes,
                        final String deletableCaseTypesSimulation,
                        final String scriptPath,
@@ -38,19 +39,23 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                        final Map<String, List<Long>> indexedData,
                        final List<Long> deletableEndStateRowIds,
                        final List<Long> simulatedEndStateRowIds,
+                       final Map<Long, List<String>> deletableDocuments,
+                       final Map<Long, List<String>> deletableRoles,
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
-        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, initialStateRowIds, indexedData);
+        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
+                initialStateRowIds, indexedData);
 
         // WHEN
         executor.execute();
 
         // THEN
-        verifyDatabaseDeletion(deletableEndStateRowIds);
+        verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
+        verifyDocumentDeletion(deletableDocuments);
+        verifyRoleDeletion(deletableRoles);
+        verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
-
-
 }
