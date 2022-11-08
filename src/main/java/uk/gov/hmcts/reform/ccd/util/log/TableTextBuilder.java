@@ -31,7 +31,7 @@ public class TableTextBuilder {
         final List<Object[]> rowData = new ArrayList<>();
 
         caseDataViews.forEach(caseDataView -> {
-            final Object[] caseDataFields = {caseDataView.getCaseType(), caseDataView.getCaseId().toString(),
+            final Object[] caseDataFields = {caseDataView.getCaseType(), caseDataView.getCaseRef().toString(),
                     caseDataView.getState(), caseDataView.getLinkedCaseIds()};
             rowData.add(caseDataFields);
         });

@@ -2,40 +2,26 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsDeletePostRequest;
+import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
-import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import javax.ws.rs.core.Response;
 
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_ROLE_PATH;
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;
 
 @Service
 @Slf4j
 @Qualifier("DisposeRoleAssignmentsRemoteOperation")
 public class DisposeRoleAssignmentsRemoteOperation {
-
-    private static final Logger logger = LoggerFactory.getLogger(DisposeDocumentsRemoteOperation.class);
-
-    private final SecurityUtil securityUtil;
-
-    private final HttpClient httpClient;
 
     private final ParameterResolver parameterResolver;
 
@@ -43,13 +29,13 @@ public class DisposeRoleAssignmentsRemoteOperation {
 
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
 
+    private final RestClientBuilder restClientBuilder;
+
     @Autowired
-    public DisposeRoleAssignmentsRemoteOperation(@Lazy final SecurityUtil securityUtil,
-                                                 @Qualifier("httpClientDispose") final HttpClient httpClient,
+    public DisposeRoleAssignmentsRemoteOperation(final RestClientBuilder restClientBuilder,
                                                  final ParameterResolver parameterResolver,
                                                  final RoleDeletionRecordHolder roleDeletionRecordHolder) {
-        this.securityUtil = securityUtil;
-        this.httpClient = httpClient;
+        this.restClientBuilder = restClientBuilder;
         this.parameterResolver = parameterResolver;
         this.roleDeletionRecordHolder = roleDeletionRecordHolder;
     }
@@ -57,47 +43,67 @@ public class DisposeRoleAssignmentsRemoteOperation {
     public void postRoleAssignmentsDelete(String caseRef) {
 
         try {
-            logger.info("Inside the Dispose Documents Remote Operation method");
+            if (!parameterResolver.getCheckCaseRolesExist()
+                ||
+                (parameterResolver.getCheckCaseRolesExist() && hasRoleAssignments(caseRef))) {
 
-            String amCaseRoleAssignmentsDeleteUrl = parameterResolver.getRoleAssignmentsHost() + DELETE_ROLE_PATH;
+                final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+                    new RoleAssignmentsPostRequest(caseRef);
 
-            RoleAssignmentsDeletePostRequest roleAssignmentsDeleteRequest =
-                new RoleAssignmentsDeletePostRequest(caseRef);
+                final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
 
-            String requestBody = gson.toJson(roleAssignmentsDeleteRequest);
+                final Response roleAssignmentsDeleteResponse = restClientBuilder
+                    .postRequestWithAllHeaders(parameterResolver.getRoleAssignmentsHost(),
+                                               DELETE_ROLE_PATH, requestDeleteBody);
 
-            HttpResponse<String> roleAssignmentsDeleteResponse =
-                postDisposeRequest(amCaseRoleAssignmentsDeleteUrl, requestBody);
+                logRoleAssignmentsDisposal(caseRef, roleAssignmentsDeleteResponse);
+                roleAssignmentsDeleteResponse.close();
+            }
 
-            logRoleAssignmentsDisposal(caseRef, roleAssignmentsDeleteResponse);
-
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             final String errorMessage = String.format("Error deleting role assignments for case : %s", caseRef);
             log.error(errorMessage, ex);
-            Thread.currentThread().interrupt();
             throw new RoleAssignmentDeletionException(errorMessage, ex);
         }
-
     }
 
-    private HttpResponse<String> postDisposeRequest(String url, String body) throws IOException, InterruptedException {
+    private boolean hasRoleAssignments(String caseRef) {
 
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(url))
-            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
-            .header(AUTHORISATION_HEADER, securityUtil.getIdamClientToken())
-            .POST(HttpRequest.BodyPublishers.ofString(body))
-            .build();
+        final RoleAssignmentsPostRequest roleAssignmentsQueryRequest =
+            new RoleAssignmentsPostRequest(caseRef);
 
-        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
 
+        final Response roleAssignmentsQueryResponse = restClientBuilder
+            .postRequestWithRoleAssignmentFetchContentType(parameterResolver.getRoleAssignmentsHost(),
+                                                           QUERY_ROLE_PATH, requestQueryBody);
+
+        if (roleAssignmentsQueryResponse.getStatus() == HttpStatus.OK.value()) {
+            RoleAssignmentsPostResponse roleAssignmentsResponse =
+                roleAssignmentsQueryResponse.readEntity(RoleAssignmentsPostResponse.class);
+
+            if (!CollectionUtils.isEmpty(roleAssignmentsResponse.getRoleAssignmentResponse())
+            ) {
+                log.info("Found {} role(s) for case : {}, calling AM role(s) delete endpoint to remove.",
+                         roleAssignmentsResponse.getRoleAssignmentResponse().size(), caseRef);
+                roleAssignmentsQueryResponse.close();
+                return true;
+
+            } else {
+                log.info("No roles found for case : {}, skipping AM roles delete endpoint.", caseRef);
+                logRoleAssignmentsDisposal(caseRef, roleAssignmentsQueryResponse);
+                roleAssignmentsQueryResponse.close();
+                return false;
+            }
+
+        } else {
+            logRoleAssignmentsDisposal(caseRef, roleAssignmentsQueryResponse);
+            roleAssignmentsQueryResponse.close();
+            throw new RoleAssignmentDeletionException("Unable to get case assignment roles.");
+        }
     }
 
-    private void logRoleAssignmentsDisposal(String caseRef, HttpResponse<String> roleAssignmentsDeleteResponse) {
-
-        roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef, roleAssignmentsDeleteResponse.statusCode());
-
+    private void logRoleAssignmentsDisposal(final String caseRef, final Response roleAssignmentsDeleteResponse) {
+        roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef, roleAssignmentsDeleteResponse.getStatus());
     }
-
 }

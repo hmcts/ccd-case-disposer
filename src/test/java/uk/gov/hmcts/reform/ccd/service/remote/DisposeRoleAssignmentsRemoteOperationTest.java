@@ -1,46 +1,42 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
+import com.google.gson.Gson;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
+import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
+import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
-import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
-import java.io.IOException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.util.Collections;
+import java.util.UUID;
+import javax.ws.rs.core.Response;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_ROLE_PATH;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;
 
 @DisplayName("dispose case role assignments")
 @ExtendWith(MockitoExtension.class)
 class DisposeRoleAssignmentsRemoteOperationTest {
 
-    @Captor
-    ArgumentCaptor<HttpRequest> captor;
-
     @Mock
-    private HttpClient httpClient;
-
-    @Mock
-    private SecurityUtil securityUtil;
+    private RestClientBuilder restClientBuilder;
 
     @Mock
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
@@ -53,34 +49,156 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    @DisplayName("should post role assignment delete remote dispose request")
-    void shouldPostRoleAssignmentsDeleteRemoteDisposeRequest() throws IOException, InterruptedException {
+    @DisplayName("should post role assignment delete remote dispose request without query")
+    void shouldPostRoleAssignmentsDeleteRemoteDisposeRequest() {
 
-        doReturn("http://localhost")
-            .when(parameterResolver).getRoleAssignmentsHost();
+        final Gson gson = new Gson();
+        final Response response = mock(Response.class);
 
-        doReturn("Bearer 1234567890").when(securityUtil).getIdamClientToken();
-        doReturn("Bearer 12345").when(securityUtil).getServiceAuthorization();
+        final String caseRef = "1234567890123456";
+        final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+            new RoleAssignmentsPostRequest(caseRef);
 
-        HttpResponse httpResponse = mock(HttpResponse.class);
+        doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+        doReturn(false).when(parameterResolver).getCheckCaseRolesExist();
 
-        when(httpClient.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenReturn(httpResponse);
+        when(response.getStatus()).thenReturn(200);
 
-        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete("1234567890123456");
+        final String requestBody = gson.toJson(roleAssignmentsDeleteRequest);
 
-        verify(httpClient).send(captor.capture(), any());
+        when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestBody)).thenReturn(response);
 
-        assertThat(captor.getValue().uri().getPath(), is(equalTo("/am/role-assignments/query/delete")));
-        assertThat(captor.getValue().headers().map().size(), is(equalTo(3)));
-        assertThat(captor.getValue().headers().map().get("Authorization").get(0), is(equalTo("Bearer 1234567890")));
-        assertThat(captor.getValue().headers().map().get("ServiceAuthorization").get(0), is(equalTo("Bearer 12345")));
-        assertThat(captor.getValue().headers().map().get("Content-Type").get(0), is(equalTo("application/json")));
+        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
 
-        HttpRequest.BodyPublisher bodyPublisher = captor.getValue().bodyPublisher().get();
-        assertThat(bodyPublisher.contentLength(), is(equalTo(66L)));
-
-        verify(roleDeletionRecordHolder, times(1))
-            .setCaseRolesDeletionResults(eq("1234567890123456"), anyInt());
+        verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
+                                                                               200);
+        verify(restClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost",
+                                                                      DELETE_ROLE_PATH,
+                                                                      requestBody);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    @DisplayName("should post role assignment delete remote dispose request with query")
+    void shouldPostRoleAssignmentsDeleteRemoteDisposeRequestAfterQuery() {
+
+        final Gson gson = new Gson();
+        final Response dResponse = mock(Response.class);
+        final Response qResponse = mock(Response.class);
+
+        final String caseRef = "1234567890123456";
+        final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+            new RoleAssignmentsPostRequest(caseRef);
+
+        final RoleAssignmentsPostRequest roleAssignmentsQueryRequest =
+            new RoleAssignmentsPostRequest(caseRef);
+
+        RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
+        QueryResponse queryResponse = new QueryResponse();
+        queryResponse.setId(UUID.randomUUID());
+        roleAssignmentsResponse.setRoleAssignmentResponse(Collections.singletonList(queryResponse));
+
+        doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+        doReturn(true).when(parameterResolver).getCheckCaseRolesExist();
+
+        when(dResponse.getStatus()).thenReturn(200);
+        when(qResponse.getStatus()).thenReturn(200);
+        when(qResponse.readEntity(RoleAssignmentsPostResponse.class)).thenReturn(roleAssignmentsResponse);
+
+        final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
+        final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
+
+        when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestDeleteBody)).thenReturn(dResponse);
+        when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
+
+        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+
+        verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
+                                                                               200);
+        verify(restClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost",
+                                                                      DELETE_ROLE_PATH,
+                                                                      requestDeleteBody);
+        verify(restClientBuilder, times(1)).postRequestWithRoleAssignmentFetchContentType("http://localhost",
+                                                                      QUERY_ROLE_PATH,
+                                                                      requestQueryBody);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    @DisplayName("should skip post role assignment delete if no roles found")
+    void shouldSkipPostRoleAssignmentsDeleteRemoteDisposeRequestIfNoRolesFound() {
+
+        final Gson gson = new Gson();
+        final Response qResponse = mock(Response.class);
+
+        final String caseRef = "1234567890123456";
+        final RoleAssignmentsPostRequest roleAssignmentsQueryRequest =
+            new RoleAssignmentsPostRequest(caseRef);
+
+        RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
+        roleAssignmentsResponse.setRoleAssignmentResponse(Collections.EMPTY_LIST);
+
+        doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+        doReturn(true).when(parameterResolver).getCheckCaseRolesExist();
+
+        when(qResponse.getStatus()).thenReturn(200);
+        when(qResponse.readEntity(RoleAssignmentsPostResponse.class)).thenReturn(roleAssignmentsResponse);
+
+        final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
+
+        when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
+
+        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+
+        verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
+                                                                               200);
+        verify(restClientBuilder, times(0)).postRequestWithAllHeaders(eq("http://localhost"),
+                                                                      eq(DELETE_ROLE_PATH),
+                                                                      anyString());
+        verify(restClientBuilder, times(1)).postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"),
+                                                                      eq(QUERY_ROLE_PATH),
+                                                                      eq(requestQueryBody));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenQueryRequestInvalid() {
+        try {
+            final Response response = mock(Response.class);
+            final String caseRef = "1234567890123456";
+            doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+            doReturn(true).when(parameterResolver).getCheckCaseRolesExist();
+
+            when(response.getStatus()).thenReturn(500);
+
+            when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"), eq(QUERY_ROLE_PATH), anyString())).thenReturn(response);
+
+            disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+
+            fail("The method should have thrown DocumentDeletionException when request is invalid");
+        } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {
+            assertThat(roleAssignmentDeletionException.getMessage())
+                .isEqualTo("Error deleting role assignments for case : 1234567890123456");
+        }
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeleteRequestInvalid() {
+        try {
+            final String caseRef = "1234567890123456";
+            final String jsonRequest = new Gson().toJson(new RoleAssignmentsPostRequest("1234567890123456"));
+            doReturn("http://localhost").when(parameterResolver).getRoleAssignmentsHost();
+            doReturn(false).when(parameterResolver).getCheckCaseRolesExist();
+
+            doThrow(new RoleAssignmentDeletionException(caseRef))
+                    .when(restClientBuilder)
+                    .postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, jsonRequest);
+
+            disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+
+            fail("The method should have thrown DocumentDeletionException when request is invalid");
+        } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {
+            assertThat(roleAssignmentDeletionException.getMessage())
+                    .isEqualTo("Error deleting role assignments for case : 1234567890123456");
+        }
+    }
 }

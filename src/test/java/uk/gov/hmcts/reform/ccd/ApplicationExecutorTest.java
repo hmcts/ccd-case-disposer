@@ -47,7 +47,7 @@ class ApplicationExecutorTest {
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseFamiliesFilter).getDeletableCasesOnly(emptyList());
-        verify(caseDeletionResolver).simulateCaseDeletion(emptyList());
+        verify(caseDeletionResolver).logCaseDeletion(emptyList());
     }
 
     @Test
@@ -56,6 +56,7 @@ class ApplicationExecutorTest {
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
+                DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
                 DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
                 null
@@ -64,6 +65,7 @@ class ApplicationExecutorTest {
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getReference(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getCaseType(),
+                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getJurisdiction(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getResolvedTtl(),
                 DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
                 null
@@ -77,12 +79,12 @@ class ApplicationExecutorTest {
                 .when(caseFindingService).findCasesDueDeletion();
         doReturn(caseDataList)
                 .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).simulateCaseDeletion(anyList());
+        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList());
 
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(2)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).simulateCaseDeletion(anyList());
+        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList());
     }
 }

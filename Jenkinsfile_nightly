@@ -2,13 +2,101 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 05 * * *')])
+  //CCD-3539 (Stop running Nightly builds on weekends). Original schedule was 'H 05 * * *'
+  pipelineTriggers([cron('H 05 * * 1-5')]),
+  parameters([
+    string(name: 'SecurityRules',
+      defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
+      description: 'The URL you want to run these tests against'),
+  ])
 ])
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
+
 def type = "java"
 def product = "ccd"
-def component = "ccd-case-disposer"
+def component = "case-disposer"
 
-withNightlyPipeline(type, product, component) {}
+def secrets = [
+  'ccd-${env}': [
+    secret('idam-case-disposer-system-user-username', 'IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME'),
+    secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
+    secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
+    secret('ccd-case-disposer-s2s-secret', 'IDAM_KEY_CCD_CASE_DISPOSER'),
+    secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
+    secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
+    secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
+    secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
+    secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
+    secret('ccd-ELASTIC-SEARCH-URL', 'ELASTIC_SEARCH_HOSTS'),
+    secret('ccd-ELASTIC-SEARCH-DATA-NODES-URL', 'ELASTIC_SEARCH_DATA_NODES_HOSTS'),
+    secret('ccd-data-s2s-secret', 'IDAM_KEY_CCD_DATA_STORE')
+  ]
+]
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
+GradleBuilder builder = new GradleBuilder(this, product)
+
+withNightlyPipeline(type, product, component) {
+  // Set required environment variables to run functional tests apart from one in vaults.
+  env.ELASTIC_SEARCH_ENABLED = true
+  env.LOG_AND_AUDIT_ENABLED = true
+  env.DATA_STORE_DB_PORT = '5432'
+  env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
+  env.DATA_STORE_DB_HOST = 'ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com'
+  env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
+  env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
+  env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
+  env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
+  env.DEFINITION_STORE_HOST = 'http://ccd-definition-store-api-aat.service.core-compute-aat.internal'
+  env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
+  env.Rules = params.SecurityRules
+
+  loadVaultSecrets(secrets)
+  enableAksStagingDeployment()
+  disableLegacyDeployment()
+  nonServiceApp()
+  enableMutationTest()
+  enableFullFunctionalTest()
+  enableSlackNotifications('#lau-builds')
+  enableFortifyScan()
+
+  after('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  }
+
+  after('mutationTest') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+  }
+
+  after('securityScan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+  }
+
+  before('fullFunctionalTest') {
+    echo "Loading the secrets"
+    loadVaultSecrets(secrets)
+
+    // Execute functional tests
+    echo "Just waiting a while to ensure that the pod has run the job"
+    sh "sleep 30s"
+    echo "Verifying that functional test run correctly"
+    try {
+      builder.gradle('functional')
+      //builder.gradleWithOutput('functional')
+    } finally {
+      junit '**/test-results/**/*.xml'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/test-results/**'
+    }
+  }
+}

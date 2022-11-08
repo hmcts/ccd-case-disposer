@@ -1,0 +1,24 @@
+{
+  "roleRequest" : {
+    "assignerId" : "787f8cea-955e-4458-b8ac-e8680827b29b",
+    "process" : "CCD",
+    "reference" : "1616494770099124/787f8cea-955e-4458-b8ac-e0000000k29k",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [ {
+    "roleType" : "CASE",
+    "grantType" : "SPECIFIC",
+    "classification" : "RESTRICTED",
+    "attributes": {
+      "caseId": "1004259907353529",
+      "jurisdiction": "IA",
+      "caseType": "Asylum"
+    },
+    "roleName" : "[PETSOLICITOR]",
+    "roleCategory" : "PROFESSIONAL",
+    "actorIdType" : "IDAM",
+    "actorId" : "787f8cea-955e-4458-b8ac-e0000000k29k",
+    "authorisations": ["QA"]
+  }
+  ]
+}

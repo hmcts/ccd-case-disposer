@@ -23,6 +23,8 @@ public class CaseDataEntity {
     private Long reference;
     @Column(name = "case_type_id", nullable = false)
     private String caseType;
+    @Column(name = "jurisdiction", nullable = false)
+    private String jurisdiction;
     @Column(name = "resolved_ttl")
     private LocalDate resolvedTtl;
 }

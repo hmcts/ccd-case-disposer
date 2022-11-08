@@ -6,6 +6,23 @@ job:
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
   concurrencyPolicy: Forbid
+  environment:
+    APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
+    DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+    DATA_STORE_DB_PORT: 5432
+    DATA_STORE_DB_NAME: ccd_data_store
+    DATA_STORE_DB_USERNAME: hmcts
+    DATA_STORE_DB_PASSWORD: hmcts
+    DATA_STORE_DB_OPTIONS: "?sslmode=allow"
+    ELASTIC_SEARCH_ENABLED: true
+    LOG_AND_AUDIT_ENABLED: true
+    ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
+    ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+    DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+    DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
+    ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
+    IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
+    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
 global:
   jobKind: CronJob
 
@@ -13,12 +30,21 @@ elastic:
   enabled: true
 
 elasticsearch:
+  nameOverride: ${SERVICE_NAME}-es
+  ingressHost: es-${SERVICE_FQDN}
   clusterName: "es"
-  imageTag: "7.17.1"
+  imageTag: "7.11.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
+  extraEnvs:
+    - name: discovery.type
+      value: single-node
+    - name: cluster.initial_master_nodes
+      value: ""
+    - name: action.auto_create_index
+      value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
   persistence:
     enabled: false
   ingress:
@@ -28,32 +54,162 @@ elasticsearch:
     path: /
     hosts:
       - es-${SERVICE_FQDN}
-  environment:
-    action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
 
 logstash:
-  image:
-    repository: hmctspublic.azurecr.io/ccd/logstash
-    tag: latest
-    pullPolicy: IfNotPresent
-  logstashJavaOpts: -Xmx1g -Xms512M
-  persistence:
-    enabled: false
-  volumeMounts:
-    - name: pipeline
-      mountPath: /usr/share/logstash/files
-  elasticsearch:
-    host: ${SERVICE_NAME}-es-master
-    port: 9200
-  configTpl:
-    xpack.monitoring.enabled: "false"
-    db.url: jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/data-store?stringtype=unspecified&ssl=false
-    db.user: hmcts
-    db.pwd: hmcts
-    es.data.nodes.url: http://${SERVICE_NAME}-es-master:9200
-  livenessProbe:
-    initialDelaySeconds: 90
-
+  image: "hmctspublic.azurecr.io/imported/logstash/logstash"
+  imageTag: "7.16.1"
+  imagePullPolicy: "IfNotPresent"
+  logstashJavaOpts: "-Xmx1g -Xms512M"
+  extraInitContainers: |
+    - name: download-postgres-jdbc
+      image: hmctspublic.azurecr.io/curl:7.70.0
+      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
+      volumeMounts:
+      - name: logstash-lib
+        mountPath: /logstash-lib
+  extraVolumes: |
+    - name: logstash-lib
+      emptyDir: {}
+  extraVolumeMounts: |
+    - name: logstash-lib
+      mountPath: /usr/share/logstash/ccd
+  logstashConfig:
+    logstash.yml: |
+      http.host: 0.0.0.0
+      xpack.monitoring.enabled: false
+      xpack.monitoring.elasticsearch.hosts: ["http://${SERVICE_NAME}-es-master:9200"]
+      queue.type: persisted
+      dead_letter_queue.enable: true
+    pipelines.yml: |
+      - pipeline.id: main
+        path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
+        queue.type: persisted
+  logstashPipeline:
+    01_input.conf: |
+      input  {
+        jdbc {
+          jdbc_connection_string => "jdbc:postgresql://${SERVICE_NAME}-postgresql:5432/ccd_data_store?sslmode=allow"
+          jdbc_user => "hmcts"
+          jdbc_password => "hmcts"
+          jdbc_validate_connection => true
+          jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
+          jdbc_driver_class => "org.postgresql.Driver"
+          jdbc_default_timezone => "UTC"
+          statement => "UPDATE case_data SET marked_by_logstash = true WHERE marked_by_logstash = false RETURNING id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data"
+          clean_run => false
+          schedule => "* * * * * *"
+        }
+      }
+    02_filter.conf: |
+      filter{
+        json{
+            source => "json_data"
+            target => "data"
+            remove_field => ["json_data"]
+            }
+            json{
+                source => "json_supplementary_data"
+                target => "supplementary_data"
+                remove_field => ["json_supplementary_data"]
+            }
+            json{
+                source => "json_data_classification"
+                target => "data_classification"
+                remove_field => ["json_data_classification"]
+            }
+            if [data][SearchCriteria] {
+                clone {
+                    clones => ["SearchCriteria"]
+                }
+            }
+            if [type] == "SearchCriteria" {
+                if [data][SearchCriteria] {
+                    mutate {
+                      rename => {"[data][SearchCriteria]" => "[data_new][SearchCriteria]" }
+                    }
+                }
+                if [data][caseManagementLocation] {
+                    mutate {
+                      rename => {"[data][caseManagementLocation]" => "[data_new][caseManagementLocation]" }
+                    }
+                }
+                if [data][CaseAccessCategory] {
+                  mutate {
+                      rename => {"[data][CaseAccessCategory]" => "[data_new][CaseAccessCategory]" }
+                  }
+                }
+                if [data][caseNameHmctsInternal] {
+                    mutate {
+                      rename => {"[data][caseNameHmctsInternal]" => "[data_new][caseNameHmctsInternal]" }
+                    }
+                }
+                if [data][caseManagementCategory] {
+                    mutate {
+                      rename => {"[data][caseManagementCategory]" => "[data_new][caseManagementCategory]" }
+                    }
+                }
+                if [supplementary_data][HMCTSServiceId] {
+                    mutate {
+                      rename => {"[supplementary_data][HMCTSServiceId]" => "[supplementary_data_new][HMCTSServiceId]" }
+                    }
+                }
+                if [data_classification][SearchCriteria] {
+                    mutate {
+                      rename => {"[data_classification][SearchCriteria]" => "[data_classification_new][SearchCriteria]" }
+                    }
+                }
+                if [data_classification][CaseAccessCategory] {
+                  mutate {
+                        rename => {"[data_classification][CaseAccessCategory]" => "[data_classification_new][CaseAccessCategory]" }
+                  }
+                }
+                if [data_classification][caseManagementLocation] {
+                  mutate {
+                      rename => {"[data_classification][caseManagementLocation]" => "[data_classification_new][caseManagementLocation]" }
+                  }
+                }
+                if [data_classification][caseNameHmctsInternal] {
+                    mutate {
+                      rename => {"[data_classification][caseNameHmctsInternal]" => "[data_classification_new][caseNameHmctsInternal]" }
+                    }
+                }
+                if [data_classification][caseManagementCategory] {
+                    mutate {
+                      rename => {"[data_classification][caseManagementCategory]" => "[data_classification_new][caseManagementCategory]" }
+                    }
+                }
+                mutate { remove_field =>[ "data" ,"supplementary_data", "data_classification", "last_state_modified_date", "type","last_modified", "created_date" ] }
+                mutate {
+                        rename => { "[data_new]" => "data" }
+                        rename => { "[supplementary_data_new]"  => "supplementary_data" }
+                        rename => { "[data_classification_new]"  => "data_classification" }
+                }
+                mutate {
+                  add_field => { "index_id" => "global_search" }
+                }
+                mutate {
+                  lowercase => [ "index_id" ]
+                }
+            } else {
+                mutate {
+                    add_field => { "index_id" => "%{case_type_id}_cases" }
+              }
+            mutate {
+              lowercase => [ "index_id" ]
+            }
+            }
+      }
+    03_output.conf: |
+      output {
+          elasticsearch {
+              hosts => ["http://${SERVICE_NAME}-es-master:9200"]
+              sniffing => false
+              index => "%{[index_id]}"
+              document_type => "_doc"
+              document_id => "%{id}"
+              timeout => 120
+          }
+      }
 
 ccd:
   enabled: true
@@ -80,7 +236,7 @@ ccd:
   global:
     ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
     ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
-    ccdUserProfileUrl: http://ccd-user-profile-api-${SERVICE_FQDN}
+    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
@@ -88,6 +244,8 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
     enableKeyVaults: true
     devMode: true
+    postgresUsername: hmcts
+    postgresPassword: hmcts
 
   ccd-definition-store-api:
     java:
@@ -96,15 +254,29 @@ ccd:
       imagePullPolicy: Always
       environment:
         ELASTIC_SEARCH_ENABLED: true
-        ELASTIC_SEARCH_HOST: ${SERVICE_NAME}-es-master
+        ELASTIC_SEARCH_HOST: "${SERVICE_NAME}-es-master"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-        DEFINITION_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
-        DEFINITION_STORE_IDAM_KEY: ${CCD_DEFINITION_STORE_S2S_SECRET}
+        DEFINITION_STORE_DB_HOST: "${SERVICE_NAME}-postgresql"
+        DEFINITION_STORE_DB_NAME: ccd_definition_store
+        DEFINITION_STORE_DB_PORT: 5432
+        DEFINITION_STORE_DB_USE_SSL: "true"
+        DEFINITION_STORE_DB_OPTIONS: "?sslmode=allow"
+        DEFINITION_STORE_IDAM_KEY: "${CCD_DEFINITION_STORE_S2S_SECRET}"
+        WELSH_TRANSLATION_ENABLED: "false"
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         DEFINITION_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_document_am_api,ccd_case_disposer
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
       devmemoryRequests: "1024Mi"
       devmemoryLimits: "2048Mi"
+      keyVaults: [ ]
+
+  ccd-user-profile-api:
+    java:
+      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
+      imagePullPolicy: Always
+      environment:
+        USER_PROFILE_DB_HOST: "${SERVICE_NAME}-postgresql"
       keyVaults: [ ]
 
   ccd-data-store-api:
@@ -115,14 +287,17 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: ${SERVICE_NAME}-postgresql
+        DATA_STORE_DB_HOST: "${SERVICE_NAME}-postgresql"
+        DATA_STORE_DB_PORT: 5432
+        DATA_STORE_DB_NAME: "ccd_data_store"
+        DATA_STORE_DB_OPTIONS: "?sslmode=allow"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
-        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps
+        DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
         IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
         IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps
+        CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOSTS: ${SERVICE_NAME}-es-master:9200
         ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
@@ -132,17 +307,35 @@ ccd:
         DATA_STORE_DB_MAX_POOL_SIZE: 80
         CCD_DOCUMENT_URL_PATTERN: 'http://dm-store.*'
         CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
-        DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&ssl=disable&gssEncMode=disable"
         IDAM_DATA_STORE_SYSTEM_USER_USERNAME: ${IDAM_DATA_STORE_SYSTEM_USER_USERNAME}
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
+        ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
       keyVaults: [ ]
       autoscaling:
         enabled: false
 
   postgresql:
-    service:
-      type: LoadBalancer
-      annotations:
-        external-dns.alpha.kubernetes.io/hostname: postgresql-${SERVICE_FQDN}.
-        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    enabled: true
+    image:
+      tag: '11.16.0'
+    auth:
+      username: hmcts
+      password: hmcts
+    primary:
+      service:
+        ports:
+          postgresql: 5432
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
+          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+      initdb:
+        scripts:
+          init.sql: |-
+            CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+      persistence:
+        enabled: false

@@ -54,7 +54,7 @@ public class ApplicationExecutor {
             caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
         });
 
-        caseDeletionResolver.simulateCaseDeletion(caseFamiliesDueDeletion);
+        caseDeletionResolver.logCaseDeletion(caseFamiliesDueDeletion);
         log.info("Case-Disposer finished.");
     }
 
