@@ -38,6 +38,7 @@ class TaskPoolConfigurationTest {
     @Test
     void shouldCreateAsyncUncaughtExceptionHandler() {
         final TaskPoolConfiguration taskPoolConfiguration = new TaskPoolConfiguration();
-        assertThat(taskPoolConfiguration.getAsyncUncaughtExceptionHandler()).isInstanceOf(AsyncUncaughtExceptionHandler.class);
+        assertThat(taskPoolConfiguration.getAsyncUncaughtExceptionHandler())
+                .isInstanceOf(AsyncUncaughtExceptionHandler.class);
     }
 }
