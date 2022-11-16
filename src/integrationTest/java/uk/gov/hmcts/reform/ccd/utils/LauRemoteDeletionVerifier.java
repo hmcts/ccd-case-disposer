@@ -12,7 +12,7 @@ import javax.inject.Inject;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Component
-public class LauIntegrationTestUtils {
+public class LauRemoteDeletionVerifier implements RemoteDeletionVerifier {
 
     @Inject
     private LauRecordHolder lauRecordHolder;
@@ -20,7 +20,7 @@ public class LauIntegrationTestUtils {
     @Inject
     private ParameterResolver parameterResolver;
 
-    public void verifyLauLogs(final List<Long> caseRefs) {
+    public void verifyRemoteDeletion(final List<Long> caseRefs) {
         if (parameterResolver.isLogAndAuditEnabled()) {
             assertThat(lauRecordHolder.getLauCaseRefList())
                     .containsExactlyInAnyOrderElementsOf(Lists.transform(caseRefs, Functions.toStringFunction()));

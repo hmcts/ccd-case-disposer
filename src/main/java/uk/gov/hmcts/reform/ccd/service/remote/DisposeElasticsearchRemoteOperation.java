@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.config.es;
+package uk.gov.hmcts.reform.ccd.service.remote;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
@@ -9,19 +9,24 @@ import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.index.reindex.ScrollableHitSource;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.config.es.GlobalSearchIndexChecker;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.remote.DisposeRemoteOperation;
 
 import java.io.IOException;
 import java.util.List;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-@Named
+@Service
 @Slf4j
-public class CaseDataElasticsearchOperations {
+@Order(value = 3)
+public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperation {
     private static final String CASE_REFERENCE_FIELD = "reference";
     private static final String SEARCH_FAILURES = "Search failures occurred";
     private static final String ELASTICSEARCH_FAILURES = "Elasticsearch operation failures occurred";
@@ -31,24 +36,25 @@ public class CaseDataElasticsearchOperations {
     private GlobalSearchIndexChecker globalSearchIndexChecker;
 
     @Inject
-    public CaseDataElasticsearchOperations(final RestHighLevelClient elasticsearchClient,
-                                           final ParameterResolver parameterResolver,
-                                           final GlobalSearchIndexChecker globalSearchIndexChecker) {
+    public DisposeElasticsearchRemoteOperation(final RestHighLevelClient elasticsearchClient,
+                                               final ParameterResolver parameterResolver,
+                                               final GlobalSearchIndexChecker globalSearchIndexChecker) {
         this.elasticsearchClient = elasticsearchClient;
         this.parameterResolver = parameterResolver;
         this.globalSearchIndexChecker = globalSearchIndexChecker;
     }
 
-    public void deleteByReference(final String caseIndex, final Long caseReference) {
-        final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(caseIndex,
-                caseReference);
+    @Override
+    public void delete(final CaseData caseData) {
+        final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(getIndex(caseData.getCaseType()),
+                caseData.getReference());
 
         deleteByQueryRequest(caseIndexDeleteRequest);
 
         if (globalSearchIndexChecker.isGlobalSearchExist()) {
             final DeleteByQueryRequest globalSearchIndexDeleteRequest =
                     buildDeleteByQueryRequest(parameterResolver.getGlobalSearchIndexName(),
-                            caseReference);
+                            caseData.getReference());
             deleteByQueryRequest(globalSearchIndexDeleteRequest);
         }
     }
@@ -94,5 +100,9 @@ public class CaseDataElasticsearchOperations {
     private <T> void throwError(final String message, final List<T> list) {
         log.error("{}:: {}", message, list);
         throw new ElasticsearchOperationException(message);
+    }
+
+    private String getIndex(final String caseType) {
+        return String.format(parameterResolver.getCasesIndexNamePattern(), caseType).toLowerCase();
     }
 }

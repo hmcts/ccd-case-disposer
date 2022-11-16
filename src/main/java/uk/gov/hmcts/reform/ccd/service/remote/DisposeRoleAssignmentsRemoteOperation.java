@@ -3,13 +3,14 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
@@ -21,8 +22,8 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;
 
 @Service
 @Slf4j
-@Qualifier("DisposeRoleAssignmentsRemoteOperation")
-public class DisposeRoleAssignmentsRemoteOperation {
+@Order(value = 2)
+public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOperation {
 
     private final ParameterResolver parameterResolver;
 
@@ -41,8 +42,9 @@ public class DisposeRoleAssignmentsRemoteOperation {
         this.roleDeletionRecordHolder = roleDeletionRecordHolder;
     }
 
-    public void postRoleAssignmentsDelete(String caseRef) {
-
+    @Override
+    public void delete(final CaseData caseData) {
+        final String caseRef = caseData.getReference().toString();
         try {
             if (!parameterResolver.getCheckCaseRolesExist()
                 ||
