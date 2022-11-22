@@ -5,6 +5,7 @@ import com.google.gson.JsonParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
@@ -40,10 +41,7 @@ public class DisposeDocumentsRemoteOperation {
 
             final String requestBody = gson.toJson(documentsDeleteRequest);
 
-            final String documentsDeleteResponse = restClientBuilder
-                    .postRequestWithServiceAuthHeader(parameterResolver.getDocumentStoreHost(),
-                            DELETE_DOCUMENT_PATH,
-                            requestBody);
+            final String documentsDeleteResponse = postDocument(requestBody);
 
             logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse);
 
@@ -86,5 +84,13 @@ public class DisposeDocumentsRemoteOperation {
             return "Case Documents Deletion ANOMALY: ";
         }
         return "Case Documents Deletion CONFIRMATION: ";
+    }
+
+    @Async
+    String postDocument(final String requestBody) {
+        return restClientBuilder
+                .postRequestWithServiceAuthHeader(parameterResolver.getDocumentStoreHost(),
+                        DELETE_DOCUMENT_PATH,
+                        requestBody);
     }
 }
