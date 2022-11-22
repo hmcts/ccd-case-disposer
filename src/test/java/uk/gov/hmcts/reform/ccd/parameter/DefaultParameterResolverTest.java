@@ -30,6 +30,13 @@ class DefaultParameterResolverTest {
     private static final String DOCUMENT_STORE_HOST = "documentStoreHost";
     private static final String ROLE_ASSIGNMENT_HOST = "roleAssignmentHost";
 
+    private static final String THREAD_MAX_POOL_SIZE = "threadMaxPoolSize";
+
+    private static final String THREAD_CORE_POOL_SIZE = "threadCorePoolSize";
+
+    private static final String THREAD_QUEUE_CAPACITY = "threadQueueCapacity";
+
+
     private static final String ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST = "checkCaseRolesExist";
 
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
@@ -66,6 +73,15 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST, true);
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                THREAD_MAX_POOL_SIZE, 10);
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                THREAD_CORE_POOL_SIZE, 5);
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                THREAD_QUEUE_CAPACITY, 200);
     }
 
     @Test
@@ -150,6 +166,27 @@ class DefaultParameterResolverTest {
     void shouldGetCorrectValueForGetCheckCaseRolesExist() {
         assertThat(defaultParameterResolver.getCheckCaseRolesExist(),
                    is(equalTo(Boolean.TRUE)));
+    }
+
+    @Test
+    @DisplayName("should get correct value for threadQueueCapacity")
+    void shouldGetCorrectValueForGetThreadQueueCapacity() {
+        assertThat(defaultParameterResolver.getThreadQueueCapacity(),
+                is(equalTo(200)));
+    }
+
+    @Test
+    @DisplayName("should get correct value for threadCorePoolSize")
+    void shouldGetCorrectValueForGetThreadCorePoolSize() {
+        assertThat(defaultParameterResolver.getThreadCorePoolSize(),
+                is(equalTo(5)));
+    }
+
+    @Test
+    @DisplayName("should get correct value for threadMaxPoolSize")
+    void shouldGetCorrectValueForGetThreadMaxPoolSize() {
+        assertThat(defaultParameterResolver.getThreadMaxPoolSize(),
+                is(equalTo(10)));
     }
 
 }
