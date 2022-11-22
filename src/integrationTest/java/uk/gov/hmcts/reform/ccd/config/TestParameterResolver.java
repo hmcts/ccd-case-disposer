@@ -48,6 +48,15 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${app.insights.log.size}")
     private Integer appInsightsLogSize;
 
+    @Value("${thread.max_pool_size}")
+    private Integer threadMaxPoolSize;
+
+    @Value("${thread.core_pool_size}")
+    private Integer threadCorePoolSize;
+
+    @Value("${thread.queue_capacity}")
+    private Integer threadQueueCapacity;
+
     @Override
     public Integer getElasticsearchRequestTimeout() {
         return elasticsearchRequestTimeout;
@@ -147,6 +156,21 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public Boolean isLogAndAuditEnabled() {
         return isLogAndAuditEnabled;
+    }
+
+    @Override
+    public Integer getThreadMaxPoolSize() {
+        return threadMaxPoolSize;
+    }
+
+    @Override
+    public Integer getThreadCorePoolSize() {
+        return threadCorePoolSize;
+    }
+
+    @Override
+    public Integer getThreadQueueCapacity() {
+        return threadQueueCapacity;
     }
 
 }

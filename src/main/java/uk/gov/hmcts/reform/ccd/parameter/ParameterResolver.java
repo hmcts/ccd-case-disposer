@@ -36,4 +36,10 @@ public interface ParameterResolver {
     Integer getAppInsightsLogSize();
 
     Boolean isLogAndAuditEnabled();
+
+    Integer getThreadMaxPoolSize();
+
+    Integer getThreadCorePoolSize();
+
+    Integer getThreadQueueCapacity();
 }

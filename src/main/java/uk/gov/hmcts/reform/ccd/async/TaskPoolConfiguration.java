@@ -8,18 +8,19 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import uk.gov.hmcts.reform.ccd.exception.CaseDisposerAsyncException;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
+import javax.inject.Inject;
 
 @Configuration
 @EnableAsync
 @Slf4j
 public class TaskPoolConfiguration implements AsyncConfigurer {
 
-    private static final int MAX_POOL_SIZE = 10;
-    private static final int CORE_POOL_SIZE = 5;
-    private static final int QUEUE_CAPACITY = 200;
+    @Inject
+    private ParameterResolver parameterResolver;
 
     @Bean
     @Override
@@ -32,9 +33,9 @@ public class TaskPoolConfiguration implements AsyncConfigurer {
         log.info("Creating Async Task Executor");
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
-        executor.setMaxPoolSize(MAX_POOL_SIZE);
-        executor.setCorePoolSize(CORE_POOL_SIZE);
-        executor.setQueueCapacity(QUEUE_CAPACITY);
+        executor.setMaxPoolSize(parameterResolver.getThreadMaxPoolSize());
+        executor.setCorePoolSize(parameterResolver.getThreadCorePoolSize());
+        executor.setQueueCapacity(parameterResolver.getThreadQueueCapacity());
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setThreadNamePrefix("Case-Deletion-thread-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
