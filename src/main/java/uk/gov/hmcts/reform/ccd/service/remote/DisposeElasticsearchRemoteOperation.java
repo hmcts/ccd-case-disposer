@@ -9,13 +9,11 @@ import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
 import org.elasticsearch.index.reindex.ScrollableHitSource;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.config.es.GlobalSearchIndexChecker;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
-import uk.gov.hmcts.reform.ccd.service.remote.DisposeRemoteOperation;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,7 +23,6 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 @Slf4j
-@Order(value = 3)
 public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperation {
     private static final String CASE_REFERENCE_FIELD = "reference";
     private static final String SEARCH_FAILURES = "Search failures occurred";

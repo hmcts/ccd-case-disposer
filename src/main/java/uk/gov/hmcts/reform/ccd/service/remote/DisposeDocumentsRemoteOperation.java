@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
@@ -18,7 +17,6 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 
 @Service
 @Slf4j
-@Order(value = 1)
 public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     private final ParameterResolver parameterResolver;

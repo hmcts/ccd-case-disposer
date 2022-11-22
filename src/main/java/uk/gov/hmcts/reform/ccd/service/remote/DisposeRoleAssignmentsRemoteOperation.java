@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;
 
 @Service
 @Slf4j
-@Order(value = 2)
 public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOperation {
 
     private final ParameterResolver parameterResolver;
