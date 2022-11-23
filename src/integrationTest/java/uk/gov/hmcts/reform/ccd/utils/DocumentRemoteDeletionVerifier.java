@@ -12,12 +12,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
 
 @Component
-public class DocumentDeleteIntegrationTestUtils {
+public class DocumentRemoteDeletionVerifier implements RemoteDeletionVerifier {
 
     @Inject
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
-    public void verifyDocumentStoreDeletion(final List<Long> caseRefDeletedDocuments) {
+    public void verifyRemoteDeletion(final List<Long> caseRefDeletedDocuments) {
         caseRefDeletedDocuments.forEach(caseRef -> {
             final CaseDocumentsDeletionResults caseDocumentsDeletionMocks =
                     DOCUMENT_DELETE.get(Long.toString(caseRef));

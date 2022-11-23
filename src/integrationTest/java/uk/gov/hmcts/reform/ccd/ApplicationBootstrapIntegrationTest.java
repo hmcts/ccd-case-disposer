@@ -6,10 +6,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ApplicationConfiguration;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
-import uk.gov.hmcts.reform.ccd.config.es.CaseDataElasticsearchOperations;
 import uk.gov.hmcts.reform.ccd.config.es.GlobalSearchIndexChecker;
 import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.remote.DisposeElasticsearchRemoteOperation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         ParameterResolver.class,
         ApplicationConfiguration.class,
         ElasticsearchConfiguration.class,
-        CaseDataElasticsearchOperations.class,
+        DisposeElasticsearchRemoteOperation.class,
         GlobalSearchIndexChecker.class}
 )
 @ActiveProfiles("test")

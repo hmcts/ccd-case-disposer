@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
@@ -47,6 +48,8 @@ class DisposeDocumentsRemoteOperationTest {
         doReturn("http://localhost").when(parameterResolver).getDocumentStoreHost();
     }
 
+    final CaseData caseData = CaseData.builder().reference(1234567890123456L).build();
+
     @Test
     void shouldPostDocumentsDeleteRemoteDisposeRequestWithoutAnomaly() {
 
@@ -55,7 +58,7 @@ class DisposeDocumentsRemoteOperationTest {
 
         when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest)).thenReturn(jsonResponse);
 
-        disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
+        disposeDocumentsRemoteOperation.delete(caseData);
 
         verify(documentDeletionRecordHolder, times(1)).setCaseDocumentsDeletionResults(eq("1234567890123456"),
                 any(CaseDocumentsDeletionResults.class));
@@ -72,7 +75,7 @@ class DisposeDocumentsRemoteOperationTest {
                     .postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH,
                             jsonRequest);
 
-            disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
+            disposeDocumentsRemoteOperation.delete(caseData);
 
             fail("The method should have thrown DocumentDeletionException when request is invalid");
         } catch (final DocumentDeletionException documentDeletionException) {
@@ -95,7 +98,7 @@ class DisposeDocumentsRemoteOperationTest {
             when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest))
                     .thenReturn(jsonResponse);
 
-            disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
+            disposeDocumentsRemoteOperation.delete(caseData);
 
             fail("The method should have thrown JsonParseException when request is invalid");
         } catch (final DocumentDeletionException documentDeletionException) {

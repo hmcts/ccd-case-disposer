@@ -10,6 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
@@ -47,6 +48,8 @@ class DisposeRoleAssignmentsRemoteOperationTest {
     @InjectMocks
     private DisposeRoleAssignmentsRemoteOperation disposeRoleAssignmentsRemoteOperation;
 
+    final CaseData caseData = CaseData.builder().reference(1234567890123456L).build();
+
     @Test
     @SuppressWarnings("unchecked")
     @DisplayName("should post role assignment delete remote dispose request without query")
@@ -68,7 +71,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
         when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestBody)).thenReturn(response);
 
-        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+        disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
                                                                                200);
@@ -111,7 +114,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestDeleteBody)).thenReturn(dResponse);
         when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
 
-        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+        disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
                                                                                200);
@@ -148,7 +151,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
         when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
 
-        disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+        disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
                                                                                200);
@@ -172,7 +175,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
             when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"), eq(QUERY_ROLE_PATH), anyString())).thenReturn(response);
 
-            disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+            disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
             fail("The method should have thrown DocumentDeletionException when request is invalid");
         } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {
@@ -193,7 +196,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
                     .when(restClientBuilder)
                     .postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, jsonRequest);
 
-            disposeRoleAssignmentsRemoteOperation.postRoleAssignmentsDelete(caseRef);
+            disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
             fail("The method should have thrown DocumentDeletionException when request is invalid");
         } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {

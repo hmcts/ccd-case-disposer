@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
@@ -17,8 +17,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 
 @Service
 @Slf4j
-@Qualifier("DisposeDocumentsRemoteOperation")
-public class DisposeDocumentsRemoteOperation {
+public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     private final ParameterResolver parameterResolver;
 
@@ -35,9 +34,11 @@ public class DisposeDocumentsRemoteOperation {
         this.documentDeletionRecordHolder = documentDeletionRecordHolder;
     }
 
-    public void postDocumentsDelete(final String caseRef) {
+    @Override
+    public void delete(final CaseData caseData) {
         try {
-            final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
+            final DocumentsDeletePostRequest documentsDeleteRequest =
+                    new DocumentsDeletePostRequest(caseData.getReference().toString());
 
             final String requestBody = gson.toJson(documentsDeleteRequest);
 
@@ -46,7 +47,8 @@ public class DisposeDocumentsRemoteOperation {
             logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse);
 
         } catch (final Exception ex) {
-            final String errorMessage = String.format("Error deleting documents for case : %s", caseRef);
+            final String errorMessage = String.format("Error deleting documents for case : %s",
+                    caseData.getReference().toString());
             log.error(errorMessage, ex);
             throw new DocumentDeletionException(errorMessage, ex);
         }
