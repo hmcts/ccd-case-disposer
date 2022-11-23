@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.with;
 
 @Component
 public class DatabaseTestUtils {
@@ -34,18 +35,22 @@ public class DatabaseTestUtils {
 
     public void verifyDatabaseDeletion(final List<Long> initialRowIds,
                                        final List<Long> endStateRows) {
-        final List<Long> databaseEndStateRowIds = new ArrayList<>();
-        initialRowIds.forEach(item -> {
-            Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findByReference(item);
-            if (caseDataToDelete.isPresent()) {
-                databaseEndStateRowIds.add(caseDataToDelete.get().getReference());
-            }
-        });
+        with().await()
+                .untilAsserted(() -> {
+                    final List<Long> databaseEndStateRowIds = new ArrayList<>();
+                    initialRowIds.forEach(item -> {
+                        Optional<CaseDataEntity> caseDataToDelete = caseDataRepository.findByReference(item);
+                        if (caseDataToDelete.isPresent()) {
+                            databaseEndStateRowIds.add(caseDataToDelete.get().getReference());
+                        }
+                    });
 
-        assertThat(databaseEndStateRowIds.size())
-                .isEqualTo(endStateRows.size());
-        assertThat(databaseEndStateRowIds).containsExactlyInAnyOrderElementsOf(endStateRows);
+                    assertThat(databaseEndStateRowIds.size())
+                            .isEqualTo(endStateRows.size());
+                    assertThat(databaseEndStateRowIds).containsExactlyInAnyOrderElementsOf(endStateRows);
+                });
     }
+
 
     public void insertDataIntoDatabase(final String scriptPath) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
