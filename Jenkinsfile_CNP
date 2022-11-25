@@ -84,14 +84,14 @@ def uploadCoreCaseDataDefinitions(env) {
 }
 
 withPipeline(type, product, component) {
-  after('test') {
+  afterAlways('test') {
     // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
 
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
 
-  after('test') {
+  afterAlways('test') {
     builder.gradle('integration')
   }
 
@@ -137,7 +137,7 @@ withPipeline(type, product, component) {
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
   }
 
-  after('akschartsinstall') {
+  afterAlways('akschartsinstall') {
     // Set required environment variables to run functional tests apart from one in vaults.
     env.ELASTIC_SEARCH_ENABLED = true
     env.LOG_AND_AUDIT_ENABLED = true
@@ -174,7 +174,7 @@ withPipeline(type, product, component) {
     }
   }
 
-  after('functionalTest:preview') {
+  afterAlways('functionalTest:preview') {
     junit 'build/test-results/functional/**/*.xml'
     archiveArtifacts 'build/reports/tests/functional/index.html'
 
@@ -188,7 +188,7 @@ withPipeline(type, product, component) {
     ]
   }
 
-  after('functionalTest:aat') {
+  afterAlways('functionalTest:aat') {
     junit 'build/test-results/functional/**/*.xml'
     archiveArtifacts 'build/reports/tests/functional/index.html'
 
