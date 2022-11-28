@@ -34,9 +34,11 @@ ccd-data:
   name: ccd_data
   secret: ${IDAM_KEY_CCD_DATA_STORE:AAAAAAAAAAAAAAAB}
 
-ccd.case-definition.host: ${DEFINITION_STORE_HOST:http://localhost:4451}
-ccd.document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
-ccd.role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
+ccd:
+  case-definition.host: ${DEFINITION_STORE_HOST:http://localhost:4451}
+  document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
+  role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
+  tasks.host: ${ROLE_ASSIGNMENT_HOST:}
 
 create.global.search: ${CREATE_GLOBAL_SEARCH:true}
 

@@ -39,6 +39,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${ccd.log.and.audit.host}")
     private String logAndAuditHost;
 
+    @Value("${ccd.tasks.host}")
+    private String tasksHost;
+
     @Value("${log.and.audit.enabled}")
     private Boolean isLogAndAuditEnabled;
 
@@ -141,6 +144,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getLogAndAuditHost() {
         return logAndAuditHost;
+    }
+
+    @Override
+    public String getTasksHost() {
+        return tasksHost;
     }
 
     @Override
