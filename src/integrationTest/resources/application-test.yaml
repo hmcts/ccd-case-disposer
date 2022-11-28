@@ -58,6 +58,8 @@ ccd:
     check-case-roles-exist: true
   log.and.audit:
     host: http://localhost:4603
+  tasks:
+    host: http://localhost:4603
 
 app.insights.log.size: 250
 log.and.audit.enabled: true
