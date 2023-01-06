@@ -9,6 +9,18 @@
     <cve>CVE-2016-1000027</cve>
     <cve>CVE-2021-37533</cve>
   </suppress>
+  <suppress>
+    <packageUrl regex="true">^pkg:maven/org.glassfish.hk2/hk2-utils@.*$</packageUrl>
+    <cve>CVE-2021-4277</cve>
+  </suppress>
+  <suppress>
+    <packageUrl regex="true">^pkg:maven/org.latencyutils/LatencyUtils@.*$</packageUrl>
+    <cve>CVE-2021-4277</cve>
+  </suppress>
+  <suppress>
+    <packageUrl regex="true">^pkg:maven/com.massisframework/j-text-utils@.*$</packageUrl>
+    <cve>CVE-2021-4277</cve>
+  </suppress>
   <!--End of false positives section -->
 
 </suppressions>
