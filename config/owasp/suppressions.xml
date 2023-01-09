@@ -21,6 +21,10 @@
     <packageUrl regex="true">^pkg:maven/com.massisframework/j-text-utils@.*$</packageUrl>
     <cve>CVE-2021-4277</cve>
   </suppress>
+  <suppress>
+    <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
+    <cpe>cpe:/a:yaml_project:yaml</cpe>
+  </suppress>
   <!--End of false positives section -->
 
 </suppressions>
