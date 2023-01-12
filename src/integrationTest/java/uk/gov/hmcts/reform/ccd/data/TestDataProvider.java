@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.ccd.data;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.ccd.config.WireMockStubs;
 import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseIntegrationTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchIntegrationTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.RoleDeleteIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.RemoteDeletionVerifier;
 import uk.gov.hmcts.reform.ccd.utils.SimulationIntegrationTestUtils;
 
 import java.util.List;
@@ -28,11 +28,8 @@ public class TestDataProvider extends TestContainers {
     @Inject
     private DatabaseIntegrationTestUtils databaseIntegrationTestUtils;
 
-    @Inject
-    private DocumentDeleteIntegrationTestUtils documentDeleteIntegrationTestUtils;
-
-    @Inject
-    private RoleDeleteIntegrationTestUtils roleDeleteIntegrationTestUtils;
+    @Autowired
+    private List<RemoteDeletionVerifier> remoteDeletionVerifiers;
 
     @Inject
     private WireMockStubs wireMockStubs;
@@ -70,12 +67,9 @@ public class TestDataProvider extends TestContainers {
         simulationIntegrationTestUtils.verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
 
-    protected void verifyDocumentDeletion(final List<Long> documentDeletionCaseRefs) {
-        documentDeleteIntegrationTestUtils.verifyDocumentStoreDeletion(documentDeletionCaseRefs);
-    }
-
-    protected void verifyRoleDeletion(final List<Long> roleDeletionCaseRefs) {
-        roleDeleteIntegrationTestUtils.verifyRoleAssignmentDeletion(roleDeletionCaseRefs);
+    protected void verifyRemoteDeletion(final List<Long> caseRefs) {
+        remoteDeletionVerifiers.forEach(remoteDeletionVerifier ->
+                remoteDeletionVerifier.verifyRemoteDeletion(caseRefs));
     }
 
     private void setDeletableCaseTypes(final String value) {

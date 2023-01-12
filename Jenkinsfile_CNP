@@ -3,6 +3,9 @@
 @Library("Infrastructure")
 
 import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.Kubectl
+import uk.gov.hmcts.contino.GithubAPI
+import uk.gov.hmcts.pipeline.TeamConfig
 
 def type = "java"
 def product = "ccd"
@@ -17,6 +20,7 @@ def secrets = [
           secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
           secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
           secret('ccd-case-disposer-s2s-secret', 'IDAM_KEY_CCD_CASE_DISPOSER'),
+          secret('ccd-data-s2s-secret', 'IDAM_KEY_CCD_DATA_STORE'),
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
           secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
           secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
@@ -35,10 +39,8 @@ def prSecrets = [
           secret('idam-case-disposer-system-user-password', 'IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD'),
           secret('idam-case-disposer-client-secret', 'IDAM_CASE_DISPOSER_CLIENT_SECRET'),
           secret('ccd-case-disposer-s2s-secret', 'IDAM_KEY_CCD_CASE_DISPOSER'),
+          secret('ccd-data-s2s-secret', 'IDAM_KEY_CCD_DATA_STORE'),
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
-          secret('case-disposer-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
-          secret('case-disposer-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
-          secret('case-disposer-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
           secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
           secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
           secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET')
@@ -82,14 +84,14 @@ def uploadCoreCaseDataDefinitions(env) {
 }
 
 withPipeline(type, product, component) {
-  after('test') {
+  afterAlways('test') {
     // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
 
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
 
-  after('test') {
+  afterAlways('test') {
     builder.gradle('integration')
   }
 
@@ -101,41 +103,67 @@ withPipeline(type, product, component) {
   onPR() {
     echo "Loading PR secrets"
     loadVaultSecrets(prSecrets)
-    env.ENV='preview'
-    env.CREATE_GLOBAL_SEARCH=true
+    env.ENV = 'preview'
+    env.CREATE_GLOBAL_SEARCH = true
+    env.LOG_AND_AUDIT_ENABLED = true
+    env.DATA_STORE_DB_USERNAME = "hmcts"
+    env.DATA_STORE_DB_PASSWORD = "hmcts"
+    env.DATA_STORE_DB_NAME = "ccd_data_store"
+    env.DATA_STORE_DB_OPTIONS = '?sslmode=allow'
+    env.DATA_STORE_DB_PORT = '5432'
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    env.DEFINITION_STORE_HOST = "http://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    env.DATA_STORE_DB_HOST = "ccd-data-store-api-staging-postgres-db-v11-aat.postgres.database.azure.com"
+    env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+    env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
+
+    def githubApi = new GithubAPI(this)
+    if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
+      enableCleanupOfHelmReleaseOnSuccess()
+    }
   }
 
   onNonPR() {
     echo "Loading secrets"
     loadVaultSecrets(secrets)
-    env.ENV='aat'
+    env.ENV = 'aat'
+    env.DATA_STORE_DB_PORT = '5432'
+    env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
     env.DATA_STORE_DB_HOST = "ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
+    env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
   }
 
-  after('akschartsinstall') {
+  afterAlways('akschartsinstall') {
     // Set required environment variables to run functional tests apart from one in vaults.
     env.ELASTIC_SEARCH_ENABLED = true
-    env.DATA_STORE_DB_PORT = '5432'
-    env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
+    env.LOG_AND_AUDIT_ENABLED = true
     env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
     env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
+    env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
 
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
     // Load the CCD definitions here:
     // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)
+
+    // If preview set DB LB IP Address
+    if("preview" == env.ENV){
+      withAksClient('nonprod', product) {
+        def subscription = env.SUBSCRIPTION_NAME
+        def namespace = new TeamConfig(this).getNameSpace(product)
+        def kubectl = new Kubectl(this, subscription, namespace)
+        kubectl.login()
+        String postgresInstanceName = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql"
+        env.DATA_STORE_DB_HOST = kubectl.getServiceLoadbalancerIP(postgresInstanceName)
+      }
+    }
 
     // Execute functional tests
     echo "Verifying that functional test run correctly"
@@ -146,7 +174,7 @@ withPipeline(type, product, component) {
     }
   }
 
-  after('functionalTest:preview') {
+  afterAlways('functionalTest:preview') {
     junit 'build/test-results/functional/**/*.xml'
     archiveArtifacts 'build/reports/tests/functional/index.html'
 
@@ -160,7 +188,7 @@ withPipeline(type, product, component) {
     ]
   }
 
-  after('functionalTest:aat') {
+  afterAlways('functionalTest:aat') {
     junit 'build/test-results/functional/**/*.xml'
     archiveArtifacts 'build/reports/tests/functional/index.html'
 

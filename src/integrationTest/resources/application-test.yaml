@@ -5,6 +5,9 @@ spring:
   flyway:
     locations: classpath:db/migration
     enabled: true
+    out-ofrder: true
+    ignore-missing-migrations: true
+    baseline-version: 0001
 
 flyway:
   noop:
@@ -20,14 +23,14 @@ elasticsearch:
   hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:4578"}
   global.search.index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
 
-deletable.case.types: ${DELETE_CASE_TYPES:"deletable_case_type,bbb,ccc"}
-simulated.case.types: ${SIMULATED_CASE_TYPES:"deletable_case_type_simulation,ttt,yyy"}
+deletable.case.types: "deletable_case_type,bbb,ccc"
+simulated.case.types: "deletable_case_type_simulation,ttt,yyy"
 
 idam:
   api:
     url: http://localhost:4603
-    username: case.disposer.idam.system.user@gmail.com
-    password: Pa55word11
+    username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:}
   s2s-auth:
     name: ccd_case_disposer
     url: http://localhost:4603
@@ -45,7 +48,21 @@ application-insights:
 
 azure:
   application-insights:
-    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:"Test"}
+    instrumentation-key: appinsights_key
 
-ccd.document.store.host: http://localhost:4603
-ccd.role.assignment.host: http://localhost:4603
+ccd:
+  document.store:
+    host: http://localhost:4603
+  role.assignment:
+    host: http://localhost:4603
+    check-case-roles-exist: true
+  log.and.audit:
+    host: http://localhost:4603
+
+app.insights.log.size: 250
+log.and.audit.enabled: true
+
+thread:
+  max_pool_size: ${THREAD_MAX_POOL_SIZE:10}
+  core_pool_size: ${THREAD_CORE_POOL_SIZE:5}
+  queue_capacity: ${THREAD_QUEUE_CAPACITY:200}

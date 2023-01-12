@@ -28,12 +28,14 @@ class TtlRetentionPolicyImplTest {
     }
 
     @Test
-    void testShouldRaiseNullPointerExceptionWhenDateIsNull() {
+    void testShouldReturnTrueWhenDateIsNull() {
         // GIVEN
-        final CaseData caseData = new CaseData(2L, 2L, DELETABLE_CASE_TYPE, null, 2L, null);
+        final CaseData caseData = new CaseData(2L, 2L, DELETABLE_CASE_TYPE,null, null, 2L, null);
 
         // WHEN/THEN
-        assertThatNullPointerException().isThrownBy(() -> underTest.mustRetain(caseData));
+        assertThat(underTest.mustRetain(caseData))
+            .isNotNull()
+            .isTrue();
     }
 
     @ParameterizedTest

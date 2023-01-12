@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
@@ -46,6 +48,8 @@ class DisposeDocumentsRemoteOperationTest {
         doReturn("http://localhost").when(parameterResolver).getDocumentStoreHost();
     }
 
+    final CaseData caseData = CaseData.builder().reference(1234567890123456L).build();
+
     @Test
     void shouldPostDocumentsDeleteRemoteDisposeRequestWithoutAnomaly() {
 
@@ -54,7 +58,7 @@ class DisposeDocumentsRemoteOperationTest {
 
         when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest)).thenReturn(jsonResponse);
 
-        disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
+        disposeDocumentsRemoteOperation.delete(caseData);
 
         verify(documentDeletionRecordHolder, times(1)).setCaseDocumentsDeletionResults(eq("1234567890123456"),
                 any(CaseDocumentsDeletionResults.class));
@@ -71,12 +75,36 @@ class DisposeDocumentsRemoteOperationTest {
                     .postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH,
                             jsonRequest);
 
-            disposeDocumentsRemoteOperation.postDocumentsDelete("1234567890123456");
+            disposeDocumentsRemoteOperation.delete(caseData);
 
             fail("The method should have thrown DocumentDeletionException when request is invalid");
         } catch (final DocumentDeletionException documentDeletionException) {
             assertThat(documentDeletionException.getMessage())
                     .isEqualTo("Error deleting documents for case : 1234567890123456");
+        }
+    }
+
+    @Test
+    void shouldThrowExceptionWhenResponseIsUnableToMapToObject() {
+        try {
+            final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
+            final String jsonResponse = new Gson().toJson(new CaseDocumentsDeletionResults(1, 1));
+
+            doThrow(new JsonSyntaxException("Unable to map document post response to object"))
+                    .when(documentDeletionRecordHolder)
+                    .setCaseDocumentsDeletionResults(eq("1234567890123456"),
+                            any(CaseDocumentsDeletionResults.class));
+
+            when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest))
+                    .thenReturn(jsonResponse);
+
+            disposeDocumentsRemoteOperation.delete(caseData);
+
+            fail("The method should have thrown JsonParseException when request is invalid");
+        } catch (final DocumentDeletionException documentDeletionException) {
+            assertThat(documentDeletionException.getCause().getMessage())
+                    .contains("Unable to map json to object document deletion endpoint response due to following "
+                            + "endpoint response:");
         }
     }
 }

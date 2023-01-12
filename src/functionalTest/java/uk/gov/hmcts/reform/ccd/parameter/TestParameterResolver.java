@@ -44,6 +44,27 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${ccd.role.assignment.host}")
     private String roleAssignmentHost;
 
+    @Value("${ccd.log.and.audit.host}")
+    private String logAndAuditHost;
+
+    @Value("${log.and.audit.enabled}")
+    private Boolean isLogAndAuditEnabled;
+
+    @Value("${ccd.role.assignment.check-case-roles-exist}")
+    private Boolean checkCaseRolesExist;
+
+    @Value("${app.insights.log.size}")
+    private Integer appInsightsLogSize;
+
+    @Value("${thread.max_pool_size}")
+    private Integer threadMaxPoolSize;
+
+    @Value("${thread.core_pool_size}")
+    private Integer threadCorePoolSize;
+
+    @Value("${thread.queue_capacity}")
+    private Integer threadQueueCapacity;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -65,7 +86,6 @@ public class TestParameterResolver implements ParameterResolver {
     public String getGlobalSearchIndexName() {
         return globalSearchIndexName;
     }
-
 
     @Override
     public String getCasesIndexType() {
@@ -122,5 +142,40 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getRoleAssignmentsHost() {
         return roleAssignmentHost;
+    }
+
+    @Override
+    public String getLogAndAuditHost() {
+        return logAndAuditHost;
+    }
+
+    @Override
+    public Boolean getCheckCaseRolesExist() {
+        return checkCaseRolesExist;
+    }
+
+    @Override
+    public Integer getAppInsightsLogSize() {
+        return appInsightsLogSize;
+    }
+
+    @Override
+    public Boolean isLogAndAuditEnabled() {
+        return isLogAndAuditEnabled;
+    }
+
+    @Override
+    public Integer getThreadMaxPoolSize() {
+        return threadMaxPoolSize;
+    }
+
+    @Override
+    public Integer getThreadCorePoolSize() {
+        return threadCorePoolSize;
+    }
+
+    @Override
+    public Integer getThreadQueueCapacity() {
+        return threadQueueCapacity;
     }
 }

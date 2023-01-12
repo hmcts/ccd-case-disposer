@@ -21,14 +21,23 @@ class DefaultParameterResolverTest {
 
     private static final String GLOBAL_SEARCH_INDEX_NAME = "globalSearchIndexName";
 
-    private static final String IDAM_API_USERNAME = "idamApiUsername";
-    private static final String IDAM_API_PASSWORD = "idamApiPassword";
+    private static final String IDAM_API_USER_FIELD = "idamApiUsername";
+    private static final String IDAM_API_PWD_FIELD = "idamApiPassword";
 
     private static final String DELETABLE_CASE_TYPES = "deletableCaseTypes";
     private static final String DELETABLE_CASE_TYPE_SIMULATION = "deletableCaseTypeSimulation";
 
     private static final String DOCUMENT_STORE_HOST = "documentStoreHost";
     private static final String ROLE_ASSIGNMENT_HOST = "roleAssignmentHost";
+
+    private static final String THREAD_MAX_POOL_SIZE = "threadMaxPoolSize";
+
+    private static final String THREAD_CORE_POOL_SIZE = "threadCorePoolSize";
+
+    private static final String THREAD_QUEUE_CAPACITY = "threadQueueCapacity";
+
+
+    private static final String ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST = "checkCaseRolesExist";
 
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
 
@@ -47,8 +56,8 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver, GLOBAL_SEARCH_INDEX_NAME, "global_index_name");
 
-        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_USERNAME, "user@email.com");
-        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_PASSWORD, "Pa55w0rd");
+        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_USER_FIELD, "user@email.com");
+        ReflectionTestUtils.setField(defaultParameterResolver, IDAM_API_PWD_FIELD, "Pa55w0rd");
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      DELETABLE_CASE_TYPES, Arrays.asList("Case_Type_01"));
@@ -61,6 +70,18 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      ROLE_ASSIGNMENT_HOST, "http://localhost:4096");
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                                     ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST, true);
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                THREAD_MAX_POOL_SIZE, 10);
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                THREAD_CORE_POOL_SIZE, 5);
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                THREAD_QUEUE_CAPACITY, 200);
     }
 
     @Test
@@ -138,6 +159,34 @@ class DefaultParameterResolverTest {
     void shouldGetCorrectValueForGetRoleAssignmentsHost() {
         assertThat(defaultParameterResolver.getRoleAssignmentsHost(),
                    is(equalTo("http://localhost:4096")));
+    }
+
+    @Test
+    @DisplayName("should get correct value for checkCaseRolesExist")
+    void shouldGetCorrectValueForGetCheckCaseRolesExist() {
+        assertThat(defaultParameterResolver.getCheckCaseRolesExist(),
+                   is(equalTo(Boolean.TRUE)));
+    }
+
+    @Test
+    @DisplayName("should get correct value for threadQueueCapacity")
+    void shouldGetCorrectValueForGetThreadQueueCapacity() {
+        assertThat(defaultParameterResolver.getThreadQueueCapacity(),
+                is(equalTo(200)));
+    }
+
+    @Test
+    @DisplayName("should get correct value for threadCorePoolSize")
+    void shouldGetCorrectValueForGetThreadCorePoolSize() {
+        assertThat(defaultParameterResolver.getThreadCorePoolSize(),
+                is(equalTo(5)));
+    }
+
+    @Test
+    @DisplayName("should get correct value for threadMaxPoolSize")
+    void shouldGetCorrectValueForGetThreadMaxPoolSize() {
+        assertThat(defaultParameterResolver.getThreadMaxPoolSize(),
+                is(equalTo(10)));
     }
 
 }

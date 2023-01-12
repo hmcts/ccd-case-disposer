@@ -41,8 +41,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
-        verifyDocumentDeletion(deletableCaseRefs);
-        verifyRoleDeletion(deletableCaseRefs);
+        verifyRemoteDeletion(deletableCaseRefs);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }

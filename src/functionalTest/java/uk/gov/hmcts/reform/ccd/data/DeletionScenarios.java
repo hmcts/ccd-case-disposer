@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
 public class DeletionScenarios {
 
     private DeletionScenarios() {
@@ -22,21 +25,23 @@ public class DeletionScenarios {
                         List.of(1004259907353528L),
                         List.of(1004259907353528L),
                         Map.of(1004259907353529L, List.of("jpg.jpg")),
+                        Map.of(1004259907353529L, List.of("S-001-role-assignment-for-case.json")),
                         Map.of("DPR_FT_MasterCaseType", List.of(1004259907353529L)),
                         Map.of("DPR_FT_MultiplePages", List.of(1004259907353528L))
+                ),
+                Arguments.of(
+                        "DPR_FT_MasterCaseType",
+                        null,
+                        "scenarios/S-002-global-search.sql",
+                        List.of(1004259907351111L),
+                        Map.of("global_search", List.of(1004259907351111L)),
+                        emptyList(),
+                        emptyList(),
+                        emptyMap(),
+                        emptyMap(),
+                        Map.of("global_search", List.of(1004259907351111L)),
+                        Map.of("global_search", emptyList())
                 )
-        //Arguments.of(
-        //"DPR_FT_MasterCaseType",
-        //null,
-        //"scenarios/S-002-global-search.sql",
-        //List.of(1004259907351111L),
-        //Map.of("global_search", List.of(1004259907351111L)),
-        //emptyList(),
-        //emptyList(),
-        //emptyMap(),
-        //Map.of("global_search", List.of(1004259907351111L)),
-        //Map.of("global_search", emptyList())
-        //)
         );
     }
 }

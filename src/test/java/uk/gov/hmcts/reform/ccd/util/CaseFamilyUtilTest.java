@@ -15,20 +15,22 @@ import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_MULTI_FAMILY
 
 class CaseFamilyUtilTest {
     private final CaseData caseData1 = new CaseData(
-        DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-        DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
-        DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
-        DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
-        DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-        null
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
+            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
+            null
     );
     private final CaseData caseData2 = new CaseData(
-        DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
-        DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getReference(),
-        DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getCaseType(),
-        DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getResolvedTtl(),
-        DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
-        caseData1
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getReference(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getCaseType(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getJurisdiction(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getResolvedTtl(),
+            DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
+            caseData1
     );
 
     @Test
@@ -38,8 +40,8 @@ class CaseFamilyUtilTest {
         final List<CaseData> result = FLATTEN_CASE_FAMILIES_FUNCTION.apply(caseFamilies);
 
         assertThat(result)
-            .isNotEmpty()
-            .containsExactlyInAnyOrder(caseData1, caseData2);
+                .isNotEmpty()
+                .containsExactlyInAnyOrder(caseData1, caseData2);
     }
 
     @Test
@@ -49,8 +51,8 @@ class CaseFamilyUtilTest {
         final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
 
         assertThat(result)
-            .singleElement()
-            .isEqualTo(caseData1);
+                .singleElement()
+                .isEqualTo(caseData1);
     }
 
     @Test
@@ -60,7 +62,7 @@ class CaseFamilyUtilTest {
         final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
 
         assertThat(result)
-            .singleElement()
-            .isEqualTo(caseData2);
+                .singleElement()
+                .isEqualTo(caseData2);
     }
 }
