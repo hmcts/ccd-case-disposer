@@ -1,5 +1,6 @@
 plugins {
     id 'application'
+    id 'checkstyle'
     id 'pmd'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
@@ -94,6 +95,12 @@ task checkoutDataStoreMigrationScripts (type: Exec){
 //integration.dependsOn(checkoutDataStoreMigrationScripts)
 
 check.dependsOn integration
+
+checkstyle {
+  maxWarnings = 0
+  toolVersion = '8.29'
+  getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+}
 
 pmd {
     toolVersion = "6.18.0"
