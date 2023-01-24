@@ -219,7 +219,7 @@ def versions = [
      junit               : '5.7.2',
      junitPlatform       : '1.7.2',
      reformLogging       : '5.1.9',
-     elasticsearch       : '7.17.1',
+     elasticsearch       : '7.17.3',
      testcontainers      : '1.16.0',
      restAssured         : '4.4.0',
      idamClient          : '2.0.1',
