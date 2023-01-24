@@ -33,7 +33,6 @@ elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
   ingressHost: es-${SERVICE_FQDN}
   clusterName: "es"
-  imageTag: "7.11.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
@@ -47,13 +46,6 @@ elasticsearch:
       value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
   persistence:
     enabled: false
-  ingress:
-    enabled: true
-    annotations:
-      kubernetes.io/ingress.class: traefik
-    path: /
-    hosts:
-      - es-${SERVICE_FQDN}
 
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
@@ -268,7 +260,7 @@ ccd:
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
       devmemoryRequests: "1024Mi"
       devmemoryLimits: "2048Mi"
-      keyVaults: [ ]
+      disableKeyVaults: true
 
   ccd-user-profile-api:
     java:
@@ -277,7 +269,7 @@ ccd:
       imagePullPolicy: Always
       environment:
         USER_PROFILE_DB_HOST: "${SERVICE_NAME}-postgresql"
-      keyVaults: [ ]
+      disableKeyVaults: true
 
   ccd-data-store-api:
     java:
@@ -311,7 +303,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
         ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
-      keyVaults: [ ]
+      disableKeyVaults: true
       autoscaling:
         enabled: false
 
