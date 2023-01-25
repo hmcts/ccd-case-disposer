@@ -96,7 +96,8 @@ withPipeline(type, product, component) {
   }
 
   enableAksStagingDeployment()
-  nonServiceApp()
+  disableLegacyDeployment()
+  //nonServiceApp()
   syncBranchesWithMaster(branchesToSync)
 
   onPR() {
