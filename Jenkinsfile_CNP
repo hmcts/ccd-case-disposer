@@ -97,7 +97,8 @@ withPipeline(type, product, component) {
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
-  //nonServiceApp()
+  nonServiceApp()
+  enableCleanupOfHelmReleaseAlways()
   syncBranchesWithMaster(branchesToSync)
 
   onPR() {
