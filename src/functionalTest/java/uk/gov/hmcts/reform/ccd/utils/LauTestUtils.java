@@ -12,6 +12,7 @@ import static com.google.common.base.Functions.toStringFunction;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.with;
 
 @Component
 public class LauTestUtils {
@@ -29,9 +30,10 @@ public class LauTestUtils {
                 .collect(Collectors.toList());
 
         if (parameterResolver.isLogAndAuditEnabled()) {
-            assertThat(lauRecordHolder.getLauCaseRefList())
-                    .containsExactlyInAnyOrderElementsOf(transform(newArrayList(caseRefs),
-                            toStringFunction()));
+            with().await()
+                    .untilAsserted(() -> assertThat(lauRecordHolder.getLauCaseRefList())
+                            .containsExactlyInAnyOrderElementsOf(transform(newArrayList(caseRefs),
+                                    toStringFunction())));
 
             lauRecordHolder.getLauCaseRefList().clear();
         }
