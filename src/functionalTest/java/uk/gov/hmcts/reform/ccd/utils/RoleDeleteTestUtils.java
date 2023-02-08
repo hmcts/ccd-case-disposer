@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.awaitility.Awaitility.with;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.AUTHORISATION_HEADER;
@@ -41,10 +42,13 @@ public class RoleDeleteTestUtils {
 
     public void verifyRoleAssignmentDeletion(final Map<Long, List<String>> deletableRoles) {
         deletableRoles.entrySet().forEach(entry -> {
-            final int caseRolesDeletionActualResults = roleDeletionRecordHolder
-                    .getCaseRolesDeletionResults(Long.toString(entry.getKey()));
+            with().await()
+                    .untilAsserted(() -> {
+                        final int caseRolesDeletionActualResults = roleDeletionRecordHolder
+                                .getCaseRolesDeletionResults(Long.toString(entry.getKey()));
 
-            assertThat(caseRolesDeletionActualResults).isEqualTo(HttpStatus.OK.value());
+                        assertThat(caseRolesDeletionActualResults).isEqualTo(HttpStatus.OK.value());
+                    });
         });
     }
 
