@@ -40,15 +40,14 @@ public class DocumentDeleteTestUtils {
     private FileUtils fileUtils;
 
     public void verifyDocumentStoreDeletion(final Map<Long, List<String>> deletableDocuments) {
-        deletableDocuments.entrySet().forEach(entry -> with().await()
-                .untilAsserted(() -> {
+        with().await()
+                .untilAsserted(() -> deletableDocuments.entrySet().forEach(entry -> {
                     final CaseDocumentsDeletionResults caseDocumentsDeletionResults = documentDeletionRecordHolder
                             .getCaseDocumentsDeletionResults(Long.toString(entry.getKey()));
 
                     assertThat(caseDocumentsDeletionResults).isNotNull();
                     assertThat(caseDocumentsDeletionResults.getMarkedForDeletion()).isNotZero();
                     assertThat(caseDocumentsDeletionResults.getCaseDocumentsFound()).isNotZero();
-
                 }));
     }
 

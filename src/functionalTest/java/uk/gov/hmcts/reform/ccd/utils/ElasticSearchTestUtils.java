@@ -71,7 +71,10 @@ public class ElasticSearchTestUtils {
     }
 
     private void refreshAllIndexes(final Set<String> indexes) {
-        indexes.forEach(ThrowingConsumer.unchecked(index -> refreshIndex(index)));
+        indexes.forEach(ThrowingConsumer.unchecked(index -> {
+            final String indexName = getIndexName(index);
+            refreshIndex(indexName);
+        }));
     }
 
     public List<String> getAllDocuments(final String indexName) throws IOException {
