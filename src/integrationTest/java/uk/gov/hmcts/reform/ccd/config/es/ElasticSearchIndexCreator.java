@@ -11,7 +11,7 @@ import org.elasticsearch.xcontent.XContentType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
-import uk.gov.hmcts.reform.ccd.utils.ElasticSearchIntegrationTestUtils;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,14 +28,14 @@ public class ElasticSearchIndexCreator {
     private RestHighLevelClient elasticsearchClient;
 
     @Inject
-    private ElasticSearchIntegrationTestUtils elasticSearchIntegrationTestUtils;
+    private ParameterResolver parameterResolver;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void insertDataIntoElasticsearch(final String indexName, final List<Long> caseRefs) throws IOException {
-        final String caseIndex = elasticSearchIntegrationTestUtils.getIndexName(indexName);
+        final String caseIndex = getIndexName(indexName);
         final List<CaseDataEntity> caseDataEntities = buildCaseDataEntity(
-                elasticSearchIntegrationTestUtils.getIndexName(indexName),
+                getIndexName(indexName),
                 caseRefs);
         final BulkRequest bulkRequest = buildBulkRequest(caseIndex, caseDataEntities);
 
@@ -71,5 +71,12 @@ public class ElasticSearchIndexCreator {
     private void refreshIndex(final String caseIndex) throws IOException {
         final RefreshRequest refreshRequest = new RefreshRequest(caseIndex);
         elasticsearchClient.indices().refresh(refreshRequest, DEFAULT);
+    }
+
+    public String getIndexName(String caseType) {
+        if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {
+            return String.format("%s_cases", caseType.toLowerCase());
+        }
+        return caseType;
     }
 }
