@@ -4,12 +4,12 @@ plugins {
     id 'pmd'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-    id 'org.springframework.boot' version '2.5.3'
+    id 'org.springframework.boot' version '2.7.0'
     id 'org.owasp.dependencycheck' version '8.0.2'
     id 'com.github.ben-manes.versions' version '0.39.0'
     id 'org.sonarqube' version '3.3'
     id 'uk.gov.hmcts.java' version '0.12.27'
-    id 'io.freefair.lombok' version '5.3.0'
+    id 'io.freefair.lombok' version '6.5.1'
     id 'org.flywaydb.flyway' version '8.2.2'
     id "info.solidsoft.pitest" version '1.7.4'
 }
@@ -19,9 +19,14 @@ apply plugin: "info.solidsoft.pitest"
 group = 'uk.gov.hmcts.reform'
 version = '0.0.1'
 
-allprojects {
-    sourceCompatibility = '11'
-    targetCompatibility = '11'
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
+  }
+}
+
+tasks.withType(JavaExec).configureEach {
+  javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
 sourceSets {
@@ -103,7 +108,6 @@ checkstyle {
 }
 
 pmd {
-    toolVersion = "6.18.0"
     //sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
     sourceSets = []
     reportsDir = file("$project.buildDir/reports/pmd")
@@ -166,7 +170,7 @@ dependencyManagement {
         dependencySet(group: 'com.google.guava', version: '30.1.1-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'org.springframework.cloud', version: '3.0.5') {
+        dependencySet(group: 'org.springframework.cloud', version: '3.1.2') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
         }
@@ -216,21 +220,22 @@ pitest {
 project.tasks['pitest'].group = "Verification"
 
 def versions = [
-     junit               : '5.7.2',
-     junitPlatform       : '1.7.2',
+     junit               : '5.9.2',
+     junitPlatform       : '1.9.2',
      reformLogging       : '5.1.9',
-     elasticsearch       : '7.17.1',
-     testcontainers      : '1.16.0',
-     restAssured         : '4.4.0',
+     elasticsearch       : '7.17.9',
+     testcontainers      : '1.17.6',
+     restAssured         : '4.5.1',
      idamClient          : '2.0.1',
      s2sClient           : '4.0.3',
      commonsIo           : '2.7',
-     wiremock            : '2.21.0',
-     lombok              : '1.18.20',
-     gradlePitest        : '1.6.0',
-     pitest              : '1.6.3',
+     wiremock            : '2.35.0',
+     lombok              : '1.18.22',
+     gradlePitest        : '1.9.0',
+     pitest              : '1.9.11',
      sonarPitest         : '0.5',
      springFramework     : '5.3.20',
+     apiGuardian         : '1.0.0',
      springBoot          : springBoot.class.package.implementationVersion,
 ]
 
@@ -273,7 +278,7 @@ dependencies {
     configurations {
         compile.exclude module: 'spring-boot-starter-logging'
     }
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.5.7'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.7.5'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
@@ -303,7 +308,8 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: versions.wiremock
-    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: '8.2.2'
+    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
+
 
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
 
@@ -317,6 +323,9 @@ dependencies {
 
     functionalTestImplementation sourceSets.main.runtimeClasspath
     functionalTestImplementation sourceSets.test.runtimeClasspath
+
+    functionalTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api' , version: versions.apiGuardian
+    integrationTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api' , version: versions.apiGuardian
 }
 
 mainClassName = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'
