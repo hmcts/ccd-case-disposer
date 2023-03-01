@@ -233,14 +233,14 @@ ccd:
   ingressHost: ${SERVICE_FQDN}
 
   global:
-    ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
-    ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
+    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+    ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
+    ccdApiGatewayIngress: http://${SERVICE_NAME}-ccd-api-gw
     enableKeyVaults: true
     devMode: true
     postgresUsername: hmcts
