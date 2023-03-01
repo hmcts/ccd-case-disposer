@@ -10,14 +10,6 @@ dependencies:
   - name: job
     version: ~0.7.10
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-  - name: elasticsearch
-    version: 7.17.3
-    repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
-    condition: elastic.enabled
-  - name: logstash
-    version: 8.5.1
-    repository: 'https://helm.elastic.co'
-    condition: elastic.enabled
   - name: ccd
     version: 8.0.25
     repository: 'https://hmctspublic.azurecr.io/helm/v1/repo/'
