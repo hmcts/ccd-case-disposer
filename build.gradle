@@ -289,6 +289,7 @@ dependencies {
 
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.7.Final'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.1'
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
 
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
