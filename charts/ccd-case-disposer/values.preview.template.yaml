@@ -51,9 +51,10 @@ elasticsearch:
   ingress:
     enabled: false
     className: traefik
-    #path: /
-    #hosts:
-      #- es-${SERVICE_FQDN}
+    # hosts:
+    #   - host: es-${SERVICE_FQDN}
+    #     paths:
+    #       - path: /
 
 
 logstash:
