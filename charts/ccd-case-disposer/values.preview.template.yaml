@@ -29,6 +29,8 @@ global:
 elastic:
   enabled: true
 
+
+
 elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
   clusterName: "es"
@@ -36,6 +38,10 @@ elasticsearch:
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
+    # Their tests delete the pod after succeeding, we pass --logs to the test command which fail if the pod has already been deleted
+    # The tests do pass, at least as of 2023-01-19
+  tests:
+    enabled: false
   extraEnvs:
     - name: discovery.type
       value: single-node
@@ -46,12 +52,11 @@ elasticsearch:
   persistence:
     enabled: false
   ingress:
-    enabled: true
-    annotations:
-      className: traefik
-    path: /
-    hosts:
-      - es-${SERVICE_FQDN}
+    enabled: false
+    className: traefik
+    #path: /
+    #hosts:
+      #- es-${SERVICE_FQDN}
 
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
