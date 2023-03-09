@@ -49,7 +49,7 @@ elasticsearch:
   persistence:
     enabled: false
   ingress:
-    enabled: false
+    enabled: true
     className: traefik
     # hosts:
     #   - host: es-${SERVICE_FQDN}
