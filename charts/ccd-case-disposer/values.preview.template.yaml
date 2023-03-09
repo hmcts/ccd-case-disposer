@@ -51,11 +51,11 @@ elasticsearch:
   ingress:
     enabled: true
     className: traefik
-    # hosts:
-    #   - host: es-${SERVICE_FQDN}
-    #     paths:
-    #       - path: /
-
+#    annotations:
+#      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
 
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
