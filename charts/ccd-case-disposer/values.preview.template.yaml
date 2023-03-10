@@ -1,7 +1,7 @@
 job:
   # Don't modify below here
   image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_FQDN}.preview.platform.hmcts.net
   kind: CronJob
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
@@ -28,8 +28,6 @@ global:
 
 elastic:
   enabled: true
-
-
 
 elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
@@ -233,7 +231,7 @@ ccd:
     ras:
       enabled: false
 
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_FQDN}.preview.platform.hmcts.net
 
   global:
     ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
@@ -252,7 +250,7 @@ ccd:
   ccd-definition-store-api:
     java:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
-      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+      ingressHost: ccd-definition-store-${SERVICE_FQDN}.preview.platform.hmcts.net
       imagePullPolicy: Always
       environment:
         ELASTIC_SEARCH_ENABLED: true
