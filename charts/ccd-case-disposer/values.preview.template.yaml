@@ -49,12 +49,13 @@ elasticsearch:
   persistence:
     enabled: false
   ingress:
-    enabled: false
+    enabled: true
     className: traefik
-    #path: /
-    #hosts:
-      #- es-${SERVICE_FQDN}
-
+#    annotations:
+#      kubernetes.io/ingress.class: traefik
+    path: /
+    hosts:
+      - es-${SERVICE_FQDN}
 
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
