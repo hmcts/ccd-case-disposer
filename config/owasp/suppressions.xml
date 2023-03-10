@@ -7,7 +7,6 @@
       CVE-2016-1000027 refer https://tools.hmcts.net/jira/browse/CCD-3246
     </notes>
     <cve>CVE-2016-1000027</cve>
-    <cve>CVE-2021-37533</cve>
   </suppress>
   <suppress>
     <packageUrl regex="true">^pkg:maven/org.glassfish.hk2/hk2-utils@.*$</packageUrl>

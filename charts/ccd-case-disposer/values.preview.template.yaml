@@ -29,6 +29,8 @@ global:
 elastic:
   enabled: true
 
+
+
 elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
   ingressHost: es-${SERVICE_FQDN}
@@ -48,8 +50,9 @@ elasticsearch:
     enabled: false
   ingress:
     enabled: true
-    annotations:
-      kubernetes.io/ingress.class: traefik
+    className: traefik
+#    annotations:
+#      kubernetes.io/ingress.class: traefik
     path: /
     hosts:
       - es-${SERVICE_FQDN}
