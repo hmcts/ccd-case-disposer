@@ -30,8 +30,8 @@ elastic:
   enabled: true
 
 elasticsearch:
-  nameOverride: ${SERVICE_NAME}-es
-  ingressHost: es-${SERVICE_FQDN}
+  nameOverride: ${SERVICE_NAME}-es-master
+  ingressHost: es-${SERVICE_FQDN}.preview.platform.hmcts.net
   clusterName: "es"
   replicas: 1
   minimumMasterNodes: 1
@@ -53,7 +53,7 @@ elasticsearch:
 #      kubernetes.io/ingress.class: traefik
     path: /
     hosts:
-      - es-${SERVICE_FQDN}
+      - es-${SERVICE_FQDN}.preview.platform.hmcts.net
 
 logstash:
   image: "hmctspublic.azurecr.io/imported/logstash/logstash"
