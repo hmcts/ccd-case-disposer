@@ -30,7 +30,6 @@ elastic:
   enabled: true
 
 elasticsearch:
-  nameOverride: ${SERVICE_NAME}-es
   ingressHost: es-${SERVICE_FQDN}.preview.platform.hmcts.net
   clusterName: "es"
   replicas: 1
