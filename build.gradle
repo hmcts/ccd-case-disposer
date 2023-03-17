@@ -11,7 +11,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.27'
     id 'io.freefair.lombok' version '6.5.1'
     id 'org.flywaydb.flyway' version '8.2.2'
-    id "info.solidsoft.pitest" version '1.7.4'
+    id "info.solidsoft.pitest" version '1.9.11'
 }
 
 apply plugin: "info.solidsoft.pitest"
