@@ -84,20 +84,21 @@ def uploadCoreCaseDataDefinitions(env) {
 }
 
 withPipeline(type, product, component) {
-  after('test') {
+  afterAlways('test') {
     // hmcts/cnp-jenkins-library may fail to copy artifacts after checkstyle error so repeat command (see /src/uk/gov/hmcts/contino/GradleBuilder.groovy)
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/checkstyle/*.html'
 
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*.html'
   }
 
-  after('test') {
+  afterAlways('test') {
     builder.gradle('integration')
   }
 
   enableAksStagingDeployment()
   disableLegacyDeployment()
   nonServiceApp()
+  enableCleanupOfHelmReleaseAlways()
   syncBranchesWithMaster(branchesToSync)
 
   onPR() {
@@ -113,14 +114,14 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_PORT = '5432'
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
     env.ELASTIC_SEARCH_HOSTS = "es-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
-    env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.service.core-compute-preview.internal"
+    env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
 
     def githubApi = new GithubAPI(this)
     if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
-      enableCleanupOfHelmReleaseOnSuccess()
+      enableCleanupOfHelmReleaseAlways()
     }
   }
 
@@ -137,7 +138,7 @@ withPipeline(type, product, component) {
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
   }
 
-  after('akschartsinstall') {
+  afterAlways('akschartsinstall') {
     // Set required environment variables to run functional tests apart from one in vaults.
     env.ELASTIC_SEARCH_ENABLED = true
     env.LOG_AND_AUDIT_ENABLED = true
@@ -174,7 +175,7 @@ withPipeline(type, product, component) {
     }
   }
 
-  after('functionalTest:preview') {
+  afterAlways('functionalTest:preview') {
     junit 'build/test-results/functional/**/*.xml'
     archiveArtifacts 'build/reports/tests/functional/index.html'
 
@@ -188,7 +189,7 @@ withPipeline(type, product, component) {
     ]
   }
 
-  after('functionalTest:aat') {
+  afterAlways('functionalTest:aat') {
     junit 'build/test-results/functional/**/*.xml'
     archiveArtifacts 'build/reports/tests/functional/index.html'
 

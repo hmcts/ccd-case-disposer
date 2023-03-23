@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.utils;
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -51,16 +52,15 @@ public class ElasticSearchTestUtils {
     }
 
     private void verifyCaseDataAreDeletedInElasticsearch(final Map<String, List<Long>> deletedFromIndexed) {
+
+        refreshAllIndexes(deletedFromIndexed.keySet());
+
         deletedFromIndexed.forEach((key, value) -> {
             final String indexName = getIndexName(key);
-
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
-                Thread.sleep(10000);
                 with()
                         .await()
                         .untilAsserted(() -> {
-                            refreshIndex(indexName);
-                            Thread.sleep(10000);
                             final Optional<Long> actualCaseReference = findCaseByReference(indexName,
                                     caseReference);
 
@@ -68,6 +68,13 @@ public class ElasticSearchTestUtils {
                         });
             }));
         });
+    }
+
+    private void refreshAllIndexes(final Set<String> indexes) {
+        indexes.forEach(ThrowingConsumer.unchecked(index -> {
+            final String indexName = getIndexName(index);
+            refreshIndex(indexName);
+        }));
     }
 
     public List<String> getAllDocuments(final String indexName) throws IOException {
@@ -112,17 +119,16 @@ public class ElasticSearchTestUtils {
     }
 
     public void verifyCaseDataAreInElasticsearch(final Map<String, List<Long>> indexedData) {
+
+        refreshAllIndexes(indexedData.keySet());
+
         indexedData.forEach((key, value) -> {
             final String indexName = getIndexName(key);
 
             value.forEach(ThrowingConsumer.unchecked(caseReference -> {
-                Thread.sleep(10000);
                 with()
                         .await()
                         .untilAsserted(() -> {
-
-                            refreshIndex(indexName);
-                            Thread.sleep(10000);
                             final Optional<Long> actualCaseReference = findCaseByReference(indexName,
                                     caseReference);
 
@@ -162,7 +168,11 @@ public class ElasticSearchTestUtils {
 
     private void refreshIndex(final String index) throws IOException {
         final RefreshRequest request = new RefreshRequest(index);
-        elasticsearchClient.indices().refresh(request, DEFAULT);
+        final RefreshResponse refreshResponse = elasticsearchClient.indices().refresh(request, DEFAULT);
+        with()
+                .await()
+                .untilAsserted(() -> assertThat(Arrays.asList(refreshResponse.getShardFailures()).size())
+                        .isEqualTo(0));
     }
 
 

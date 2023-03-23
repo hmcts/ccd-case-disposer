@@ -1,7 +1,7 @@
 job:
   # Don't modify below here
   image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_FQDN}.preview.platform.hmcts.net
   kind: CronJob
   schedule: "*/20 * * * *"
   startingDeadlineSeconds: 180
@@ -33,7 +33,6 @@ elasticsearch:
   nameOverride: ${SERVICE_NAME}-es
   ingressHost: es-${SERVICE_FQDN}
   clusterName: "es"
-  imageTag: "7.11.1"
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
@@ -49,8 +48,9 @@ elasticsearch:
     enabled: false
   ingress:
     enabled: true
-    annotations:
-      kubernetes.io/ingress.class: traefik
+    className: traefik
+#    annotations:
+#      kubernetes.io/ingress.class: traefik
     path: /
     hosts:
       - es-${SERVICE_FQDN}
@@ -231,7 +231,7 @@ ccd:
     ras:
       enabled: false
 
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_FQDN}.preview.platform.hmcts.net
 
   global:
     ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
@@ -241,7 +241,7 @@ ccd:
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    ccdApiGatewayIngress: gateway-${SERVICE_FQDN}
+    ccdApiGatewayIngress: gateway-${SERVICE_FQDN}.preview.platform.hmcts.net
     enableKeyVaults: true
     devMode: true
     postgresUsername: hmcts
@@ -250,7 +250,7 @@ ccd:
   ccd-definition-store-api:
     java:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
-      ingressHost: ccd-definition-store-${SERVICE_FQDN}
+      ingressHost: ccd-definition-store-${SERVICE_NAME}.preview.platform.hmcts.net
       imagePullPolicy: Always
       environment:
         ELASTIC_SEARCH_ENABLED: true
@@ -268,7 +268,7 @@ ccd:
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
       devmemoryRequests: "1024Mi"
       devmemoryLimits: "2048Mi"
-      keyVaults: [ ]
+      disableKeyVaults: true
 
   ccd-user-profile-api:
     java:
@@ -277,12 +277,12 @@ ccd:
       imagePullPolicy: Always
       environment:
         USER_PROFILE_DB_HOST: "${SERVICE_NAME}-postgresql"
-      keyVaults: [ ]
+      disableKeyVaults: true
 
   ccd-data-store-api:
     java:
       image: hmctspublic.azurecr.io/ccd/data-store-api:latest
-      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
+      ingressHost: ccd-data-store-api-${SERVICE_FQDN}.preview.platform.hmcts.net
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
@@ -311,7 +311,7 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
         ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
-      keyVaults: [ ]
+      disableKeyVaults: true
       autoscaling:
         enabled: false
 
