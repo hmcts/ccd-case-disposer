@@ -10,7 +10,7 @@ plugins {
     id 'org.sonarqube' version '4.0.0.2929'
     id 'uk.gov.hmcts.java' version '0.12.27'
     id 'io.freefair.lombok' version '6.5.1'
-    id 'org.flywaydb.flyway' version '9.15.1'
+    id 'org.flywaydb.flyway' version '9.16.1'
     id "info.solidsoft.pitest" version '1.9.11'
 
 }
@@ -288,7 +288,7 @@ dependencies {
 
 
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.5.7.Final'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.1'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.6.0'
 
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
