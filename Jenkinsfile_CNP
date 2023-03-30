@@ -10,7 +10,7 @@ import uk.gov.hmcts.pipeline.TeamConfig
 def type = "java"
 def product = "ccd"
 def component = "case-disposer"
-def branchesToSync = ['demo','perftest']
+def branchesToSync = ['demo','perftest','ithc']
 
 GradleBuilder builder = new GradleBuilder(this, product)
 
