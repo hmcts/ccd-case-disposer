@@ -235,7 +235,7 @@ def versions = [
      gradlePitest        : '1.9.0',
      pitest              : '1.9.11',
      sonarPitest         : '0.5',
-     springFramework     : '5.3.20',
+     springFramework     : '5.3.26',
      apiGuardian         : '1.0.0',
      springBoot          : springBoot.class.package.implementationVersion,
 ]
@@ -250,7 +250,7 @@ ext.libraries = [
         ]
 ]
 
-ext['spring-framework.version'] = '5.3.20'
+ext['spring-framework.version'] = '5.3.26'
 ext['log4j2.version'] = '2.17.1'
 ext['jackson.version'] = '2.14.1'
 
