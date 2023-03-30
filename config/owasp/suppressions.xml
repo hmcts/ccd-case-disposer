@@ -17,10 +17,6 @@
     <cve>CVE-2021-4277</cve>
   </suppress>
   <suppress>
-    <packageUrl regex="true">^pkg:maven/org.yaml/snakeyaml@.*$</packageUrl>
-    <cve>CVE-2022-1471</cve>
-  </suppress>
-  <suppress>
     <notes>False positive as project does not contain json-java or hutool</notes>
     <cve>CVE-2022-45688</cve>
   </suppress>
