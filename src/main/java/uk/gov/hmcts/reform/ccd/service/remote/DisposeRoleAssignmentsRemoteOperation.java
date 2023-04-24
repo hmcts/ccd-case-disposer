@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
+import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,8 +14,6 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
-
-import javax.ws.rs.core.Response;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_ROLE_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;

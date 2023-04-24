@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.ccd.util;
 
+import jakarta.inject.Named;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.inject.Named;
 
 @Named
 @Slf4j

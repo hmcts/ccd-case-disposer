@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
+import jakarta.inject.Inject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
@@ -10,8 +11,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,7 @@ public class DatabaseIntegrationTestUtils {
                     final List<CaseDataEntity> all = caseDataRepository.findAll();
                     final List<Long> actualRowIds = all.stream()
                             .map(CaseDataEntity::getId)
-                            .collect(Collectors.toUnmodifiableList());
+                            .toList();
 
                     assertThat(actualRowIds)
                             .isNotNull()

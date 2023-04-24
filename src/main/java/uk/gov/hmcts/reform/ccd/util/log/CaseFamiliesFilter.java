@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
@@ -8,8 +10,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;

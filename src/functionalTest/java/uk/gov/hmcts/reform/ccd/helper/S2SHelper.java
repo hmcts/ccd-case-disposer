@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.ccd.helper;
 
 import feign.jackson.JacksonEncoder;
+import jakarta.inject.Named;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 import uk.gov.hmcts.reform.authorisation.generators.ServiceAuthTokenGenerator;
-
-import javax.inject.Named;
 
 import static feign.Feign.builder;
 

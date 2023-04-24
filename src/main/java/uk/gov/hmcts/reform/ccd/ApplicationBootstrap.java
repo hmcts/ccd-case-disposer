@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,13 +9,15 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
-
-import javax.inject.Inject;
+import org.springframework.context.annotation.ComponentScan;
 
 @Slf4j
 @SpringBootApplication
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, it's not a utility class
+@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam"})
+@ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 public class ApplicationBootstrap implements ApplicationRunner {
 
     @Inject

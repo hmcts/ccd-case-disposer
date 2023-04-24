@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
 import java.util.Collections;
 import java.util.UUID;
-import javax.ws.rs.core.Response;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;

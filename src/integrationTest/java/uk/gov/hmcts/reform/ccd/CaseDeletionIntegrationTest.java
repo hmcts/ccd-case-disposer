@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.data.TestDataProvider;
 import java.util.List;
 import java.util.Map;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
 @ComponentScan({"uk.gov.hmcts.reform.ccd"})

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.data;
 
+import jakarta.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.ccd.config.WireMockStubs;
 import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.utils.SimulationIntegrationTestUtils;
 
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 
 import static java.lang.System.setProperty;
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
