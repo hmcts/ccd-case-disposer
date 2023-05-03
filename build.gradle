@@ -281,7 +281,7 @@ dependencies {
     configurations {
         compile.exclude module: 'spring-boot-starter-logging'
     }
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.0.2'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.0.3'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: versions.reformLogging
