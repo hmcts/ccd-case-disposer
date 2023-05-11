@@ -32,15 +32,15 @@ public class GlobalSearchIndexCreator {
     public void createGlobalSearchIndex() {
         if (createGlobalSearch.equals("true") && isPreview()) {
             final Response response = RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(parameterResolver.getCaseDefinitionHost().concat(GLOBAL_SEARCH_PATH))
-                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-                .header(SERVICE_AUTHORISATION_HEADER, securityUtils.getServiceAuthorization())
-                .header(AUTHORISATION_HEADER, securityUtils.getIdamClientToken())
-                .when()
-                .post()
-                .andReturn();
+                    .given()
+                    .relaxedHTTPSValidation()
+                    .baseUri(parameterResolver.getCaseDefinitionHost().concat(GLOBAL_SEARCH_PATH))
+                    .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                    .header(SERVICE_AUTHORISATION_HEADER, securityUtils.getServiceAuthorization())
+                    .header(AUTHORISATION_HEADER, securityUtils.getIdamClientToken())
+                    .when()
+                    .post()
+                    .andReturn();
 
             assertThat(response.getStatusCode()).isEqualTo(201);
         }

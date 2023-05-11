@@ -14,11 +14,11 @@ import uk.gov.hmcts.reform.ccd.service.remote.DisposeElasticsearchRemoteOperatio
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = {
-    ParameterResolver.class,
-    ApplicationConfiguration.class,
-    ElasticsearchConfiguration.class,
-    DisposeElasticsearchRemoteOperation.class,
-    GlobalSearchIndexChecker.class
+        ParameterResolver.class,
+        ApplicationConfiguration.class,
+        ElasticsearchConfiguration.class,
+        DisposeElasticsearchRemoteOperation.class,
+        GlobalSearchIndexChecker.class
 })
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
