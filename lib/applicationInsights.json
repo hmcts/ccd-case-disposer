@@ -1,0 +1,6 @@
+{
+  "connectionString": "${file:/mnt/secrets/pcq/app-insights-connection-string}",
+  "role": {
+    "name": "pcq-consolidation-service"
+  }
+}
