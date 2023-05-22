@@ -11,7 +11,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'io.freefair.lombok' version '8.0.1'
     id 'org.flywaydb.flyway' version '9.16.3'
-    id "info.solidsoft.pitest" version '1.9.11'
+    id "info.solidsoft.pitest" version '1.9.0'
 
 }
 
@@ -190,8 +190,7 @@ repositories {
 }
 
 pitest {
-    pitestVersion.set('1.9.0')
-    junit5PluginVersion.set('0.15')
+    junit5PluginVersion.set('1.0.0')
     targetClasses = ['uk.gov.hmcts.reform.*']
     excludedClasses = [
             'uk.gov.hmcts.reform.ccd.madeup.*'
@@ -289,7 +288,6 @@ dependencies {
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
-    testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
     testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
