@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
 import dnl.utils.text.table.TextTable;
+import jakarta.inject.Named;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Named;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.COLUMN_NAMES;
 

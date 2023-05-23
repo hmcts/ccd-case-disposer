@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import jakarta.inject.Inject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.helper.S2SHelper;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.awaitility.Awaitility.with;

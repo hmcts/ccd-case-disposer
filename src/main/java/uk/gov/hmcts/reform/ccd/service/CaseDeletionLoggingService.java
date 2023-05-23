@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.ccd.service;
 
 import com.google.common.collect.Lists;
 import dnl.utils.text.table.TextTable;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
@@ -19,8 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;

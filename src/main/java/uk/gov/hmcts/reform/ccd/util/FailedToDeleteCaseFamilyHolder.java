@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.util;
 
+import jakarta.inject.Named;
 import lombok.Getter;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 
@@ -8,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.inject.Named;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toSet;

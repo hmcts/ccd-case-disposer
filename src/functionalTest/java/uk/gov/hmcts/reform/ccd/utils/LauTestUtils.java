@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
+import jakarta.inject.Inject;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 
 import static com.google.common.base.Functions.toStringFunction;
 import static com.google.common.collect.Lists.newArrayList;

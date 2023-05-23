@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
+import jakarta.inject.Named;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 
 import java.util.Collection;
@@ -7,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import javax.inject.Named;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;

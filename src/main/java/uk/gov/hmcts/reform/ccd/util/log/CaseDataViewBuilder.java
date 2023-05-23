@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
+import jakarta.inject.Named;
 import lombok.Getter;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 
 import java.util.List;
-import javax.inject.Named;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;

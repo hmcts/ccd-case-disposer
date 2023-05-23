@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import jakarta.inject.Inject;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
@@ -10,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
 
 import java.util.List;
 import java.util.Map;
-import javax.inject.Inject;
 
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;

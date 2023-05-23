@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -7,7 +8,6 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.parameter.DefaultParameterResolver;
 
 import java.util.List;
-import javax.inject.Inject;
 
 import static java.lang.System.clearProperty;
 import static org.assertj.core.api.Assertions.assertThat;

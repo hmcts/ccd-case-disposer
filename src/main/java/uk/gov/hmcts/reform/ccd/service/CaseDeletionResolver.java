@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.ccd.service;
 
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
@@ -9,8 +11,6 @@ import uk.gov.hmcts.reform.ccd.util.LogAndAuditCaseFilter;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
 import java.util.List;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 @Named
 public class CaseDeletionResolver {

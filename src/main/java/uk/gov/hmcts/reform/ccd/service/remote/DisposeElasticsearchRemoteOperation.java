@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -17,7 +18,6 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.List;
-import javax.inject.Inject;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
