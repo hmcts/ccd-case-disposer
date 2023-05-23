@@ -3,7 +3,7 @@
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   //CCD-3539 (Stop running Nightly builds on weekends). Original schedule was 'H 05 * * *'
-  pipelineTriggers([cron('0 3 * * 1-5')]),
+  pipelineTriggers([cron('0 07 * * 07-07')]),
   parameters([
     string(name: 'SecurityRules',
       defaultValue: 'https://raw.githubusercontent.com/hmcts/security-test-rules/master/conf/security-rules.conf',
