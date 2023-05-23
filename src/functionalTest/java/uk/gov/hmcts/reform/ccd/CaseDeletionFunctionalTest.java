@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd;
 
 import org.awaitility.Awaitility;
-import org.awaitility.Durations;
+import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -26,7 +26,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
     @BeforeAll
     static void setup() {
         Awaitility.setDefaultPollInterval(0, TimeUnit.MILLISECONDS);
-        Awaitility.setDefaultPollDelay(Durations.FIVE_SECONDS);
+        Awaitility.setDefaultPollDelay(Duration.FIVE_SECONDS);
         Awaitility.setDefaultTimeout(70, TimeUnit.SECONDS);
     }
 
