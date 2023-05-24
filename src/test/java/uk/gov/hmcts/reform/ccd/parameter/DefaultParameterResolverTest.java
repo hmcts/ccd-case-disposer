@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.ccd.parameter;
 
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,6 @@ class DefaultParameterResolverTest {
 
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
 
-    @Before
     @BeforeEach
     public void initMock() {
 

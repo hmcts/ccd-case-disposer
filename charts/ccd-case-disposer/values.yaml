@@ -15,8 +15,8 @@ job:
   keyVaults:
     ccd:
       secrets:
-        - name: AppInsightsInstrumentationKey
-          alias: azure.application-insights.instrumentation-key
+        - name: app-insights-connection-string
+          alias: app-insights-connection-string
         - name: data-store-api-POSTGRES-USER
           alias: DATA_STORE_DB_USERNAME
         - name: data-store-api-POSTGRES-PASS

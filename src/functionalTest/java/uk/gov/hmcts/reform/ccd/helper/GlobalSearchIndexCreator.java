@@ -2,13 +2,13 @@ package uk.gov.hmcts.reform.ccd.helper;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import jakarta.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.Optional;
-import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;

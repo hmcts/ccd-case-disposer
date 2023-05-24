@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.ccd.config.es;
 
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import static org.elasticsearch.client.RequestOptions.DEFAULT;
 

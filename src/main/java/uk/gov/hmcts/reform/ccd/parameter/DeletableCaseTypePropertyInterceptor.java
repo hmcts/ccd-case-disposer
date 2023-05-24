@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.ccd.parameter;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.exception.DuplicateCaseTypeException;
 
 import java.util.List;
-import javax.annotation.PostConstruct;
 
 import static java.util.stream.Collectors.toList;
 

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver;
 
 @Configuration
 @ComponentScan(
-    basePackages = {"uk.gov.hmcts.reform.ccd"},
+    basePackages = {"uk.gov.hmcts.reform.ccd", "uk.gov.hmcts.reform.idam"},
     excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = ApplicationRunner.class)
 )
 @EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.ccd.data"})

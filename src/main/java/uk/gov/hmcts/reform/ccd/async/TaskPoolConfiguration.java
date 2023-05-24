@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.async;
 
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
-import javax.inject.Inject;
 
 @Configuration
 @EnableAsync

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import lombok.NonNull;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
@@ -21,8 +23,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.ccd.util.ListUtil.distinctByKey;

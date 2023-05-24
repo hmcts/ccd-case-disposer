@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
-import com.microsoft.applicationinsights.core.dependencies.google.common.collect.Sets;
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
@@ -31,9 +31,10 @@ class SimulatedCaseDataViewHolderTest {
         final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder = new SimulatedCaseDataViewHolder();
         simulatedCaseDataViewHolder.setUpData(caseDataViews);
 
-        final Set<Long> expectedIds = Sets.newHashSet(DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getId(),
-                DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(0).getId(),
-                DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(1).getId());
+        final Set<Long> expectedIds = Sets.newHashSet(
+            DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getId(),
+            DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(0).getId(),
+            DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(1).getId());
 
         assertThat(simulatedCaseDataViewHolder.getSimulatedCaseIds())
                 .isNotNull()

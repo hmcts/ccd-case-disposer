@@ -1,18 +1,17 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT;
@@ -55,7 +54,11 @@ class RestClientBuilderTest {
         when(builder.post(Entity.json(requestBody))).thenReturn(response);
         when(response.readEntity(String.class)).thenReturn("Web client response");
 
-        final String postResponse = restClientBuilder.postRequestWithServiceAuthHeader("http://localhost:9090", "/delete", requestBody);
+        final String postResponse = restClientBuilder.postRequestWithServiceAuthHeader(
+            "http://localhost:9090",
+            "/delete",
+            requestBody
+        );
 
         verify(response, times(1)).readEntity(String.class);
         assertThat(postResponse).isEqualTo("Web client response");
@@ -84,8 +87,11 @@ class RestClientBuilderTest {
         when(builder.header(AUTHORISATION_HEADER, "Bearer 5678")).thenReturn(builder);
         when(builder.post(Entity.json(requestBody))).thenReturn(response);
 
-        final Response postResponse = restClientBuilder.postRequestWithAllHeaders("http://localhost:9090", "/delete",
-                requestBody);
+        final Response postResponse = restClientBuilder.postRequestWithAllHeaders(
+            "http://localhost:9090",
+            "/delete",
+            requestBody
+        );
 
         assertThat(postResponse).isEqualTo(response);
     }
