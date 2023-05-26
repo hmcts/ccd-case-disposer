@@ -10,7 +10,7 @@ plugins {
     id 'org.sonarqube' version '4.0.0.2929'
     id 'uk.gov.hmcts.java' version '0.12.43'
     id 'io.freefair.lombok' version '8.0.1'
-    id 'org.flywaydb.flyway' version '9.16.3'
+    id 'org.flywaydb.flyway' version '9.19.1'
     id "info.solidsoft.pitest" version '1.9.11'
 
 }
@@ -285,7 +285,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.0.0'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: versions.wiremock
-    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: '8.5.13'
+    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: '9.19.1'
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest

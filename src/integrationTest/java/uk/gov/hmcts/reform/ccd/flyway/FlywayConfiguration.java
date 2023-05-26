@@ -1,11 +1,14 @@
 package uk.gov.hmcts.reform.ccd.flyway;
 
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.flywaydb.core.internal.database.postgresql.PostgreSQLConfigurationExtension;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
@@ -23,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnClass(Flyway.class)
 @ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", matchIfMissing = true)
-public class FlywayConfiguration {
+public class FlywayConfiguration implements FlywayConfigurationCustomizer {
 
     @Bean
     @ConditionalOnProperty(prefix = "flyway.noop", name = "strategy", matchIfMissing = true)
@@ -35,6 +38,13 @@ public class FlywayConfiguration {
     @ConditionalOnProperty(prefix = "flyway.noop", name = "strategy", havingValue = "false")
     public FlywayMigrationStrategy flywayVoidMigrationStrategy() {
         return null;
+    }
+
+    @Override
+    public void customize(FluentConfiguration configuration) {
+        PostgreSQLConfigurationExtension configurationExtension =
+            configuration.getPluginRegister().getPlugin(PostgreSQLConfigurationExtension.class);
+        configurationExtension.setTransactionalLock(false);
     }
 }
 
