@@ -37,7 +37,7 @@ public class ApplicationExecutor {
     }
 
     public void execute() {
-        log.info("Case-Disposer started...");
+        log.info("Case-Disposer started....");
         final List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
         final List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
 
