@@ -3,22 +3,15 @@
 
   <!--Please add all the false positives under the below section-->
   <suppress>
-    <notes>False Positives
-      CVE-2016-1000027 refer https://tools.hmcts.net/jira/browse/CCD-3246
-    </notes>
-    <cve>CVE-2016-1000027</cve>
-  </suppress>
-  <suppress>
-    <packageUrl regex="true">^pkg:maven/org.glassfish.hk2/hk2-utils@.*$</packageUrl>
-    <cve>CVE-2021-4277</cve>
+    <notes><![CDATA[
+      name: jackson-databind
+      Does not seem to be considered as CVE: https://github.com/FasterXML/jackson-databind/issues/3972
+    ]]></notes>
+    <cve>CVE-2023-35116</cve>
   </suppress>
   <suppress>
     <packageUrl regex="true">^pkg:maven/com.massisframework/j-text-utils@.*$</packageUrl>
     <cve>CVE-2023-2972</cve>
-  </suppress>
-  <suppress>
-    <notes>False positive as project does not contain json-java or hutool</notes>
-    <cve>CVE-2022-45688</cve>
   </suppress>
   <!--End of false positives section -->
 
