@@ -1,17 +1,19 @@
 plugins {
-    id 'application'
-    id 'checkstyle'
-    id 'pmd'
-    id 'jacoco'
-    id 'io.spring.dependency-management' version '1.1.2'
-    id 'org.springframework.boot' version '3.1.2'
-    id 'org.owasp.dependencycheck' version '8.3.1'
-    id 'com.github.ben-manes.versions' version '0.47.0'
-    id 'org.sonarqube' version '4.3.0.3225'
-    id 'uk.gov.hmcts.java' version '0.12.43'
-    id 'io.freefair.lombok' version '8.1.0'
-    id 'org.flywaydb.flyway' version '9.21.1'
-    id "info.solidsoft.pitest" version '1.9.11'
+  id 'application'
+  id 'checkstyle'
+  id 'pmd'
+  id 'jacoco'
+  id 'io.spring.dependency-management' version '1.1.2'
+  id 'org.springframework.boot' version '3.1.2'
+  id 'org.owasp.dependencycheck' version '8.3.1'
+  id 'com.github.ben-manes.versions' version '0.47.0'
+  id 'org.sonarqube' version '4.3.0.3225'
+  id 'uk.gov.hmcts.java' version '0.12.43'
+  id 'io.freefair.lombok' version '8.1.0'
+  id 'org.flywaydb.flyway' version '9.21.1'
+  id "info.solidsoft.pitest" version '1.9.11'
+  id "au.com.dius.pact" version '4.3.4'
+  id 'net.serenity-bdd.serenity-gradle-plugin' version '3.2.0'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -45,6 +47,15 @@ sourceSets {
         }
         resources.srcDir file('src/integrationTest/resources')
     }
+
+  contractTest {
+    java {
+      compileClasspath += main.output
+      runtimeClasspath += main.output
+      srcDir file('src/contractTest/java')
+    }
+    resources.srcDir file('src/contractTest/resources')
+  }
 
 }
 
@@ -112,6 +123,14 @@ pmd {
     // https://github.com/pmd/pmd/issues/876
     ruleSets = []
     ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+project.ext {
+  pacticipantVersion = getCheckedOutGitCommitHash()
+}
+
+static def getCheckedOutGitCommitHash() {
+  'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 
 jacocoTestReport {
@@ -236,6 +255,8 @@ def versions = [
     springSecurity      : '6.1.2',
     testcontainers      : '1.18.3',
     wiremock            : '2.35.0',
+    pactVersion         : '4.3.4',
+    serenity            : '3.1.20',
 ]
 
 ext['jackson.version'] = '2.14.1'
@@ -294,11 +315,59 @@ dependencies {
     functionalTestImplementation sourceSets.main.runtimeClasspath
     functionalTestImplementation sourceSets.test.runtimeClasspath
 
-    functionalTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api' , version: versions.apiGuardian
-    integrationTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api' , version: versions.apiGuardian
+    functionalTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api', version: versions.apiGuardian
+    integrationTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api', version: versions.apiGuardian
+
+  //pact contract testing
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
+  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.12'
+
+  contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
+  contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
+
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
 }
 
 mainClassName = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'
+
+task contract(type: Test, description: 'Runs the pact contract tests.', group: 'Verification') {
+  description = "Runs the consumer Pact tests"
+  useJUnitPlatform()
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+task runAndPublishConsumerPactTests(type: Test){
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+}
+
+runAndPublishConsumerPactTests.dependsOn contract
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+
+pact {
+  broker {
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  }
+  publish {
+    pactDirectory = 'pacts'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    version = project.pacticipantVersion
+  }
+}
+
+task runProviderPactVerification(type: Test) {
+  logger.lifecycle("Runs provider pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
+  systemProperty 'pact.provider.version', project.pacticipantVersion
+}
+
+runProviderPactVerification.dependsOn contract
+runProviderPactVerification.finalizedBy pactVerify
 
 bootJar {
     getArchiveFileName().set(provider {
@@ -323,5 +392,8 @@ rootProject.tasks.named("processFunctionalTestResources") {
 }
 
 rootProject.tasks.named("processIntegrationTestResources") {
+  duplicatesStrategy = 'include'
+}
+rootProject.tasks.named("processContractTestResources") {
   duplicatesStrategy = 'include'
 }
