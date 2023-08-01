@@ -13,7 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.SpringBootContractBaseTest;
 
-//@PactTestFor(providerName = "wa_task_management_api_delete_task_by_id", port = "8991")
 public class TaskManagerDeleteTaskConsumerTest extends SpringBootContractBaseTest {
 
     private static final String WA_URL = "/task";
