@@ -12,8 +12,7 @@ plugins {
   id 'io.freefair.lombok' version '8.1.0'
   id 'org.flywaydb.flyway' version '9.21.1'
   id "info.solidsoft.pitest" version '1.9.11'
-  id "au.com.dius.pact" version '4.3.16'
-  id 'net.serenity-bdd.serenity-gradle-plugin' version '3.2.0'
+  id "au.com.dius.pact" version '4.4.0-beta.2'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -251,7 +250,7 @@ def versions = [
     springSecurity      : '6.1.2',
     testcontainers      : '1.18.3',
     wiremock            : '2.35.0',
-    pactVersion         : '4.3.19',
+    pactVersion         : '4.4.0-beta.2',
     serenity            : '3.1.20',
 ]
 
