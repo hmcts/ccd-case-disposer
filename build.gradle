@@ -12,7 +12,7 @@ plugins {
   id 'io.freefair.lombok' version '8.1.0'
   id 'org.flywaydb.flyway' version '9.21.1'
   id "info.solidsoft.pitest" version '1.9.11'
-  id "au.com.dius.pact" version '4.3.4'
+  id "au.com.dius.pact" version '4.3.16'
   id 'net.serenity-bdd.serenity-gradle-plugin' version '3.2.0'
 }
 
@@ -123,10 +123,6 @@ pmd {
     // https://github.com/pmd/pmd/issues/876
     ruleSets = []
     ruleSetFiles = files("config/pmd/ruleset.xml")
-}
-
-project.ext {
-  pacticipantVersion = getCheckedOutGitCommitHash()
 }
 
 static def getCheckedOutGitCommitHash() {
@@ -255,11 +251,27 @@ def versions = [
     springSecurity      : '6.1.2',
     testcontainers      : '1.18.3',
     wiremock            : '2.35.0',
-    pactVersion         : '4.3.4',
+    pactVersion         : '4.3.15',
     serenity            : '3.1.20',
 ]
 
 ext['jackson.version'] = '2.14.1'
+
+
+rootProject.tasks.named("processTestResources") {
+  duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named("processFunctionalTestResources") {
+  duplicatesStrategy = 'include'
+}
+
+rootProject.tasks.named("processIntegrationTestResources") {
+  duplicatesStrategy = 'include'
+}
+rootProject.tasks.named("processContractTestResources") {
+  duplicatesStrategy = 'include'
+}
 
 dependencies {
 
@@ -318,18 +330,38 @@ dependencies {
     functionalTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api', version: versions.apiGuardian
     integrationTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api', version: versions.apiGuardian
 
-  //pact contract testing
-  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-  contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.7.12'
+    //pact contract testing
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit', version: versions.pactVersion
+    contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
+    contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
 
-  contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
-  contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
-
-  contractTestImplementation sourceSets.main.runtimeClasspath
-  contractTestImplementation sourceSets.test.runtimeClasspath
+    contractTestImplementation sourceSets.main.runtimeClasspath
+    contractTestImplementation sourceSets.test.runtimeClasspath
 }
 
 mainClassName = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'
+
+task runAndPublishConsumerPactTests(type: Test){
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+
+}
+
+runAndPublishConsumerPactTests.finalizedBy pactPublish
+project.ext.pacticipantVersion = getCheckedOutGitCommitHash()
+
+pact {
+  broker {
+    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
+  }
+  publish {
+    pactDirectory = 'build/pacts'
+    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
+    version = project.pacticipantVersion
+  }
+}
 
 task contract(type: Test, description: 'Runs the pact contract tests.', group: 'Verification') {
   description = "Runs the consumer Pact tests"
@@ -337,37 +369,6 @@ task contract(type: Test, description: 'Runs the pact contract tests.', group: '
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
 }
-
-task runAndPublishConsumerPactTests(type: Test){
-  logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-}
-
-runAndPublishConsumerPactTests.dependsOn contract
-runAndPublishConsumerPactTests.finalizedBy pactPublish
-
-pact {
-  broker {
-    pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
-  }
-  publish {
-    pactDirectory = 'pacts'
-    tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
-    version = project.pacticipantVersion
-  }
-}
-
-task runProviderPactVerification(type: Test) {
-  logger.lifecycle("Runs provider pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-  systemProperty 'pact.verifier.publishResults', System.getProperty('pact.verifier.publishResults')
-  systemProperty 'pact.provider.version', project.pacticipantVersion
-}
-
-runProviderPactVerification.dependsOn contract
-runProviderPactVerification.finalizedBy pactVerify
 
 bootJar {
     getArchiveFileName().set(provider {
@@ -381,19 +382,4 @@ bootJar {
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
-}
-
-rootProject.tasks.named("processTestResources") {
-  duplicatesStrategy = 'include'
-}
-
-rootProject.tasks.named("processFunctionalTestResources") {
-  duplicatesStrategy = 'include'
-}
-
-rootProject.tasks.named("processIntegrationTestResources") {
-  duplicatesStrategy = 'include'
-}
-rootProject.tasks.named("processContractTestResources") {
-  duplicatesStrategy = 'include'
 }
