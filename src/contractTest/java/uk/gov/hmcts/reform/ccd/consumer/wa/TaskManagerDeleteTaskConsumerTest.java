@@ -35,7 +35,7 @@ public class TaskManagerDeleteTaskConsumerTest extends SpringBootContractBaseTes
 
     @Test
     @PactTestFor(pactMethod = "executeDeleteTaskById201", pactVersion = PactSpecVersion.V3)
-    void testDeleteTaskByTaskId201Test(MockServer mockServer) {
+    void testDeleteTaskByTaskId201(MockServer mockServer) {
 
         RestAssured
             .given()
