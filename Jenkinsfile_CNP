@@ -6,6 +6,7 @@ import uk.gov.hmcts.contino.GradleBuilder
 import uk.gov.hmcts.contino.Kubectl
 import uk.gov.hmcts.contino.GithubAPI
 import uk.gov.hmcts.pipeline.TeamConfig
+import uk.gov.hmcts.contino.AppPipelineDsl
 
 def type = "java"
 def product = "ccd"
@@ -117,11 +118,16 @@ withPipeline(type, product, component) {
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
+    env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
+    env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+    env.PACT_BROKER_PORT = "443"
+    env.PACT_BROKER_SCHEME = "https"
 
     def githubApi = new GithubAPI(this)
     if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
       enableCleanupOfHelmReleaseAlways()
     }
+    enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
   }
 
   onNonPR() {
@@ -135,6 +141,15 @@ withPipeline(type, product, component) {
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
+    env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
+    env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
+    env.PACT_BROKER_PORT = "443"
+    env.PACT_BROKER_SCHEME = "https"
+    enablePactAs([PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
+  }
+
+  afterSuccess('pact-provider-verification') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'build/reports/tests/**/*'
   }
 
   afterAlways('akschartsinstall') {
