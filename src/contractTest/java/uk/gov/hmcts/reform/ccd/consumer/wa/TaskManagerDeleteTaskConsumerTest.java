@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.ccd.SpringBootContractBaseTest;
 public class TaskManagerDeleteTaskConsumerTest extends SpringBootContractBaseTest {
 
     private static final String WA_URL = "/task";
-    private static final String WA_DELETE_TASK = WA_URL + "/" + "delete";
+    private static final String WA_DELETE_TASK = WA_URL + "/delete";
 
     @Pact(provider = "wa_task_management_api_delete_task_by_id", consumer = "wa_task_management_api")
     public RequestResponsePact executeDeleteTaskById201(PactDslWithProvider builder) {
