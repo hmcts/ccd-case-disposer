@@ -28,6 +28,7 @@ public class TaskManagerDeleteTaskConsumerTest extends SpringBootContractBaseTes
             .method(HttpMethod.POST.toString())
             .body(deleteTaskWithRequest(), String.valueOf(ContentType.JSON))
             .matchHeader(SERVICE_AUTHORIZATION, SERVICE_AUTH_TOKEN)
+            .matchHeader(AUTHORIZATION, AUTH_TOKEN)
             .willRespondWith()
             .status(HttpStatus.CREATED.value())
             .toPact();
