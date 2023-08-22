@@ -23,6 +23,7 @@ public abstract class SpringBootContractBaseTest {
     public static final String PACT_TEST_CLIENT_SECRET_VALUE = "pactsecret";
     public static final String PACT_TEST_SCOPES_VALUE = "openid profile roles";
     public static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    public static final String AUTHORIZATION = "Authorization";
     public static final String AUTH_TOKEN = "Bearer someAuthorizationToken";
     public static final String SERVICE_AUTH_TOKEN = "Bearer someServiceAuthorizationToken";
 
