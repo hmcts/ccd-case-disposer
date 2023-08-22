@@ -13,8 +13,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.SpringBootContractBaseTest;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
 public class TaskManagerDeleteTaskConsumerTest extends SpringBootContractBaseTest {
 
     private static final String WA_URL = "/task";
