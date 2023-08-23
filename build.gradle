@@ -330,11 +330,6 @@ dependencies {
     integrationTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api', version: versions.apiGuardian
 
     //pact contract testing
-    runtimeOnly("org.antlr:antlr4-runtime") {
-      version {
-        strictly '4.9.2'
-      }
-    }
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit', version: versions.pactVersion
     contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
