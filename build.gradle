@@ -12,7 +12,7 @@ plugins {
   id 'io.freefair.lombok' version '8.2.2'
   id 'org.flywaydb.flyway' version '9.21.1'
   id "info.solidsoft.pitest" version '1.9.11'
-  id "au.com.dius.pact" version '4.4.0-beta.2'
+  id "au.com.dius.pact" version '4.6.2'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -250,7 +250,7 @@ def versions = [
     springSecurity      : '6.1.2',
     testcontainers      : '1.18.3',
     wiremock            : '2.35.0',
-    pactVersion         : '4.4.0-beta.2',
+    pactVersion         : '4.6.1',
     serenity            : '3.1.20',
 ]
 
@@ -341,15 +341,6 @@ dependencies {
 
 mainClassName = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'
 
-task runAndPublishConsumerPactTests(type: Test){
-  logger.lifecycle("Runs pact Tests")
-  testClassesDirs = sourceSets.contractTest.output.classesDirs
-  classpath = sourceSets.contractTest.runtimeClasspath
-
-}
-
-runAndPublishConsumerPactTests.finalizedBy pactPublish
-
 pact {
   broker {
     pactBrokerUrl = System.getenv("PACT_BROKER_FULL_URL") ?: 'http://localhost:80'
@@ -359,6 +350,13 @@ pact {
     tags = [System.getenv("PACT_BRANCH_NAME") ?: 'Dev']
     version = project.pacticipantVersion
   }
+}
+
+task runAndPublishConsumerPactTests(type: Test){
+  logger.lifecycle("Runs pact Tests")
+  testClassesDirs = sourceSets.contractTest.output.classesDirs
+  classpath = sourceSets.contractTest.runtimeClasspath
+  finalizedBy(pactPublish)
 }
 
 task contract(type: Test, description: 'Runs the pact contract tests.', group: 'Verification') {
