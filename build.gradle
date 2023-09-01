@@ -186,7 +186,7 @@ dependencyManagement {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
         }
-        dependencySet(group: 'org.yaml', version: '2.1') {
+        dependencySet(group: 'org.yaml', version: '2.2') {
             entry 'snakeyaml'
         }
     }
