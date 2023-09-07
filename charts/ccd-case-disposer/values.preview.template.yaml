@@ -20,6 +20,7 @@ job:
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
+    TASKS_HOST: http://wa-task-management-api-aat.service.core-compute-aat.internal
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net

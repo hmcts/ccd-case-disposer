@@ -70,6 +70,21 @@ public class TestConstants {
             Map.entry("1504259907350000", buildCaseActionPostRequest("1504259907350000"))
     );
 
+    public static Map<String, Integer> TASKS_DELETE = Map.ofEntries(
+            Map.entry("1504259907353529", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353528", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353526", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353525", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353524", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353523", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353522", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353519", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353518", HttpStatus.CREATED.value()),
+            Map.entry("1504259907353527", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351111", HttpStatus.CREATED.value()),
+            Map.entry("1504259907350000", HttpStatus.CREATED.value())
+    );
+
 
 
     private static CaseActionPostRequestResponse buildCaseActionPostRequest(final String caseRef) {

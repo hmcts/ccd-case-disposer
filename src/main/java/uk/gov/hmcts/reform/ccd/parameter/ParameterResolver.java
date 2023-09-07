@@ -31,6 +31,8 @@ public interface ParameterResolver {
 
     String getLogAndAuditHost();
 
+    String getTasksHost();
+
     Boolean getCheckCaseRolesExist();
 
     Integer getAppInsightsLogSize();

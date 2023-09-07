@@ -7,6 +7,8 @@ import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.data.tm.DeleteCaseTasksAction;
+import uk.gov.hmcts.reform.ccd.data.tm.DeleteTasksRequest;
 
 import java.util.Collections;
 
@@ -20,6 +22,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.LAU_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_QUERY;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.TASKS_DELETE;
 
 @Configuration
 public class WireMockStubs {
@@ -30,7 +33,7 @@ public class WireMockStubs {
     private static final String ROLES_DELETE_PATH = "/am/role-assignments/query/delete";
     private static final String ROLES_QUERY_PATH = "/am/role-assignments/query";
     private static final String LAU_SAVE_PATH = "/audit/caseAction";
-
+    private static final String TASKS_DELETE_PATH = "/task/delete";
     private RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
 
     public void setUpStubs(final WireMockServer wireMockServer) {
@@ -39,6 +42,17 @@ public class WireMockStubs {
         setupDeleteRolesStub(wireMockServer);
         setupQueryRolesStub(wireMockServer);
         setupLauStub(wireMockServer);
+        setupTasksStub(wireMockServer);
+    }
+
+    private void setupTasksStub(final WireMockServer wireMockServer) {
+        TASKS_DELETE.entrySet().forEach(entry ->
+                wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
+                        .withRequestBody(equalToJson(new Gson()
+                                .toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(entry.getKey())))))
+                        .willReturn(aResponse()
+                                .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+                                .withStatus(201))));
     }
 
     private void setupLauStub(final WireMockServer wireMockServer) {

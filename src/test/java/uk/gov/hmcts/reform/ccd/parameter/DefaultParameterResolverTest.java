@@ -28,6 +28,7 @@ class DefaultParameterResolverTest {
 
     private static final String DOCUMENT_STORE_HOST = "documentStoreHost";
     private static final String ROLE_ASSIGNMENT_HOST = "roleAssignmentHost";
+    private static final String TASKS_HOST = "tasksHost";
 
     private static final String THREAD_MAX_POOL_SIZE = "threadMaxPoolSize";
 
@@ -68,6 +69,9 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      ROLE_ASSIGNMENT_HOST, "http://localhost:4096");
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                                     TASKS_HOST, "http://localhost:4000");
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST, true);
@@ -151,6 +155,14 @@ class DefaultParameterResolverTest {
         assertThat(defaultParameterResolver.getDocumentStoreHost(),
                 is(equalTo("http://localhost:4603")));
     }
+
+    @Test
+    @DisplayName("should get correct value for getTasksHost")
+    void shouldGetCorrectValueForGetTaskHost() {
+        assertThat(defaultParameterResolver.getTasksHost(),
+                   is(equalTo("http://localhost:4000")));
+    }
+
 
     @Test
     @DisplayName("should get correct value for getRoleAssignmentsHost")
