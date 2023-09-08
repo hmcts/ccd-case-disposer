@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.LauTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.TaskDeleteTestUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,9 @@ public class TestDataProvider {
 
     @Inject
     private RoleDeleteTestUtils roleDeleteTestUtils;
+
+    @Inject
+    private TaskDeleteTestUtils taskDeleteTestUtils;
 
     @Inject
     private LauTestUtils lauTestUtils;
@@ -86,6 +90,10 @@ public class TestDataProvider {
 
     protected void verifyRoleDeletion(final Map<Long, List<String>> deletableRoles) {
         roleDeleteTestUtils.verifyRoleAssignmentDeletion(deletableRoles);
+    }
+
+    protected void verifyTaskDeletion(List<Long> deletableRowIds) {
+        taskDeleteTestUtils.verifyTasksDeletion(deletableRowIds);
     }
 
     protected void verifyLauLogs(final List<List<Long>> roleDeletionCaseRefs) {

@@ -58,6 +58,7 @@ withNightlyPipeline(type, product, component) {
   env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
   env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
   env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
+  env.TASKS_HOST = 'http://wa-task-management-api-aat.service.core-compute-aat.internal'
   env.DEFINITION_STORE_HOST = 'http://ccd-definition-store-api-aat.service.core-compute-aat.internal'
   env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
   env.Rules = params.SecurityRules
