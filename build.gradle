@@ -313,7 +313,7 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
     testImplementation group: 'org.awaitility', name: 'awaitility', version: '3.1.6'
     testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: versions.wiremock
-    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.0'
+    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.1'
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.pitest
