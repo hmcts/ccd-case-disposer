@@ -240,7 +240,7 @@ def versions = [
     junit               : '5.10.0',
     junitPlatform       : '1.9.2',
     lombok              : '1.18.28',
-    pitest              : '1.9.11',
+    pitest              : '1.14.4',
     reformLogging       : '6.0.1',
     restAssured         : '5.3.2',
     s2sClient           : '5.0.0',
