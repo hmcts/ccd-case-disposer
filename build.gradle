@@ -235,6 +235,7 @@ def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.13.0',
     elasticsearch       : '7.17.13',
+    gradlePitest        : '1.9.11',
     idamClient          : '3.0.1',
     jersey              : '3.1.3',
     junit               : '5.10.0',
@@ -316,7 +317,7 @@ dependencies {
     testImplementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.1'
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.5.1'
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
-    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.pitest
+    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
     testImplementation 'com.github.hmcts:fortify-client:1.3.0:all'
 
