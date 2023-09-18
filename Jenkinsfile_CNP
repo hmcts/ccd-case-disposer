@@ -4,7 +4,6 @@
 
 import uk.gov.hmcts.contino.GradleBuilder
 import uk.gov.hmcts.contino.Kubectl
-import uk.gov.hmcts.contino.GithubAPI
 import uk.gov.hmcts.pipeline.TeamConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 
@@ -124,10 +123,6 @@ withPipeline(type, product, component) {
     env.PACT_BROKER_PORT = "443"
     env.PACT_BROKER_SCHEME = "https"
 
-    def githubApi = new GithubAPI(this)
-    if (!githubApi.getLabelsbyPattern(env.BRANCH_NAME, "keep-helm")) {
-      enableCleanupOfHelmReleaseAlways()
-    }
     enablePactAs([AppPipelineDsl.PactRoles.CONSUMER, AppPipelineDsl.PactRoles.PROVIDER])
   }
 
