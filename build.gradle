@@ -178,10 +178,6 @@ dependencyCheck {
 dependencyManagement {
     dependencies {
         dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.76'
-        // CVE-2018-10237 - Unbounded memory allocation
-        dependencySet(group: 'com.google.guava', version: '32.1.2-jre') {
-            entry 'guava'
-        }
         dependencySet(group: 'org.springframework.cloud', version: '4.0.4') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
@@ -292,7 +288,11 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'commons-net', name: 'commons-net', version: '3.9.0'
-    implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4'
+    implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4', {
+      exclude group: 'com.google.guava', module: 'guava'
+    }
+    implementation group: 'com.google.guava', name: 'guava', version: '32.1.2-jre'
+
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
@@ -340,7 +340,10 @@ dependencies {
     contractTestImplementation sourceSets.test.runtimeClasspath
 }
 
-mainClassName = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'
+application {
+  mainClass = 'uk.gov.hmcts.reform.ccd.ApplicationBootstrap'
+}
+
 
 pact {
   broker {
