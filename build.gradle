@@ -11,7 +11,7 @@ plugins {
   id 'uk.gov.hmcts.java' version '0.12.45'
   id 'io.freefair.lombok' version '8.3'
   id 'org.flywaydb.flyway' version '9.22.1'
-  id "info.solidsoft.pitest" version '1.9.11'
+  id "info.solidsoft.pitest" version '1.15.0'
   id "au.com.dius.pact" version '4.6.3'
 }
 
