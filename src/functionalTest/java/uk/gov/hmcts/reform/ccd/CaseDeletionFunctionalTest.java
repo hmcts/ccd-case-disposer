@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 @ActiveProfiles("functional")
 @SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
+@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam"})
 class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @Autowired
