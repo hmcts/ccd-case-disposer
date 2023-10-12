@@ -240,7 +240,7 @@ def versions = [
     pitest              : '1.15.1',
     reformLogging       : '6.0.1',
     restAssured         : '5.3.2',
-    s2sClient           : '5.0.0',
+    s2sClient           : '5.1.1',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
     springFramework     : '6.0.12',
