@@ -251,7 +251,7 @@ def versions = [
     serenity            : '3.1.20',
 ]
 
-ext['jackson.version'] = '2.14.1'
+ext['jackson.version'] = '2.15.3'
 project.ext.pacticipantVersion = getCheckedOutGitCommitHash()
 
 rootProject.tasks.named("processTestResources") {
