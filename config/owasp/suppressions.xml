@@ -3,13 +3,6 @@
 
   <!--Please add all the false positives under the below section-->
   <suppress>
-    <notes><![CDATA[
-      name: jackson-databind
-      Does not seem to be considered as CVE: https://github.com/FasterXML/jackson-databind/issues/3972
-    ]]></notes>
-    <cve>CVE-2023-35116</cve>
-  </suppress>
-  <suppress>
     <packageUrl regex="true">^pkg:maven/com.massisframework/j-text-utils@.*$</packageUrl>
     <cve>CVE-2021-4277</cve>
   </suppress>
