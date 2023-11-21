@@ -244,7 +244,7 @@ def versions = [
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
     springFramework     : '6.1.0',
-    springSecurity      : '6.1.5',
+    springSecurity      : '6.2.0',
     testcontainers      : '1.19.2',
     wiremock            : '3.0.1',
     pactVersion         : '4.6.3',
