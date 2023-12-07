@@ -303,7 +303,7 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '7.4'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.4.18'
 
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.0'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.1'
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
     implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: versions.elasticsearch
