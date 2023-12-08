@@ -202,7 +202,7 @@ repositories {
 
 pitest {
     pitestVersion.set('1.9.11')
-    junit5PluginVersion.set('1.1.2')
+    junit5PluginVersion.set('1.2.1')
     targetClasses = ['uk.gov.hmcts.reform.*']
     excludedClasses = [
             'uk.gov.hmcts.reform.ccd.madeup.*'
@@ -255,7 +255,7 @@ def versions = [
     serenity            : '3.1.20',
 ]
 
-ext['jackson.version'] = '2.15.3'
+ext['jackson.version'] = '2.16.0'
 project.ext.pacticipantVersion = getCheckedOutGitCommitHash()
 
 rootProject.tasks.named("processTestResources") {
