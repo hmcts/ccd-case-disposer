@@ -236,7 +236,7 @@ def versions = [
     commonsIo           : '2.15.1',
     elasticsearch       : '7.17.15',
     gradlePitest        : '1.15.0',
-    idamClient          : '3.0.2',
+    idamClient          : '3.0.3',
     jersey              : '3.1.4',
     junit               : '5.10.1',
     junitPlatform       : '1.9.2',
