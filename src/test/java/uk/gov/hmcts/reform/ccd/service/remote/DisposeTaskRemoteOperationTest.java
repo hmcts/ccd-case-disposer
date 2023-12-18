@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_TASKS_PATH;
 public class DisposeTaskRemoteOperationTest {
 
     @Mock
-    private RestClientBuilder restClientBuilder;
+    private CcdRestClientBuilder ccdRestClientBuilder;
 
     @Mock
     private TasksDeletionRecordHolder taskDeletionRecordHolder;
@@ -56,12 +56,12 @@ public class DisposeTaskRemoteOperationTest {
 
         when(response.getStatus()).thenReturn(201);
 
-        when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_TASKS_PATH, jsonRequest)).thenReturn(response);
+        when(ccdRestClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_TASKS_PATH, jsonRequest)).thenReturn(response);
 
         disposeTasksRemoteOperation.delete(caseData);
 
         verify(taskDeletionRecordHolder, times(1)).setCaseTasksDeletionResults("1234567890123456",
                                                                                201);
-        verify(restClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost", DELETE_TASKS_PATH, jsonRequest);
+        verify(ccdRestClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost", DELETE_TASKS_PATH, jsonRequest);
     }
 }

@@ -26,7 +26,7 @@ public class LogAndAuditRemoteOperation {
 
     private final ParameterResolver parameterResolver;
 
-    private final RestClientBuilder restClientBuilder;
+    private final CcdRestClientBuilder ccdRestClientBuilder;
 
     private final SecurityUtil securityUtil;
 
@@ -38,11 +38,11 @@ public class LogAndAuditRemoteOperation {
     private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     public LogAndAuditRemoteOperation(final ParameterResolver parameterResolver,
-                                      final RestClientBuilder restClientBuilder,
+                                      final CcdRestClientBuilder ccdRestClientBuilder,
                                       final LauRecordHolder lauRecordHolder,
                                       final SecurityUtil securityUtil) {
         this.parameterResolver = parameterResolver;
-        this.restClientBuilder = restClientBuilder;
+        this.ccdRestClientBuilder = ccdRestClientBuilder;
         this.lauRecordHolder = lauRecordHolder;
         this.securityUtil = securityUtil;
     }
@@ -52,10 +52,11 @@ public class LogAndAuditRemoteOperation {
             try {
                 final CaseActionPostRequestResponse caseActionPostRequestResponse =
                         buildCaseActionPostRequest(caseData);
-                final String logAndAuditPostResponse =
-                        restClientBuilder.postRequestWithServiceAuthHeader(parameterResolver.getLogAndAuditHost(),
-                                LAU_SAVE_PATH,
-                                gson.toJson(caseActionPostRequestResponse));
+                final String logAndAuditPostResponse = ccdRestClientBuilder.postRequestWithServiceAuthHeader(
+                    parameterResolver.getLogAndAuditHost(),
+                    LAU_SAVE_PATH,
+                    gson.toJson(caseActionPostRequestResponse)
+                );
 
                 logResponse(logAndAuditPostResponse);
             } catch (final Exception exception) {

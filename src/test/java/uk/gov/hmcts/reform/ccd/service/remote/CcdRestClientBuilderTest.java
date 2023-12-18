@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @ExtendWith(MockitoExtension.class)
-class RestClientBuilderTest {
+class CcdRestClientBuilderTest {
 
     @Mock
     private SecurityUtil securityUtil;
@@ -39,12 +39,12 @@ class RestClientBuilderTest {
         final Invocation.Builder builder = mock(Invocation.Builder.class);
         final Response response = mock(Response.class);
 
-        final RestClientBuilder restClientBuilder = new RestClientBuilder(securityUtil);
+        final CcdRestClientBuilder ccdRestClientBuilder = new CcdRestClientBuilder(securityUtil);
         final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest("123");
         final Gson gson = new Gson();
         final String requestBody = gson.toJson(documentsDeleteRequest);
 
-        setField(restClientBuilder, "client", client);
+        setField(ccdRestClientBuilder, "client", client);
 
         doReturn("Bearer 12345").when(securityUtil).getServiceAuthorization();
         when(client.target(any(String.class))).thenReturn(webTarget);
@@ -54,7 +54,7 @@ class RestClientBuilderTest {
         when(builder.post(Entity.json(requestBody))).thenReturn(response);
         when(response.readEntity(String.class)).thenReturn("Web client response");
 
-        final String postResponse = restClientBuilder.postRequestWithServiceAuthHeader(
+        final String postResponse = ccdRestClientBuilder.postRequestWithServiceAuthHeader(
             "http://localhost:9090",
             "/delete",
             requestBody
@@ -71,12 +71,12 @@ class RestClientBuilderTest {
         final Invocation.Builder builder = mock(Invocation.Builder.class);
         final Response response = mock(Response.class);
 
-        final RestClientBuilder restClientBuilder = new RestClientBuilder(securityUtil);
+        final CcdRestClientBuilder ccdRestClientBuilder = new CcdRestClientBuilder(securityUtil);
         final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest("123");
         final Gson gson = new Gson();
         final String requestBody = gson.toJson(documentsDeleteRequest);
 
-        setField(restClientBuilder, "client", client);
+        setField(ccdRestClientBuilder, "client", client);
 
         doReturn("Bearer 12345").when(securityUtil).getServiceAuthorization();
         doReturn("Bearer 5678").when(securityUtil).getIdamClientToken();
@@ -87,7 +87,7 @@ class RestClientBuilderTest {
         when(builder.header(AUTHORISATION_HEADER, "Bearer 5678")).thenReturn(builder);
         when(builder.post(Entity.json(requestBody))).thenReturn(response);
 
-        final Response postResponse = restClientBuilder.postRequestWithAllHeaders(
+        final Response postResponse = ccdRestClientBuilder.postRequestWithAllHeaders(
             "http://localhost:9090",
             "/delete",
             requestBody
@@ -99,8 +99,8 @@ class RestClientBuilderTest {
 
     @Test
     void shouldGetClient() {
-        final RestClientBuilder restClientBuilder = new RestClientBuilder(securityUtil);
-        final Client client = restClientBuilder.getClient();
+        final CcdRestClientBuilder ccdRestClientBuilder = new CcdRestClientBuilder(securityUtil);
+        final Client client = ccdRestClientBuilder.getClient();
 
         assertThat(client.getConfiguration().getProperty(READ_TIMEOUT)).isEqualTo(60000);
         assertThat(client.getConfiguration().getProperty(CONNECT_TIMEOUT)).isEqualTo(60000);

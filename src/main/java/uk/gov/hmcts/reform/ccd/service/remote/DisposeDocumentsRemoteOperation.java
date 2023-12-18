@@ -21,15 +21,15 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     private final ParameterResolver parameterResolver;
 
-    private final RestClientBuilder restClientBuilder;
+    private final CcdRestClientBuilder ccdRestClientBuilder;
     private final Gson gson = new Gson();
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
     @Autowired
-    public DisposeDocumentsRemoteOperation(final RestClientBuilder restClientBuilder,
+    public DisposeDocumentsRemoteOperation(final CcdRestClientBuilder ccdRestClientBuilder,
                                            final ParameterResolver parameterResolver,
                                            final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
-        this.restClientBuilder = restClientBuilder;
+        this.ccdRestClientBuilder = ccdRestClientBuilder;
         this.parameterResolver = parameterResolver;
         this.documentDeletionRecordHolder = documentDeletionRecordHolder;
     }
@@ -90,7 +90,7 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     @Async
     String postDocument(final String requestBody) {
-        return restClientBuilder
+        return ccdRestClientBuilder
                 .postRequestWithServiceAuthHeader(parameterResolver.getDocumentStoreHost(),
                         DELETE_DOCUMENT_PATH,
                         requestBody);

@@ -35,7 +35,7 @@ class LogAndAuditRemoteOperationTest {
     private ParameterResolver parameterResolver;
 
     @Mock
-    private RestClientBuilder restClientBuilder;
+    private CcdRestClientBuilder ccdRestClientBuilder;
 
     @Mock
     private SecurityUtil securityUtil;
@@ -60,14 +60,14 @@ class LogAndAuditRemoteOperationTest {
         final String caseActionResponse =
                 new Gson().toJson(new CaseActionPostRequestResponse(ActionLog.builder().caseRef("123").build()));
 
-        when(restClientBuilder.postRequestWithServiceAuthHeader(eq("http://localhost"), eq(LAU_SAVE_PATH),
-                anyString())).thenReturn(caseActionResponse);
+        when(ccdRestClientBuilder.postRequestWithServiceAuthHeader(eq("http://localhost"), eq(LAU_SAVE_PATH),
+                                                                   anyString())).thenReturn(caseActionResponse);
 
         logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(DELETABLE_CASE_DATA_WITH_PAST_TTL);
 
         verify(lauRecordHolder, times(1)).addLauCaseRef("123");
-        verify(restClientBuilder, times(1)).postRequestWithServiceAuthHeader(eq("http://localhost"), eq(LAU_SAVE_PATH),
-                anyString());
+        verify(ccdRestClientBuilder, times(1)).postRequestWithServiceAuthHeader(eq("http://localhost"), eq(LAU_SAVE_PATH),
+                                                                                anyString());
     }
 
     @Test
@@ -77,7 +77,7 @@ class LogAndAuditRemoteOperationTest {
                     new Gson().toJson(new CaseActionPostRequestResponse(ActionLog.builder().caseRef("1").build()));
 
             doThrow(new LogAndAuditException("Hmmmmm something is wrong here"))
-                    .when(restClientBuilder)
+                    .when(ccdRestClientBuilder)
                     .postRequestWithServiceAuthHeader("http://localhost", LAU_SAVE_PATH,
                             caseActionResponse);
 

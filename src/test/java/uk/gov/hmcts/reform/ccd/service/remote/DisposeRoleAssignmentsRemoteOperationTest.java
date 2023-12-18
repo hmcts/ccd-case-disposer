@@ -37,7 +37,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;
 class DisposeRoleAssignmentsRemoteOperationTest {
 
     @Mock
-    private RestClientBuilder restClientBuilder;
+    private CcdRestClientBuilder ccdRestClientBuilder;
 
     @Mock
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
@@ -69,15 +69,15 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
         final String requestBody = gson.toJson(roleAssignmentsDeleteRequest);
 
-        when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestBody)).thenReturn(response);
+        when(ccdRestClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestBody)).thenReturn(response);
 
         disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
                                                                                200);
-        verify(restClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost",
-                                                                      DELETE_ROLE_PATH,
-                                                                      requestBody);
+        verify(ccdRestClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost",
+                                                                         DELETE_ROLE_PATH,
+                                                                         requestBody);
     }
 
     @Test
@@ -111,19 +111,19 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
         final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
 
-        when(restClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestDeleteBody)).thenReturn(dResponse);
-        when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
+        when(ccdRestClientBuilder.postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, requestDeleteBody)).thenReturn(dResponse);
+        when(ccdRestClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
 
         disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
                                                                                200);
-        verify(restClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost",
-                                                                      DELETE_ROLE_PATH,
-                                                                      requestDeleteBody);
-        verify(restClientBuilder, times(1)).postRequestWithRoleAssignmentFetchContentType("http://localhost",
-                                                                      QUERY_ROLE_PATH,
-                                                                      requestQueryBody);
+        verify(ccdRestClientBuilder, times(1)).postRequestWithAllHeaders("http://localhost",
+                                                                         DELETE_ROLE_PATH,
+                                                                         requestDeleteBody);
+        verify(ccdRestClientBuilder, times(1)).postRequestWithRoleAssignmentFetchContentType("http://localhost",
+                                                                                             QUERY_ROLE_PATH,
+                                                                                             requestQueryBody);
     }
 
     @Test
@@ -149,18 +149,18 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
         final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
 
-        when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
+        when(ccdRestClientBuilder.postRequestWithRoleAssignmentFetchContentType("http://localhost", QUERY_ROLE_PATH, requestQueryBody)).thenReturn(qResponse);
 
         disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults("1234567890123456",
                                                                                200);
-        verify(restClientBuilder, times(0)).postRequestWithAllHeaders(eq("http://localhost"),
-                                                                      eq(DELETE_ROLE_PATH),
-                                                                      anyString());
-        verify(restClientBuilder, times(1)).postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"),
-                                                                      eq(QUERY_ROLE_PATH),
-                                                                      eq(requestQueryBody));
+        verify(ccdRestClientBuilder, times(0)).postRequestWithAllHeaders(eq("http://localhost"),
+                                                                         eq(DELETE_ROLE_PATH),
+                                                                         anyString());
+        verify(ccdRestClientBuilder, times(1)).postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"),
+                                                                                             eq(QUERY_ROLE_PATH),
+                                                                                             eq(requestQueryBody));
     }
 
     @Test
@@ -173,7 +173,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
             when(response.getStatus()).thenReturn(500);
 
-            when(restClientBuilder.postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"), eq(QUERY_ROLE_PATH), anyString())).thenReturn(response);
+            when(ccdRestClientBuilder.postRequestWithRoleAssignmentFetchContentType(eq("http://localhost"), eq(QUERY_ROLE_PATH), anyString())).thenReturn(response);
 
             disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
@@ -193,7 +193,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
             doReturn(false).when(parameterResolver).getCheckCaseRolesExist();
 
             doThrow(new RoleAssignmentDeletionException(caseRef))
-                    .when(restClientBuilder)
+                    .when(ccdRestClientBuilder)
                     .postRequestWithAllHeaders("http://localhost", DELETE_ROLE_PATH, jsonRequest);
 
             disposeRoleAssignmentsRemoteOperation.delete(caseData);
