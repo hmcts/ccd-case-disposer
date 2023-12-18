@@ -24,13 +24,13 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
 
     private TasksDeletionRecordHolder tasksDeletionRecordHolder;
 
-    private final RestClientBuilder restClientBuilder;
+    private final CcdRestClientBuilder ccdRestClientBuilder;
 
     @Autowired
-    public DisposeTasksRemoteOperation(final RestClientBuilder restClientBuilder,
+    public DisposeTasksRemoteOperation(final CcdRestClientBuilder ccdRestClientBuilder,
                                        final ParameterResolver parameterResolver,
                                        final TasksDeletionRecordHolder tasksDeletionRecordHolder) {
-        this.restClientBuilder = restClientBuilder;
+        this.ccdRestClientBuilder = ccdRestClientBuilder;
         this.parameterResolver = parameterResolver;
         this.tasksDeletionRecordHolder = tasksDeletionRecordHolder;
     }
@@ -67,7 +67,7 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
 
     @Async
     Response deleteTasks(final String requestDeleteBody) {
-        return restClientBuilder
+        return ccdRestClientBuilder
                 .postRequestWithAllHeaders(parameterResolver.getTasksHost(),
                                            DELETE_TASKS_PATH, requestDeleteBody);
     }

@@ -28,13 +28,13 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
 
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
 
-    private final RestClientBuilder restClientBuilder;
+    private final CcdRestClientBuilder ccdRestClientBuilder;
 
     @Autowired
-    public DisposeRoleAssignmentsRemoteOperation(final RestClientBuilder restClientBuilder,
+    public DisposeRoleAssignmentsRemoteOperation(final CcdRestClientBuilder ccdRestClientBuilder,
                                                  final ParameterResolver parameterResolver,
                                                  final RoleDeletionRecordHolder roleDeletionRecordHolder) {
-        this.restClientBuilder = restClientBuilder;
+        this.ccdRestClientBuilder = ccdRestClientBuilder;
         this.parameterResolver = parameterResolver;
         this.roleDeletionRecordHolder = roleDeletionRecordHolder;
     }
@@ -72,7 +72,7 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
 
         final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
 
-        final Response roleAssignmentsQueryResponse = restClientBuilder
+        final Response roleAssignmentsQueryResponse = ccdRestClientBuilder
             .postRequestWithRoleAssignmentFetchContentType(parameterResolver.getRoleAssignmentsHost(),
                                                            QUERY_ROLE_PATH, requestQueryBody);
 
@@ -107,7 +107,7 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
 
     @Async
     Response deleteRoleAssignment(final String requestDeleteBody) {
-        return restClientBuilder
+        return ccdRestClientBuilder
                 .postRequestWithAllHeaders(parameterResolver.getRoleAssignmentsHost(),
                         DELETE_ROLE_PATH, requestDeleteBody);
     }

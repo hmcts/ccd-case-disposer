@@ -20,7 +20,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_H
 
 @Slf4j
 @Service
-public class RestClientBuilder {
+public class CcdRestClientBuilder {
 
     private static final int CLIENT_READ_TIMEOUT = 60000;
     private static final int CLIENT_CONNECT_TIMEOUT = 60000;
@@ -28,7 +28,7 @@ public class RestClientBuilder {
     private final SecurityUtil securityUtil;
     private Client client;
 
-    public RestClientBuilder(final SecurityUtil securityUtil) {
+    public CcdRestClientBuilder(final SecurityUtil securityUtil) {
         this.securityUtil = securityUtil;
         client = getClient();
     }

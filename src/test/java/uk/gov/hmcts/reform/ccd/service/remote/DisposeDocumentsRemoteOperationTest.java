@@ -32,7 +32,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 class DisposeDocumentsRemoteOperationTest {
 
     @Mock
-    private RestClientBuilder restClientBuilder;
+    private CcdRestClientBuilder ccdRestClientBuilder;
 
     @Mock
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
@@ -56,13 +56,13 @@ class DisposeDocumentsRemoteOperationTest {
         final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
         final String jsonResponse = new Gson().toJson(new CaseDocumentsDeletionResults(1, 1));
 
-        when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest)).thenReturn(jsonResponse);
+        when(ccdRestClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest)).thenReturn(jsonResponse);
 
         disposeDocumentsRemoteOperation.delete(caseData);
 
         verify(documentDeletionRecordHolder, times(1)).setCaseDocumentsDeletionResults(eq("1234567890123456"),
                 any(CaseDocumentsDeletionResults.class));
-        verify(restClientBuilder, times(1)).postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest);
+        verify(ccdRestClientBuilder, times(1)).postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest);
     }
 
     @Test
@@ -71,7 +71,7 @@ class DisposeDocumentsRemoteOperationTest {
             final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
 
             doThrow(new DocumentDeletionException("1234567890123456"))
-                    .when(restClientBuilder)
+                    .when(ccdRestClientBuilder)
                     .postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH,
                             jsonRequest);
 
@@ -95,7 +95,7 @@ class DisposeDocumentsRemoteOperationTest {
                     .setCaseDocumentsDeletionResults(eq("1234567890123456"),
                             any(CaseDocumentsDeletionResults.class));
 
-            when(restClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest))
+            when(ccdRestClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest))
                     .thenReturn(jsonResponse);
 
             disposeDocumentsRemoteOperation.delete(caseData);
