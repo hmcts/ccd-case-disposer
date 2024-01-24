@@ -21,6 +21,8 @@ steps:
     cmd: docker pull --platform linux/arm64 hmctspublic.azurecr.io/base/java:21-distroless && docker tag hmctspublic.azurecr.io/base/java:21-distroless hmctspublic.azurecr.io/base/java/linux/arm64:21-distroless
     when:
       - pull-base-image-amd64
+    retries: 10
+    retryDelay: 5
 
   - id: runtime-arm64
     build: >
@@ -47,6 +49,8 @@ steps:
     cmd: docker manifest create {{.Run.Registry}}/{{CI_IMAGE_TAG}} {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64 {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64
     when:
       - push-images
+    retries: 10
+    retryDelay: 5
 
   - id: manifest-push
     cmd: docker manifest push --purge {{.Run.Registry}}/{{CI_IMAGE_TAG}}
