@@ -238,7 +238,7 @@ def versions = [
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
     jersey              : '3.1.5',
-    junit               : '5.10.1',
+    junit               : '5.10.2',
     junitPlatform       : '1.9.2',
     lombok              : '1.18.30',
     pitest              : '1.15.6',
