@@ -329,7 +329,7 @@ dependencies {
     testImplementation group: 'org.pitest', name: 'pitest', version: versions.pitest
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
-    testImplementation 'com.github.hmcts:fortify-client:1.4.0:all'
+    testImplementation 'com.github.hmcts:fortify-client:1.4.1:all'
     testRuntimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
