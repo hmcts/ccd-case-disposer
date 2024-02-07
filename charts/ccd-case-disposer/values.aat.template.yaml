@@ -47,5 +47,5 @@ job:
     DATA_STORE_DB_NAME: ccd_data_store
     DATA_STORE_DB_OPTIONS: "?sslmode=require"
     ELASTIC_SEARCH_ENABLED: true
-  global:
-    jobKind: CronJob
+global:
+  jobKind: CronJob
