@@ -23,8 +23,8 @@ def secrets = [
           secret('ccd-data-s2s-secret', 'IDAM_KEY_CCD_DATA_STORE'),
           secret('ccd-definition-s2s-secret', 'CCD_DEFINITION_STORE_S2S_SECRET'),
           secret('data-store-api-POSTGRES-DATABASE', 'DATA_STORE_DB_NAME'),
-          secret('data-store-api-POSTGRES-USER', 'DATA_STORE_DB_USERNAME'),
-          secret('data-store-api-POSTGRES-PASS', 'DATA_STORE_DB_PASSWORD'),
+          secret('data-store-api-POSTGRES-USER-V15', 'DATA_STORE_DB_USERNAME'),
+          secret('data-store-api-POSTGRES-PASS-V15', 'DATA_STORE_DB_PASSWORD'),
           secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
           secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
           secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
@@ -133,7 +133,7 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_PORT = '5432'
     env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
-    env.DATA_STORE_DB_HOST = "ccd-data-store-api-postgres-db-v11-aat.postgres.database.azure.com"
+    env.DATA_STORE_DB_HOST = "ccd-data-store-api-postgres-db-v15-aat.postgres.database.azure.com"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TASKS_HOST= "http://wa-task-management-api-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
