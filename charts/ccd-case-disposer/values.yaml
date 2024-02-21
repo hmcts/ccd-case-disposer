@@ -17,9 +17,9 @@ job:
       secrets:
         - name: app-insights-connection-string
           alias: app-insights-connection-string
-        - name: data-store-api-POSTGRES-USER
+        - name: data-store-api-POSTGRES-USER-V15
           alias: DATA_STORE_DB_USERNAME
-        - name: data-store-api-POSTGRES-PASS
+        - name: data-store-api-POSTGRES-PASS-V15
           alias: DATA_STORE_DB_PASSWORD
         - name: ccd-ELASTIC-SEARCH-DATA-NODES-URL
           alias: ELASTIC_SEARCH_DATA_NODES_HOSTS
@@ -46,7 +46,7 @@ job:
     S2S_URL: http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DOCUMENT_STORE_HOST: http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     TASKS_HOST: http://wa-task-management-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
-    DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v11-{{ .Values.global.environment }}.postgres.database.azure.com
+    DATA_STORE_DB_HOST: ccd-data-store-api-postgres-db-v15-{{ .Values.global.environment }}.postgres.database.azure.com
     DEFINITION_STORE_HOST: http://ccd-definition-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     DATA_STORE_DB_PORT: 5432
