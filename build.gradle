@@ -111,7 +111,7 @@ check.dependsOn integration
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '10.14.2'
+  toolVersion = '10.15.0'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
