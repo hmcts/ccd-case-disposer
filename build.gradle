@@ -242,7 +242,7 @@ def versions = [
     junitPlatform       : '1.9.2',
     lombok              : '1.18.34',
     pitest              : '1.16.1',
-    reformLogging       : '6.1.5',
+    reformLogging       : '6.1.6',
     restAssured         : '5.5.0',
     s2sClient           : '5.1.3',
     sonarPitest         : '0.5',
