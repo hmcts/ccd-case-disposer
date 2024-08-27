@@ -251,7 +251,7 @@ def versions = [
     springSecurity      : '6.3.3',
     testcontainers      : '1.20.1',
     wiremock            : '3.0.1',
-    pactVersion         : '4.6.13',
+    pactVersion         : '4.6.14',
     serenity            : '3.1.20',
 ]
 
