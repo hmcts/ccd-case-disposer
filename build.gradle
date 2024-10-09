@@ -237,7 +237,7 @@ def versions = [
     flyway              : '10.19.0',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
-    jersey              : '3.1.8',
+    jersey              : '3.1.9',
     junit               : '5.11.2',
     junitPlatform       : '1.9.2',
     lombok              : '1.18.34',
