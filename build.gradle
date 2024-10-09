@@ -185,7 +185,7 @@ dependencyManagement {
         dependencySet(group: 'org.yaml', version: '2.3') {
             entry 'snakeyaml'
         }
-        dependencySet(group: 'ch.qos.logback', version: '1.5.8') {
+        dependencySet(group: 'ch.qos.logback', version: '1.5.9') {
           entry 'logback-core'
           entry 'logback-classic'
         }
