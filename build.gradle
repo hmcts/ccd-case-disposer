@@ -246,7 +246,7 @@ def versions = [
     s2sClient           : '5.2.0',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
-    springFramework     : '6.1.13',
+    springFramework     : '6.1.14',
     springSecurity      : '6.3.3',
     testcontainers      : '1.20.2',
     wiremock            : '3.0.1',
