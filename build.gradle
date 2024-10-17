@@ -327,7 +327,7 @@ dependencies {
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.6.1'
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
-    testImplementation 'com.github.hmcts:fortify-client:1.4.4:all'
+    testImplementation 'com.github.hmcts:fortify-client:1.4.5:all'
     testRuntimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
