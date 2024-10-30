@@ -36,6 +36,8 @@ elasticsearch:
 deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
 
+requests.limit: ${CCD_DISPOSER_REQUEST_LIMIT:100}
+
 ccd:
   document.store:
     host: ${DOCUMENT_STORE_HOST:http://localhost:4506}

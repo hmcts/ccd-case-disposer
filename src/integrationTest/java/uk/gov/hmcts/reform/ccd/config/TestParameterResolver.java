@@ -60,6 +60,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${thread.queue_capacity}")
     private Integer threadQueueCapacity;
 
+    @Value("${requests.limit}")
+    private Integer requestsLimit;
+
     @Override
     public Integer getElasticsearchRequestTimeout() {
         return elasticsearchRequestTimeout;
@@ -179,6 +182,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public Integer getThreadQueueCapacity() {
         return threadQueueCapacity;
+    }
+
+    @Override
+    public Integer getRequestsLimit() {
+        return requestsLimit;
     }
 
 }

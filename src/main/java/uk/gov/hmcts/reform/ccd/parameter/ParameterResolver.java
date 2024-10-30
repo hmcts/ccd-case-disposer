@@ -44,4 +44,6 @@ public interface ParameterResolver {
     Integer getThreadCorePoolSize();
 
     Integer getThreadQueueCapacity();
+
+    Integer getRequestsLimit();
 }
