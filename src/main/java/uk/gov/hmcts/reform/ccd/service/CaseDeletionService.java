@@ -52,7 +52,7 @@ public class CaseDeletionService {
     @Transactional
     public void deleteLinkedCaseFamilies(@NonNull final List<CaseFamily> linkedCaseFamilies) {
         int index = 0;
-        while (index < parameterResolver.getRequestsLimit() && index < linkedCaseFamilies.size()) {
+        while (index < parameterResolver.getRequestLimit() && index < linkedCaseFamilies.size()) {
             deleteLinkedCases(linkedCaseFamilies.get(index));
             deleteCase(linkedCaseFamilies.get(index));
             index++;

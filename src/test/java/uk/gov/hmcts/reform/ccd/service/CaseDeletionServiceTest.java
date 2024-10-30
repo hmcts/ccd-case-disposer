@@ -173,7 +173,7 @@ class CaseDeletionServiceTest {
 
     @Test
     void testDeleteCases() {
-        when(parameterResolver.getRequestsLimit()).thenReturn(1);
+        when(parameterResolver.getRequestLimit()).thenReturn(1);
         // GIVEN
         final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily);
         List.of(1L, 10L, 11L)
@@ -225,7 +225,7 @@ class CaseDeletionServiceTest {
     @Test
     void shouldLimitCaseDeletionToRequestsLimit() {
         // Given
-        when(parameterResolver.getRequestsLimit()).thenReturn(2);
+        when(parameterResolver.getRequestLimit()).thenReturn(2);
         final CaseFamily caseFamily2 = new CaseFamily(caseData, emptyList());
         final CaseFamily caseFamily3 = new CaseFamily(caseData, emptyList());
 
@@ -262,7 +262,7 @@ class CaseDeletionServiceTest {
     @Test
     void shouldDeleteAllCasesIfRequestsLimitGreaterThanCases() {
         // Given
-        when(parameterResolver.getRequestsLimit()).thenReturn(10);
+        when(parameterResolver.getRequestLimit()).thenReturn(10);
         final CaseFamily caseFamily2 = new CaseFamily(caseData, emptyList());
         final CaseFamily caseFamily3 = new CaseFamily(caseData, emptyList());
 
