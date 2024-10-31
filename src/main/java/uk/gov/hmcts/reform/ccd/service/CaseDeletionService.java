@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
@@ -30,7 +29,6 @@ public class CaseDeletionService {
     private final RemoteDisposeService remoteDisposeService;
     private final Snooper snooper;
     private final FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
-    private final ParameterResolver parameterResolver;
 
     @Inject
     public CaseDeletionService(final CaseDataRepository caseDataRepository,
@@ -38,25 +36,19 @@ public class CaseDeletionService {
                                final CaseLinkRepository caseLinkRepository,
                                final FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder,
                                final RemoteDisposeService remoteDisposeService,
-                               final Snooper snooper,
-                               final ParameterResolver parameterResolver) {
+                               final Snooper snooper) {
         this.caseDataRepository = caseDataRepository;
         this.caseEventRepository = caseEventRepository;
         this.caseLinkRepository = caseLinkRepository;
         this.failedToDeleteCaseFamilyHolder = failedToDeleteCaseFamilyHolder;
         this.snooper = snooper;
         this.remoteDisposeService = remoteDisposeService;
-        this.parameterResolver = parameterResolver;
     }
 
     @Transactional
     public void deleteLinkedCaseFamilies(@NonNull final List<CaseFamily> linkedCaseFamilies) {
-        int index = 0;
-        while (index < parameterResolver.getRequestLimit() && index < linkedCaseFamilies.size()) {
-            deleteLinkedCases(linkedCaseFamilies.get(index));
-            deleteCase(linkedCaseFamilies.get(index));
-            index++;
-        }
+        linkedCaseFamilies.forEach(this::deleteLinkedCases);
+        linkedCaseFamilies.forEach(this::deleteCase);
     }
 
     void deleteCase(final CaseFamily caseFamily) {

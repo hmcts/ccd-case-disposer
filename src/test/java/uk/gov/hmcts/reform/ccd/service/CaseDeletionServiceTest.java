@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.ccd.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
 import uk.gov.hmcts.reform.ccd.util.Snooper;
@@ -38,8 +36,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.JURISDICTION;
@@ -59,8 +55,6 @@ class CaseDeletionServiceTest {
     private RemoteDisposeService remoteDisposeService;
     @Mock
     private FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
-    @Mock
-    private ParameterResolver parameterResolver;
 
     @Mock
     private Snooper snooper;
@@ -82,11 +76,6 @@ class CaseDeletionServiceTest {
     private final CaseLinkEntity caseLinkEntity2 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 11L).build();
 
     private final CaseFamily defaultCaseFamily = new CaseFamily(caseData, List.of(linkedCaseData1, linkedCaseData2));
-
-    @BeforeEach
-    void setUp() {
-        setField(underTest, "parameterResolver", parameterResolver);
-    }
 
     @Test
     void testDeleteCaseWithNoLinkedCases() {
@@ -173,7 +162,6 @@ class CaseDeletionServiceTest {
 
     @Test
     void testDeleteCases() {
-        when(parameterResolver.getRequestLimit()).thenReturn(1);
         // GIVEN
         final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily);
         List.of(1L, 10L, 11L)
@@ -220,79 +208,5 @@ class CaseDeletionServiceTest {
         verify(caseLinkRepository, times(2)).findById(any(CaseLinkPrimaryKey.class));
         verify(failedToDeleteCaseFamilyHolder, times(2)).addCaseFamily(defaultCaseFamily);
         verifyNoMoreInteractions(caseLinkRepository);
-    }
-
-    @Test
-    void shouldLimitCaseDeletionToRequestsLimit() {
-        // Given
-        when(parameterResolver.getRequestLimit()).thenReturn(2);
-        final CaseFamily caseFamily2 = new CaseFamily(caseData, emptyList());
-        final CaseFamily caseFamily3 = new CaseFamily(caseData, emptyList());
-
-        final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily, caseFamily2, caseFamily3);
-
-        doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
-            .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
-        doNothing().when(caseLinkRepository).delete(any(CaseLinkEntity.class));
-        doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
-        doNothing().when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
-
-        doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
-        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(anyLong());
-
-        // When
-        underTest.deleteLinkedCaseFamilies(linkedFamilies);
-
-        // Then
-        verify(caseEventRepository,times(2)).deleteByCaseDataId(1L);
-        verify(caseDataRepository,times(2)).findById(1L);
-
-        List.of(10L, 11L).forEach(caseId -> {
-            verify(caseEventRepository).deleteByCaseDataId(caseId);
-            verify(caseDataRepository).findById(caseId);
-        });
-
-        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
-        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
-        verify(caseLinkRepository, times(2)).delete(any(CaseLinkEntity.class));
-        verify(caseDataRepository, times(4)).delete(any(CaseDataEntity.class));
-        verify(remoteDisposeService, times(4)).remoteDeleteAll(any(CaseData.class));
-    }
-
-    @Test
-    void shouldDeleteAllCasesIfRequestsLimitGreaterThanCases() {
-        // Given
-        when(parameterResolver.getRequestLimit()).thenReturn(10);
-        final CaseFamily caseFamily2 = new CaseFamily(caseData, emptyList());
-        final CaseFamily caseFamily3 = new CaseFamily(caseData, emptyList());
-
-        final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily, caseFamily2, caseFamily3);
-
-        doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
-            .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
-        doNothing().when(caseLinkRepository).delete(any(CaseLinkEntity.class));
-        doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
-        doNothing().when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
-
-        doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
-        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(anyLong());
-
-        // When
-        underTest.deleteLinkedCaseFamilies(linkedFamilies);
-
-        // Then
-        verify(caseEventRepository,times(3)).deleteByCaseDataId(1L);
-        verify(caseDataRepository,times(3)).findById(1L);
-
-        List.of(10L, 11L).forEach(caseId -> {
-            verify(caseEventRepository).deleteByCaseDataId(caseId);
-            verify(caseDataRepository).findById(caseId);
-        });
-
-        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
-        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
-        verify(caseLinkRepository, times(2)).delete(any(CaseLinkEntity.class));
-        verify(caseDataRepository, times(5)).delete(any(CaseDataEntity.class));
-        verify(remoteDisposeService, times(5)).remoteDeleteAll(any(CaseData.class));
     }
 }
