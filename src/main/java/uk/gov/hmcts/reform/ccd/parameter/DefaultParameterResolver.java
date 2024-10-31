@@ -65,6 +65,9 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${thread.queue_capacity}")
     private Integer threadQueueCapacity;
 
+    @Value("${request.limit}")
+    private Integer requestLimit;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -171,5 +174,10 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Override
     public Integer getThreadQueueCapacity() {
         return threadQueueCapacity;
+    }
+
+    @Override
+    public Integer getRequestLimit() {
+        return requestLimit;
     }
 }
