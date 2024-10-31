@@ -48,39 +48,41 @@ public class LogAndAuditRemoteOperation {
     }
 
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
-        if (parameterResolver.isLogAndAuditEnabled()) {
-            try {
-                final CaseActionPostRequestResponse caseActionPostRequestResponse =
-                        buildCaseActionPostRequest(caseData);
-                final String logAndAuditPostResponse = ccdRestClientBuilder.postRequestWithServiceAuthHeader(
-                    parameterResolver.getLogAndAuditHost(),
-                    LAU_SAVE_PATH,
-                    gson.toJson(caseActionPostRequestResponse)
-                );
+        try {
+            final CaseActionPostRequestResponse caseActionPostRequestResponse =
+                buildCaseActionPostRequest(caseData);
+            final String logAndAuditPostResponse = ccdRestClientBuilder.postRequestWithServiceAuthHeader(
+                parameterResolver.getLogAndAuditHost(),
+                LAU_SAVE_PATH,
+                gson.toJson(caseActionPostRequestResponse)
+            );
 
-                logResponse(logAndAuditPostResponse);
-            } catch (final Exception exception) {
-                final String errorMessage = String.format("Error posting to Log and Audit for case : %s",
-                        caseData.getReference());
-                log.error(errorMessage, exception);
-                throw new LogAndAuditException(errorMessage, exception);
-            }
+            logResponse(logAndAuditPostResponse);
+        } catch (final Exception exception) {
+            final String errorMessage = String.format(
+                "Error posting to Log and Audit for case : %s",
+                caseData.getReference()
+            );
+            log.error(errorMessage, exception);
+            throw new LogAndAuditException(errorMessage, exception);
         }
     }
 
     private void logResponse(final String logAndAuditPostResponse) {
         try {
             final CaseActionPostRequestResponse caseActionResults =
-                    gson.fromJson(logAndAuditPostResponse, CaseActionPostRequestResponse.class);
+                gson.fromJson(logAndAuditPostResponse, CaseActionPostRequestResponse.class);
 
             logLauRecord(caseActionResults);
 
-            log.info("Case data with case ref: {} successfully posted to Log and Audit",
-                    caseActionResults.getActionLog().getCaseRef());
+            log.info(
+                "Case data with case ref: {} successfully posted to Log and Audit",
+                caseActionResults.getActionLog().getCaseRef()
+            );
 
         } catch (final JsonParseException jsonParseException) {
             final String errorMessage = "Unable to map json to object Log and Audit endpoint response due"
-                    + " to following endpoint response: ".concat(logAndAuditPostResponse);
+                + " to following endpoint response: ".concat(logAndAuditPostResponse);
             log.error(errorMessage);
             throw new LogAndAuditException(errorMessage);
         }
@@ -93,13 +95,13 @@ public class LogAndAuditRemoteOperation {
 
     private CaseActionPostRequestResponse buildCaseActionPostRequest(final CaseData caseData) {
         return new CaseActionPostRequestResponse(ActionLog.builder()
-                .userId(securityUtil.getUserDetails().getId())
-                .caseAction("DELETE")
-                .caseTypeId(caseData.getCaseType())
-                .caseRef(caseData.getReference().toString())
-                .caseJurisdictionId(caseData.getJurisdiction())
-                .timestamp(getTimestamp())
-                .build());
+                                                     .userId(securityUtil.getUserDetails().getId())
+                                                     .caseAction("DELETE")
+                                                     .caseTypeId(caseData.getCaseType())
+                                                     .caseRef(caseData.getReference().toString())
+                                                     .caseJurisdictionId(caseData.getJurisdiction())
+                                                     .timestamp(getTimestamp())
+                                                     .build());
     }
 
 

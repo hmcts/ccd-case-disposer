@@ -50,7 +50,6 @@ class LogAndAuditRemoteOperationTest {
     void setUp() {
         final UserDetails userDetails = mock(UserDetails.class);
         when(parameterResolver.getLogAndAuditHost()).thenReturn("http://localhost");
-        when(parameterResolver.isLogAndAuditEnabled()).thenReturn(true);
         when(securityUtil.getUserDetails()).thenReturn(userDetails);
         when(userDetails.getId()).thenReturn("123");
     }

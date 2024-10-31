@@ -4,7 +4,6 @@ import com.google.common.base.Functions;
 import com.google.common.collect.Lists;
 import jakarta.inject.Inject;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
 
 import java.util.List;
@@ -17,15 +16,10 @@ public class LauRemoteDeletionVerifier implements RemoteDeletionVerifier {
     @Inject
     private LauRecordHolder lauRecordHolder;
 
-    @Inject
-    private ParameterResolver parameterResolver;
-
     public void verifyRemoteDeletion(final List<Long> caseRefs) {
-        if (parameterResolver.isLogAndAuditEnabled()) {
-            assertThat(lauRecordHolder.getLauCaseRefList())
-                    .containsExactlyInAnyOrderElementsOf(Lists.transform(caseRefs, Functions.toStringFunction()));
+        assertThat(lauRecordHolder.getLauCaseRefList())
+            .containsExactlyInAnyOrderElementsOf(Lists.transform(caseRefs, Functions.toStringFunction()));
 
-            lauRecordHolder.getLauCaseRefList().clear();
-        }
+        lauRecordHolder.getLauCaseRefList().clear();
     }
 }

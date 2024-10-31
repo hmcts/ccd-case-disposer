@@ -105,7 +105,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(prSecrets)
     env.ENV = 'preview'
     env.CREATE_GLOBAL_SEARCH = true
-    env.LOG_AND_AUDIT_ENABLED = true
     env.DATA_STORE_DB_USERNAME = "hmcts"
     env.DATA_STORE_DB_PASSWORD = "hmcts"
     env.DATA_STORE_DB_NAME = "ccd_data_store"
@@ -152,7 +151,6 @@ withPipeline(type, product, component) {
   afterAlways('akschartsinstall') {
     // Set required environment variables to run functional tests apart from one in vaults.
     env.ELASTIC_SEARCH_ENABLED = true
-    env.LOG_AND_AUDIT_ENABLED = true
     env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
     env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
