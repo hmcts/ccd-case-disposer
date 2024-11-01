@@ -12,6 +12,8 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 
+import java.util.List;
+
 import static org.glassfish.jersey.client.ClientProperties.CONNECT_TIMEOUT;
 import static org.glassfish.jersey.client.ClientProperties.READ_TIMEOUT;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
@@ -70,6 +72,17 @@ public class CcdRestClientBuilder {
             .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
             .header(AUTHORISATION_HEADER, securityUtil.getIdamClientToken())
             .post(Entity.entity(body, MediaType.valueOf(MEDIATYPE_ROLE_FETCH)));
+    }
+
+    public Response deleteRequestWithAuthHeaders(final String baseUrl, final String path, final String ccdCaseId) {
+        return client
+            .target(baseUrl)
+            .path(path)
+            .request()
+            .header(SERVICE_AUTHORISATION_HEADER, securityUtil.getServiceAuthorization())
+            .header(AUTHORISATION_HEADER, securityUtil.getIdamClientToken())
+            .build("DELETE", Entity.json(List.of(ccdCaseId)))
+            .invoke();
     }
 
     // Client should be closed in finally block or used in try-with-resource

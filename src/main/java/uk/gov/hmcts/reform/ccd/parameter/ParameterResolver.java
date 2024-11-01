@@ -33,6 +33,8 @@ public interface ParameterResolver {
 
     String getTasksHost();
 
+    String getHearingHost();
+
     Boolean getCheckCaseRolesExist();
 
     Integer getAppInsightsLogSize();

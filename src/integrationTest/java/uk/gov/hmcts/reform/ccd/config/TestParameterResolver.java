@@ -42,6 +42,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${ccd.tasks.host}")
     private String tasksHost;
 
+    @Value("${ccd.hearing.host}")
+    private String hearingHost;
+
     @Value("${ccd.role.assignment.check-case-roles-exist}")
     private Boolean checkCaseRolesExist;
 
@@ -146,6 +149,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getTasksHost() {
         return tasksHost;
+    }
+
+    @Override
+    public String getHearingHost() {
+        return hearingHost;
     }
 
     @Override
