@@ -50,7 +50,6 @@ GradleBuilder builder = new GradleBuilder(this, product)
 withNightlyPipeline(type, product, component) {
   // Set required environment variables to run functional tests apart from one in vaults.
   env.ELASTIC_SEARCH_ENABLED = true
-  env.LOG_AND_AUDIT_ENABLED = true
   env.DATA_STORE_DB_PORT = '5432'
   env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
   env.DATA_STORE_DB_HOST = 'ccd-data-store-api-postgres-db-v15-aat.postgres.database.azure.com'
