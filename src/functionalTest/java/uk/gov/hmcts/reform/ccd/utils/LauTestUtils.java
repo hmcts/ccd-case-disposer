@@ -26,16 +26,16 @@ public class LauTestUtils {
     public void verifyLauLogs(final List<List<Long>> deletableEndStateRowIds) {
 
         final List<Long> caseRefs = deletableEndStateRowIds.stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+            .flatMap(List::stream)
+            .collect(Collectors.toList());
 
-        if (parameterResolver.isLogAndAuditEnabled()) {
-            with().await()
-                    .untilAsserted(() -> assertThat(lauRecordHolder.getLauCaseRefList())
-                            .containsExactlyInAnyOrderElementsOf(transform(newArrayList(caseRefs),
-                                    toStringFunction())));
+        with().await()
+            .untilAsserted(() -> assertThat(lauRecordHolder.getLauCaseRefList())
+                .containsExactlyInAnyOrderElementsOf(transform(
+                    newArrayList(caseRefs),
+                    toStringFunction()
+                )));
 
-            lauRecordHolder.getLauCaseRefList().clear();
-        }
+        lauRecordHolder.getLauCaseRefList().clear();
     }
 }
