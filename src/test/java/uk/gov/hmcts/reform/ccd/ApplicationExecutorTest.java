@@ -47,11 +47,6 @@ class ApplicationExecutorTest {
     @InjectMocks
     private ApplicationExecutor applicationExecutor;
 
-    @BeforeEach
-    void setUp() {
-        setField(applicationExecutor, "parameterResolver", parameterResolver);
-    }
-
     @Test
     void testFindDeletableCandidatesWhenNoDeletableCandidatesFound() {
         doReturn(emptyList()).when(caseFindingService).findCasesDueDeletion();
