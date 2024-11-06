@@ -53,7 +53,7 @@ class ApplicationExecutorTest {
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseFamiliesFilter).getDeletableCasesOnly(emptyList());
-        verify(caseDeletionResolver).logCaseDeletion(emptyList());
+        verify(caseDeletionResolver).logCaseDeletion(emptyList(),emptyList());
     }
 
     @Test
@@ -86,13 +86,13 @@ class ApplicationExecutorTest {
                 .when(caseFindingService).findCasesDueDeletion();
         doReturn(caseDataList)
                 .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList());
+        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList(),anyList());
 
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(2)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList());
+        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
 
     @Test
@@ -136,13 +136,13 @@ class ApplicationExecutorTest {
             .when(caseFindingService).findCasesDueDeletion();
         doReturn(caseDataList)
             .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList());
+        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList(),anyList());
 
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList());
+        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
 
     @Test
@@ -186,12 +186,12 @@ class ApplicationExecutorTest {
             .when(caseFindingService).findCasesDueDeletion();
         doReturn(caseDataList)
             .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList());
+        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList(),anyList());
 
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(3)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList());
+        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
 }

@@ -34,28 +34,23 @@ public class CaseDeletionResolver {
         this.logAndAuditCaseFilter = logAndAuditCaseFilter;
     }
 
-    public void logCaseDeletion(final List<CaseFamily> linkedFamilies) {
+    public void logCaseDeletion(final List<CaseFamily> deletableCases,
+                                final List<CaseFamily> deletableLinkedFamiliesSimulation) {
 
-        final List<CaseFamily> successfullyDeletedOrSimulatedCases = caseFamiliesFilter
-                .filterSuccessfulCaseFamiliesByCaseRef(linkedFamilies,
+        final List<CaseFamily> deletedLinkedFamilies = caseFamiliesFilter
+                .filterSuccessfulCaseFamiliesByCaseRef(deletableCases,
                         failedToDeleteCaseFamilyHolder.getCaseRefs());
 
-        final List<CaseFamily> deletableLinkedFamilies = caseFamiliesFilter
-                .getDeletableCasesOnly(successfullyDeletedOrSimulatedCases);
+        sendSuccessfullyDeletedCasesToLogAndAudit(deletedLinkedFamilies);
 
-        final List<CaseFamily> deletableLinkedFamiliesSimulation =
-                caseFamiliesFilter.geSimulationCasesOnly(successfullyDeletedOrSimulatedCases);
-
-        sendSuccessfullyDeletedCasesToLogAndAudit(deletableLinkedFamilies);
-
-        caseDeletionLoggingService.logCaseFamilies(deletableLinkedFamilies,
-                deletableLinkedFamiliesSimulation,
+        caseDeletionLoggingService.logCaseFamilies(deletedLinkedFamilies,
+                                                   deletableLinkedFamiliesSimulation,
                 failedToDeleteCaseFamilyHolder.getFailedToDeleteCaseFamilies());
     }
 
-    private void sendSuccessfullyDeletedCasesToLogAndAudit(final List<CaseFamily> deletableLinkedFamilies) {
+    private void sendSuccessfullyDeletedCasesToLogAndAudit(final List<CaseFamily> deletedLinkedFamilies) {
         final List<CaseData> distinctCaseDataFromCaseFamilyList =
-                logAndAuditCaseFilter.getDistinctCaseDataFromCaseFamilyList(deletableLinkedFamilies);
+                logAndAuditCaseFilter.getDistinctCaseDataFromCaseFamilyList(deletedLinkedFamilies);
         distinctCaseDataFromCaseFamilyList.forEach(logAndAuditRemoteOperation::postCaseDeletionToLogAndAudit);
     }
 }
