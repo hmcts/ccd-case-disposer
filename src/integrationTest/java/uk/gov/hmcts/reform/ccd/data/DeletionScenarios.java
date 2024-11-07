@@ -405,6 +405,21 @@ public class DeletionScenarios {
                         Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
                         Map.of("FT_MultiplePages", List.of(1504259907353527L), "FT_MasterCaseType",
                                 List.of(1504259907350000L))
+                ),
+                Arguments.of(
+                    "FT_MultiplePages,HearingRecordings",
+                    null,
+                    "scenarios/S-024-deletable-hearings-and-non-hearing-cases.sql",
+                    List.of(1L, 2L, 3L),
+                    Map.of("FT_MultiplePages", List.of(6446787681450550L), "HearingRecordings",
+                           List.of(4331434790352648L, 7344069216690734L)),
+                    emptyList(),
+                    emptyList(),
+                    List.of(6446787681450550L, 4331434790352648L, 7344069216690734L),
+                    Map.of("HearingRecordings", List.of(4331434790352648L, 7344069216690734L),
+                           "FT_MultiplePages", List.of(6446787681450550L)),
+                    Map.of("FT_MultiplePages", emptyList(),"HearingRecordings", emptyList())
+
                 )
         );
     }

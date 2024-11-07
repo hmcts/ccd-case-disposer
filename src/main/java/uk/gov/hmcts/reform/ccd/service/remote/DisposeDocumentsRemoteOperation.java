@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
@@ -88,7 +87,7 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
         return "Case Documents Deletion CONFIRMATION: ";
     }
 
-    @Async
+
     String postDocument(final String requestBody) {
         return ccdRestClientBuilder
                 .postRequestWithServiceAuthHeader(parameterResolver.getDocumentStoreHost(),

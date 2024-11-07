@@ -50,6 +50,9 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${ccd.tasks.host}")
     private String tasksHost;
 
+    @Value("${ccd.hearing.host}")
+    private String hearingHost;
+
     @Value("${ccd.role.assignment.check-case-roles-exist}")
     private Boolean checkCaseRolesExist;
 
@@ -151,6 +154,11 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Override
     public String getTasksHost() {
         return tasksHost;
+    }
+
+    @Override
+    public String getHearingHost() {
+        return hearingHost;
     }
 
     @Override

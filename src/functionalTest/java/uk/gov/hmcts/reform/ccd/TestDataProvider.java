@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.ccd;
 
 import jakarta.inject.Inject;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
+import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
@@ -42,6 +43,9 @@ public class TestDataProvider {
     @Inject
     private GlobalSearchIndexCreator globalSearchIndexCreator;
 
+    @Inject
+    private SecurityUtil securityUtil;
+
 
     protected void setupData(final String deletableCaseTypes,
                              final String deletableCaseTypesSimulation,
@@ -52,6 +56,8 @@ public class TestDataProvider {
                              final Map<String, List<Long>> indexedData) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
+
+        securityUtil.generateTokens();
 
         createGlobalSearchIndex();
 
