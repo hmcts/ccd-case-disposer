@@ -45,7 +45,6 @@ public class SecurityUtil {
         generateUserDetails();
     }
 
-    @Scheduled(initialDelay = 55, fixedRate = 55, timeUnit = MINUTES)
     private void generateUserDetails() {
         try {
             userDetails = idamClient.getUserDetails(idamClientToken);
