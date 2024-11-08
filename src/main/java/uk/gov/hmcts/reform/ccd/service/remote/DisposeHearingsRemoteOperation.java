@@ -11,6 +11,8 @@ import uk.gov.hmcts.reform.ccd.util.log.HearingDeletionRecordHolder;
 
 import java.util.List;
 
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -22,14 +24,16 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
 
     @Override
     public void delete(final CaseData caseData) {
-        final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
-        try {
-            final Response deleteHearingsResponse = deleteHearings(caseRef);
-            logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.status());
-        } catch (final Exception ex) {
-            final String errorMessage = String.format("Error deleting hearing for case : %s", caseRef);
-            log.error(errorMessage, ex);
-            throw new HearingDeletionException(errorMessage, ex);
+        if (caseData.getCaseType().equals(HEARING_RECORDINGS_CASE_TYPE)) {
+            final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
+            try {
+                final Response deleteHearingsResponse = deleteHearings(caseRef);
+                logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.status());
+            } catch (final Exception ex) {
+                final String errorMessage = String.format("Error deleting hearing for case : %s", caseRef);
+                log.error(errorMessage, ex);
+                throw new HearingDeletionException(errorMessage, ex);
+            }
         }
     }
 

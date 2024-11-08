@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,8 +23,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @DisplayName("dispose case documents")
 @ExtendWith(MockitoExtension.class)
@@ -43,12 +44,10 @@ class DisposeDocumentsRemoteOperationTest {
     @InjectMocks
     private DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation;
 
-    @BeforeEach
-    void setUp() {
-        doReturn("http://localhost").when(parameterResolver).getDocumentStoreHost();
-    }
-
-    final CaseData caseData = CaseData.builder().reference(1234567890123456L).build();
+    final CaseData caseData = CaseData.builder()
+        .reference(1234567890123456L)
+        .caseType("someRandomCaseType")
+        .build();
 
     @Test
     void shouldPostDocumentsDeleteRemoteDisposeRequestWithoutAnomaly() {
@@ -56,13 +55,24 @@ class DisposeDocumentsRemoteOperationTest {
         final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
         final String jsonResponse = new Gson().toJson(new CaseDocumentsDeletionResults(1, 1));
 
-        when(ccdRestClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest)).thenReturn(jsonResponse);
+        when(ccdRestClientBuilder.postRequestWithServiceAuthHeader(
+            "http://localhost",
+            DELETE_DOCUMENT_PATH,
+            jsonRequest
+        )).thenReturn(jsonResponse);
+        doReturn("http://localhost").when(parameterResolver).getDocumentStoreHost();
 
         disposeDocumentsRemoteOperation.delete(caseData);
 
-        verify(documentDeletionRecordHolder, times(1)).setCaseDocumentsDeletionResults(eq("1234567890123456"),
-                any(CaseDocumentsDeletionResults.class));
-        verify(ccdRestClientBuilder, times(1)).postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest);
+        verify(documentDeletionRecordHolder, times(1)).setCaseDocumentsDeletionResults(
+            eq("1234567890123456"),
+            any(CaseDocumentsDeletionResults.class)
+        );
+        verify(ccdRestClientBuilder, times(1)).postRequestWithServiceAuthHeader(
+            "http://localhost",
+            DELETE_DOCUMENT_PATH,
+            jsonRequest
+        );
     }
 
     @Test
@@ -71,16 +81,17 @@ class DisposeDocumentsRemoteOperationTest {
             final String jsonRequest = new Gson().toJson(new DocumentsDeletePostRequest("1234567890123456"));
 
             doThrow(new DocumentDeletionException("1234567890123456"))
-                    .when(ccdRestClientBuilder)
-                    .postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH,
-                            jsonRequest);
+                .when(ccdRestClientBuilder)
+                .postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH,
+                                                  jsonRequest
+                );
 
             disposeDocumentsRemoteOperation.delete(caseData);
 
             fail("The method should have thrown DocumentDeletionException when request is invalid");
         } catch (final DocumentDeletionException documentDeletionException) {
             assertThat(documentDeletionException.getMessage())
-                    .isEqualTo("Error deleting documents for case : 1234567890123456");
+                .isEqualTo("Error deleting documents for case : 1234567890123456");
         }
     }
 
@@ -91,20 +102,40 @@ class DisposeDocumentsRemoteOperationTest {
             final String jsonResponse = new Gson().toJson(new CaseDocumentsDeletionResults(1, 1));
 
             doThrow(new JsonSyntaxException("Unable to map document post response to object"))
-                    .when(documentDeletionRecordHolder)
-                    .setCaseDocumentsDeletionResults(eq("1234567890123456"),
-                            any(CaseDocumentsDeletionResults.class));
+                .when(documentDeletionRecordHolder)
+                .setCaseDocumentsDeletionResults(
+                    eq("1234567890123456"),
+                    any(CaseDocumentsDeletionResults.class)
+                );
 
-            when(ccdRestClientBuilder.postRequestWithServiceAuthHeader("http://localhost", DELETE_DOCUMENT_PATH, jsonRequest))
-                    .thenReturn(jsonResponse);
+            when(ccdRestClientBuilder.postRequestWithServiceAuthHeader(
+                "http://localhost",
+                DELETE_DOCUMENT_PATH,
+                jsonRequest
+            ))
+                .thenReturn(jsonResponse);
+            doReturn("http://localhost").when(parameterResolver).getDocumentStoreHost();
 
             disposeDocumentsRemoteOperation.delete(caseData);
 
             fail("The method should have thrown JsonParseException when request is invalid");
         } catch (final DocumentDeletionException documentDeletionException) {
             assertThat(documentDeletionException.getCause().getMessage())
-                    .contains("Unable to map json to object document deletion endpoint response due to following "
-                            + "endpoint response:");
+                .contains("Unable to map json to object document deletion endpoint response due to following "
+                              + "endpoint response:");
         }
+    }
+
+    @Test
+    void shouldNotDeleteHearings() {
+        final CaseData caseData = CaseData.builder()
+            .reference(1234567890123456L)
+            .caseType(HEARING_RECORDINGS_CASE_TYPE).build();
+
+        disposeDocumentsRemoteOperation.delete(caseData);
+
+        verifyNoInteractions(documentDeletionRecordHolder);
+        verifyNoInteractions(ccdRestClientBuilder);
+
     }
 }

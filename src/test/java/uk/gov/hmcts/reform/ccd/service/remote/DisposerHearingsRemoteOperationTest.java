@@ -19,8 +19,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_HEARINGS_PATH;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @ExtendWith(MockitoExtension.class)
 class DisposerHearingsRemoteOperationTest {
@@ -37,7 +39,9 @@ class DisposerHearingsRemoteOperationTest {
     @InjectMocks
     private DisposeHearingsRemoteOperation disposeHearingsRemoteOperation;
 
-    final CaseData caseData = CaseData.builder().reference(1234567890123456L).build();
+    final CaseData caseData = CaseData.builder()
+        .reference(1234567890123456L)
+        .caseType(HEARING_RECORDINGS_CASE_TYPE).build();
 
     @Test
     void shouldDeleteHearingsSuccessfully() {
@@ -69,5 +73,20 @@ class DisposerHearingsRemoteOperationTest {
             .when(hearingClient).deleteHearing(any(), eq(DELETE_HEARINGS_PATH), eq(caseRefs));
 
         assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));
+    }
+
+
+    @Test
+    void shouldNotDeleteHearings() {
+        final CaseData caseData = CaseData.builder()
+            .reference(1234567890123456L)
+            .caseType("someRandomCaseType").build();
+
+        disposeHearingsRemoteOperation.delete(caseData);
+
+        verifyNoInteractions(hearingDeletionRecordHolder);
+        verifyNoInteractions(hearingClient);
+        verifyNoInteractions(securityUtil);
+
     }
 }

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.ccd.util;
 
-@SuppressWarnings({"ALL", "java:S1075"})
+@SuppressWarnings({"java:S1075"})
 public class RestConstants {
     private RestConstants() {
     }
@@ -19,4 +19,7 @@ public class RestConstants {
     public static final String MEDIATYPE_ROLE_FETCH =
         "application/vnd.uk.gov.hmcts.role-assignment-service.post-assignment-query-request+json;"
             + "charset=UTF-8;version=2.0";
+
+
+    public static final String HEARING_RECORDINGS_CASE_TYPE = "HearingRecordings";
 }

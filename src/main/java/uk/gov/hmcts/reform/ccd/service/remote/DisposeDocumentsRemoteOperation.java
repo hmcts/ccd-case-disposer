@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @Service
 @Slf4j
@@ -35,21 +36,23 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     @Override
     public void delete(final CaseData caseData) {
-        try {
-            final DocumentsDeletePostRequest documentsDeleteRequest =
+        if (!caseData.getCaseType().equals(HEARING_RECORDINGS_CASE_TYPE)) {
+            try {
+                final DocumentsDeletePostRequest documentsDeleteRequest =
                     new DocumentsDeletePostRequest(caseData.getReference().toString());
 
-            final String requestBody = gson.toJson(documentsDeleteRequest);
+                final String requestBody = gson.toJson(documentsDeleteRequest);
 
-            final String documentsDeleteResponse = postDocument(requestBody);
+                final String documentsDeleteResponse = postDocument(requestBody);
 
-            logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse);
+                logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse);
 
-        } catch (final Exception ex) {
-            final String errorMessage = String.format("Error deleting documents for case : %s",
-                    caseData.getReference().toString());
-            log.error(errorMessage, ex);
-            throw new DocumentDeletionException(errorMessage, ex);
+            } catch (final Exception ex) {
+                final String errorMessage = String.format("Error deleting documents for case : %s",
+                                                          caseData.getReference().toString());
+                log.error(errorMessage, ex);
+                throw new DocumentDeletionException(errorMessage, ex);
+            }
         }
     }
 

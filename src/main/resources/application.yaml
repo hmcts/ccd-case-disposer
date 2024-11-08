@@ -47,7 +47,7 @@ ccd:
   tasks:
     host: ${TASKS_HOST:http://localhost:4000}
   hearing:
-    host: ${HEARING_HOST:http://localhost:4000}
+    host: ${HEARING_RECORDING_HOST:http://localhost:4000}
 
 idam:
   api:
