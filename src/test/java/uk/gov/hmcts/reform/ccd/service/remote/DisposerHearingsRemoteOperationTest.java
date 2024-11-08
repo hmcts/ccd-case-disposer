@@ -89,4 +89,19 @@ class DisposerHearingsRemoteOperationTest {
         verifyNoInteractions(securityUtil);
 
     }
+
+    @Test
+    void shouldThrowExceptionWhenResponseCodeNot204() {
+        Response mockResponse = mock(Response.class);
+
+        when(mockResponse.status()).thenReturn(500);
+        when(securityUtil.getIdamClientToken()).thenReturn("123");
+        when(securityUtil.getServiceAuthorization()).thenReturn("456");
+        when(hearingClient.deleteHearing("123",
+                                         "456",
+                                         List.of(caseData.getReference().toString())))
+            .thenReturn(mockResponse);
+
+        assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));
+    }
 }

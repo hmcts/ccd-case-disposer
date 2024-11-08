@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.util.log.HearingDeletionRecordHolder;
 
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @Service
@@ -28,7 +29,16 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
             final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
             try {
                 final Response deleteHearingsResponse = deleteHearings(caseRef);
+
                 logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.status());
+
+                if (deleteHearingsResponse.status() != NO_CONTENT.value()){
+                    final String errorMessage = String
+                            .format("Unexpected response code %d while deleting hearing for case: %s",
+                            deleteHearingsResponse.status(), caseRef);
+
+                    throw new HearingDeletionException(errorMessage);
+                }
             } catch (final Exception ex) {
                 final String errorMessage = String.format("Error deleting hearing for case : %s", caseRef);
                 log.error(errorMessage, ex);
