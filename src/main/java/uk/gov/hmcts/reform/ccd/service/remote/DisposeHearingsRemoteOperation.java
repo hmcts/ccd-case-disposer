@@ -32,7 +32,7 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
 
                 logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.status());
 
-                if (deleteHearingsResponse.status() != NO_CONTENT.value()){
+                if (deleteHearingsResponse.status() != NO_CONTENT.value()) {
                     final String errorMessage = String
                             .format("Unexpected response code %d while deleting hearing for case: %s",
                             deleteHearingsResponse.status(), caseRef);
