@@ -12,6 +12,10 @@ public class RemoteDisposeService {
     @Autowired
     private List<DisposeRemoteOperation> disposeRemoteOperations;
 
+    /**
+     * Each class that implements DisposeRemoteOperation is responsible for handling the deletion logic.
+     * The implementation will decide whether the deletion should take place or not, based on the provided CaseData.
+     */
     public void remoteDeleteAll(final CaseData caseData) {
         disposeRemoteOperations.forEach(disposeRemoteOperation -> disposeRemoteOperation.delete(caseData));
     }
