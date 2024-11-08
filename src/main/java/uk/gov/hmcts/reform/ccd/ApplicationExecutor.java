@@ -12,12 +12,11 @@ import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILIES_FUNCTION;
+import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILY_FUNCTION;
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION;
 
 @Slf4j
@@ -52,10 +51,10 @@ public class ApplicationExecutor {
 
         int index = 0;
         while (index < deletableCasesOnly.size() && index < parameterResolver.getRequestLimit()) {
-            List<CaseFamily>  deletableCase = new ArrayList<>(Collections.singletonList(deletableCasesOnly.get(
-                index)));
 
-            final List<CaseData> flattenedCaseFamiliesView = FLATTEN_CASE_FAMILIES_FUNCTION.apply(deletableCase);
+            CaseFamily deletableCase = deletableCasesOnly.get(index);
+
+            final List<CaseData> flattenedCaseFamiliesView = FLATTEN_CASE_FAMILY_FUNCTION.apply(deletableCase);
 
             final List<CaseData> potentialMultiFamilyCases =
                 POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(deletableCase);
@@ -68,7 +67,7 @@ public class ApplicationExecutor {
                 );
                 caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
             });
-            actuallyDeletableCases.add(deletableCase.getFirst());
+            actuallyDeletableCases.add(deletableCase);
             index++;
         }
 

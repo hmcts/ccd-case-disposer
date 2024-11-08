@@ -10,7 +10,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY2_WITH_PAST_TTL;
-import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILIES_FUNCTION;
+import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILY_FUNCTION;
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION;
 
 class CaseFamilyUtilTest {
@@ -35,9 +35,9 @@ class CaseFamilyUtilTest {
 
     @Test
     void testShouldFlattenCaseFamilies() {
-        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, List.of(caseData2)));
+        final CaseFamily caseFamily = new CaseFamily(caseData1, List.of(caseData2));
 
-        final List<CaseData> result = FLATTEN_CASE_FAMILIES_FUNCTION.apply(caseFamilies);
+        final List<CaseData> result = FLATTEN_CASE_FAMILY_FUNCTION.apply(caseFamily);
 
         assertThat(result)
                 .isNotEmpty()
@@ -46,9 +46,8 @@ class CaseFamilyUtilTest {
 
     @Test
     void testShouldReturnOnlyRootCaseWhenNoLinkedCasesPresent() {
-        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, emptyList()));
-
-        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
+        final CaseFamily caseFamily = new CaseFamily(caseData1, emptyList());
+        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamily);
 
         assertThat(result)
                 .singleElement()
@@ -57,9 +56,9 @@ class CaseFamilyUtilTest {
 
     @Test
     void testResultShouldNotContainRootCaseWhenLinkedCasesPresent() {
-        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, List.of(caseData2)));
+        final CaseFamily caseFamily = new CaseFamily(caseData1, List.of(caseData2));
 
-        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
+        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamily);
 
         assertThat(result)
                 .singleElement()
