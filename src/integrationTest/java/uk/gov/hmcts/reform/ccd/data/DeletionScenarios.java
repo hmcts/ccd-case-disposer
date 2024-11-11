@@ -421,7 +421,6 @@ public class DeletionScenarios {
                     Map.of("FT_MultiplePages", emptyList(),"HearingRecordings", emptyList())
 
                 ),
-            ,
                 Arguments.of(
                     "FT_MasterCaseType",
                     null,
