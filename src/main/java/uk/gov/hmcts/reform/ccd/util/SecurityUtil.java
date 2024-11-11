@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.util;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,15 +16,17 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
+
 @Service
 @Slf4j
 @EnableScheduling
+@Getter
 public class SecurityUtil {
 
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamClient idamClient;
 
-    private String serviceAuthToken;
+    private String serviceAuthorization;
     private String idamClientToken;
     private UserDetails userDetails = new UserDetails();
 
@@ -36,23 +39,10 @@ public class SecurityUtil {
         this.idamClient = idamClient;
     }
 
-    public String getServiceAuthorization() {
-        return serviceAuthToken;
-    }
-
-    public String getIdamClientToken() {
-        return idamClientToken;
-    }
-
-    public UserDetails  getUserDetails() {
-        return userDetails;
-    }
-
-    @Scheduled(fixedRate = 55, timeUnit = MINUTES)
-    private void generateTokens() {
+    public void generateTokens() {
+        generateServiceToken();
         generateIdamToken();
         generateUserDetails();
-        generateServiceToken();
     }
 
     private void generateUserDetails() {
@@ -68,10 +58,10 @@ public class SecurityUtil {
         }
     }
 
-
+    @Scheduled(initialDelay = 237, fixedRate = 237, timeUnit = MINUTES)
     private void generateServiceToken() {
         try {
-            serviceAuthToken = authTokenGenerator.generate();
+            serviceAuthorization = authTokenGenerator.generate();
         } catch (final Exception exception) {
             log.error("Case disposer is unable to generate service auth token due to error - {}",
                     exception.getMessage(),
@@ -82,6 +72,7 @@ public class SecurityUtil {
         }
     }
 
+    @Scheduled(initialDelay = 55, fixedRate = 55, timeUnit = MINUTES)
     private void generateIdamToken() {
         try {
             idamClientToken = idamClient.getAccessToken(parameterResolver.getIdamUsername(),

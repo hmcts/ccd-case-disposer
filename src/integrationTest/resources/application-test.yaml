@@ -60,6 +60,8 @@ ccd:
     host: http://localhost:4603
   tasks:
     host: http://localhost:4603
+  hearing:
+    host: http://localhost:4603
 
 app.insights.log.size: 250
 

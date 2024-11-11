@@ -19,17 +19,21 @@ public class DocumentRemoteDeletionVerifier implements RemoteDeletionVerifier {
 
     public void verifyRemoteDeletion(final List<Long> caseRefDeletedDocuments) {
         caseRefDeletedDocuments.forEach(caseRef -> {
-            final CaseDocumentsDeletionResults caseDocumentsDeletionMocks =
-                    DOCUMENT_DELETE.get(Long.toString(caseRef));
+            final CaseDocumentsDeletionResults caseDocumentsDeletionMocks = DOCUMENT_DELETE.get(Long.toString(caseRef));
 
-            final CaseDocumentsDeletionResults caseDocumentsDeletionActualResults = documentDeletionRecordHolder
+            // This if statement guards against hearing cases. Some caseRefs might be of type HearingRecordings,
+            // which means that the document endpoint will not be called; instead, the hearing endpoint will be used.
+            if (caseDocumentsDeletionMocks != null) {
+                final CaseDocumentsDeletionResults caseDocumentsDeletionActualResults = documentDeletionRecordHolder
                     .getCaseDocumentsDeletionResults(Long.toString(caseRef));
 
-            assertThat(caseDocumentsDeletionActualResults).isNotNull();
-            assertThat(caseDocumentsDeletionActualResults.getCaseDocumentsFound())
+                assertThat(caseDocumentsDeletionActualResults).isNotNull();
+                assertThat(caseDocumentsDeletionActualResults.getCaseDocumentsFound())
                     .isEqualTo(caseDocumentsDeletionMocks.getCaseDocumentsFound());
-            assertThat(caseDocumentsDeletionActualResults.getMarkedForDeletion())
+                assertThat(caseDocumentsDeletionActualResults.getMarkedForDeletion())
                     .isEqualTo(caseDocumentsDeletionMocks.getMarkedForDeletion());
+            }
+
 
         });
     }

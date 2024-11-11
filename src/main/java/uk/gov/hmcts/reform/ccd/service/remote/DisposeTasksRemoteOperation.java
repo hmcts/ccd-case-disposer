@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteCaseTasksAction;
@@ -65,7 +64,7 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
         tasksDeletionRecordHolder.setCaseTasksDeletionResults(caseRef, taskDeleteResponse.getStatus());
     }
 
-    @Async
+
     Response deleteTasks(final String requestDeleteBody) {
         return ccdRestClientBuilder
                 .postRequestWithAllHeaders(parameterResolver.getTasksHost(),
