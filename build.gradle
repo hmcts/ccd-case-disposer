@@ -10,7 +10,7 @@ plugins {
   id 'org.sonarqube' version '5.1.0.4882'
   id 'uk.gov.hmcts.java' version '0.12.63'
   id 'io.freefair.lombok' version '8.10.2'
-  id 'org.flywaydb.flyway' version '10.20.1'
+  id 'org.flywaydb.flyway' version '10.21.0'
   id "info.solidsoft.pitest" version '1.15.0'
   id "au.com.dius.pact" version '4.6.15'
 }
@@ -111,7 +111,7 @@ check.dependsOn integration
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '10.20.0'
+  toolVersion = '10.20.1'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
@@ -234,7 +234,7 @@ def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.17.0',
     elasticsearch       : '7.17.25',
-    flyway              : '10.20.1',
+    flyway              : '10.21.0',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
     jersey              : '3.1.9',
