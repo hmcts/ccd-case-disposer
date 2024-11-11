@@ -31,10 +31,16 @@ class RemoteDisposeServiceTest {
                 mock(DisposeRoleAssignmentsRemoteOperation.class);
         final DisposeElasticsearchRemoteOperation disposeElasticsearchRemoteOperation =
                 mock(DisposeElasticsearchRemoteOperation.class);
+        final DisposeHearingsRemoteOperation disposeHearingsRemoteOperation =
+            mock(DisposeHearingsRemoteOperation.class);
+        final DisposeTasksRemoteOperation disposeTasksRemoteOperation =
+            mock(DisposeTasksRemoteOperation.class);
 
         disposeRemoteOperations.add(disposeDocumentsRemoteOperation);
         disposeRemoteOperations.add(disposeRoleAssignmentsRemoteOperation);
         disposeRemoteOperations.add(disposeElasticsearchRemoteOperation);
+        disposeRemoteOperations.add(disposeHearingsRemoteOperation);
+        disposeRemoteOperations.add(disposeTasksRemoteOperation);
 
         remoteDisposeService.remoteDeleteAll(CaseData.builder().build());
 
@@ -44,5 +50,9 @@ class RemoteDisposeServiceTest {
                 .delete(any(CaseData.class));
         verify(disposeElasticsearchRemoteOperation, times(1))
                 .delete(any(CaseData.class));
+        verify(disposeHearingsRemoteOperation, times(1))
+            .delete(any(CaseData.class));
+        verify(disposeTasksRemoteOperation, times(1))
+            .delete(any(CaseData.class));
     }
 }

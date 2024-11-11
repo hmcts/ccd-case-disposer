@@ -407,6 +407,22 @@ public class DeletionScenarios {
                                 List.of(1504259907350000L))
                 ),
                 Arguments.of(
+                    "FT_MultiplePages,HearingRecordings",
+                    null,
+                    "scenarios/S-024-deletable-hearings-and-non-hearing-cases.sql",
+                    List.of(1L, 2L, 3L),
+                    Map.of("FT_MultiplePages", List.of(6446787681450550L), "HearingRecordings",
+                           List.of(4331434790352648L, 7344069216690734L)),
+                    emptyList(),
+                    emptyList(),
+                    List.of(6446787681450550L, 4331434790352648L, 7344069216690734L),
+                    Map.of("HearingRecordings", List.of(4331434790352648L, 7344069216690734L),
+                           "FT_MultiplePages", List.of(6446787681450550L)),
+                    Map.of("FT_MultiplePages", emptyList(),"HearingRecordings", emptyList())
+
+                ),
+            ,
+                Arguments.of(
                     "FT_MasterCaseType",
                     null,
                     "scenarios/S-025-delete-cases-based-on-request-limit.sql",
@@ -468,16 +484,16 @@ public class DeletionScenarios {
                                                         1504259907351149L, 1504259907351148L)),
                     List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L, 12L),
                     List.of(1504259907351157L, 1504259907351156L, 1504259907351159L,
-                        1504259907351158L, 1504259907351153L, 1504259907351152L,
-                        1504259907351155L, 1504259907351154L, 1504259907351149L,
-                        1504259907351151L, 1504259907351150L, 150425990735148L),
+                            1504259907351158L, 1504259907351153L, 1504259907351152L,
+                            1504259907351155L, 1504259907351154L, 1504259907351149L,
+                            1504259907351151L, 1504259907351150L, 150425990735148L),
                     emptyList(),
                     Map.of("FT_MultiplePages", List.of(1504259907351159L, 1504259907351158L,
-                                                        1504259907351157L, 1504259907351156L,
-                                                        1504259907351155L, 1504259907351154L,
-                                                        1504259907351153L, 1504259907351152L,
-                                                        1504259907351151L, 1504259907351150L,
-                                                        1504259907351149L, 1504259907351148L)),
+                                                       1504259907351157L, 1504259907351156L,
+                                                       1504259907351155L, 1504259907351154L,
+                                                       1504259907351153L, 1504259907351152L,
+                                                       1504259907351151L, 1504259907351150L,
+                                                       1504259907351149L, 1504259907351148L)),
                     Map.of("FT_MultiplePages", emptyList())
                 )
 

@@ -14,11 +14,13 @@ import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static feign.form.ContentProcessor.CONTENT_TYPE_HEADER;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.HEARINGS_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.LAU_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_QUERY;
@@ -34,6 +36,9 @@ public class WireMockStubs {
     private static final String ROLES_QUERY_PATH = "/am/role-assignments/query";
     private static final String LAU_SAVE_PATH = "/audit/caseAction";
     private static final String TASKS_DELETE_PATH = "/task/delete";
+    private static final String HEARINGS_DELETE_PATH = "/delete";
+
+
     private RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
 
     public void setUpStubs(final WireMockServer wireMockServer) {
@@ -43,6 +48,7 @@ public class WireMockStubs {
         setupQueryRolesStub(wireMockServer);
         setupLauStub(wireMockServer);
         setupTasksStub(wireMockServer);
+        setupHearingsStub(wireMockServer);
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
@@ -99,4 +105,15 @@ public class WireMockStubs {
                                                         .toJson(roleAssignmentsResponse))
                                           .withStatus(200))));
     }
+
+    private void setupHearingsStub(final WireMockServer wireMockServer) {
+        HEARINGS_DELETE.entrySet().forEach(entry ->
+               wireMockServer.stubFor(delete(urlPathMatching(HEARINGS_DELETE_PATH))
+                                          .withRequestBody(equalToJson("[\"" + entry.getKey() + "\"]"))
+                                          .willReturn(aResponse().withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+                                                          .withBody(new Gson().toJson(entry.getValue()))
+                                                          .withStatus(204))));
+    }
+
+
 }
