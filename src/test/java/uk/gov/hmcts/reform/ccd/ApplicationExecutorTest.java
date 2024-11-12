@@ -98,7 +98,7 @@ class ApplicationExecutorTest {
     @Test
     void shouldLimitCaseDeletionToRequestsLimit() {
         // Given
-        when(parameterResolver.getRequestLimit()).thenReturn(4);
+        when(parameterResolver.getRequestLimit()).thenReturn(1);
         final CaseData caseData1 = new CaseData(
             DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
             DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
@@ -141,7 +141,7 @@ class ApplicationExecutorTest {
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(2)).deleteLinkedCaseFamilies(anyList());
+        verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(anyList());
         verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
 

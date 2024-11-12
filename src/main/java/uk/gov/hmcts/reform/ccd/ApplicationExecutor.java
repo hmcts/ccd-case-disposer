@@ -62,12 +62,12 @@ public class ApplicationExecutor {
                 caseFamiliesDueDeletion,
                 subjectCaseData
             );
-            final List<CaseData> flattenedCaseFamiliesView1 = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies);
-            requestLimit = requestLimit - flattenedCaseFamiliesView1.size();
+            final int linkedFamilySize = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies).size();
 
             if (requestLimit >= 0) {
                 caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
                 actuallyDeletableCases.addAll(linkedFamilies);
+                requestLimit -= linkedFamilySize;
             }
         }
 
