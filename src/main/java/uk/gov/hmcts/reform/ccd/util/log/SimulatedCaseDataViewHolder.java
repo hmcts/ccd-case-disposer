@@ -23,11 +23,14 @@ public class SimulatedCaseDataViewHolder {
 
     public Set<Long> getSimulatedCaseIds() {
         final Set<Long> deletableCaseIds = new HashSet<>();
-        simulatedCaseDataViews.forEach(deletedCaseDataView ->
+        if (simulatedCaseDataViews != null && !simulatedCaseDataViews.isEmpty()) {
+            simulatedCaseDataViews.forEach(deletedCaseDataView ->
                 deletableCaseIds.addAll(Stream.of(List.of(deletedCaseDataView.getCaseRef()),
-                                deletedCaseDataView.getLinkedCaseIds())
-                        .flatMap(Collection::stream)
-                        .collect(toSet())));
+                                                 deletedCaseDataView.getLinkedCaseIds())
+                                           .flatMap(Collection::stream)
+                                           .collect(toSet())));
+        }
+
         return deletableCaseIds;
     }
 
