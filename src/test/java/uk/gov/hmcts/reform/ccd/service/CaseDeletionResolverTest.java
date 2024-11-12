@@ -54,18 +54,17 @@ class CaseDeletionResolverTest {
         final List<List<Long>> caseRefs = List.of(List.of(2L));
 
         when(failedToDeleteCaseFamilyHolder.getCaseRefs()).thenReturn(caseRefs);
-        when(caseFamiliesFilter.filterSuccessfulCaseFamiliesByCaseRef(linkedFamilies, caseRefs))
-                .thenReturn(filteredCases);
-        when(caseFamiliesFilter.getDeletableCasesOnly(filteredCases))
+        when(caseFamiliesFilter.filterSuccessfulCaseFamiliesByCaseRef(filteredCases, caseRefs))
                 .thenReturn(filteredCases);
 
-        caseDeletionResolver.logCaseDeletion(linkedFamilies);
+        caseDeletionResolver.logCaseDeletion(filteredCases,linkedFamilies);
 
-        verify(caseFamiliesFilter, times(1)).filterSuccessfulCaseFamiliesByCaseRef(linkedFamilies, caseRefs);
-        verify(caseFamiliesFilter, times(1)).getDeletableCasesOnly(filteredCases);
-        verify(caseFamiliesFilter, times(1)).geSimulationCasesOnly(filteredCases);
+        verify(caseFamiliesFilter, times(1)).filterSuccessfulCaseFamiliesByCaseRef(filteredCases, caseRefs);
         verify(caseDeletionLoggingService, times(1))
                 .logCaseFamilies(anyList(), anyList(), anyList());
+        verify(caseDeletionLoggingService, times(1))
+            .logCaseFamilies(anyList(), anyList(), anyList());
+        verify(logAndAuditCaseFilter,times(1)).getDistinctCaseDataFromCaseFamilyList(anyList());
 
         verify(logAndAuditRemoteOperation, times(2)).postCaseDeletionToLogAndAudit(any(CaseData.class));
     }
