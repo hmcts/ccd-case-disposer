@@ -45,7 +45,8 @@ public class ApplicationExecutor {
         log.info("Case-Disposer started...");
         final List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
         final List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
-        final List<CaseFamily> deletableLinkedFamiliesSimulation = caseFamiliesFilter.geSimulationCasesOnly(caseFamiliesDueDeletion);
+        final List<CaseFamily> deletableLinkedFamiliesSimulation = caseFamiliesFilter
+            .geSimulationCasesOnly(caseFamiliesDueDeletion);
         final List<CaseFamily> actuallyDeletableCases = new ArrayList<>();
 
         final List<CaseData> flattenedCaseFamiliesView = FLATTEN_CASE_FAMILIES_FUNCTION.apply(deletableCasesOnly);
@@ -53,22 +54,22 @@ public class ApplicationExecutor {
         final List<CaseData> potentialMultiFamilyCases =
                 POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(deletableCasesOnly);
 
-         Integer requestLimit = parameterResolver.getRequestLimit();
+        Integer requestLimit = parameterResolver.getRequestLimit();
 
-         for (CaseData subjectCaseData : potentialMultiFamilyCases) {
-             final List<CaseFamily> linkedFamilies = findLinkedCaseFamilies(
-                 flattenedCaseFamiliesView,
-                 caseFamiliesDueDeletion,
-                 subjectCaseData
-             );
-             final List<CaseData> flattenedCaseFamiliesView1 = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies);
-             requestLimit = requestLimit - flattenedCaseFamiliesView1.size();
+        for (CaseData subjectCaseData : potentialMultiFamilyCases) {
+            final List<CaseFamily> linkedFamilies = findLinkedCaseFamilies(
+                flattenedCaseFamiliesView,
+                caseFamiliesDueDeletion,
+                subjectCaseData
+            );
+            final List<CaseData> flattenedCaseFamiliesView1 = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies);
+            requestLimit = requestLimit - flattenedCaseFamiliesView1.size();
 
-             if (requestLimit >= 0) {
-                 caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
-                 actuallyDeletableCases.addAll(linkedFamilies);
-             }
-         }
+            if (requestLimit >= 0) {
+                caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
+                actuallyDeletableCases.addAll(linkedFamilies);
+            }
+        }
 
         caseDeletionResolver.logCaseDeletion(actuallyDeletableCases, deletableLinkedFamiliesSimulation);
         log.info("Case-Disposer finished.");
