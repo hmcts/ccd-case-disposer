@@ -1,38 +1,38 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
+import uk.gov.hmcts.reform.ccd.service.remote.clients.DocumentClient;
+import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @Service
 @Slf4j
 public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
-    private final ParameterResolver parameterResolver;
-
-    private final CcdRestClientBuilder ccdRestClientBuilder;
-    private final Gson gson = new Gson();
+    private final DocumentClient documentClient;
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
+    private final SecurityUtil securityUtil;
 
     @Autowired
-    public DisposeDocumentsRemoteOperation(final CcdRestClientBuilder ccdRestClientBuilder,
-                                           final ParameterResolver parameterResolver,
+    public DisposeDocumentsRemoteOperation(final DocumentClient documentClient,
+                                           final SecurityUtil securityUtil,
                                            final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
-        this.ccdRestClientBuilder = ccdRestClientBuilder;
-        this.parameterResolver = parameterResolver;
+        this.documentClient = documentClient;
+        this.securityUtil = securityUtil;
         this.documentDeletionRecordHolder = documentDeletionRecordHolder;
     }
+
 
     @Override
     public void delete(final CaseData caseData) {
@@ -41,15 +41,20 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
                 final DocumentsDeletePostRequest documentsDeleteRequest =
                     new DocumentsDeletePostRequest(caseData.getReference().toString());
 
-                final String requestBody = gson.toJson(documentsDeleteRequest);
+                final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse = postDocument(documentsDeleteRequest);
+                if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()){
+                    final String errorMessage = String
+                        .format("Unexpected response code %d while deleting documents for case: %s",
+                                documentsDeleteResponse.getStatusCode(), caseData.getReference());
 
-                final String documentsDeleteResponse = postDocument(requestBody);
+                    throw new HearingDeletionException(errorMessage);
+                }
 
-                logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse);
+                logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse.getBody());
 
             } catch (final Exception ex) {
-                final String errorMessage = String.format("Error deleting documents for case : %s",
-                                                          caseData.getReference().toString());
+                final String errorMessage = String.format(
+                    "Error deleting documents for case : %s", caseData.getReference().toString());
                 log.error(errorMessage, ex);
                 throw new DocumentDeletionException(errorMessage, ex);
             }
@@ -58,43 +63,41 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
 
     private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
-                                      final String documentsDeleteResponse) {
+                                      final CaseDocumentsDeletionResults documentsDeletionResults) {
         try {
-            final CaseDocumentsDeletionResults documentsDeletionResults =
-                    gson.fromJson(documentsDeleteResponse, CaseDocumentsDeletionResults.class);
-
-            documentDeletionRecordHolder.setCaseDocumentsDeletionResults(documentsDeleteRequest.getCaseRef(),
-                    documentsDeletionResults);
+            documentDeletionRecordHolder.setCaseDocumentsDeletionResults(
+                documentsDeleteRequest.getCaseRef(),
+                documentsDeletionResults
+            );
 
             final String message = getLogMessage(documentsDeletionResults);
 
-            log.info(message + "Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
-                    documentsDeleteRequest.getCaseRef(),
-                    documentsDeletionResults.getCaseDocumentsFound(),
-                    documentsDeletionResults.getMarkedForDeletion());
+            log.info(
+                message + "Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
+                documentsDeleteRequest.getCaseRef(),
+                documentsDeletionResults.getCaseDocumentsFound(),
+                documentsDeletionResults.getMarkedForDeletion()
+            );
 
         } catch (final JsonParseException jsonParseException) {
             final String errorMessage = "Unable to map json to object document deletion endpoint response due"
-                    + " to following endpoint response: ".concat(documentsDeleteResponse);
+                + " to following endpoint response: ".concat(documentsDeletionResults.toString());
             log.error(errorMessage);
             throw new DocumentDeletionException(errorMessage);
         }
-
     }
 
     private String getLogMessage(final CaseDocumentsDeletionResults documentsDeletionResults) {
         if (!documentsDeletionResults.getCaseDocumentsFound()
-                .equals(documentsDeletionResults.getMarkedForDeletion())) {
+            .equals(documentsDeletionResults.getMarkedForDeletion())) {
             return "Case Documents Deletion ANOMALY: ";
         }
         return "Case Documents Deletion CONFIRMATION: ";
     }
 
 
-    String postDocument(final String requestBody) {
-        return ccdRestClientBuilder
-                .postRequestWithServiceAuthHeader(parameterResolver.getDocumentStoreHost(),
-                        DELETE_DOCUMENT_PATH,
-                        requestBody);
+    ResponseEntity<CaseDocumentsDeletionResults> postDocument(final DocumentsDeletePostRequest documentsDeletePostRequest) {
+        return documentClient
+            .deleteDocument(securityUtil.getServiceAuthorization(), documentsDeletePostRequest);
     }
 }

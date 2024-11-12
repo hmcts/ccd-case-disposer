@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.service.remote;
+package uk.gov.hmcts.reform.ccd.service.remote.clients;
 
 import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
