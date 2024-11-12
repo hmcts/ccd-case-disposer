@@ -47,7 +47,6 @@ public class TestConstants {
             Map.entry("1504259907351238", new CaseDocumentsDeletionResults(32, 32)),
             Map.entry("1504259907351237", new CaseDocumentsDeletionResults(33, 33)),
             Map.entry("1504259907351236", new CaseDocumentsDeletionResults(34, 34)),
-
             Map.entry("1504259907351233", new CaseDocumentsDeletionResults(35, 35)),
             Map.entry("1504259907351232", new CaseDocumentsDeletionResults(36, 36)),
             Map.entry("1504259907351231", new CaseDocumentsDeletionResults(37, 37)),
