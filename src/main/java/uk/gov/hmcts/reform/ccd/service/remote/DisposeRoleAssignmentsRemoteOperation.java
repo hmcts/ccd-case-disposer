@@ -1,60 +1,57 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import com.google.gson.Gson;
-import jakarta.ws.rs.core.Response;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.remote.clients.RoleAssignmentClient;
+import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
-
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_ROLE_PATH;
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.QUERY_ROLE_PATH;
 
 @Service
 @Slf4j
 public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOperation {
 
-    private final ParameterResolver parameterResolver;
-
-    private final Gson gson = new Gson();
-
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
 
-    private final CcdRestClientBuilder ccdRestClientBuilder;
+    private final RoleAssignmentClient roleAssignmentClient;
+
+    private final SecurityUtil securityUtil;
 
     @Autowired
-    public DisposeRoleAssignmentsRemoteOperation(final CcdRestClientBuilder ccdRestClientBuilder,
-                                                 final ParameterResolver parameterResolver,
-                                                 final RoleDeletionRecordHolder roleDeletionRecordHolder) {
-        this.ccdRestClientBuilder = ccdRestClientBuilder;
-        this.parameterResolver = parameterResolver;
+    public DisposeRoleAssignmentsRemoteOperation(final RoleAssignmentClient roleAssignmentClient,
+                                                 final RoleDeletionRecordHolder roleDeletionRecordHolder,
+                                                 final SecurityUtil securityUtil) {
+        this.roleAssignmentClient = roleAssignmentClient;
         this.roleDeletionRecordHolder = roleDeletionRecordHolder;
+        this.securityUtil = securityUtil;
     }
 
     @Override
     public void delete(final CaseData caseData) {
         final String caseRef = caseData.getReference().toString();
         try {
-            if (!parameterResolver.getCheckCaseRolesExist()
-                ||
-                (parameterResolver.getCheckCaseRolesExist() && hasRoleAssignments(caseRef))) {
+            final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+                new RoleAssignmentsPostRequest(caseRef);
 
-                final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
-                    new RoleAssignmentsPostRequest(caseRef);
+            final ResponseEntity<RoleAssignmentsPostResponse> roleAssignmentsDeleteResponse =
+                deleteRoleAssignment(roleAssignmentsDeleteRequest);
 
-                final String requestDeleteBody = gson.toJson(roleAssignmentsDeleteRequest);
+            roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef,
+                                                                 roleAssignmentsDeleteResponse.getStatusCode().value());
 
-                final Response roleAssignmentsDeleteResponse = deleteRoleAssignment(requestDeleteBody);
+            if (!roleAssignmentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
+                final String errorMessage = String
+                    .format("Unexpected response code %d while deleting role assignments for case: %s",
+                            roleAssignmentsDeleteResponse.getStatusCode().value(), caseData.getReference()
+                    );
 
-                logRoleAssignmentsDisposal(caseRef, roleAssignmentsDeleteResponse);
-                roleAssignmentsDeleteResponse.close();
+                throw new RoleAssignmentDeletionException(errorMessage);
             }
 
         } catch (final Exception ex) {
@@ -64,50 +61,13 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
         }
     }
 
-    private boolean hasRoleAssignments(String caseRef) {
 
-        final RoleAssignmentsPostRequest roleAssignmentsQueryRequest =
-            new RoleAssignmentsPostRequest(caseRef);
-
-        final String requestQueryBody = gson.toJson(roleAssignmentsQueryRequest);
-
-        final Response roleAssignmentsQueryResponse = ccdRestClientBuilder
-            .postRequestWithRoleAssignmentFetchContentType(parameterResolver.getRoleAssignmentsHost(),
-                                                           QUERY_ROLE_PATH, requestQueryBody);
-
-        if (roleAssignmentsQueryResponse.getStatus() == HttpStatus.OK.value()) {
-            RoleAssignmentsPostResponse roleAssignmentsResponse =
-                roleAssignmentsQueryResponse.readEntity(RoleAssignmentsPostResponse.class);
-
-            if (!CollectionUtils.isEmpty(roleAssignmentsResponse.getRoleAssignmentResponse())
-            ) {
-                log.info("Found {} role(s) for case : {}, calling AM role(s) delete endpoint to remove.",
-                         roleAssignmentsResponse.getRoleAssignmentResponse().size(), caseRef);
-                roleAssignmentsQueryResponse.close();
-                return true;
-
-            } else {
-                log.info("No roles found for case : {}, skipping AM roles delete endpoint.", caseRef);
-                logRoleAssignmentsDisposal(caseRef, roleAssignmentsQueryResponse);
-                roleAssignmentsQueryResponse.close();
-                return false;
-            }
-
-        } else {
-            logRoleAssignmentsDisposal(caseRef, roleAssignmentsQueryResponse);
-            roleAssignmentsQueryResponse.close();
-            throw new RoleAssignmentDeletionException("Unable to get case assignment roles.");
-        }
-    }
-
-    private void logRoleAssignmentsDisposal(final String caseRef, final Response roleAssignmentsDeleteResponse) {
-        roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef, roleAssignmentsDeleteResponse.getStatus());
-    }
-
-
-    Response deleteRoleAssignment(final String requestDeleteBody) {
-        return ccdRestClientBuilder
-                .postRequestWithAllHeaders(parameterResolver.getRoleAssignmentsHost(),
-                        DELETE_ROLE_PATH, requestDeleteBody);
+    private ResponseEntity<RoleAssignmentsPostResponse> deleteRoleAssignment(final RoleAssignmentsPostRequest
+                                                                         roleAssignmentsPostRequest) {
+        return roleAssignmentClient.deleteRoleAssignment(
+            securityUtil.getServiceAuthorization(),
+            securityUtil.getIdamClientToken(),
+            roleAssignmentsPostRequest
+        );
     }
 }

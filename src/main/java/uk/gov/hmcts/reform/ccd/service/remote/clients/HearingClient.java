@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.List;
 
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_HEARINGS_PATH;
+import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @FeignClient(name = "hearingClient", url = "${ccd.hearing.host}")
 public interface HearingClient {
@@ -19,8 +21,8 @@ public interface HearingClient {
         produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.APPLICATION_JSON_VALUE)
     Response deleteHearing(
-        @RequestHeader("Authorization") String authHeader,
-        @RequestHeader("ServiceAuthorization") String serviceAuthHeader,
+        @RequestHeader(AUTHORISATION_HEADER) String authHeader,
+        @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestBody final List<String> ccdCaseIds
     );
 

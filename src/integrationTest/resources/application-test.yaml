@@ -57,7 +57,6 @@ ccd:
     host: http://localhost:4603
   role.assignment:
     host: http://localhost:4603
-    check-case-roles-exist: true
   log.and.audit:
     host: http://localhost:4603
   tasks:

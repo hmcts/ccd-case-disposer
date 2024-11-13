@@ -25,18 +25,6 @@ public interface ParameterResolver {
 
     String getIdamPassword();
 
-    String getDocumentStoreHost();
-
-    String getRoleAssignmentsHost();
-
-    String getLogAndAuditHost();
-
-    String getTasksHost();
-
-    String getHearingHost();
-
-    Boolean getCheckCaseRolesExist();
-
     Integer getAppInsightsLogSize();
 
     Integer getThreadMaxPoolSize();

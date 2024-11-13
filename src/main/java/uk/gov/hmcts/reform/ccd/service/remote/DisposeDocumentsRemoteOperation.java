@@ -41,16 +41,18 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
                 final DocumentsDeletePostRequest documentsDeleteRequest =
                     new DocumentsDeletePostRequest(caseData.getReference().toString());
 
-                final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse = postDocument(documentsDeleteRequest);
-                if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()){
+                final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse =
+                    postDocument(documentsDeleteRequest);
+
+                logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse.getBody());
+
+                if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
                     final String errorMessage = String
                         .format("Unexpected response code %d while deleting documents for case: %s",
-                                documentsDeleteResponse.getStatusCode(), caseData.getReference());
+                                documentsDeleteResponse.getStatusCode().value(), caseData.getReference());
 
                     throw new HearingDeletionException(errorMessage);
                 }
-
-                logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse.getBody());
 
             } catch (final Exception ex) {
                 final String errorMessage = String.format(
@@ -96,7 +98,8 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
     }
 
 
-    ResponseEntity<CaseDocumentsDeletionResults> postDocument(final DocumentsDeletePostRequest documentsDeletePostRequest) {
+    private ResponseEntity<CaseDocumentsDeletionResults> postDocument(final DocumentsDeletePostRequest
+                                                                          documentsDeletePostRequest) {
         return documentClient
             .deleteDocument(securityUtil.getServiceAuthorization(), documentsDeletePostRequest);
     }

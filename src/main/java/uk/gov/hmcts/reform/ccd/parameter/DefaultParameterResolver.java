@@ -53,9 +53,6 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${ccd.hearing.host}")
     private String hearingHost;
 
-    @Value("${ccd.role.assignment.check-case-roles-exist}")
-    private Boolean checkCaseRolesExist;
-
     @Value("${app.insights.log.size}")
     private Integer appInsightsLogSize;
 
@@ -132,36 +129,6 @@ public class DefaultParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public String getDocumentStoreHost() {
-        return documentStoreHost;
-    }
-
-    @Override
-    public Boolean getCheckCaseRolesExist() {
-        return checkCaseRolesExist;
-    }
-
-    @Override
-    public String getRoleAssignmentsHost() {
-        return roleAssignmentHost;
-    }
-
-    @Override
-    public String getLogAndAuditHost() {
-        return logAndAuditHost;
-    }
-
-    @Override
-    public String getTasksHost() {
-        return tasksHost;
-    }
-
-    @Override
-    public String getHearingHost() {
-        return hearingHost;
     }
 
     @Override
