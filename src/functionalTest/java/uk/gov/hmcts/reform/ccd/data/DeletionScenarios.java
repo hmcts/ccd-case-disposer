@@ -55,7 +55,7 @@ public class DeletionScenarios {
                      emptyMap(),
                      emptyMap(),
                      Map.of("DPR_FT_HEARING_CaseType", List.of(1004259907359999L)),
-                     Map.of("DPR_FT_HEARING_CaseType", emptyList()),
+                     emptyMap(),
                      List.of(1004259907359999L)
                  )
 
