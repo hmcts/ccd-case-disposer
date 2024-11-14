@@ -128,6 +128,7 @@ class DisposeDocumentsRemoteOperationTest {
 
     @Test
     void shouldNotDeleteHearings() {
+        when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
         final CaseData caseData = CaseData.builder()
             .reference(1234567890123456L)
             .caseType(HEARING_RECORDINGS_CASE_TYPE).build();

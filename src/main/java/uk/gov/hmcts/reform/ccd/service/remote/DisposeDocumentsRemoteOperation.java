@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @Service
 @Slf4j
@@ -36,7 +35,7 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     @Override
     public void delete(final CaseData caseData) {
-        if (!caseData.getCaseType().equals(HEARING_RECORDINGS_CASE_TYPE)) {
+        if (!caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
             try {
                 final DocumentsDeletePostRequest documentsDeleteRequest =
                     new DocumentsDeletePostRequest(caseData.getReference().toString());

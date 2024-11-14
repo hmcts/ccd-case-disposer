@@ -35,6 +35,8 @@ public interface ParameterResolver {
 
     String getHearingHost();
 
+    String getHearingCaseType();
+
     Boolean getCheckCaseRolesExist();
 
     Integer getAppInsightsLogSize();
