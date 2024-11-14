@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.JsonParseException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
@@ -18,21 +18,12 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     private final DocumentClient documentClient;
-    private DocumentDeletionRecordHolder documentDeletionRecordHolder;
+    private final DocumentDeletionRecordHolder documentDeletionRecordHolder;
     private final SecurityUtil securityUtil;
-
-    @Autowired
-    public DisposeDocumentsRemoteOperation(final DocumentClient documentClient,
-                                           final SecurityUtil securityUtil,
-                                           final DocumentDeletionRecordHolder documentDeletionRecordHolder) {
-        this.documentClient = documentClient;
-        this.securityUtil = securityUtil;
-        this.documentDeletionRecordHolder = documentDeletionRecordHolder;
-    }
-
 
     @Override
     public void delete(final CaseData caseData) {

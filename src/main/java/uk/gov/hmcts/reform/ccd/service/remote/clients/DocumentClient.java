@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 
-@FeignClient(name = "documentClient", url = "${ccd.document.store.host}")
+@FeignClient(name = "documentClient", url = "${remote.document.store.host}")
 public interface DocumentClient {
 
     @PostMapping(

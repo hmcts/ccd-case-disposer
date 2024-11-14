@@ -31,7 +31,7 @@ public class RoleDeleteTestUtils {
     @Inject
     private SecurityUtils securityUtils;
 
-    @Value("${ccd.role.assignment.host}")
+    @Value("${remote.role.assignment.host}")
     private String roleAssignmentHost;
 
     @Inject

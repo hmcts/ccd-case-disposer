@@ -27,7 +27,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISAT
 @Slf4j
 public class DocumentDeleteTestUtils {
 
-    @Value("${ccd.document.store.host}")
+    @Value("${remote.document.store.host}")
     private String documentStoreHost;
 
     @Inject

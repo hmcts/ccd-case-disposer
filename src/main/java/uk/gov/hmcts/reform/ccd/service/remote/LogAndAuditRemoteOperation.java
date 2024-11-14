@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import com.google.gson.JsonParseException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
@@ -21,24 +22,16 @@ import static java.time.LocalDateTime.now;
 @Service
 @Slf4j
 @Qualifier("LogAndAuditRemoteOperation")
+@RequiredArgsConstructor
 public class LogAndAuditRemoteOperation {
 
     private final LauClient lauClient;
-
     private final SecurityUtil securityUtil;
-
     private final LauRecordHolder lauRecordHolder;
 
 
     private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    public LogAndAuditRemoteOperation(final LauClient lauClient,
-                                      final LauRecordHolder lauRecordHolder,
-                                      final SecurityUtil securityUtil) {
-        this.lauClient = lauClient;
-        this.lauRecordHolder = lauRecordHolder;
-        this.securityUtil = securityUtil;
-    }
 
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
         try {

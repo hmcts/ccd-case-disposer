@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import feign.Request;
-import feign.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteTasksRequest;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.TasksClient;
@@ -19,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,11 +42,10 @@ class DisposeTaskRemoteOperationTest {
     @Test
     @DisplayName("should delete tasks successfully")
     void shouldDeleteTasksSuccessfully() {
-        final Response response = mock(Response.class);
+        final ResponseEntity<Void> response = new ResponseEntity<>(HttpStatus.CREATED);
 
         when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
         when(securityUtil.getIdamClientToken()).thenReturn("some_cool_idam_token");
-        when(response.status()).thenReturn(HttpStatus.CREATED.value());
         when(tasksClient.deleteTasks(anyString(), anyString(), any(DeleteTasksRequest.class)))
             .thenReturn(response);
 
@@ -68,10 +65,7 @@ class DisposeTaskRemoteOperationTest {
     @Test
     void shouldThrowTasksDeletionExceptionWhenResponseStatusIsNot201() {
         CaseData caseData = CaseData.builder().reference(12345L).build();
-        Response response = Response.builder()
-            .status(400) // Non-201 response status
-            .request(mock(Request.class))
-            .build();
+        ResponseEntity<Void> response = ResponseEntity.status(400).build();
 
         when(tasksClient.deleteTasks(any(), any(), any(DeleteTasksRequest.class))).thenReturn(response);
 

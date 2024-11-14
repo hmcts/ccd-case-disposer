@@ -38,19 +38,19 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("#{'${simulated.case.types}'.split(',')}")
     private List<String> deletableCaseTypeSimulation;
 
-    @Value("${ccd.document.store.host}")
+    @Value("${remote.document.store.host}")
     private String documentStoreHost;
 
-    @Value("${ccd.role.assignment.host}")
+    @Value("${remote.role.assignment.host}")
     private String roleAssignmentHost;
 
-    @Value("${ccd.log.and.audit.host}")
+    @Value("${remote.log.and.audit.host}")
     private String logAndAuditHost;
 
-    @Value("${ccd.tasks.host}")
+    @Value("${remote.tasks.host}")
     private String tasksHost;
 
-    @Value("${ccd.hearing.host}")
+    @Value("${remote.hearing.host}")
     private String hearingHost;
 
     @Value("${app.insights.log.size}")

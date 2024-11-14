@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import feign.Response;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteCaseTasksAction;
@@ -14,22 +14,13 @@ import uk.gov.hmcts.reform.ccd.util.log.TasksDeletionRecordHolder;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
 
     private final SecurityUtil securityUtil;
-
-    private TasksDeletionRecordHolder tasksDeletionRecordHolder;
-
+    private final TasksDeletionRecordHolder tasksDeletionRecordHolder;
     private final TasksClient tasksClient;
 
-    @Autowired
-    public DisposeTasksRemoteOperation(final TasksClient tasksClient,
-                                       final SecurityUtil securityUtil,
-                                       final TasksDeletionRecordHolder tasksDeletionRecordHolder) {
-        this.tasksClient = tasksClient;
-        this.securityUtil = securityUtil;
-        this.tasksDeletionRecordHolder = tasksDeletionRecordHolder;
-    }
 
     @SuppressWarnings("java:S1135")
     @Override
@@ -39,15 +30,14 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
             final DeleteTasksRequest tasksDeletePostRequest =
                 new DeleteTasksRequest(new DeleteCaseTasksAction(caseRef));
 
+            final ResponseEntity<Void> taskDeleteResponse = deleteTasks(tasksDeletePostRequest);
 
-            final Response taskDeleteResponse = deleteTasks(tasksDeletePostRequest);
+            tasksDeletionRecordHolder.setCaseTasksDeletionResults(caseRef, taskDeleteResponse.getStatusCode().value());
 
-            tasksDeletionRecordHolder.setCaseTasksDeletionResults(caseRef, taskDeleteResponse.status());
-
-            if (taskDeleteResponse.status() != 201) {
+            if (!taskDeleteResponse.getStatusCode().is2xxSuccessful()) {
                 final String errorMessage = String
                     .format("Unexpected response code %d while deleting tasks for case: %s",
-                            taskDeleteResponse.status(), caseData.getReference()
+                            taskDeleteResponse.getStatusCode().value(), caseData.getReference()
                     );
 
                 throw new TasksDeletionException(errorMessage);
@@ -60,7 +50,7 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
         }
     }
 
-    Response deleteTasks(final DeleteTasksRequest tasksDeletePostRequest) {
+    ResponseEntity<Void> deleteTasks(final DeleteTasksRequest tasksDeletePostRequest) {
         return tasksClient.deleteTasks(
             securityUtil.getServiceAuthorization(),
             securityUtil.getIdamClientToken(),

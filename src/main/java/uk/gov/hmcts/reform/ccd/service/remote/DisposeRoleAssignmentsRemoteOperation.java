@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
@@ -15,22 +15,12 @@ import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOperation {
 
-    private RoleDeletionRecordHolder roleDeletionRecordHolder;
-
+    private final RoleDeletionRecordHolder roleDeletionRecordHolder;
     private final RoleAssignmentClient roleAssignmentClient;
-
     private final SecurityUtil securityUtil;
-
-    @Autowired
-    public DisposeRoleAssignmentsRemoteOperation(final RoleAssignmentClient roleAssignmentClient,
-                                                 final RoleDeletionRecordHolder roleDeletionRecordHolder,
-                                                 final SecurityUtil securityUtil) {
-        this.roleAssignmentClient = roleAssignmentClient;
-        this.roleDeletionRecordHolder = roleDeletionRecordHolder;
-        this.securityUtil = securityUtil;
-    }
 
     @Override
     public void delete(final CaseData caseData) {

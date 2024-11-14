@@ -52,7 +52,7 @@ azure:
   application-insights:
     instrumentation-key: appinsights_key
 
-ccd:
+remote:
   document.store:
     host: http://localhost:4603
   role.assignment:
