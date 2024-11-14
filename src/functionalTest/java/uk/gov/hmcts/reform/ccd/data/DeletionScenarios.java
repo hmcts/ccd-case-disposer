@@ -28,6 +28,7 @@ public class DeletionScenarios {
                         Map.of(1004259907353529L, List.of("S-001-role-assignment-for-case.json")),
                         Map.of("DPR_FT_MasterCaseType", List.of(1004259907353529L)),
                         Map.of("DPR_FT_MultiplePages", List.of(1004259907353528L)),
+                        Map.of("DPR_FT_MasterCaseType", List.of(1004259907353529L)),
                         List.of(1004259907353529L)
                 ),
                 Arguments.of(
@@ -42,6 +43,7 @@ public class DeletionScenarios {
                         emptyMap(),
                         Map.of("global_search", List.of(1004259907351111L)),
                         Map.of("global_search", emptyList()),
+                        Map.of("global_search", List.of(1004259907351111L)),
                         List.of(1004259907351111L)
                 ),
                  Arguments.of(
@@ -49,13 +51,14 @@ public class DeletionScenarios {
                      null,
                      "scenarios/S-003-hearing-deletable-case-type",
                      List.of(1004259907359999L),
-                     Map.of("DPR_FT_HEARING_CaseType", List.of(1004259907359999L)),
+                     emptyMap(),
                      emptyList(),
                      emptyList(),
                      emptyMap(),
                      emptyMap(),
-                     Map.of("DPR_FT_HEARING_CaseType", List.of(1004259907359999L)),
                      emptyMap(),
+                     emptyMap(),
+                     Map.of("DPR_FT_HEARING_CaseType", List.of(1004259907359999L)),
                      List.of(1004259907359999L)
                  )
 
