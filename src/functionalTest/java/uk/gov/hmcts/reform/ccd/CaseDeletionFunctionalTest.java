@@ -61,7 +61,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         verifyRoleDeletion(deletableRoles);
         verifyTaskDeletion(deletableRowIds);
         verifyLauLogs(new ArrayList<>(deletedCases.values()));
-        //verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
 }
