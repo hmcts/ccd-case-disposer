@@ -29,7 +29,7 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
-    @Value("${ccd.case-definition.host}")
+    @Value("${remote.case-definition.host}")
     private String caseDefinitionHost;
 
     @Value("${idam.api.username}")
@@ -37,24 +37,6 @@ public class TestParameterResolver implements ParameterResolver {
 
     @Value("${idam.api.password}")
     private String idamApiPassword;
-
-    @Value("${ccd.document.store.host}")
-    private String documentStoreHost;
-
-    @Value("${ccd.role.assignment.host}")
-    private String roleAssignmentHost;
-
-    @Value("${ccd.log.and.audit.host}")
-    private String logAndAuditHost;
-
-    @Value("${ccd.tasks.host}")
-    private String tasksHost;
-
-    @Value("${ccd.hearing.host}")
-    private String hearingHost;
-
-    @Value("${ccd.role.assignment.check-case-roles-exist}")
-    private Boolean checkCaseRolesExist;
 
     @Value("${app.insights.log.size}")
     private Integer appInsightsLogSize;
@@ -141,36 +123,6 @@ public class TestParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(toUnmodifiableList());
-    }
-
-    @Override
-    public String getDocumentStoreHost() {
-        return documentStoreHost;
-    }
-
-    @Override
-    public String getRoleAssignmentsHost() {
-        return roleAssignmentHost;
-    }
-
-    @Override
-    public String getLogAndAuditHost() {
-        return logAndAuditHost;
-    }
-
-    @Override
-    public String getTasksHost() {
-        return tasksHost;
-    }
-
-    @Override
-    public String getHearingHost() {
-        return hearingHost;
-    }
-
-    @Override
-    public Boolean getCheckCaseRolesExist() {
-        return checkCaseRolesExist;
     }
 
     @Override

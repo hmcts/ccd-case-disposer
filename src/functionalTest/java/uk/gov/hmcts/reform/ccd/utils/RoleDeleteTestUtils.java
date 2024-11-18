@@ -3,11 +3,11 @@ package uk.gov.hmcts.reform.ccd.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.helper.S2SHelper;
 import uk.gov.hmcts.reform.ccd.helper.SecurityUtils;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
 import java.io.IOException;
@@ -31,8 +31,8 @@ public class RoleDeleteTestUtils {
     @Inject
     private SecurityUtils securityUtils;
 
-    @Inject
-    private ParameterResolver parameterResolver;
+    @Value("${remote.role.assignment.host}")
+    private String roleAssignmentHost;
 
     @Inject
     private S2SHelper s2SHelper;
@@ -61,7 +61,7 @@ public class RoleDeleteTestUtils {
                                 final Response response = RestAssured
                                         .given()
                                         .relaxedHTTPSValidation()
-                                        .baseUri(parameterResolver.getRoleAssignmentsHost() + ROLE_ASSIGNMENT_PATH)
+                                        .baseUri(roleAssignmentHost + ROLE_ASSIGNMENT_PATH)
                                         .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                                         .header(SERVICE_AUTHORISATION_HEADER, s2SHelper.getToken())
                                         .header(AUTHORISATION_HEADER, securityUtils.getIdamClientToken())

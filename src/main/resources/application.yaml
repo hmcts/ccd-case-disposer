@@ -39,12 +39,11 @@ hearing.case.type: HearingRecordings
 
 request.limit: ${CCD_DISPOSER_REQUEST_LIMIT:1000}
 
-ccd:
+remote:
   document.store:
     host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
   role.assignment:
     host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
-    check-case-roles-exist: ${ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST:true}
   log.and.audit:
     host: ${LOG_AND_AUDIT_HOST:http://localhost:4550}
   tasks:

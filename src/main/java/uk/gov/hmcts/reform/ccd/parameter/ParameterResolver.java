@@ -25,19 +25,7 @@ public interface ParameterResolver {
 
     String getIdamPassword();
 
-    String getDocumentStoreHost();
-
-    String getRoleAssignmentsHost();
-
-    String getLogAndAuditHost();
-
-    String getTasksHost();
-
-    String getHearingHost();
-
     String getHearingCaseType();
-
-    Boolean getCheckCaseRolesExist();
 
     Integer getAppInsightsLogSize();
 

@@ -34,7 +34,7 @@ ccd-data:
   name: ccd_data
   secret: ${IDAM_KEY_CCD_DATA_STORE:AAAAAAAAAAAAAAAB}
 
-ccd:
+remote:
   case-definition.host: ${DEFINITION_STORE_HOST:http://localhost:4451}
   document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
   role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}

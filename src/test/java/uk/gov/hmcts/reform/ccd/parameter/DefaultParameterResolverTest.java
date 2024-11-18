@@ -37,8 +37,6 @@ class DefaultParameterResolverTest {
     private static final String THREAD_QUEUE_CAPACITY = "threadQueueCapacity";
 
 
-    private static final String ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST = "checkCaseRolesExist";
-
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
 
     @BeforeEach
@@ -73,8 +71,6 @@ class DefaultParameterResolverTest {
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      TASKS_HOST, "http://localhost:4000");
 
-        ReflectionTestUtils.setField(defaultParameterResolver,
-                                     ROLE_ASSIGNMENT_CHECK_CASE_ROLES_EXIST, true);
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                 THREAD_MAX_POOL_SIZE, 10);
@@ -149,34 +145,6 @@ class DefaultParameterResolverTest {
                    is(equalTo(Arrays.asList("Case_Type_02"))));
     }
 
-    @Test
-    @DisplayName("should get correct value for getDocumentStoreHost")
-    void shouldGetCorrectValueForGetDocumentStoreHost() {
-        assertThat(defaultParameterResolver.getDocumentStoreHost(),
-                is(equalTo("http://localhost:4603")));
-    }
-
-    @Test
-    @DisplayName("should get correct value for getTasksHost")
-    void shouldGetCorrectValueForGetTaskHost() {
-        assertThat(defaultParameterResolver.getTasksHost(),
-                   is(equalTo("http://localhost:4000")));
-    }
-
-
-    @Test
-    @DisplayName("should get correct value for getRoleAssignmentsHost")
-    void shouldGetCorrectValueForGetRoleAssignmentsHost() {
-        assertThat(defaultParameterResolver.getRoleAssignmentsHost(),
-                   is(equalTo("http://localhost:4096")));
-    }
-
-    @Test
-    @DisplayName("should get correct value for checkCaseRolesExist")
-    void shouldGetCorrectValueForGetCheckCaseRolesExist() {
-        assertThat(defaultParameterResolver.getCheckCaseRolesExist(),
-                   is(equalTo(Boolean.TRUE)));
-    }
 
     @Test
     @DisplayName("should get correct value for threadQueueCapacity")
