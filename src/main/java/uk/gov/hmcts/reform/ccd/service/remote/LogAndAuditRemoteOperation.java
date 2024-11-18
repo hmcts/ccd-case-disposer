@@ -1,15 +1,16 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
 import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.remote.clients.LauClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
 
@@ -17,47 +18,43 @@ import java.text.SimpleDateFormat;
 
 import static java.sql.Timestamp.valueOf;
 import static java.time.LocalDateTime.now;
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.LAU_SAVE_PATH;
 
 @Service
 @Slf4j
 @Qualifier("LogAndAuditRemoteOperation")
+@RequiredArgsConstructor
 public class LogAndAuditRemoteOperation {
 
-    private final ParameterResolver parameterResolver;
-
-    private final CcdRestClientBuilder ccdRestClientBuilder;
-
+    private final LauClient lauClient;
     private final SecurityUtil securityUtil;
-
     private final LauRecordHolder lauRecordHolder;
-
-    private final Gson gson = new Gson();
 
 
     private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-    public LogAndAuditRemoteOperation(final ParameterResolver parameterResolver,
-                                      final CcdRestClientBuilder ccdRestClientBuilder,
-                                      final LauRecordHolder lauRecordHolder,
-                                      final SecurityUtil securityUtil) {
-        this.parameterResolver = parameterResolver;
-        this.ccdRestClientBuilder = ccdRestClientBuilder;
-        this.lauRecordHolder = lauRecordHolder;
-        this.securityUtil = securityUtil;
-    }
 
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
         try {
             final CaseActionPostRequestResponse caseActionPostRequestResponse =
                 buildCaseActionPostRequest(caseData);
-            final String logAndAuditPostResponse = ccdRestClientBuilder.postRequestWithServiceAuthHeader(
-                parameterResolver.getLogAndAuditHost(),
-                LAU_SAVE_PATH,
-                gson.toJson(caseActionPostRequestResponse)
+            final ResponseEntity<CaseActionPostRequestResponse> logAndAuditPostResponse = lauClient.postLauAudit(
+                securityUtil.getServiceAuthorization(),
+                caseActionPostRequestResponse
             );
 
-            logResponse(logAndAuditPostResponse);
+            logResponse(logAndAuditPostResponse.getBody());
+
+            if (!logAndAuditPostResponse.getStatusCode().is2xxSuccessful()) {
+                final String errorMessage = String
+                    .format("Unexpected response code %d while sending data to Log and Audit for case: %s",
+                            logAndAuditPostResponse.getStatusCode().value(), caseData.getReference());
+
+                log.error(errorMessage);
+
+                throw new LogAndAuditException(errorMessage);
+            }
+
+
         } catch (final Exception exception) {
             final String errorMessage = String.format(
                 "Error posting to Log and Audit for case : %s",
@@ -68,29 +65,22 @@ public class LogAndAuditRemoteOperation {
         }
     }
 
-    private void logResponse(final String logAndAuditPostResponse) {
+    private void logResponse(final CaseActionPostRequestResponse logAndAuditPostResponse) {
         try {
-            final CaseActionPostRequestResponse caseActionResults =
-                gson.fromJson(logAndAuditPostResponse, CaseActionPostRequestResponse.class);
-
-            logLauRecord(caseActionResults);
+            lauRecordHolder.addLauCaseRef(logAndAuditPostResponse.getActionLog().getCaseRef());
 
             log.info(
                 "Case data with case ref: {} successfully posted to Log and Audit",
-                caseActionResults.getActionLog().getCaseRef()
+                logAndAuditPostResponse.getActionLog().getCaseRef()
             );
 
         } catch (final JsonParseException jsonParseException) {
             final String errorMessage = "Unable to map json to object Log and Audit endpoint response due"
-                + " to following endpoint response: ".concat(logAndAuditPostResponse);
+                + " to following endpoint response: ".concat(logAndAuditPostResponse.toString());
             log.error(errorMessage);
             throw new LogAndAuditException(errorMessage);
         }
 
-    }
-
-    private void logLauRecord(final CaseActionPostRequestResponse caseActionResults) {
-        lauRecordHolder.addLauCaseRef(caseActionResults.getActionLog().getCaseRef());
     }
 
     private CaseActionPostRequestResponse buildCaseActionPostRequest(final CaseData caseData) {

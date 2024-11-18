@@ -52,12 +52,11 @@ azure:
   application-insights:
     instrumentation-key: appinsights_key
 
-ccd:
+remote:
   document.store:
     host: http://localhost:4603
   role.assignment:
     host: http://localhost:4603
-    check-case-roles-exist: true
   log.and.audit:
     host: http://localhost:4603
   tasks:
