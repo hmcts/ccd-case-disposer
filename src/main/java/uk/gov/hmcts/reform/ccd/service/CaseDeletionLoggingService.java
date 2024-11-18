@@ -57,6 +57,7 @@ public class CaseDeletionLoggingService {
                 simulatedLinkedFamilies,
                 failedLinkedFamilies);
 
+
         final List<List<CaseDataView>> caseViewPartition = Lists.partition(caseDataViews,
                 parameterResolver.getAppInsightsLogSize());
 
