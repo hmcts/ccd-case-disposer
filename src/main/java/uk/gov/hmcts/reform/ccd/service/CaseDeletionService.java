@@ -1,8 +1,9 @@
 package uk.gov.hmcts.reform.ccd.service;
 
-import jakarta.inject.Inject;
+
 import jakarta.inject.Named;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 @Named
 @Slf4j
+@RequiredArgsConstructor
 public class CaseDeletionService {
 
     private final CaseDataRepository caseDataRepository;
@@ -30,20 +32,6 @@ public class CaseDeletionService {
     private final Snooper snooper;
     private final FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
 
-    @Inject
-    public CaseDeletionService(final CaseDataRepository caseDataRepository,
-                               final CaseEventRepository caseEventRepository,
-                               final CaseLinkRepository caseLinkRepository,
-                               final FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder,
-                               final RemoteDisposeService remoteDisposeService,
-                               final Snooper snooper) {
-        this.caseDataRepository = caseDataRepository;
-        this.caseEventRepository = caseEventRepository;
-        this.caseLinkRepository = caseLinkRepository;
-        this.failedToDeleteCaseFamilyHolder = failedToDeleteCaseFamilyHolder;
-        this.snooper = snooper;
-        this.remoteDisposeService = remoteDisposeService;
-    }
 
     @Transactional
     public void deleteLinkedCaseFamilies(@NonNull final List<CaseFamily> linkedCaseFamilies) {

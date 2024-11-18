@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
 import uk.gov.hmcts.reform.ccd.util.LogAndAuditCaseFilter;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
+import uk.gov.hmcts.reform.ccd.util.log.SimulatedCaseTypesLogger;
 
 import java.util.List;
 
@@ -35,6 +36,9 @@ class CaseDeletionResolverTest {
 
     @Mock
     private FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
+
+    @Mock
+    private SimulatedCaseTypesLogger simulatedCaseTypesLogger;
 
     @Mock
     private LogAndAuditRemoteOperation logAndAuditRemoteOperation;
@@ -65,6 +69,8 @@ class CaseDeletionResolverTest {
         verify(caseDeletionLoggingService, times(1))
             .logCaseFamilies(anyList(), anyList(), anyList());
         verify(logAndAuditCaseFilter,times(1)).getDistinctCaseDataFromCaseFamilyList(anyList());
+
+        verify(simulatedCaseTypesLogger, times(1)).logSimulatedCaseTypeInAppInsights(anyList());
 
         verify(logAndAuditRemoteOperation, times(2)).postCaseDeletionToLogAndAudit(any(CaseData.class));
     }

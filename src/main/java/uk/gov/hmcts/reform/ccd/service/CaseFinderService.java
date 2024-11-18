@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service;
 
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.ccd.util.ListUtil.distinctByKey;
 
 @Named
 @Slf4j
+@RequiredArgsConstructor
 public class CaseFinderService {
     private final ParameterResolver parameterResolver;
     private final CaseFamilyTreeService caseFamilyTreeService;
@@ -38,13 +39,6 @@ public class CaseFinderService {
 
         return x.retainAll(y) ? Collections.unmodifiableSet(x) : setX;
     };
-
-    @Inject
-    public CaseFinderService(final ParameterResolver parameterResolver,
-                             final CaseFamilyTreeService caseFamilyTreeService) {
-        this.parameterResolver = parameterResolver;
-        this.caseFamilyTreeService = caseFamilyTreeService;
-    }
 
     public List<CaseFamily> findCasesDueDeletion() {
         final List<CaseFamily> caseFamilies = caseFamilyTreeService.getCaseFamilies();
