@@ -41,7 +41,7 @@ ccd:
   tasks.host: ${TASKS_HOST:http://localhost:4000}
 
 create.global.search: ${CREATE_GLOBAL_SEARCH:true}
-hearing.case.type: DPR_FT_HEARING_CaseType
+hearing.case.type: DPR_FT_HearingCaseType
 
 app.insights.log.size: ${CASE_DISPOSER_SUMMARY_LOG_SIZE:250}
 
