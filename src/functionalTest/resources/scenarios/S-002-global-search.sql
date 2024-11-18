@@ -1,7 +1,7 @@
-DELETE FROM case_link where case_id in (SELECT id FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HEARING_CaseType'));
-DELETE FROM case_link where linked_case_id in (SELECT id FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HEARING_CaseType'));
-DELETE FROM case_event where case_data_id in (SELECT id FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HEARING_CaseType'));
-DELETE FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HEARING_CaseType');
+DELETE FROM case_link where case_id in (SELECT id FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HearingCaseType'));
+DELETE FROM case_link where linked_case_id in (SELECT id FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HearingCaseType'));
+DELETE FROM case_event where case_data_id in (SELECT id FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HearingCaseType'));
+DELETE FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_MultiplePages','DPR_FT_Conditionals','DPR_FT_HearingCaseType');
 
 INSERT INTO case_data (case_type_id, jurisdiction, state, security_classification, data, data_classification,
                        reference, resolved_ttl)
