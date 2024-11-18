@@ -12,5 +12,5 @@ VALUES ('DPR_FT_HearingCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "PUBLIC"
         }',
-        1004259907359999,
+        1004259907359998,
         '2016-06-24 20:44:52.824');
