@@ -48,15 +48,15 @@ public class DeletionScenarios {
                      "DPR_FT_HearingCaseType",
                      null,
                      "scenarios/S-003-hearing-deletable-case-type",
-                     List.of(1004259907359999L),
-                     Map.of("DPR_FT_HearingCaseType", List.of(1004259907359999L)),
+                     List.of(1004259907359998L),
+                     Map.of("DPR_FT_HearingCaseType", List.of(1004259907359998L)),
                      emptyList(),
                      emptyList(),
                      emptyMap(),
                      emptyMap(),
-                     Map.of("DPR_FT_HearingCaseType", List.of(1004259907359999L)),
+                     Map.of("DPR_FT_HearingCaseType", List.of(1004259907359998L)),
                      emptyMap(),
-                     List.of(1004259907359999L)
+                     List.of(1004259907359998L)
                  )
 
         );
