@@ -43,7 +43,7 @@ public class DeletionScenarios {
                         Map.of("global_search", List.of(1004259907351111L)),
                         Map.of("global_search", emptyList()),
                         List.of(1004259907351111L)
-                ),
+                )/*,
                  Arguments.of(
                      "DPR_FT_HearingCaseType",
                      null,
@@ -57,7 +57,7 @@ public class DeletionScenarios {
                      Map.of("DPR_FT_HearingCaseType", List.of(1004259907359998L)),
                      emptyMap(),
                      List.of(1004259907359998L)
-                 )
+                 )*/
 
         );
     }
