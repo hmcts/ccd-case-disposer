@@ -240,7 +240,7 @@ def versions = [
     jersey              : '3.1.9',
     junit               : '5.11.3',
     junitPlatform       : '1.9.2',
-    lombok              : '1.18.34',
+    lombok              : '1.18.36',
     reformLogging       : '6.1.7',
     restAssured         : '5.5.0',
     s2sClient           : '5.2.0',
