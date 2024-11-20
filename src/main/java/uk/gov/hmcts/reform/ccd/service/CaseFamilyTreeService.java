@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.service;
 
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
@@ -28,21 +28,13 @@ import static java.util.Collections.emptyList;
 import static uk.gov.hmcts.reform.ccd.util.ListUtil.distinctByKey;
 
 @Named
+@RequiredArgsConstructor
 public class CaseFamilyTreeService {
     private static final String CASE_DATA_NOT_FOUND = "Case data for case_id=%d is not found";
     private final CaseDataRepository caseDataRepository;
     private final CaseLinkRepository caseLinkRepository;
     private final ParameterResolver parameterResolver;
     private final Function<LinkedEntities<CaseDataEntity>, CaseTreeNode> parentNodesFunction = this::findParents;
-
-    @Inject
-    public CaseFamilyTreeService(final CaseDataRepository caseDataRepository,
-                                 final CaseLinkRepository caseLinkRepository,
-                                 final ParameterResolver parameterResolver) {
-        this.caseDataRepository = caseDataRepository;
-        this.caseLinkRepository = caseLinkRepository;
-        this.parameterResolver = parameterResolver;
-    }
 
     private final Function<LinkedEntities<CaseData>, List<CaseData>> familyMembersFunction = this::findFamilyMembers;
 
