@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.action.bulk.BulkItemResponse;
@@ -23,6 +23,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperation {
     private static final String CASE_REFERENCE_FIELD = "reference";
     private static final String SEARCH_FAILURES = "Search failures occurred";
@@ -30,16 +31,8 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
 
     private final RestHighLevelClient elasticsearchClient;
     private final ParameterResolver parameterResolver;
-    private GlobalSearchIndexChecker globalSearchIndexChecker;
+    private final GlobalSearchIndexChecker globalSearchIndexChecker;
 
-    @Inject
-    public DisposeElasticsearchRemoteOperation(final RestHighLevelClient elasticsearchClient,
-                                               final ParameterResolver parameterResolver,
-                                               final GlobalSearchIndexChecker globalSearchIndexChecker) {
-        this.elasticsearchClient = elasticsearchClient;
-        this.parameterResolver = parameterResolver;
-        this.globalSearchIndexChecker = globalSearchIndexChecker;
-    }
 
     @Override
     public void delete(final CaseData caseData) {

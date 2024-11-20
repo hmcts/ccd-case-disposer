@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
@@ -15,14 +15,10 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Named
+@RequiredArgsConstructor
 public class CaseFamiliesFilter {
 
-    private ParameterResolver parameterResolver;
-
-    @Inject
-    public CaseFamiliesFilter(final ParameterResolver parameterResolver) {
-        this.parameterResolver = parameterResolver;
-    }
+    private final ParameterResolver parameterResolver;
 
     public List<CaseFamily> getDeletableCasesOnly(final List<CaseFamily> linkedFamilies) {
         return filterCaseFamiliesByCaseTypes(

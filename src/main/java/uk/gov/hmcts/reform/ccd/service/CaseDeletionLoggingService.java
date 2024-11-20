@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.ccd.service;
 
 import com.google.common.collect.Lists;
 import dnl.utils.text.table.TextTable;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
@@ -28,6 +28,7 @@ import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 
 @Named
 @Slf4j
+@RequiredArgsConstructor
 public class CaseDeletionLoggingService {
 
     private final TableTextBuilder tableTextBuilder;
@@ -35,19 +36,6 @@ public class CaseDeletionLoggingService {
     private final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder;
     private final ParameterResolver parameterResolver;
     private final SummaryStringLogBuilder summaryStringLogBuilder;
-
-    @Inject
-    public CaseDeletionLoggingService(final TableTextBuilder tableTextBuilder,
-                                      final CaseDataViewBuilder caseDataViewBuilder,
-                                      final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder,
-                                      final ParameterResolver parameterResolver,
-                                      final SummaryStringLogBuilder summaryStringLogBuilder) {
-        this.tableTextBuilder = tableTextBuilder;
-        this.caseDataViewBuilder = caseDataViewBuilder;
-        this.simulatedCaseDataViewHolder = simulatedCaseDataViewHolder;
-        this.parameterResolver = parameterResolver;
-        this.summaryStringLogBuilder = summaryStringLogBuilder;
-    }
 
     public void logCaseFamilies(final List<CaseFamily> deletedLinkedFamilies,
                                 final List<CaseFamily> simulatedLinkedFamilies,

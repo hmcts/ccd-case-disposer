@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import jakarta.inject.Inject;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
 
 import java.util.List;
@@ -16,9 +15,6 @@ import static org.awaitility.Awaitility.with;
 
 @Component
 public class LauTestUtils {
-
-    @Inject
-    private ParameterResolver parameterResolver;
 
     @Inject
     private LauRecordHolder lauRecordHolder;
