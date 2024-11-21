@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd;
 
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
@@ -21,25 +21,13 @@ import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_MULTI_FAMILY
 
 @Slf4j
 @Named
+@RequiredArgsConstructor
 public class ApplicationExecutor {
     private final CaseFinderService caseFindingService;
     private final CaseDeletionResolver caseDeletionResolver;
     private final CaseDeletionService caseDeletionService;
     private final CaseFamiliesFilter caseFamiliesFilter;
     private final ParameterResolver parameterResolver;
-
-    @Inject
-    public ApplicationExecutor(final CaseFinderService caseFindingService,
-                               final CaseDeletionResolver caseDeletionResolver,
-                               final CaseDeletionService caseDeletionService,
-                               final CaseFamiliesFilter caseFamiliesFilter,
-                               final ParameterResolver parameterResolver) {
-        this.caseFindingService = caseFindingService;
-        this.caseDeletionResolver = caseDeletionResolver;
-        this.caseDeletionService = caseDeletionService;
-        this.caseFamiliesFilter = caseFamiliesFilter;
-        this.parameterResolver = parameterResolver;
-    }
 
     public void execute() {
         log.info("Case-Disposer started...");

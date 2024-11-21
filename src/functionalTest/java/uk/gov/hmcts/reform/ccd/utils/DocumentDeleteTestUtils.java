@@ -5,10 +5,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.helper.SecurityUtils;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.io.UnsupportedEncodingException;
@@ -27,14 +27,14 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISAT
 @Slf4j
 public class DocumentDeleteTestUtils {
 
+    @Value("${remote.document.store.host}")
+    private String documentStoreHost;
+
     @Inject
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
     @Inject
     private SecurityUtils securityUtils;
-
-    @Inject
-    private ParameterResolver parameterResolver;
 
     @Inject
     private FileUtils fileUtils;
@@ -59,7 +59,7 @@ public class DocumentDeleteTestUtils {
                                 final Response response = RestAssured
                                         .given()
                                         .relaxedHTTPSValidation()
-                                        .baseUri(parameterResolver.getDocumentStoreHost() + DOCUMENT_PATH)
+                                        .baseUri(documentStoreHost + DOCUMENT_PATH)
                                         .header(SERVICE_AUTHORISATION_HEADER, securityUtils.getServiceAuthorization())
                                         .header("user-id", DOCUMENT_STORE_USER)
                                         .multiPart("files", fileUtils.getResourceFile(filename), IMAGE_JPEG_VALUE)

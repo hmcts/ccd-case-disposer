@@ -1,73 +1,60 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import com.google.gson.Gson;
-import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteCaseTasksAction;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteTasksRequest;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.exception.TasksDeletionException;
+import uk.gov.hmcts.reform.ccd.service.remote.clients.TasksClient;
+import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.TasksDeletionRecordHolder;
-
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_TASKS_PATH;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
 
-    private final ParameterResolver parameterResolver;
+    private final SecurityUtil securityUtil;
+    private final TasksDeletionRecordHolder tasksDeletionRecordHolder;
+    private final TasksClient tasksClient;
 
-    private final Gson gson = new Gson();
 
-    private TasksDeletionRecordHolder tasksDeletionRecordHolder;
-
-    private final CcdRestClientBuilder ccdRestClientBuilder;
-
-    @Autowired
-    public DisposeTasksRemoteOperation(final CcdRestClientBuilder ccdRestClientBuilder,
-                                       final ParameterResolver parameterResolver,
-                                       final TasksDeletionRecordHolder tasksDeletionRecordHolder) {
-        this.ccdRestClientBuilder = ccdRestClientBuilder;
-        this.parameterResolver = parameterResolver;
-        this.tasksDeletionRecordHolder = tasksDeletionRecordHolder;
-    }
-
+    @SuppressWarnings("java:S1135")
     @Override
     public void delete(final CaseData caseData) {
         final String caseRef = caseData.getReference().toString();
         try {
             final DeleteTasksRequest tasksDeletePostRequest =
-                    new DeleteTasksRequest(new DeleteCaseTasksAction(caseRef));
+                new DeleteTasksRequest(new DeleteCaseTasksAction(caseRef));
 
-            final String requestDeleteBody = gson.toJson(tasksDeletePostRequest);
+            final ResponseEntity<Void> taskDeleteResponse = deleteTasks(tasksDeletePostRequest);
 
-            final Response taskDeleteResponse = deleteTasks(requestDeleteBody);
+            tasksDeletionRecordHolder.setCaseTasksDeletionResults(caseRef, taskDeleteResponse.getStatusCode().value());
 
-            logTasksDisposal(caseRef, taskDeleteResponse);
+            if (!taskDeleteResponse.getStatusCode().is2xxSuccessful()) {
+                final String errorMessage = String
+                    .format("Unexpected response code %d while deleting tasks for case: %s",
+                            taskDeleteResponse.getStatusCode().value(), caseData.getReference()
+                    );
 
-            if (taskDeleteResponse.getStatus() != 201) {
-                log.error("Error in deleting tasks for case : Case Ref = {} ", caseRef);
+                throw new TasksDeletionException(errorMessage);
             }
-
         } catch (final Exception ex) {
+            // TODO: we need to re-throw the exception here once task deletion endpoint is enabled in PROD.
+            // TODO: rethrowing the exception will prevent the case deletion in CCD
             final String errorMessage = String.format("Error deleting tasks for case : %s", caseRef);
             log.error(errorMessage, ex);
         }
     }
 
-
-    private void logTasksDisposal(final String caseRef, final Response taskDeleteResponse) {
-        log.info("logTasksDisposal in  tasks for case : Case Ref = {}  and status : Status = {}",
-                 caseRef,taskDeleteResponse.getStatus());
-        tasksDeletionRecordHolder.setCaseTasksDeletionResults(caseRef, taskDeleteResponse.getStatus());
-    }
-
-
-    Response deleteTasks(final String requestDeleteBody) {
-        return ccdRestClientBuilder
-                .postRequestWithAllHeaders(parameterResolver.getTasksHost(),
-                                           DELETE_TASKS_PATH, requestDeleteBody);
+    ResponseEntity<Void> deleteTasks(final DeleteTasksRequest tasksDeletePostRequest) {
+        return tasksClient.deleteTasks(
+            securityUtil.getServiceAuthorization(),
+            securityUtil.getIdamClientToken(),
+            tasksDeletePostRequest
+        );
     }
 }

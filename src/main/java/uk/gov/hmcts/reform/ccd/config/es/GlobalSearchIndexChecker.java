@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.config.es;
 
 
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
@@ -13,16 +13,10 @@ import java.io.IOException;
 import static org.elasticsearch.client.RequestOptions.DEFAULT;
 
 @Named
+@RequiredArgsConstructor
 public class GlobalSearchIndexChecker {
     private final RestHighLevelClient elasticsearchClient;
     private final ParameterResolver parameterResolver;
-
-    @Inject
-    public GlobalSearchIndexChecker(final RestHighLevelClient elasticsearchClient,
-                                    final ParameterResolver parameterResolver) {
-        this.elasticsearchClient = elasticsearchClient;
-        this.parameterResolver = parameterResolver;
-    }
 
     public boolean isGlobalSearchExist() {
         try {

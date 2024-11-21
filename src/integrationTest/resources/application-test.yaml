@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:postgresql:11:///localhost?stringtype=unspecified
+    url: jdbc:tc:postgresql:15:///localhost?stringtype=unspecified
   flyway:
     locations: classpath:db/migration
     enabled: true
@@ -52,12 +52,11 @@ azure:
   application-insights:
     instrumentation-key: appinsights_key
 
-ccd:
+remote:
   document.store:
     host: http://localhost:4603
   role.assignment:
     host: http://localhost:4603
-    check-case-roles-exist: true
   log.and.audit:
     host: http://localhost:4603
   tasks:
