@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
 import jakarta.inject.Named;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Named
+@Getter
 public class HearingDeletionRecordHolder {
     private List<Map<String, Integer>> hearingDeletionRecordHolderList = new ArrayList<>();
 
