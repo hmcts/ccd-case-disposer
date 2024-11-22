@@ -232,7 +232,7 @@ project.tasks['pitest'].group = "Verification"
 
 def versions = [
     apiGuardian         : '1.1.2',
-    commonsIo           : '2.17.0',
+    commonsIo           : '2.18.0',
     elasticsearch       : '7.17.25',
     flyway              : '10.21.0',
     gradlePitest        : '1.15.0',
@@ -248,7 +248,7 @@ def versions = [
     springBoot          : springBoot.class.package.implementationVersion,
     springFramework     : '6.1.14',
     springSecurity      : '6.4.0',
-    testcontainers      : '1.20.3',
+    testcontainers      : '1.20.4',
     wiremock            : '3.0.1',
     pactVersion         : '4.6.15',
     serenity            : '3.1.20',
