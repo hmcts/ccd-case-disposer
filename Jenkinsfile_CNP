@@ -118,6 +118,7 @@ withPipeline(type, product, component) {
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
+    env.HEARING_RECORDING_HOST = "http://em-hrs-api-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
     env.PACT_BROKER_PORT = "443"
     env.PACT_BROKER_SCHEME = "https"
@@ -137,6 +138,7 @@ withPipeline(type, product, component) {
     env.TASKS_HOST= "http://wa-task-management-api-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
+    env.HEARING_RECORDING_HOST = "http://em-hrs-api-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
     env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
     env.PACT_BROKER_PORT = "443"
@@ -157,6 +159,7 @@ withPipeline(type, product, component) {
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
     env.TASKS_HOST = 'http://wa-task-management-api-aat.service.core-compute-aat.internal'
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
+    env.HEARING_RECORDING_HOST = "http://em-hrs-api-aat.service.core-compute-aat.internal"
 
     echo "Just waiting a while to ensure that the pod has run the job"
     sh "sleep 120s"
