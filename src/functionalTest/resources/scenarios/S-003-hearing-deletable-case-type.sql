@@ -5,31 +5,12 @@ DELETE FROM case_data where case_type_id in ('DPR_FT_MasterCaseType','DPR_FT_Mul
 
 INSERT INTO case_data (case_type_id, jurisdiction, state, security_classification, data, data_classification,
                        reference, resolved_ttl)
-VALUES ('DPR_FT_MasterCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES ('DPR_FT_HearingCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
-          "PersonFirstName": "Janet",
-         "SearchCriteria": {"classification":"PUBLIC",
-               "value" : {
-        "SearchParties" : {
-        "classification" : "PUBLIC",
-                    "value" : [
-                      {
-                        "value" : {
-                          "Name" : "PUBLIC",
-                          "EmailAddress" : "PUBLIC",
-                          "AddressLine1" : "PUBLIC",
-                          "PostCode" : "PUBLIC",
-                          "DateOfBirth" : "PUBLIC",
-                          "DateOfDeath" : "PUBLIC"
-                        },
-                        "id" : "[[ANYTHING_PRESENT]]"
-                      }]
-      }
-    }
-        }
+          "PersonFirstName": "Janet"
         }',
         '{
           "PersonFirstName": "PUBLIC"
         }',
-        1004259907351111,
+        1004259907359998,
         '2016-06-24 20:44:52.824');

@@ -25,6 +25,8 @@ public interface ParameterResolver {
 
     String getIdamPassword();
 
+    String getHearingCaseType();
+
     Integer getAppInsightsLogSize();
 
     Integer getThreadMaxPoolSize();

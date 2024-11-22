@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.HearingClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.HearingDeletionRecordHolder;
@@ -37,6 +38,9 @@ class DisposerHearingsRemoteOperationTest {
     @Mock
     private HearingDeletionRecordHolder hearingDeletionRecordHolder;
 
+    @Mock
+    private ParameterResolver parameterResolver;
+
     @InjectMocks
     private DisposeHearingsRemoteOperation disposeHearingsRemoteOperation;
 
@@ -49,6 +53,7 @@ class DisposerHearingsRemoteOperationTest {
         Response mockResponse = mock(Response.class);
 
         when(mockResponse.status()).thenReturn(204);
+        when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
         when(securityUtil.getIdamClientToken()).thenReturn("123");
         when(securityUtil.getServiceAuthorization()).thenReturn("456");
         when(hearingClient.deleteHearing("123",
@@ -69,6 +74,7 @@ class DisposerHearingsRemoteOperationTest {
     @Test
     void shouldThrowHearingDeletionExceptionWhenErrorOccurs() {
         final List<String> caseRefs = List.of("1234567890123456");
+        when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
 
         doThrow(new RuntimeException("Delete request failed"))
             .when(hearingClient).deleteHearing(any(), eq(DELETE_HEARINGS_PATH), eq(caseRefs));
@@ -79,6 +85,7 @@ class DisposerHearingsRemoteOperationTest {
 
     @Test
     void shouldNotDeleteHearings() {
+        when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
         final CaseData caseData = CaseData.builder()
             .reference(1234567890123456L)
             .caseType("someRandomCaseType").build();
@@ -96,6 +103,7 @@ class DisposerHearingsRemoteOperationTest {
         Response mockResponse = mock(Response.class);
 
         when(mockResponse.status()).thenReturn(500);
+        when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
         when(securityUtil.getIdamClientToken()).thenReturn("123");
         when(securityUtil.getServiceAuthorization()).thenReturn("456");
         when(hearingClient.deleteHearing("123",
