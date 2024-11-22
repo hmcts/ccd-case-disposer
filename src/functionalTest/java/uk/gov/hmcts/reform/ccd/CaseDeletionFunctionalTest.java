@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 
 @ActiveProfiles("functional")
 @SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
-@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd"})
+@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd",
+    "uk.gov.hmcts.reform.em.hrs"})
 class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @Autowired
@@ -56,6 +57,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         // THEN
         verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
         verifyDocumentDeletion(deletableDocuments);
+        verifyHearingDocumentDeletion(deletedFromIndexed);
         verifyRoleDeletion(deletableRoles);
         verifyTaskDeletion(deletableRowIds);
         verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));

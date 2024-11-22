@@ -53,6 +53,9 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${remote.hearing.host}")
     private String hearingHost;
 
+    @Value("${hearing.case.type}")
+    private String hearingCaseType;
+
     @Value("${app.insights.log.size}")
     private Integer appInsightsLogSize;
 
@@ -129,6 +132,11 @@ public class DefaultParameterResolver implements ParameterResolver {
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getHearingCaseType() {
+        return hearingCaseType;
     }
 
     @Override

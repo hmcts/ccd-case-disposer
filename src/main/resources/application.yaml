@@ -35,6 +35,7 @@ elasticsearch:
 
 deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
+hearing.case.type: HearingRecordings
 
 request.limit: ${CCD_DISPOSER_REQUEST_LIMIT:1000}
 

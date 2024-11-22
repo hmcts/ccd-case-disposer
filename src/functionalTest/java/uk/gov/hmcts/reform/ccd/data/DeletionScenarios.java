@@ -43,7 +43,21 @@ public class DeletionScenarios {
                         Map.of("global_search", List.of(1004259907351111L)),
                         Map.of("global_search", emptyList()),
                         List.of(1004259907351111L)
-                )
+                ),
+                 Arguments.of(
+                     "DPR_FT_HearingCaseType",
+                     null,
+                     "scenarios/S-003-hearing-deletable-case-type.sql",
+                     List.of(1004259907359998L),
+                     Map.of("DPR_FT_HearingCaseType", List.of(1004259907359998L)),
+                     emptyList(),
+                     emptyList(),
+                     emptyMap(),
+                     emptyMap(),
+                     Map.of("DPR_FT_HearingCaseType", List.of(1004259907359998L)),
+                     emptyMap(),
+                     List.of(1004259907359998L)
+                 )
         );
     }
 }
