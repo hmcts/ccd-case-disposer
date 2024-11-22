@@ -40,7 +40,7 @@ public class ApplicationExecutor {
         final List<CaseData> flattenedCaseFamiliesView = FLATTEN_CASE_FAMILIES_FUNCTION.apply(deletableCasesOnly);
 
         final List<CaseData> potentialMultiFamilyCases =
-                POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(deletableCasesOnly);
+            POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(deletableCasesOnly);
 
         Integer requestLimit = parameterResolver.getRequestLimit();
 
@@ -52,7 +52,11 @@ public class ApplicationExecutor {
             );
             final int linkedFamilySize = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies).size();
 
-            if (requestLimit >= 0) {
+            // The RequestLimit specifies the total number of cases that can be deleted.
+            // In some scenarios, the linkedFamilySize may exceed the requestLimit, causing the deletion to be skipped.
+            // However, in other scenarios, if the linkedFamilySize is less than or equal to the requestLimit,
+            // the deletion will proceed.
+            if (requestLimit >= linkedFamilySize) {
                 caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
                 actuallyDeletableCases.addAll(linkedFamilies);
                 requestLimit -= linkedFamilySize;
@@ -67,20 +71,20 @@ public class ApplicationExecutor {
                                                     final List<CaseFamily> allCaseFamilies,
                                                     final CaseData subjectCaseData) {
         return buildLinkedFamilyIdsFunction(flattenedCasesView)
-                .andThen(buildLinkedFamiliesFunction(allCaseFamilies))
-                .apply(subjectCaseData);
+            .andThen(buildLinkedFamiliesFunction(allCaseFamilies))
+            .apply(subjectCaseData);
     }
 
     private Function<CaseData, List<Long>> buildLinkedFamilyIdsFunction(final List<CaseData> flattenedCasesView) {
         return candidateCaseData -> flattenedCasesView.stream()
-                .filter(caseData -> caseData.getId().equals(candidateCaseData.getId()))
-                .map(CaseData::getFamilyId)
-                .collect(Collectors.toUnmodifiableList());
+            .filter(caseData -> caseData.getId().equals(candidateCaseData.getId()))
+            .map(CaseData::getFamilyId)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     private Function<List<Long>, List<CaseFamily>> buildLinkedFamiliesFunction(final List<CaseFamily> allCaseFamilies) {
         return linkedCaseFamilyIds -> allCaseFamilies.stream()
-                .filter(caseFamily -> linkedCaseFamilyIds.contains(caseFamily.getRootCase().getFamilyId()))
-                .collect(Collectors.toUnmodifiableList());
+            .filter(caseFamily -> linkedCaseFamilyIds.contains(caseFamily.getRootCase().getFamilyId()))
+            .collect(Collectors.toUnmodifiableList());
     }
 }
