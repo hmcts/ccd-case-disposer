@@ -22,6 +22,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA03_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY2_WITH_PAST_TTL;
@@ -168,12 +169,12 @@ class ApplicationExecutorTest {
             null
         );
         final CaseData caseData3 = new CaseData(
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
+            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getId(),
+            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getReference(),
+            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getCaseType(),
+            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getJurisdiction(),
+            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getResolvedTtl(),
+            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getId(),
             null
         );
         final List<CaseFamily> caseDataList = List.of(
