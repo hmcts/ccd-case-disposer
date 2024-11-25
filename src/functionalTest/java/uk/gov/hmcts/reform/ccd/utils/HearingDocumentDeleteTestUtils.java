@@ -24,19 +24,20 @@ public class HearingDocumentDeleteTestUtils {
     private ParameterResolver parameterResolver;
 
     public void verifyHearingDocumentStoreDeletion(final Map<String, List<Long>> indexedData) {
-        with().await().untilAsserted(() -> {
-            indexedData.forEach((key, value) -> {
-                if (key.equals(parameterResolver.getHearingCaseType())) {
-                    value.forEach(caseReference -> {
+        indexedData.forEach((key, value) -> {
+            if (key.equals(parameterResolver.getHearingCaseType())) {
+                value.forEach(caseReference -> {
+                    with().await().untilAsserted(() -> {
                         int status = hearingDeletionRecordHolder
                                 .getHearingDeletionResults(Long.toString(caseReference));
-
                         assertEquals("Status does not match", NO_CONTENT.value(), status);
                     });
-                    hearingDeletionRecordHolder.getHearingDeletionRecordHolderList().clear();
-                }
-            });
+                });
+            }
         });
-    }
 
+        hearingDeletionRecordHolder.getHearingDeletionRecordHolderList().clear();
+    }
 }
+
+

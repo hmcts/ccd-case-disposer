@@ -40,7 +40,7 @@ remote:
   role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
   tasks.host: ${TASKS_HOST:http://localhost:4000}
   hearing.host: ${HEARING_RECORDING_HOST:http://localhost:4678}
-  case.type: DPR_FT_HearingCaseType
+  hearing.case.type: DPR_FT_HearingCaseType
 
 create.global.search: ${CREATE_GLOBAL_SEARCH:true}
 
