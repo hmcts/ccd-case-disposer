@@ -30,7 +30,7 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
-    @Value("${hearing.case.type}")
+    @Value("${remote.hearing.case.type}")
     private String hearingCaseType;
 
     @Value("${app.insights.log.size}")

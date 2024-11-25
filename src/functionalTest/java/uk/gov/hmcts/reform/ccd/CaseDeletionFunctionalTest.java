@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 @ActiveProfiles("functional")
 @SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
-@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd","uk.gov.hmcts.reform.em.hrs"})
+@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd"})
 class CaseDeletionFunctionalTest extends TestDataProvider {
 
     @Autowired

@@ -53,7 +53,7 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${request.limit}")
     private Integer requestLimit;
 
-    @Value("${hearing.case.type}")
+    @Value("${remote.hearing.case.type}")
     private String hearingCaseType;
 
     @Override

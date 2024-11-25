@@ -53,7 +53,7 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${remote.hearing.host}")
     private String hearingHost;
 
-    @Value("${hearing.case.type}")
+    @Value("${remote.hearing.case.type}")
     private String hearingCaseType;
 
     @Value("${app.insights.log.size}")
