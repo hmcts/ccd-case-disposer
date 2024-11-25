@@ -35,12 +35,17 @@ ccd-data:
   secret: ${IDAM_KEY_CCD_DATA_STORE:AAAAAAAAAAAAAAAB}
 
 remote:
-  case-definition.host: ${DEFINITION_STORE_HOST:http://localhost:4451}
-  document.store.host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
-  role.assignment.host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
-  tasks.host: ${TASKS_HOST:http://localhost:4000}
-  hearing.host: ${HEARING_RECORDING_HOST:http://localhost:4678}
-  case.type: DPR_FT_HearingCaseType
+  case-definition:
+    host: ${CASE_DEFINITION_STORE_HOST:http://localhost:4451}
+  document:
+    host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
+  role.assignment:
+    host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
+  tasks:
+    host: ${TASKS_HOST:http://localhost:4000}
+  hearing:
+    host: ${HEARING_RECORDING_HOST:http://localhost:4678}
+    case.type: DPR_FT_HearingCaseType
 
 create.global.search: ${CREATE_GLOBAL_SEARCH:true}
 
