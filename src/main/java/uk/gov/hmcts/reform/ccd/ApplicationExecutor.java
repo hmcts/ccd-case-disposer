@@ -50,6 +50,7 @@ public class ApplicationExecutor {
                 caseFamiliesDueDeletion,
                 subjectCaseData
             );
+
             final int linkedFamilySize = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies).size();
 
             // The RequestLimit specifies the total number of cases that can be deleted.
