@@ -53,6 +53,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${request.limit}")
     private Integer requestLimit;
 
+    @Value("${remote.hearing.case.type}")
+    private String hearingCaseType;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
@@ -145,6 +148,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public Integer getRequestLimit() {
         return requestLimit;
+    }
+
+    @Override
+    public String getHearingCaseType() {
+        return hearingCaseType;
     }
 
 }

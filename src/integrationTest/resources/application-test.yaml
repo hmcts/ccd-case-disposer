@@ -63,6 +63,7 @@ remote:
     host: http://localhost:4603
   hearing:
     host: http://localhost:4603
+    case.type: HearingRecordings
 
 app.insights.log.size: 250
 

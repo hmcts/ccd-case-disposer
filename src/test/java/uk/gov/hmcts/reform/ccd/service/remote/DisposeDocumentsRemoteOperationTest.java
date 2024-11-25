@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.DocumentClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
@@ -42,6 +43,9 @@ class DisposeDocumentsRemoteOperationTest {
 
     @Mock
     private SecurityUtil securityUtil;
+
+    @Mock
+    private ParameterResolver parameterResolver;
 
     @InjectMocks
     private DisposeDocumentsRemoteOperation disposeDocumentsRemoteOperation;
@@ -118,6 +122,7 @@ class DisposeDocumentsRemoteOperationTest {
 
     @Test
     void shouldNotDeleteHearings() {
+        when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
         final CaseData caseData = CaseData.builder()
             .reference(1234567890123456L)
             .caseType(HEARING_RECORDINGS_CASE_TYPE).build();

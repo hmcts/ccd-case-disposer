@@ -10,11 +10,11 @@ import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
+import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.DocumentClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @Service
 @Slf4j
@@ -24,10 +24,11 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
     private final DocumentClient documentClient;
     private final DocumentDeletionRecordHolder documentDeletionRecordHolder;
     private final SecurityUtil securityUtil;
+    private final ParameterResolver parameterResolver;
 
     @Override
     public void delete(final CaseData caseData) {
-        if (!caseData.getCaseType().equals(HEARING_RECORDINGS_CASE_TYPE)) {
+        if (!caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
             try {
                 final DocumentsDeletePostRequest documentsDeleteRequest =
                     new DocumentsDeletePostRequest(caseData.getReference().toString());
