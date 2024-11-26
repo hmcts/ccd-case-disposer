@@ -499,7 +499,7 @@ public class DeletionScenarios {
                 Arguments.of(
                     "FT_MasterCaseType",
                     null,
-                    "scenarios/S-028-cases-links-to-mutiple-childs-within-request-limit",
+                    "scenarios/S-028-cases-links-to-mutiple-childs-within-request-limit.sql",
                     List.of(1L, 2L, 3L, 4L,  6L, 7L, 8L, 9L, 10L, 11L, 12L),
                     Map.of("FT_MasterCaseType", List.of(1504259907351239L, 1504259907351238L,
                                                         1504259907351237L, 1504259907351236L,
