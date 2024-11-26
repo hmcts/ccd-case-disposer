@@ -60,6 +60,7 @@ withNightlyPipeline(type, product, component) {
   env.TASKS_HOST = 'http://wa-task-management-api-aat.service.core-compute-aat.internal'
   env.DEFINITION_STORE_HOST = 'http://ccd-definition-store-api-aat.service.core-compute-aat.internal'
   env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
+  env.HEARING_RECORDING_HOST = "http://em-hrs-api-aat.service.core-compute-aat.internal"
   env.Rules = params.SecurityRules
 
   loadVaultSecrets(secrets)

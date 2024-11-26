@@ -6,6 +6,7 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.HearingDocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.LauTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
@@ -30,6 +31,9 @@ public class TestDataProvider {
 
     @Inject
     private DocumentDeleteTestUtils documentDeleteTestUtils;
+
+    @Inject
+    private HearingDocumentDeleteTestUtils hearingDocumentDeleteTestUtils;
 
     @Inject
     private RoleDeleteTestUtils roleDeleteTestUtils;
@@ -92,6 +96,10 @@ public class TestDataProvider {
 
     protected void verifyDocumentDeletion(final Map<Long, List<String>> deletableDocuments) {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
+    }
+
+    protected void verifyHearingDocumentDeletion(final Map<String, List<Long>> deletedFromIndexed) {
+        hearingDocumentDeleteTestUtils.verifyHearingDocumentStoreDeletion(deletedFromIndexed);
     }
 
     protected void verifyRoleDeletion(final Map<Long, List<String>> deletableRoles) {

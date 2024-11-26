@@ -56,6 +56,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         // THEN
         verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
         verifyDocumentDeletion(deletableDocuments);
+        verifyHearingDocumentDeletion(deletedFromIndexed);
         verifyRoleDeletion(deletableRoles);
         verifyTaskDeletion(deletableRowIds);
         verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));

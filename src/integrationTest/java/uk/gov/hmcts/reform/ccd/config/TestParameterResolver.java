@@ -30,6 +30,9 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
+    @Value("${remote.hearing.case.type}")
+    private String hearingCaseType;
+
     @Value("${app.insights.log.size}")
     private Integer appInsightsLogSize;
 
@@ -113,6 +116,11 @@ public class TestParameterResolver implements ParameterResolver {
     @Override
     public String getIdamPassword() {
         return null;
+    }
+
+    @Override
+    public String getHearingCaseType() {
+        return hearingCaseType;
     }
 
     @Override
