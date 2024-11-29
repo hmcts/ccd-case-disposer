@@ -91,7 +91,7 @@ public class WireMockStubs {
                                 .toJson(new RoleAssignmentsPostRequest(entry.getKey()))))
                         .willReturn(aResponse()
                                 .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                                .withStatus(200))));
+                                .withStatus(entry.getValue()))));
     }
 
     private void setupQueryRolesStub(final WireMockServer wireMockServer) {
@@ -103,7 +103,7 @@ public class WireMockStubs {
                                           .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                           .withBody(new Gson()
                                                         .toJson(roleAssignmentsResponse))
-                                          .withStatus(200))));
+                                          .withStatus(entry.getValue()))));
     }
 
     private void setupHearingsStub(final WireMockServer wireMockServer) {

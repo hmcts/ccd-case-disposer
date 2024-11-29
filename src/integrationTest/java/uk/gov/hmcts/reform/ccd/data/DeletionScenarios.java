@@ -519,9 +519,21 @@ public class DeletionScenarios {
                                                         1504259907351233L,1504259907351232L,
                                                         1504259907351231L, 1504259907351230L,
                                                         1504259907351229L)),
-                    Map.of("FT_MasterCaseType", List.of(1504259907351234L,1504259907351228L))
+                    Map.of("FT_MasterCaseType", List.of(1504259907351234L,1504259907351228L)),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-029-deletable-failed-cases-due-to-role-delete-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of( "FT_MasterCaseType",
+                           List.of(1504259907445511L, 1504259907445512L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907445511L),
+                    Map.of("FT_MasterCaseType", List.of(1504259907445511L,1504259907445512L)),
+                    Map.of("FT_MasterCaseType", emptyList())
                 )
-
+            )
         );
     }
 }

@@ -145,4 +145,25 @@ public interface TestData {
             TODAY,
             2L,
             null);
+
+
+    CaseData DELETABLE_CASE_DATA80_WITH_PAST_TTL = new CaseData(80L, 80L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 1L, null);
+
+    CaseData DELETABLE_CASE_DATA81_WITH_PAST_TTL = new CaseData(81L, 81L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 1L, null);
+
+    CaseData DELETABLE_CASE_DATA82_WITH_PAST_TTL = new CaseData(82L, 82L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 4L, null);
+
+    CaseData DELETABLE_CASE_DATA83_WITH_PAST_TTL = new CaseData(83L, 83L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 6L, null);
+    List<CaseData>  linkedCases = List.of(DELETABLE_CASE_DATA80_WITH_PAST_TTL,
+                                          DELETABLE_CASE_DATA81_WITH_PAST_TTL);
+
+    List<CaseData>  linkedCases2 = List.of(DELETABLE_CASE_DATA81_WITH_PAST_TTL,
+                                           DELETABLE_CASE_DATA82_WITH_PAST_TTL);
+
+    List<CaseData>  linkedCases3 = List.of(DELETABLE_CASE_DATA81_WITH_PAST_TTL,
+                                           DELETABLE_CASE_DATA83_WITH_PAST_TTL);
 }
