@@ -525,7 +525,7 @@ public class DeletionScenarios {
                     null,
                     "scenarios/S-029-deletable-failed-cases-due-to-role-delete-exception.sql",
                     List.of(1L, 2L),
-                    Map.of( "FT_MasterCaseType",
+                    Map.of("FT_MasterCaseType",
                            List.of(1504259907445511L, 1504259907445512L)),
                     List.of(2L),
                     emptyList(),
