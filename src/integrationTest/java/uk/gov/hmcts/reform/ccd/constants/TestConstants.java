@@ -53,7 +53,9 @@ public class TestConstants {
             Map.entry("1504259907351230", new CaseDocumentsDeletionResults(38, 38)),
             Map.entry("1504259907351229", new CaseDocumentsDeletionResults(39, 39)),
             Map.entry("1504259907445511", new CaseDocumentsDeletionResults(40, 40)),
-            Map.entry("1504259907445512", new CaseDocumentsDeletionResults(41, 41))
+            Map.entry("1504259907445512", new CaseDocumentsDeletionResults(41, 41)),
+            Map.entry("1504259907445515", new CaseDocumentsDeletionResults(42, 42)),
+            Map.entry("1504259907445516", new CaseDocumentsDeletionResults(43, 43))
     );
 
     public static Map<String, Integer> ROLE_DELETE = Map.ofEntries(

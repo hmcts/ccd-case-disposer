@@ -534,17 +534,30 @@ public class DeletionScenarios {
                         Map.of("FT_MasterCaseType", emptyList())
                 ),
                 Arguments.of(
-                        "HearingRecordings",
-                        null,
-                        "scenarios/S-030-deletable-failed-cases-due-to-hearing-deletion-exception.sql",
-                        List.of(1L, 2L),
-                        Map.of("HearingRecordings",
-                               List.of(1504259907445513L, 1504259907445514L)),
-                        List.of(2L),
-                        emptyList(),
-                        List.of(1504259907445513L),
-                        Map.of("HearingRecordings", List.of(1504259907445513L,1504259907445514L)),
-                        Map.of("HearingRecordings", emptyList())
+                    "HearingRecordings",
+                    null,
+                    "scenarios/S-030-deletable-failed-cases-due-to-hearing-deletion-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("HearingRecordings",
+                           List.of(1504259907445513L, 1504259907445514L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907445513L),
+                    Map.of("HearingRecordings", List.of(1504259907445513L,1504259907445514L)),
+                    Map.of("HearingRecordings", emptyList())
+                ),
+                Arguments.of(
+                    "FT_ElasticCaseType",
+                    null,
+                    "scenarios/S-031-deletable-failed-cases-due-to-elastic-search-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("FT_MasterCaseType",
+                           List.of(1504259907445515L, 1504259907445516L)),
+                    List.of(1L, 2L),
+                    emptyList(),
+                    List.of(),
+                    Map.of("FT_ElasticCaseType", emptyList()),
+                    Map.of("FT_ElasticCaseType", emptyList())
                 )
 
         );
