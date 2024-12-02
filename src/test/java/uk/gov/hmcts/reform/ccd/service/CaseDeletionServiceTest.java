@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
-import uk.gov.hmcts.reform.ccd.util.Snooper;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -55,9 +53,6 @@ class CaseDeletionServiceTest {
     private RemoteDisposeService remoteDisposeService;
     @Mock
     private FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
-
-    @Mock
-    private Snooper snooper;
 
     @InjectMocks
     private CaseDeletionService underTest;
@@ -131,7 +126,6 @@ class CaseDeletionServiceTest {
         catchThrowable(() -> underTest.deleteCase(caseFamily));
 
         // THEN
-        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(Exception.class));
         verify(failedToDeleteCaseFamilyHolder).addCaseFamily(caseFamily);
         verify(caseEventRepository).deleteByCaseDataId(anyLong());
         verify(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
@@ -204,7 +198,6 @@ class CaseDeletionServiceTest {
         final Throwable thrown = catchThrowable(() -> underTest.deleteLinkedCases(defaultCaseFamily));
 
         // THEN
-        verify(snooper).snoop(eq("Could not delete linked case.reference:: 10"), any(Exception.class));
         verify(caseLinkRepository, times(2)).findById(any(CaseLinkPrimaryKey.class));
         verify(failedToDeleteCaseFamilyHolder, times(2)).addCaseFamily(defaultCaseFamily);
         verifyNoMoreInteractions(caseLinkRepository);
