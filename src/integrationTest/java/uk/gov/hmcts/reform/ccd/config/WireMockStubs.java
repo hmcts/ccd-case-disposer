@@ -112,7 +112,7 @@ public class WireMockStubs {
                                           .withRequestBody(equalToJson("[\"" + entry.getKey() + "\"]"))
                                           .willReturn(aResponse().withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                                           .withBody(new Gson().toJson(entry.getValue()))
-                                                          .withStatus(204))));
+                                                          .withStatus(entry.getValue()))));
     }
 
 
