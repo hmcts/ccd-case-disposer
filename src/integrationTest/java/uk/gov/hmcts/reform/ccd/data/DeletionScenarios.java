@@ -520,6 +520,46 @@ public class DeletionScenarios {
                                                         1504259907351231L, 1504259907351230L,
                                                         1504259907351229L)),
                     Map.of("FT_MasterCaseType", List.of(1504259907351234L,1504259907351228L))
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-032-multiple-parent-linked-cases-within-request-limit.sql",
+                    List.of(1L, 2L, 3L, 7L, 8L, 9L, 10L),
+                    Map.of("FT_MasterCaseType", List.of(1504259907351171L, 1504259907351172L,
+                                                        1504259907351173L, 1504259907351177L,
+                                                        1504259907351178L, 1504259907351179L,
+                                                        1504259907351161L)),
+                    emptyList(),
+                    emptyList(),
+                    List.of(1504259907351171L, 1504259907351172L,
+                            1504259907351173L, 1504259907351177L,
+                            1504259907351178L, 1504259907351179L,
+                            1504259907351161L),
+                    Map.of("FT_MasterCaseType",
+                           List.of(1504259907351171L, 1504259907351172L,
+                                   1504259907351173L, 1504259907351177L,
+                                   1504259907351178L, 1504259907351179L,
+                                   1504259907351161L)),
+                    Map.of("FT_MasterCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-033-multiple-parent-linked-cases-greater-than-request-limit.sql",
+                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L),
+                    Map.of("FT_MasterCaseType", List.of(1504259907351171L, 1504259907351172L,
+                                                        1504259907351173L, 1504259907351174L,
+                                                        1504259907351175L,
+                                                        1504259907351176L,1504259907351177L,
+                                                        1504259907351178L, 1504259907351179L,
+                                                        1504259907351161L, 1504259907351162L)),
+                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L),
+                    emptyList(),
+                    emptyList(),
+                    Map.of("FT_MasterCaseType",
+                           emptyList()),
+                    Map.of("FT_MasterCaseType", emptyList())
                 )
 
         );

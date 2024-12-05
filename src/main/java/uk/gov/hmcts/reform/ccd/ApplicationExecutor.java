@@ -14,8 +14,9 @@ import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILIES_AND_REMOVE_DUPLICATE_FUNCTION;
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILIES_FUNCTION;
-import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION;
+import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_ROOT_CASE_AGGREGATOR_FUNCTION;
 
 @Slf4j
 @Named
@@ -39,32 +40,36 @@ public class ApplicationExecutor {
         final List<CaseData> flattenedCaseFamiliesView = FLATTEN_CASE_FAMILIES_FUNCTION.apply(deletableCasesOnly);
 
         final List<CaseData> potentialMultiFamilyCases =
-            POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(deletableCasesOnly);
+            POTENTIAL_ROOT_CASE_AGGREGATOR_FUNCTION.apply(deletableCasesOnly);
 
         Integer requestLimit = parameterResolver.getRequestLimit();
 
         for (CaseData subjectCaseData : potentialMultiFamilyCases) {
-            final List<CaseFamily> linkedFamilies = findLinkedCaseFamilies(
-                flattenedCaseFamiliesView,
-                caseFamiliesDueDeletion,
-                subjectCaseData
-            );
-            final int linkedFamilySize = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies).size();
-
             // If a root case has more than 1 child case, the linked family may be processed more than once.
             // To avoid this, we check if the family id of the root case has already been processed.
             final boolean hasNotBeenProcessed = actuallyDeletableCases
                 .stream().noneMatch(caseFamily -> caseFamily.getRootCase().getFamilyId()
                     .equals(subjectCaseData.getFamilyId()));
 
-            // The RequestLimit specifies the total number of cases that can be deleted.
-            // In some scenarios, the linkedFamilySize may exceed the requestLimit, causing the deletion to be skipped.
-            // However, in other scenarios, if the linkedFamilySize is less than or equal to the requestLimit,
-            // the deletion will proceed.
-            if (hasNotBeenProcessed && (requestLimit >= linkedFamilySize)) {
-                caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
-                actuallyDeletableCases.addAll(linkedFamilies);
-                requestLimit -= linkedFamilySize;
+            if (hasNotBeenProcessed) {
+                final List<CaseFamily> linkedFamilies = findLinkedCaseFamilies(
+                    flattenedCaseFamiliesView,
+                    caseFamiliesDueDeletion,
+                    subjectCaseData
+                );
+                final int linkedFamilySize = FLATTEN_CASE_FAMILIES_AND_REMOVE_DUPLICATE_FUNCTION
+                    .apply(linkedFamilies).size();
+
+                // The RequestLimit specifies the total number of cases that can be deleted.
+                // In some scenarios, the linkedFamilySize may exceed the requestLimit,
+                // causing the deletion to be skipped.
+                // However, in other scenarios, if the linkedFamilySize is less than or equal to
+                // the requestLimit the deletion will proceed.
+                if ((requestLimit >= linkedFamilySize)) {
+                    caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
+                    actuallyDeletableCases.addAll(linkedFamilies);
+                    requestLimit -= linkedFamilySize;
+                }
             }
         }
 
@@ -75,8 +80,26 @@ public class ApplicationExecutor {
     private List<CaseFamily> findLinkedCaseFamilies(final List<CaseData> flattenedCasesView,
                                                     final List<CaseFamily> allCaseFamilies,
                                                     final CaseData subjectCaseData) {
+        List<CaseFamily> completeCaseFamilies = new ArrayList<>();
+        buildCompleteCaseFamilies(flattenedCasesView, allCaseFamilies, completeCaseFamilies, subjectCaseData);
+        return completeCaseFamilies;
+    }
+
+    private void buildCompleteCaseFamilies(final List<CaseData> flattenedCasesView,
+                                           final List<CaseFamily> allCaseFamilies,
+                                           List<CaseFamily> completeCaseFamilies,
+                                           CaseData subjectCaseData) {
         final List<Long> linkedFamilyIds = buildLinkedFamilyIds(flattenedCasesView, subjectCaseData);
-        return buildLinkedFamilies(allCaseFamilies, linkedFamilyIds);
+        List<CaseFamily> caseFamilies = buildLinkedFamilies(allCaseFamilies, linkedFamilyIds);
+
+        for (CaseFamily caseFamily : caseFamilies) {
+            if (!completeCaseFamilies.contains(caseFamily)) {
+                completeCaseFamilies.add(caseFamily);
+                for (CaseData childCase : caseFamily.getLinkedCases()) {
+                    buildCompleteCaseFamilies(flattenedCasesView, allCaseFamilies, completeCaseFamilies, childCase);
+                }
+            }
+        }
     }
 
     private List<Long> buildLinkedFamilyIds(final List<CaseData> flattenedCasesView, final CaseData candidateCaseData) {

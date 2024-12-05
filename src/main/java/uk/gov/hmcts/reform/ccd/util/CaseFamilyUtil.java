@@ -25,13 +25,20 @@ public class CaseFamilyUtil {
      * Duplicate cases may occur when a case belongs to multiple root cases. This ensures
      * that each case is processed only once, avoiding issues like deleting the same case family multiple times.
      */
-    public static final Function<List<CaseFamily>, List<CaseData>> POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION =
+    public static final Function<List<CaseFamily>, List<CaseData>> POTENTIAL_ROOT_CASE_AGGREGATOR_FUNCTION =
+        caseFamilies -> {
+            return caseFamilies.stream()
+                .flatMap(caseFamily ->
+                                  Stream.of(caseFamily.getRootCase()))
+                .toList();
+        };
+
+    public static final Function<List<CaseFamily>, List<CaseData>> FLATTEN_CASE_FAMILIES_AND_REMOVE_DUPLICATE_FUNCTION =
         caseFamilies -> {
             Set<Long> seenIds = new HashSet<>();
             return caseFamilies.stream()
                 .flatMap(caseFamily ->
-                             caseFamily.getLinkedCases().isEmpty()
-                                 ? Stream.of(caseFamily.getRootCase()) : caseFamily.getLinkedCases().stream())
+                             Stream.concat(Stream.of(caseFamily.getRootCase()), caseFamily.getLinkedCases().stream()))
                 .filter(caseData -> seenIds.add(caseData.getId()))
                 .toList();
         };

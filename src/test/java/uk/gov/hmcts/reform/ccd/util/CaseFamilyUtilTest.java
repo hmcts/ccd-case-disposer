@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY2_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILIES_FUNCTION;
-import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION;
+import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_ROOT_CASE_AGGREGATOR_FUNCTION;
 
 class CaseFamilyUtilTest {
     private final CaseData caseData1 = new CaseData(
@@ -48,7 +48,7 @@ class CaseFamilyUtilTest {
     void testShouldReturnOnlyRootCaseWhenNoLinkedCasesPresent() {
         final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, emptyList()));
 
-        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
+        final List<CaseData> result = POTENTIAL_ROOT_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
 
         assertThat(result)
             .singleElement()
@@ -56,13 +56,13 @@ class CaseFamilyUtilTest {
     }
 
     @Test
-    void testResultShouldNotContainRootCaseWhenLinkedCasesPresent() {
+    void testResultShouldContainRootCaseWhenLinkedCasesPresent() {
         final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, List.of(caseData2)));
 
-        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
+        final List<CaseData> result = POTENTIAL_ROOT_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
 
         assertThat(result)
             .singleElement()
-            .isEqualTo(caseData2);
+            .isEqualTo(caseData1);
     }
 }
