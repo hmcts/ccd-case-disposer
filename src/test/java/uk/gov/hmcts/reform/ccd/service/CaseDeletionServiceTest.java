@@ -233,6 +233,8 @@ class CaseDeletionServiceTest {
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
         verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
         verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(DocumentDeletionException.class));
     }
@@ -255,6 +257,8 @@ class CaseDeletionServiceTest {
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
         verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
         verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(ElasticsearchOperationException.class));
     }
@@ -277,6 +281,8 @@ class CaseDeletionServiceTest {
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
         verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
         verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(RoleAssignmentDeletionException.class));
     }
@@ -299,6 +305,8 @@ class CaseDeletionServiceTest {
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
         verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
         verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
         verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(HearingDeletionException.class));
     }
