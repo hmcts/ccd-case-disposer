@@ -23,11 +23,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA03_WITH_PAST_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA05_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA09_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA10_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA11_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.linkedCasesFamilyId_1;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.linkedCasesFamilyId_4;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationExecutorTest {
@@ -108,7 +111,7 @@ class ApplicationExecutorTest {
     @Test
     void shouldDeleteAllCaseDataIfRequestsLimitGreaterThanSize() {
         // Given
-        when(parameterResolver.getRequestLimit()).thenReturn(10);
+        when(parameterResolver.getRequestLimit()).thenReturn(3);
 
         final List<CaseFamily> caseDataList = List.of(
             new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
@@ -154,4 +157,31 @@ class ApplicationExecutorTest {
         verify(caseDeletionService, times(2)).deleteLinkedCaseFamilies(anyList());
         verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
+
+    @Test
+    void shouldNotDeleteCaseDataIfRequestsLimitLessThanAllLinkedCases() {
+        // Given
+        when(parameterResolver.getRequestLimit()).thenReturn(5);
+
+        // We will delete a single case only (DELETABLE_CASE_DATA05_WITH_PAST_TTL) because
+        // the request limit is 5 and the linked cases are 6
+        final CaseFamily caseFamily3 = new CaseFamily(DELETABLE_CASE_DATA05_WITH_PAST_TTL, emptyList());
+        final List<CaseFamily> caseDataList = List.of(
+            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, linkedCasesFamilyId_1),
+            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, linkedCasesFamilyId_4),
+            caseFamily3
+        );
+        doReturn(caseDataList)
+            .when(caseFindingService).findCasesDueDeletion();
+        doReturn(caseDataList)
+            .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
+        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList(),anyList());
+
+        applicationExecutor.execute();
+
+        verify(caseFindingService).findCasesDueDeletion();
+        verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(List.of(caseFamily3));
+        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
+    }
+
 }

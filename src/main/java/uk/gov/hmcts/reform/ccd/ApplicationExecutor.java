@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.FLATTEN_CASE_FAMILIES_FUNCTION;
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION;
@@ -38,58 +40,71 @@ public class ApplicationExecutor {
 
         final List<CaseData> flattenedCaseFamiliesView = FLATTEN_CASE_FAMILIES_FUNCTION.apply(deletableCasesOnly);
 
-        final List<CaseData> potentialMultiFamilyCases =
-            POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(deletableCasesOnly);
-
         Integer requestLimit = parameterResolver.getRequestLimit();
 
-        for (CaseData subjectCaseData : potentialMultiFamilyCases) {
-            final List<CaseFamily> linkedFamilies = findLinkedCaseFamilies(
+        final List<List<CaseData>> splitCaseFamily = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(
+            deletableCasesOnly);
+
+        for (List<CaseData> caseDataList : splitCaseFamily) {
+            final List<CaseFamily> deletableCaseFamilies = getCaseFamilies(
+                caseDataList,
                 flattenedCaseFamiliesView,
-                caseFamiliesDueDeletion,
-                subjectCaseData
+                caseFamiliesDueDeletion
             );
-            final int linkedFamilySize = FLATTEN_CASE_FAMILIES_FUNCTION.apply(linkedFamilies).size();
 
             // If a root case has more than 1 child case, the linked family may be processed more than once.
             // To avoid this, we check if the family id of the root case has already been processed.
-            final boolean hasNotBeenProcessed = actuallyDeletableCases
-                .stream().noneMatch(caseFamily -> caseFamily.getRootCase().getFamilyId()
-                    .equals(subjectCaseData.getFamilyId()));
+            final boolean hasNotBeenProcessed = isHasNotBeenProcessed(deletableCaseFamilies, actuallyDeletableCases);
 
-            // The RequestLimit specifies the total number of cases that can be deleted.
-            // In some scenarios, the linkedFamilySize may exceed the requestLimit, causing the deletion to be skipped.
-            // However, in other scenarios, if the linkedFamilySize is less than or equal to the requestLimit,
-            // the deletion will proceed.
-            if (hasNotBeenProcessed && (requestLimit >= linkedFamilySize)) {
-                caseDeletionService.deleteLinkedCaseFamilies(linkedFamilies);
-                actuallyDeletableCases.addAll(linkedFamilies);
-                requestLimit -= linkedFamilySize;
+            if (hasNotBeenProcessed) {
+                final int linkedFamilySize = FLATTEN_CASE_FAMILIES_FUNCTION.apply(deletableCaseFamilies).size();
+
+                // The RequestLimit defines the maximum number of cases that can be deleted.
+                // If the linkedFamilySize exceeds this limit, the deletion will be skipped.
+                // However, if the linkedFamilySize is within the RequestLimit, the deletion will proceed.
+                if (requestLimit >= linkedFamilySize) {
+                    caseDeletionService.deleteLinkedCaseFamilies(deletableCaseFamilies);
+                    actuallyDeletableCases.addAll(deletableCaseFamilies);
+                    requestLimit -= linkedFamilySize;
+                }
             }
         }
-
         caseDeletionResolver.logCaseDeletion(actuallyDeletableCases, deletableLinkedFamiliesSimulation);
         log.info("Case-Disposer finished.");
     }
 
-    private List<CaseFamily> findLinkedCaseFamilies(final List<CaseData> flattenedCasesView,
-                                                    final List<CaseFamily> allCaseFamilies,
-                                                    final CaseData subjectCaseData) {
-        final List<Long> linkedFamilyIds = buildLinkedFamilyIds(flattenedCasesView, subjectCaseData);
-        return buildLinkedFamilies(allCaseFamilies, linkedFamilyIds);
+    private boolean isHasNotBeenProcessed(final List<CaseFamily> deletableCaseFamilies,
+                                          final List<CaseFamily> actuallyDeletableCases) {
+        final Set<Long> familyIdsForLinkedCases = deletableCaseFamilies.stream()
+            .map(caseFamily -> caseFamily.getRootCase().getFamilyId())
+            .collect(Collectors.toSet());
+
+        return actuallyDeletableCases.stream()
+            .noneMatch(caseFamily -> familyIdsForLinkedCases.contains(caseFamily.getRootCase().getFamilyId()));
     }
 
-    private List<Long> buildLinkedFamilyIds(final List<CaseData> flattenedCasesView, final CaseData candidateCaseData) {
-        return flattenedCasesView.stream()
-            .filter(caseData -> caseData.getId().equals(candidateCaseData.getId()))
-            .map(CaseData::getFamilyId)
-            .toList();
+    private List<CaseFamily> getCaseFamilies(final List<CaseData> caseDataList,
+                                             final List<CaseData> flattenedCaseFamiliesView,
+                                             final List<CaseFamily> caseFamiliesDueDeletion) {
+        // Collect the family IDs of matching case data
+        final Set<Long> matchingFamilyIds = getMatchingFamilyIds(caseDataList, flattenedCaseFamiliesView);
+
+        // Filter case families due for deletion that have matching family IDs
+        return getMatchingCaseFamilies(caseFamiliesDueDeletion, matchingFamilyIds);
     }
 
-    private List<CaseFamily> buildLinkedFamilies(final List<CaseFamily> allCaseFamilies,
-                                                 final List<Long> linkedCaseFamilyIds) {
-        return allCaseFamilies.stream()
-            .filter(caseFamily -> linkedCaseFamilyIds.contains(caseFamily.getRootCase().getFamilyId()))
+    private Set<Long> getMatchingFamilyIds(List<CaseData> caseDataList, List<CaseData> flattenedCaseFamiliesView) {
+        return caseDataList.stream()
+            .flatMap(caseData -> flattenedCaseFamiliesView.stream()
+                .filter(flattenedCase -> flattenedCase.getId().equals(caseData.getId()))
+                .map(CaseData::getFamilyId))
+            .collect(Collectors.toSet());
+    }
+
+    private List<CaseFamily> getMatchingCaseFamilies(final List<CaseFamily> caseFamiliesDueDeletion,
+                                                     final Set<Long> matchingFamilyIds) {
+        return caseFamiliesDueDeletion.stream()
+            .filter(caseFamily -> matchingFamilyIds.contains(caseFamily.getRootCase().getFamilyId()))
             .toList();
     }
 }
