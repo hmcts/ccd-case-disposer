@@ -520,6 +520,45 @@ public class DeletionScenarios {
                                                         1504259907351231L, 1504259907351230L,
                                                         1504259907351229L)),
                     Map.of("FT_MasterCaseType", List.of(1504259907351234L,1504259907351228L))
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-029-deletable-failed-cases-due-to-role-delete-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("FT_MasterCaseType",
+                           List.of(1504259907445511L, 1504259907445512L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907445511L),
+                    Map.of("FT_MasterCaseType", List.of(1504259907445511L,1504259907445512L)),
+                    Map.of("FT_MasterCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "HearingRecordings",
+                    null,
+                    "scenarios/S-030-deletable-failed-cases-due-to-hearing-deletion-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("HearingRecordings",
+                           List.of(1504259907445513L, 1504259907445514L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907445513L),
+                    Map.of("HearingRecordings", List.of(1504259907445513L,1504259907445514L)),
+                    Map.of("HearingRecordings", emptyList())
+                ),
+                Arguments.of(
+                    "FT_ElasticCaseType",
+                    null,
+                    "scenarios/S-031-deletable-failed-cases-due-to-elastic-search-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("FT_MasterCaseType",
+                           List.of(1504259907445515L, 1504259907445516L)),
+                    List.of(1L, 2L),
+                    emptyList(),
+                    List.of(),
+                    Map.of("FT_ElasticCaseType", emptyList()),
+                    Map.of("FT_ElasticCaseType", emptyList())
                 )
 
         );

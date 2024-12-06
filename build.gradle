@@ -5,14 +5,14 @@ plugins {
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.6'
   id 'org.springframework.boot' version '3.3.5'
-  id 'org.owasp.dependencycheck' version '11.1.0'
+  id 'org.owasp.dependencycheck' version '11.1.1'
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'org.sonarqube' version '6.0.1.5171'
   id 'uk.gov.hmcts.java' version '0.12.63'
   id 'io.freefair.lombok' version '8.11'
   id 'org.flywaydb.flyway' version '10.22.0'
   id "info.solidsoft.pitest" version '1.15.0'
-  id "au.com.dius.pact" version '4.6.15'
+  id "au.com.dius.pact" version '4.6.16'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -233,7 +233,7 @@ project.tasks['pitest'].group = "Verification"
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.18.0',
-    elasticsearch       : '7.17.25',
+    elasticsearch       : '7.17.26',
     flyway              : '10.22.0',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
@@ -243,14 +243,14 @@ def versions = [
     lombok              : '1.18.36',
     reformLogging       : '6.1.7',
     restAssured         : '5.5.0',
-    s2sClient           : '5.2.0',
+    s2sClient           : '5.3.0',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
     springFramework     : '6.1.14',
     springSecurity      : '6.4.0',
     testcontainers      : '1.20.4',
     wiremock            : '3.0.1',
-    pactVersion         : '4.6.15',
+    pactVersion         : '4.6.16',
     serenity            : '3.1.20',
 ]
 

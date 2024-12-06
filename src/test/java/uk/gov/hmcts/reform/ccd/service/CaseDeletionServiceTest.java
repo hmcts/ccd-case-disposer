@@ -13,6 +13,10 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
+import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
+import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
+import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
@@ -201,5 +205,102 @@ class CaseDeletionServiceTest {
         verify(caseLinkRepository, times(2)).findById(any(CaseLinkPrimaryKey.class));
         verify(failedToDeleteCaseFamilyHolder, times(2)).addCaseFamily(defaultCaseFamily);
         verifyNoMoreInteractions(caseLinkRepository);
+    }
+
+
+    @Test
+    void testShouldNotDeleteCasesIfDocumentExceptionOccur() {
+        // GIVEN
+        final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily);
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                 Optional.of(LINKED_CASE_ENTITY_10),Optional.of(LINKED_CASE_ENTITY_11))
+            .when(caseDataRepository).findById(any(Long.class));
+        doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
+            .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
+        doThrow(DocumentDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+
+        // WHEN
+        underTest.deleteLinkedCaseFamilies(linkedFamilies);
+
+        // THEN
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
+        verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
+        verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
+        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(DocumentDeletionException.class));
+    }
+
+    @Test
+    void testShouldNotDeleteCasesIfElasticSearchOperationExceptionOccur() {
+        // GIVEN
+        final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily);
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                 Optional.of(LINKED_CASE_ENTITY_10),Optional.of(LINKED_CASE_ENTITY_11))
+            .when(caseDataRepository).findById(any(Long.class));
+        doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
+            .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
+        doThrow(ElasticsearchOperationException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+
+        // WHEN
+        underTest.deleteLinkedCaseFamilies(linkedFamilies);
+
+        // THEN
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
+        verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
+        verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
+        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(ElasticsearchOperationException.class));
+    }
+
+    @Test
+    void testShouldNotDeleteCasesIfRoleAssignmentDeletionExceptionOccur() {
+        // GIVEN
+        final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily);
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                 Optional.of(LINKED_CASE_ENTITY_10),Optional.of(LINKED_CASE_ENTITY_11))
+            .when(caseDataRepository).findById(any(Long.class));
+        doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
+            .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
+        doThrow(RoleAssignmentDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+
+        // WHEN
+        underTest.deleteLinkedCaseFamilies(linkedFamilies);
+
+        // THEN
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
+        verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
+        verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
+        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(RoleAssignmentDeletionException.class));
+    }
+
+    @Test
+    void testShouldNotDeleteCasesIfHearingDeletionExceptionOccur() {
+        // GIVEN
+        final List<CaseFamily> linkedFamilies = List.of(defaultCaseFamily);
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL),
+                 Optional.of(LINKED_CASE_ENTITY_10),Optional.of(LINKED_CASE_ENTITY_11))
+            .when(caseDataRepository).findById(any(Long.class));
+        doReturn(Optional.of(caseLinkEntity1), Optional.of(caseLinkEntity2))
+            .when(caseLinkRepository).findById(any(CaseLinkPrimaryKey.class));
+        doThrow(HearingDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+
+        // WHEN
+        underTest.deleteLinkedCaseFamilies(linkedFamilies);
+
+        // THEN
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 10L));
+        verify(caseLinkRepository).findById(new CaseLinkPrimaryKey(1L, 11L));
+        verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
+        verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
+        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(HearingDeletionException.class));
     }
 }
