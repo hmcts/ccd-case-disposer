@@ -18,19 +18,13 @@ public class CaseFamilyUtil {
                          Stream.concat(Stream.of(caseFamily.getRootCase()), caseFamily.getLinkedCases().stream()))
             .toList();
 
-    /**
-     * This function removes duplicate CaseData entries from the list of case families.
-     * Duplicate cases may occur when a case belongs to multiple root cases. This ensures
-     * that each case is processed only once, avoiding issues like deleting the same case family multiple times.
-     */
+
     public static final Function<List<CaseFamily>, List<List<CaseData>>>
-        POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION = caseFamilies -> {
-            return caseFamilies.stream()
-                .map(caseFamily -> caseFamily.getLinkedCases().isEmpty()
-                    ? List.of(caseFamily.getRootCase())  // Wrap the root case in a list
-                    : caseFamily.getLinkedCases()) // Return linked cases as a list
-                .toList();
-        };
+        POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION = caseFamilies -> caseFamilies.stream()
+            .map(caseFamily -> caseFamily.getLinkedCases().isEmpty()
+                ? List.of(caseFamily.getRootCase())  // Wrap the root case in a list
+                : caseFamily.getLinkedCases()) // Return linked cases as a list
+            .toList();
 }
 
 

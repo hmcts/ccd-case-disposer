@@ -42,10 +42,10 @@ public class ApplicationExecutor {
 
         Integer requestLimit = parameterResolver.getRequestLimit();
 
-        final List<List<CaseData>> splitCaseFamily = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(
+        final List<List<CaseData>> potentialMultiFamilyCases = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(
             deletableCasesOnly);
 
-        for (List<CaseData> caseDataList : splitCaseFamily) {
+        for (List<CaseData> caseDataList : potentialMultiFamilyCases) {
             final List<CaseFamily> deletableCaseFamilies = getCaseFamilies(
                 caseDataList,
                 flattenedCaseFamiliesView,
@@ -75,12 +75,13 @@ public class ApplicationExecutor {
 
     private boolean isHasNotBeenProcessed(final List<CaseFamily> deletableCaseFamilies,
                                           final List<CaseFamily> actuallyDeletableCases) {
-        final Set<Long> familyIdsForLinkedCases = deletableCaseFamilies.stream()
+        final Set<Long> processedFamilyIds = actuallyDeletableCases.stream()
             .map(caseFamily -> caseFamily.getRootCase().getFamilyId())
             .collect(Collectors.toSet());
 
-        return actuallyDeletableCases.stream()
-            .noneMatch(caseFamily -> familyIdsForLinkedCases.contains(caseFamily.getRootCase().getFamilyId()));
+        return deletableCaseFamilies.stream()
+            .map(caseFamily -> caseFamily.getRootCase().getFamilyId())
+            .noneMatch(processedFamilyIds::contains);
     }
 
     private List<CaseFamily> getCaseFamilies(final List<CaseData> caseDataList,

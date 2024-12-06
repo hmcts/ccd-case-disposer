@@ -134,6 +134,11 @@ VALUES (11, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '2016-06-24 20:44:52.824'
 );
 
+-- 1. Deletes records with IDs 1 and 7 first.
+-- 2. Deletes records with IDs 2 and 8 in the next step.
+-- 3. Attempts to delete all families linked through ID 11, but skips these due to exceeding the request limit.
+-- 4. Finally, deletes records with IDs 9 and 10, as they fall within the specified limit.
+
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
 VALUES (1, 'FT_MasterCaseType', 7);
 
@@ -141,10 +146,10 @@ INSERT INTO case_link (case_id, case_type_id, linked_case_id)
 VALUES (2, 'FT_MasterCaseType', 8);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (3, 'FT_MasterCaseType', 9);
+VALUES (3, 'FT_MasterCaseType', 11);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (4, 'FT_MasterCaseType', 10);
+VALUES (4, 'FT_MasterCaseType', 11);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
 VALUES (5, 'FT_MasterCaseType', 11);
