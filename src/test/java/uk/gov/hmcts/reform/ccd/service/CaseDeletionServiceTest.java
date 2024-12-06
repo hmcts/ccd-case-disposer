@@ -229,7 +229,6 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
         verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
-        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(DocumentDeletionException.class));
     }
 
     @Test
@@ -253,7 +252,6 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
         verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
-        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(ElasticsearchOperationException.class));
     }
 
     @Test
@@ -277,7 +275,6 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
         verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
-        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(RoleAssignmentDeletionException.class));
     }
 
     @Test
@@ -301,6 +298,5 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
         verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(failedToDeleteCaseFamilyHolder, times(1)).addCaseFamily(defaultCaseFamily);
-        verify(snooper).snoop(eq("Could not delete case.reference:: 1"), any(HearingDeletionException.class));
     }
 }

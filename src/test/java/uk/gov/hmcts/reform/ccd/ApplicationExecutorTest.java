@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA03_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA05_WITH_PAST_TTL;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA06_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA09_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA10_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA11_WITH_PAST_TTL;
@@ -163,13 +164,15 @@ class ApplicationExecutorTest {
         // Given
         when(parameterResolver.getRequestLimit()).thenReturn(5);
 
-        // We will delete a single case only (DELETABLE_CASE_DATA05_WITH_PAST_TTL) because
+        // We will delete a two cases only caseFamily3 caseFamily4 and  because
         // the request limit is 5 and the linked cases are 6
         final CaseFamily caseFamily3 = new CaseFamily(DELETABLE_CASE_DATA05_WITH_PAST_TTL, emptyList());
+        final CaseFamily caseFamily4 = new CaseFamily(DELETABLE_CASE_DATA06_WITH_PAST_TTL, emptyList());
         final List<CaseFamily> caseDataList = List.of(
             new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, linkedCasesFamilyId_1),
             new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, linkedCasesFamilyId_4),
-            caseFamily3
+            caseFamily3,
+            caseFamily4
         );
         doReturn(caseDataList)
             .when(caseFindingService).findCasesDueDeletion();
@@ -181,6 +184,7 @@ class ApplicationExecutorTest {
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(List.of(caseFamily3));
+        verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(List.of(caseFamily4));
         verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
 
