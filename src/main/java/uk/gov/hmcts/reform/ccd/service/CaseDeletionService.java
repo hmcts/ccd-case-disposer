@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
-import uk.gov.hmcts.reform.ccd.util.Snooper;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +28,6 @@ public class CaseDeletionService {
     private final CaseEventRepository caseEventRepository;
     private final CaseLinkRepository caseLinkRepository;
     private final RemoteDisposeService remoteDisposeService;
-    private final Snooper snooper;
     private final FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
 
 
@@ -50,7 +48,7 @@ public class CaseDeletionService {
         } catch (final Exception exception) { // Catch all exceptions
             final String errorMessage = String.format("Could not delete case.reference:: %s",
                     rootCaseData.getReference());
-            snooper.snoop(errorMessage, exception);
+            log.error(errorMessage, exception);
             failedToDeleteCaseFamilyHolder.addCaseFamily(caseFamily);
         }
     }
@@ -67,7 +65,7 @@ public class CaseDeletionService {
             } catch (final Exception exception) { // Catch all exceptions
                 final String errorMessage = String.format("Could not delete linked case.reference:: %s",
                         caseData.getReference());
-                snooper.snoop(errorMessage, exception);
+                log.error(errorMessage, exception);
                 failedToDeleteCaseFamilyHolder.addCaseFamily(caseFamily);
             }
         });
