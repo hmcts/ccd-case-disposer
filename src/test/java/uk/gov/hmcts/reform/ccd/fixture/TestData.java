@@ -67,6 +67,14 @@ public interface TestData {
             JURISDICTION, YESTERDAY, 91L, null);
     CaseData DELETABLE_CASE_DATA08_WITH_PAST_TTL = new CaseData(92L, 92L, DELETABLE_CASE_TYPE, JURISDICTION,
             YESTERDAY, 92L, null);
+
+    CaseData DELETABLE_CASE_DATA09_WITH_PAST_TTL = new CaseData(10L, 10L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 1L, null);
+    CaseData DELETABLE_CASE_DATA10_WITH_PAST_TTL = new CaseData(11L, 11L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 1L, null);
+    CaseData DELETABLE_CASE_DATA11_WITH_PAST_TTL = new CaseData(12L, 12L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 4L, null);
+
     CaseData DELETABLE_CASE_DATA2_WITH_PAST_TTL =
             new CaseData(1000L, 1000L, DELETABLE_CASE_TYPE, JURISDICTION,
                     YESTERDAY, 1000L, null);
@@ -145,4 +153,22 @@ public interface TestData {
             TODAY,
             2L,
             null);
+
+    CaseData DELETABLE_CASE_DATA80_WITH_PAST_TTL = new CaseData(80L, 80L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 1L, null);
+    CaseData DELETABLE_CASE_DATA81_WITH_PAST_TTL = new CaseData(81L, 81L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 1L, null);
+
+    CaseData DELETABLE_CASE_DATA81_DUPLICATE_WITH_PAST_TTL = new CaseData(81L, 81L, DELETABLE_CASE_TYPE,
+                                                                          JURISDICTION, YESTERDAY, 4L, null);
+    CaseData DELETABLE_CASE_DATA82_WITH_PAST_TTL = new CaseData(82L, 82L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 4L, null);
+
+    CaseData DELETABLE_CASE_DATA83_WITH_PAST_TTL = new CaseData(83L, 83L, DELETABLE_CASE_TYPE,
+                                                                JURISDICTION, YESTERDAY, 6L, null);
+
+    List<CaseData>  linkedCasesFamilyId_1 = List.of(DELETABLE_CASE_DATA80_WITH_PAST_TTL,
+                                          DELETABLE_CASE_DATA81_WITH_PAST_TTL);
+    List<CaseData>  linkedCasesFamilyId_4 = List.of(DELETABLE_CASE_DATA81_DUPLICATE_WITH_PAST_TTL,
+                                           DELETABLE_CASE_DATA82_WITH_PAST_TTL);
 }

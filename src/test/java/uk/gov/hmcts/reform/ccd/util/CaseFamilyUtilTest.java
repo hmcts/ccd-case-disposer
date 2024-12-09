@@ -48,9 +48,9 @@ class CaseFamilyUtilTest {
     void testShouldReturnOnlyRootCaseWhenNoLinkedCasesPresent() {
         final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, emptyList()));
 
-        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
+        final List<List<CaseData>> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
 
-        assertThat(result)
+        assertThat(result.getFirst())
             .singleElement()
             .isEqualTo(caseData1);
     }
@@ -59,9 +59,9 @@ class CaseFamilyUtilTest {
     void testResultShouldNotContainRootCaseWhenLinkedCasesPresent() {
         final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, List.of(caseData2)));
 
-        final List<CaseData> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
+        final List<List<CaseData>> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
 
-        assertThat(result)
+        assertThat(result.getFirst())
             .singleElement()
             .isEqualTo(caseData2);
     }
