@@ -164,13 +164,16 @@ class ApplicationExecutorTest {
         // Given
         when(parameterResolver.getRequestLimit()).thenReturn(5);
 
-        // We will delete a two cases only caseFamily3 caseFamily4 and  because
-        // the request limit is 5 and the linked cases are 6
+        // We will delete caseFamily1 and caseFamily2.Even though the request limit is 5 and the linked cases are 6
+        // one of the linked cases will be removed so that total deletable cases will be 5.
+        final CaseFamily caseFamily1 = new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, linkedCasesFamilyId_1);
+        final CaseFamily caseFamily2 = new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, linkedCasesFamilyId_4);
         final CaseFamily caseFamily3 = new CaseFamily(DELETABLE_CASE_DATA05_WITH_PAST_TTL, emptyList());
         final CaseFamily caseFamily4 = new CaseFamily(DELETABLE_CASE_DATA06_WITH_PAST_TTL, emptyList());
+
         final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, linkedCasesFamilyId_1),
-            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, linkedCasesFamilyId_4),
+            caseFamily1,
+            caseFamily2,
             caseFamily3,
             caseFamily4
         );
@@ -183,8 +186,7 @@ class ApplicationExecutorTest {
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(List.of(caseFamily3));
-        verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(List.of(caseFamily4));
+        verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(List.of(caseFamily1,caseFamily2));
         verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
 
