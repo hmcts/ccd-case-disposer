@@ -25,8 +25,7 @@ public class SimulatedCaseDataViewHolder {
         final Set<Long> deletableCaseIds = new HashSet<>();
         if (simulatedCaseDataViews != null && !simulatedCaseDataViews.isEmpty()) {
             simulatedCaseDataViews.forEach(deletedCaseDataView ->
-                deletableCaseIds.addAll(Stream.of(List.of(deletedCaseDataView.getCaseRef()),
-                                                 deletedCaseDataView.getLinkedCaseIds())
+                deletableCaseIds.addAll(Stream.of(List.of(deletedCaseDataView.getCaseRef()))
                                            .flatMap(Collection::stream)
                                            .collect(toSet())));
         }

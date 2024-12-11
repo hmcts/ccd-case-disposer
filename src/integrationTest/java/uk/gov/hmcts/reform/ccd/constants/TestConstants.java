@@ -39,8 +39,6 @@ public class TestConstants {
             Map.entry("1504259907351188", new CaseDocumentsDeletionResults(24, 24)),
             Map.entry("1504259907351187", new CaseDocumentsDeletionResults(25, 25)),
             Map.entry("1504259907351186", new CaseDocumentsDeletionResults(26, 26)),
-            Map.entry("1504259907351183", new CaseDocumentsDeletionResults(27, 27)),
-            Map.entry("1504259907351182", new CaseDocumentsDeletionResults(28, 28)),
             Map.entry("1504259907351181", new CaseDocumentsDeletionResults(29, 29)),
             Map.entry("1504259907351180", new CaseDocumentsDeletionResults(30, 30)),
             Map.entry("1504259907351239", new CaseDocumentsDeletionResults(31, 31)),
@@ -55,7 +53,21 @@ public class TestConstants {
             Map.entry("1504259907445511", new CaseDocumentsDeletionResults(40, 40)),
             Map.entry("1504259907445512", new CaseDocumentsDeletionResults(41, 41)),
             Map.entry("1504259907445515", new CaseDocumentsDeletionResults(42, 42)),
-            Map.entry("1504259907445516", new CaseDocumentsDeletionResults(43, 43))
+            Map.entry("1504259907445516", new CaseDocumentsDeletionResults(43, 43)),
+            Map.entry("1504259907351190", new CaseDocumentsDeletionResults(44, 44)),
+            Map.entry("1504259907351191", new CaseDocumentsDeletionResults(45, 45)),
+            Map.entry("1504259907351171", new CaseDocumentsDeletionResults(40, 40)),
+            Map.entry("1504259907351172", new CaseDocumentsDeletionResults(41, 41)),
+            Map.entry("1504259907351173", new CaseDocumentsDeletionResults(42, 42)),
+            Map.entry("1504259907351174", new CaseDocumentsDeletionResults(43, 43)),
+            Map.entry("1504259907351175", new CaseDocumentsDeletionResults(44, 44)),
+            Map.entry("1504259907351176", new CaseDocumentsDeletionResults(45, 45)),
+            Map.entry("1504259907351177", new CaseDocumentsDeletionResults(46, 46)),
+            Map.entry("1504259907351178", new CaseDocumentsDeletionResults(47, 47)),
+            Map.entry("1504259907351179", new CaseDocumentsDeletionResults(48, 48)),
+            Map.entry("1504259907351161", new CaseDocumentsDeletionResults(49, 49)),
+            Map.entry("1504259907351162", new CaseDocumentsDeletionResults(50, 50))
+
     );
 
     public static Map<String, Integer> ROLE_DELETE = Map.ofEntries(
@@ -85,11 +97,11 @@ public class TestConstants {
             Map.entry("1504259907351130", HttpStatus.OK.value()),
             Map.entry("1504259907351129", HttpStatus.OK.value()),
             Map.entry("1504259907351189", HttpStatus.OK.value()),
+            Map.entry("1504259907351190", HttpStatus.OK.value()),
+            Map.entry("1504259907351191", HttpStatus.OK.value()),
             Map.entry("1504259907351188", HttpStatus.OK.value()),
             Map.entry("1504259907351187", HttpStatus.OK.value()),
             Map.entry("1504259907351186", HttpStatus.OK.value()),
-            Map.entry("1504259907351183", HttpStatus.OK.value()),
-            Map.entry("1504259907351182", HttpStatus.OK.value()),
             Map.entry("1504259907351181", HttpStatus.OK.value()),
             Map.entry("1504259907351180", HttpStatus.OK.value()),
             Map.entry("1504259907351239", HttpStatus.OK.value()),
@@ -104,7 +116,19 @@ public class TestConstants {
             Map.entry("1504259907445511", HttpStatus.OK.value()),
             Map.entry("1504259907445512", HttpStatus.NOT_FOUND.value()),
             Map.entry("1504259907445513", HttpStatus.OK.value()),
-            Map.entry("1504259907445514", HttpStatus.OK.value())
+            Map.entry("1504259907445514", HttpStatus.OK.value()),
+            Map.entry("1504259907351171", HttpStatus.OK.value()),
+            Map.entry("1504259907351172", HttpStatus.OK.value()),
+            Map.entry("1504259907351173", HttpStatus.OK.value()),
+            Map.entry("1504259907351174", HttpStatus.OK.value()),
+            Map.entry("1504259907351175", HttpStatus.OK.value()),
+            Map.entry("1504259907351176", HttpStatus.OK.value()),
+            Map.entry("1504259907351177", HttpStatus.OK.value()),
+            Map.entry("1504259907351178", HttpStatus.OK.value()),
+            Map.entry("1504259907351179", HttpStatus.OK.value()),
+            Map.entry("1504259907351161", HttpStatus.OK.value()),
+            Map.entry("1504259907351162", HttpStatus.OK.value())
+
     );
 
     public static Map<String, Integer> ROLE_QUERY = Map.ofEntries(
@@ -134,11 +158,11 @@ public class TestConstants {
         Map.entry("1504259907351130", HttpStatus.OK.value()),
         Map.entry("1504259907351129", HttpStatus.OK.value()),
         Map.entry("1504259907351189", HttpStatus.OK.value()),
+        Map.entry("1504259907351190", HttpStatus.OK.value()),
+        Map.entry("1504259907351191", HttpStatus.OK.value()),
         Map.entry("1504259907351188", HttpStatus.OK.value()),
         Map.entry("1504259907351187", HttpStatus.OK.value()),
         Map.entry("1504259907351186", HttpStatus.OK.value()),
-        Map.entry("1504259907351183", HttpStatus.OK.value()),
-        Map.entry("1504259907351182", HttpStatus.OK.value()),
         Map.entry("1504259907351181", HttpStatus.OK.value()),
         Map.entry("1504259907351180", HttpStatus.OK.value()),
         Map.entry("1504259907351239", HttpStatus.OK.value()),
@@ -153,7 +177,19 @@ public class TestConstants {
         Map.entry("1504259907445511", HttpStatus.OK.value()),
         Map.entry("1504259907445512", HttpStatus.OK.value()),
         Map.entry("1504259907445513", HttpStatus.OK.value()),
-        Map.entry("1504259907445514", HttpStatus.OK.value())
+        Map.entry("1504259907445514", HttpStatus.OK.value()),
+        Map.entry("1504259907351171", HttpStatus.OK.value()),
+        Map.entry("1504259907351172", HttpStatus.OK.value()),
+        Map.entry("1504259907351173", HttpStatus.OK.value()),
+        Map.entry("1504259907351174", HttpStatus.OK.value()),
+        Map.entry("1504259907351175", HttpStatus.OK.value()),
+        Map.entry("1504259907351176", HttpStatus.OK.value()),
+        Map.entry("1504259907351177", HttpStatus.OK.value()),
+        Map.entry("1504259907351178", HttpStatus.OK.value()),
+        Map.entry("1504259907351179", HttpStatus.OK.value()),
+        Map.entry("1504259907351161", HttpStatus.OK.value()),
+        Map.entry("1504259907351162", HttpStatus.OK.value())
+
     );
     public static Map<String, CaseActionPostRequestResponse> LAU_QUERY = Map.ofEntries(
             Map.entry("1504259907353529", buildCaseActionPostRequest("1504259907353529")),
@@ -182,11 +218,11 @@ public class TestConstants {
             Map.entry("1504259907351130", buildCaseActionPostRequest("1504259907351130")),
             Map.entry("1504259907351129", buildCaseActionPostRequest("1504259907351129")),
             Map.entry("1504259907351189", buildCaseActionPostRequest("1504259907351189")),
+            Map.entry("1504259907351190", buildCaseActionPostRequest("1504259907351190")),
+            Map.entry("1504259907351191", buildCaseActionPostRequest("1504259907351191")),
             Map.entry("1504259907351188", buildCaseActionPostRequest("1504259907351188")),
             Map.entry("1504259907351187", buildCaseActionPostRequest("1504259907351187")),
             Map.entry("1504259907351186", buildCaseActionPostRequest("1504259907351186")),
-            Map.entry("1504259907351183", buildCaseActionPostRequest("1504259907351183")),
-            Map.entry("1504259907351182", buildCaseActionPostRequest("1504259907351182")),
             Map.entry("1504259907351181", buildCaseActionPostRequest("1504259907351181")),
             Map.entry("1504259907351180", buildCaseActionPostRequest("1504259907351180")),
             Map.entry("1504259907351239", buildCaseActionPostRequest("1504259907351239")),
@@ -201,7 +237,17 @@ public class TestConstants {
             Map.entry("1504259907445511", buildCaseActionPostRequest("1504259907445511")),
             Map.entry("1504259907445512", buildCaseActionPostRequest("1504259907445512")),
             Map.entry("1504259907445513", buildCaseActionPostRequest("1504259907445513")),
-            Map.entry("1504259907445514", buildCaseActionPostRequest("1504259907445514"))
+            Map.entry("1504259907445514", buildCaseActionPostRequest("1504259907445514")),
+            Map.entry("1504259907351171", buildCaseActionPostRequest("1504259907351171")),
+            Map.entry("1504259907351172", buildCaseActionPostRequest("1504259907351172")),
+            Map.entry("1504259907351173", buildCaseActionPostRequest("1504259907351173")),
+            Map.entry("1504259907351174", buildCaseActionPostRequest("1504259907351174")),
+            Map.entry("1504259907351175", buildCaseActionPostRequest("1504259907351175")),
+            Map.entry("1504259907351176", buildCaseActionPostRequest("1504259907351176")),
+            Map.entry("1504259907351177", buildCaseActionPostRequest("1504259907351177")),
+            Map.entry("1504259907351178", buildCaseActionPostRequest("1504259907351178")),
+            Map.entry("1504259907351179", buildCaseActionPostRequest("1504259907351179")),
+            Map.entry("1504259907351161", buildCaseActionPostRequest("1504259907351161"))
     );
 
     public static Map<String, Integer> TASKS_DELETE = Map.ofEntries(
@@ -231,11 +277,11 @@ public class TestConstants {
             Map.entry("1504259907351130", HttpStatus.CREATED.value()),
             Map.entry("1504259907351129", HttpStatus.CREATED.value()),
             Map.entry("1504259907351189", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351190", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351191", HttpStatus.CREATED.value()),
             Map.entry("1504259907351188", HttpStatus.CREATED.value()),
             Map.entry("1504259907351187", HttpStatus.CREATED.value()),
             Map.entry("1504259907351186", HttpStatus.CREATED.value()),
-            Map.entry("1504259907351183", HttpStatus.CREATED.value()),
-            Map.entry("1504259907351182", HttpStatus.CREATED.value()),
             Map.entry("1504259907351181", HttpStatus.CREATED.value()),
             Map.entry("1504259907351180", HttpStatus.CREATED.value()),
             Map.entry("1504259907351239", HttpStatus.CREATED.value()),
@@ -250,7 +296,19 @@ public class TestConstants {
             Map.entry("1504259907445511", HttpStatus.CREATED.value()),
             Map.entry("1504259907445512", HttpStatus.CREATED.value()),
             Map.entry("1504259907445513", HttpStatus.CREATED.value()),
-            Map.entry("1504259907445514", HttpStatus.CREATED.value())
+            Map.entry("1504259907445514", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351171", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351172", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351173", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351174", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351175", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351176", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351177", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351178", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351179", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351161", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351162", HttpStatus.CREATED.value())
+
     );
 
     public static Map<String, Integer> HEARINGS_DELETE = Map.ofEntries(

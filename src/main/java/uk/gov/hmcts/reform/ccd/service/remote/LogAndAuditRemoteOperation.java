@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.service.remote.clients.LauClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
 
+import java.rmi.Remote;
 import java.text.SimpleDateFormat;
 
 import static java.sql.Timestamp.valueOf;

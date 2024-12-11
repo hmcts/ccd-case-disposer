@@ -6,9 +6,10 @@ import dnl.utils.text.table.TextTable;
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
-import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.SummaryStringLogBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.SimulatedCaseDataViewHolder;
@@ -36,14 +37,14 @@ public class CaseDeletionLoggingService {
     private final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder;
     private final ParameterResolver parameterResolver;
     private final SummaryStringLogBuilder summaryStringLogBuilder;
+    private final ProcessedCasesRecordHolder processedCasesRecordHolder;
 
-    public void logCaseFamilies(final List<CaseFamily> deletedLinkedFamilies,
-                                final List<CaseFamily> simulatedLinkedFamilies,
-                                final List<CaseFamily> failedLinkedFamilies) {
 
-        final List<CaseDataView> caseDataViews = buildCaseDataViews(deletedLinkedFamilies,
-                simulatedLinkedFamilies,
-                failedLinkedFamilies);
+    public void logCases() {
+
+        logSimulatedCases();
+
+        final List<CaseDataView> caseDataViews = buildCaseDataViews();
 
         final List<List<CaseDataView>> caseViewPartition = Lists.partition(caseDataViews,
                 parameterResolver.getAppInsightsLogSize());
@@ -66,6 +67,17 @@ public class CaseDeletionLoggingService {
         simulatedCaseDataViewHolder.setUpData(caseDataViews);
     }
 
+    private void logSimulatedCases() {
+        processedCasesRecordHolder.getSimulatedCases().forEach(caseData -> {
+            final String logMessage = String.format(
+                "Simulated case type: %s, Case ref: %s",
+                caseData.getCaseType(), caseData.getReference()
+            );
+
+            log.info(logMessage);
+        });
+    }
+
     private ByteArrayOutputStream buildTextTable(final List<CaseDataView> caseViewListPartition) {
         final TextTable textTable = tableTextBuilder.buildTextTable(caseViewListPartition);
 
@@ -82,20 +94,19 @@ public class CaseDeletionLoggingService {
         log.info(summaryString);
     }
 
-    private List<CaseDataView> buildCaseDataViews(final List<CaseFamily> deletedLinkedFamilies,
-                                                  final List<CaseFamily> simulatedLinkedFamilies,
-                                                  final List<CaseFamily> failedLinkedFamilies) {
+    private List<CaseDataView> buildCaseDataViews() {
         final List<CaseDataView> caseDataViews = new ArrayList<>();
 
-        caseDataViewBuilder.buildCaseDataViewList(deletedLinkedFamilies, caseDataViews, DELETED_STATE);
-        caseDataViewBuilder.buildCaseDataViewList(simulatedLinkedFamilies, caseDataViews, SIMULATED_STATE);
-        caseDataViewBuilder.buildCaseDataViewList(failedLinkedFamilies, caseDataViews, FAILED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(processedCasesRecordHolder.getSuccessfullyDeletedCases(), caseDataViews, DELETED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(new ArrayList<>(processedCasesRecordHolder.getSimulatedCases()), caseDataViews, SIMULATED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(processedCasesRecordHolder.getFailedToDeleteDeletedCases(), caseDataViews, FAILED_STATE);
 
         removeCaseDataViewDuplicates(caseDataViews);
 
         return caseDataViews;
     }
 
+    // TODO: this method might need to be removed
     private void removeCaseDataViewDuplicates(final List<CaseDataView> caseDataViews) {
         final Set<Long> nameSet = new HashSet<>();
         caseDataViews.removeIf(e -> (!nameSet.add(e.getCaseRef())));
