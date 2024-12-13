@@ -10,14 +10,12 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.SummaryStringLogBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
-import uk.gov.hmcts.reform.ccd.util.log.SimulatedCaseDataViewHolder;
 import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,9 +34,6 @@ class CaseDeletionLoggingServiceTest {
 
     @Spy
     private CaseDataViewBuilder caseDataViewBuilder;
-
-    @Spy
-    private SimulatedCaseDataViewHolder simulatedCaseDataViewHolder;
 
     @Mock
     private ParameterResolver parameterResolver;
@@ -68,13 +63,7 @@ class CaseDeletionLoggingServiceTest {
         verify(tableTextBuilder, times(1)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
                 .buildSummaryString(anyList(), anyInt(), anyInt());
-        verify(simulatedCaseDataViewHolder, times(1)).setUpData(anyList());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
-
-
-        assertThat(simulatedCaseDataViewHolder.getSimulatedCaseIds())
-                .isNotNull()
-                .containsExactlyInAnyOrder(30L);
     }
 
     @Test
@@ -94,9 +83,6 @@ class CaseDeletionLoggingServiceTest {
         verify(tableTextBuilder, times(0)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
                 .buildSummaryString(0, 0, 0, 0, 0, 0);
-        verify(simulatedCaseDataViewHolder, times(1)).setUpData(Collections.emptyList());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
-
-        assertThat(simulatedCaseDataViewHolder.getSimulatedCaseIds()).isEmpty();
     }
 }

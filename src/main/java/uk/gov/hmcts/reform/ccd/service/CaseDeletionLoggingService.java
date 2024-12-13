@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.SummaryStringLogBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
-import uk.gov.hmcts.reform.ccd.util.log.SimulatedCaseDataViewHolder;
 import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
 import java.io.ByteArrayOutputStream;
@@ -33,7 +32,6 @@ public class CaseDeletionLoggingService {
 
     private final TableTextBuilder tableTextBuilder;
     private final CaseDataViewBuilder caseDataViewBuilder;
-    private final SimulatedCaseDataViewHolder simulatedCaseDataViewHolder;
     private final ParameterResolver parameterResolver;
     private final SummaryStringLogBuilder summaryStringLogBuilder;
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
@@ -63,7 +61,6 @@ public class CaseDeletionLoggingService {
         } else {
             logDataIfNoDeletableOrSimulatedCasesFound();
         }
-        simulatedCaseDataViewHolder.setUpData(caseDataViews);
     }
 
     private void logSimulatedCases() {
