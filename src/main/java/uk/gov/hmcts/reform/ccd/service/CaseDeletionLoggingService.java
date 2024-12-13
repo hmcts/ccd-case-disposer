@@ -108,7 +108,6 @@ public class CaseDeletionLoggingService {
         return caseDataViews;
     }
 
-    // TODO: this method might need to be removed
     private void removeCaseDataViewDuplicates(final List<CaseDataView> caseDataViews) {
         final Set<Long> nameSet = new HashSet<>();
         caseDataViews.removeIf(e -> (!nameSet.add(e.getCaseRef())));
