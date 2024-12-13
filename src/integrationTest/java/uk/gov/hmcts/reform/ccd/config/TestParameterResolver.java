@@ -88,7 +88,8 @@ public class TestParameterResolver implements ParameterResolver {
 
     @Override
     public List<String> getDeletableCaseTypesSimulation() {
-        final String[] result = Optional.ofNullable(System.getProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION))
+        String property = System.getProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
+        final String[] result = Optional.ofNullable(property)
                 .map(value -> value.strip().split(","))
                 .orElse(new String[0]);
 

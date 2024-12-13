@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.ccd.data.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Value;
 
 import java.time.LocalDate;
@@ -22,7 +21,9 @@ public class CaseData {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CaseData caseData = (CaseData) o;
         return Objects.equals(id, caseData.id);
     }

@@ -13,7 +13,7 @@ class TableTextBuilderTest {
 
     @Test
     void shouldCreateTableText() {
-        final CaseDataView caseDataView = new CaseDataView("CAVEAT", 123L, DELETED_STATE, List.of(345L, 678L));
+        final CaseDataView caseDataView = new CaseDataView("CAVEAT", 123L, DELETED_STATE);
 
         final TextTable textTable = new TableTextBuilder().buildTextTable(List.of(caseDataView));
 
@@ -21,12 +21,9 @@ class TableTextBuilderTest {
         assertThat(textTable.getTableModel().getColumnName(0)).isEqualTo("Case Type");
         assertThat(textTable.getTableModel().getColumnName(1)).isEqualTo("Case ID");
         assertThat(textTable.getTableModel().getColumnName(2)).isEqualTo("Delete State");
-        assertThat(textTable.getTableModel().getColumnName(3)).isEqualTo("Linked Case IDs");
         assertThat(textTable.getTableModel().getRowCount()).isEqualTo(1);
         assertThat(textTable.getTableModel().getValueAt(0, 0)).isEqualTo("CAVEAT");
         assertThat(textTable.getTableModel().getValueAt(0, 1)).isEqualTo("123");
         assertThat(textTable.getTableModel().getValueAt(0, 2)).isEqualTo(DELETED_STATE);
-        assertThat(textTable.getTableModel().getValueAt(0, 3)).isEqualTo(List.of(345L, 678L));
-
     }
 }

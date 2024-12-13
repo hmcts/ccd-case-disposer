@@ -13,12 +13,6 @@ public class CaseFamilyUtil {
     private CaseFamilyUtil() {
     }
 
-//    public static Set<CaseData> getRoots(final List<CaseFamily> caseFamilies) {
-//        return caseFamilies.stream()
-//            .map(CaseFamily::getRootCase)
-//            .collect(Collectors.toSet());
-//    }
-
     public static Set<CaseData> getCaseData(final List<CaseFamily> caseFamilies) {
         return  caseFamilies.stream()
             .flatMap(caseFamily ->
@@ -26,9 +20,3 @@ public class CaseFamilyUtil {
             .collect(Collectors.toSet());
     }
 }
-
-
-
-
-
-

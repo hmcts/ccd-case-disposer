@@ -2,6 +2,7 @@ plugins {
   id 'application'
   id 'checkstyle'
   id 'pmd'
+  id 'idea'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.6'
   id 'org.springframework.boot' version '3.3.5'
@@ -57,6 +58,18 @@ sourceSets {
   }
 
 }
+
+idea {
+  module {
+    testSources.from(project.sourceSets.integrationTest.java.srcDirs)
+    testSources.from(project.sourceSets.functionalTest.java.srcDirs)
+    testSources.from(project.sourceSets.contractTest.java.srcDirs)
+    testResources.from(project.sourceSets.integrationTest.resources.srcDirs)
+    testResources.from(project.sourceSets.functionalTest.resources.srcDirs)
+    testResources.from(project.sourceSets.contractTest.resources.srcDirs)
+  }
+}
+
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked" << "-Werror"
@@ -140,14 +153,16 @@ jacocoTestReport {
 project.tasks['sonarqube'].dependsOn jacocoTestReport
 
 sonarqube {
-    properties {
-        property "sonar.projectName", "Reform :: ccd-case-disposer"
-        property "sonar.projectKey", "uk.gov.hmcts.reform:ccd-case-disposer"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.coverage.exclusions", "**/ccd/ApplicationBootstrap.java"
-        property "sonar.pitest.mode", "reuseReport"
-        property "sonar.pitest.reportsDirectory", "build/reports/pitest"
-    }
+  properties {
+    property "sonar.projectName", "Reform :: ccd-case-disposer"
+    property "sonar.projectKey", "uk.gov.hmcts.reform:ccd-case-disposer"
+    property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+    property "sonar.coverage.exclusions", "**/ccd/ApplicationBootstrap.java"
+    property "sonar.pitest.mode", "reuseReport"
+    property "sonar.pitest.reportsDirectory", "build/reports/pitest"
+    property "sonar.sources", "src/main/java"
+    property "sonar.tests", "src/test/java,src/contractTest/java,src/functionalTest/java,src/integrationTest/java"
+  }
 }
 
 // before committing a change, make sure task still works

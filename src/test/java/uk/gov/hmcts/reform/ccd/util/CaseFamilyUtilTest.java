@@ -5,6 +5,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,36 +32,24 @@ class CaseFamilyUtilTest {
         caseData1
     );
 
-//    @Test
-//    void testShouldFlattenCaseFamilies() {
-//        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, List.of(caseData2)));
-//
-//        final List<CaseData> result = FLATTEN_CASE_FAMILIES_FUNCTION.apply(caseFamilies);
-//
-//        assertThat(result)
-//            .isNotEmpty()
-//            .containsExactlyInAnyOrder(caseData1, caseData2);
-//    }
+    @Test
+    void testShouldFlattenCaseFamilies() {
+        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, List.of(caseData2)));
 
-//    @Test
-//    void testShouldReturnOnlyRootCaseWhenNoLinkedCasesPresent() {
-//        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, emptyList()));
-//
-//        final List<List<CaseData>> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
-//
-//        assertThat(result.getFirst())
-//            .singleElement()
-//            .isEqualTo(caseData1);
-//    }
+        final Set<CaseData> result = CaseFamilyUtil.getCaseData(caseFamilies);
 
-//    @Test
-//    void testResultShouldNotContainRootCaseWhenLinkedCasesPresent() {
-//        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, List.of(caseData2)));
-//
-//        final List<List<CaseData>> result = POTENTIAL_MULTI_FAMILY_CASE_AGGREGATOR_FUNCTION.apply(caseFamilies);
-//
-//        assertThat(result.getFirst())
-//            .singleElement()
-//            .isEqualTo(caseData2);
-//    }
+        assertThat(result)
+            .isNotEmpty()
+            .containsExactlyInAnyOrder(caseData1, caseData2);
+    }
+
+    @Test
+    void testShouldReturnOnlyRootCaseWhenNoLinkedCasesPresent() {
+        final List<CaseFamily> caseFamilies = List.of(new CaseFamily(caseData1, emptyList()));
+
+        final Set<CaseData> result = CaseFamilyUtil.getCaseData(caseFamilies);
+
+        assertThat(result.stream().toList().getFirst())
+            .isEqualTo(caseData1);
+    }
 }

@@ -7,12 +7,10 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
-
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
-
 
 import java.util.List;
 import java.util.Set;

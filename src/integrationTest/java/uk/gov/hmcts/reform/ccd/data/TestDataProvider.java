@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.utils.SimulationIntegrationTestUtils;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
@@ -40,8 +41,8 @@ public class TestDataProvider extends TestContainers {
                              final List<Long> rowIds,
                              final Map<String, List<Long>> indexedData) throws Exception {
 
-        setDeletableCaseTypes(deletableCaseTypes);
-        setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
+        setSystemProperty(DELETABLE_CASE_TYPES_PROPERTY, deletableCaseTypes);
+        setSystemProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION, deletableCaseTypesSimulation);
 
         wireMockStubs.setUpStubs(WIREMOCK_SERVER);
 
@@ -72,15 +73,11 @@ public class TestDataProvider extends TestContainers {
                 remoteDeletionVerifier.verifyRemoteDeletion(caseRefs));
     }
 
-    private void setDeletableCaseTypes(final String value) {
+    private void setSystemProperty(String propertyName, final String value) {
         if (value != null) {
-            setProperty(DELETABLE_CASE_TYPES_PROPERTY, value);
-        }
-    }
-
-    private void setDeletableCaseTypesSimulation(final String value) {
-        if (value != null) {
-            setProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION, value);
+            setProperty(propertyName, value);
+        } else {
+            clearProperty(propertyName);
         }
     }
 }

@@ -6,7 +6,6 @@ import dnl.utils.text.table.TextTable;
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
@@ -97,9 +96,12 @@ public class CaseDeletionLoggingService {
     private List<CaseDataView> buildCaseDataViews() {
         final List<CaseDataView> caseDataViews = new ArrayList<>();
 
-        caseDataViewBuilder.buildCaseDataViewList(processedCasesRecordHolder.getSuccessfullyDeletedCases(), caseDataViews, DELETED_STATE);
-        caseDataViewBuilder.buildCaseDataViewList(new ArrayList<>(processedCasesRecordHolder.getSimulatedCases()), caseDataViews, SIMULATED_STATE);
-        caseDataViewBuilder.buildCaseDataViewList(processedCasesRecordHolder.getFailedToDeleteDeletedCases(), caseDataViews, FAILED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(
+            processedCasesRecordHolder.getSuccessfullyDeletedCases(), caseDataViews, DELETED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(
+            new ArrayList<>(processedCasesRecordHolder.getSimulatedCases()), caseDataViews, SIMULATED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(
+            processedCasesRecordHolder.getFailedToDeleteDeletedCases(), caseDataViews, FAILED_STATE);
 
         removeCaseDataViewDuplicates(caseDataViews);
 
