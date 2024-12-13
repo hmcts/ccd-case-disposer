@@ -27,11 +27,6 @@ public class ProcessedCasesRecordHolder {
         processedCases.add(caseData);
     }
 
-    public boolean hasBeenProcessed(final Long caseRef) {
-        return processedCases.stream()
-            .anyMatch(caseData -> caseData.getReference().equals(caseRef));
-    }
-
     public List<CaseData> getSuccessfullyDeletedCases() {
         return processedCases.stream()
             .filter(caseData -> !failedToDeleteCaseRefs.contains(caseData.getReference()))
