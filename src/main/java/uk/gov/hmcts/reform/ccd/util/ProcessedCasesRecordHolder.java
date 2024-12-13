@@ -8,14 +8,14 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Named
 @Getter
 public class ProcessedCasesRecordHolder {
 
-    private Set<Long> failedToDeleteCaseRefs = new HashSet<>();
-    private Set<CaseData> processedCases = new HashSet<>();
+    private final Set<Long> failedToDeleteCaseRefs = new HashSet<>();
+    private final Set<CaseData> processedCases = new HashSet<>();
+
     @Setter
     private Set<CaseData> simulatedCases = new HashSet<>();
 
@@ -35,12 +35,12 @@ public class ProcessedCasesRecordHolder {
     public List<CaseData> getSuccessfullyDeletedCases() {
         return processedCases.stream()
             .filter(caseData -> !failedToDeleteCaseRefs.contains(caseData.getReference()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<CaseData> getFailedToDeleteDeletedCases() {
         return processedCases.stream()
             .filter(caseData -> failedToDeleteCaseRefs.contains(caseData.getReference()))
-            .collect(Collectors.toList());
+            .toList();
     }
 }
