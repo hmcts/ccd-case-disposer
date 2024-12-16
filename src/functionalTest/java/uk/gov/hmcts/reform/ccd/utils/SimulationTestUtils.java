@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
