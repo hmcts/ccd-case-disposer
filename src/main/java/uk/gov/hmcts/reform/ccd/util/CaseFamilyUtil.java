@@ -13,6 +13,12 @@ public class CaseFamilyUtil {
     private CaseFamilyUtil() {
     }
 
+    /**
+     * Flatten case families into a set of case data
+     *
+     * @param caseFamilies the case families
+     * @return the set with CaseData entries
+     */
     public static Set<CaseData> getCaseData(final List<CaseFamily> caseFamilies) {
         return  caseFamilies.stream()
             .flatMap(caseFamily ->

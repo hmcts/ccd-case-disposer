@@ -33,24 +33,29 @@ public class CaseDeletionService {
 
     @Transactional
     public void deleteCaseData(@NonNull final CaseData caseData) {
-        deleteLinkedCases(caseData);
+        deleteCaseLinks(caseData);
         deleteCase(caseData);
     }
 
-    void deleteLinkedCases(final CaseData caseData) {
+    /**
+     * Break links between cases.
+     * Find all the links that involve the case and delete those links
+     * so we don't have any linked cases associated with the case.
+     *
+     * @param caseData - case to delete links for
+     */
+    void deleteCaseLinks(final CaseData caseData) {
         try {
-            log.info("About to delete linked case.reference:: {}", caseData.getReference());
+            log.info("About to delete linked case reference:: {}", caseData.getReference());
 
             final List<CaseLinkEntity> allLinkedCases = caseLinkRepository.findByCaseIdOrLinkedCaseId(caseData.getId());
             if (!allLinkedCases.isEmpty()) {
                 caseLinkRepository.deleteAll(allLinkedCases);
             }
-
-            log.info("Deleted linked case.reference:: {}", caseData.getReference());
-
+            log.info("Deleted linked case reference:: {}", caseData.getReference());
         } catch (final Exception exception) { // Catch all exceptions
             final String errorMessage = String.format(
-                "Could not delete linked case.reference:: %s",
+                "Could not delete linked case reference:: %s",
                 caseData.getReference()
             );
             log.error(errorMessage, exception);
@@ -70,11 +75,10 @@ public class CaseDeletionService {
                 logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
             }
 
-            log.info("Deleted case.reference:: {}", caseData.getReference());
-
+            log.info("Deleted case reference:: {}", caseData.getReference());
         } catch (final Exception exception) { // Catch all exceptions
             final String errorMessage = String.format(
-                "Could not delete case.reference:: %s",
+                "Could not delete case reference:: %s",
                 caseData.getReference()
             );
             log.error(errorMessage, exception);

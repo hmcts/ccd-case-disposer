@@ -123,12 +123,12 @@ class CaseDeletionServiceTest {
 
 
     @Test
-    void shouldLogErrorWhenDeleteLinkedCasesFails() {
+    void shouldLogErrorWhenDeleteCaseLinksFails() {
         // GIVEN
         doThrow(IllegalArgumentException.class).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
 
         // WHEN
-        catchThrowable(() -> underTest.deleteLinkedCases(caseData));
+        catchThrowable(() -> underTest.deleteCaseLinks(caseData));
 
         // THEN
         verify(caseLinkRepository, times(1)).findByCaseIdOrLinkedCaseId(1L);
