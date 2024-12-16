@@ -142,7 +142,7 @@ VALUES (12, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       150425990735128,
+       1504259907351128,
        '2016-06-24 20:44:52.824'
 );
 

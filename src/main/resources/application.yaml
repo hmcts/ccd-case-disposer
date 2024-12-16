@@ -33,9 +33,8 @@ elasticsearch:
     name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
 
 
-deletable.case.types: HearingRecordings
-simulated.case.types: Probate
-
+deletable.case.types: ${DELETE_CASE_TYPES:}
+simulated.case.types: ${SIMULATED_CASE_TYPES:}
 
 request.limit: ${CCD_DISPOSER_REQUEST_LIMIT:1000}
 

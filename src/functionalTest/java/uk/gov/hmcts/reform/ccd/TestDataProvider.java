@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.HearingDocumentDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.LauTestUtils;
+import uk.gov.hmcts.reform.ccd.utils.SimulationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RoleDeleteTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.TaskDeleteTestUtils;
 
@@ -18,6 +19,9 @@ import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
 public class TestDataProvider {
+
+    @Inject
+    private SimulationTestUtils simulationTestUtils;
 
     @Inject
     private ElasticSearchTestUtils elasticSearchTestUtils;
@@ -88,6 +92,10 @@ public class TestDataProvider {
 
     protected void verifyDocumentDeletion(final Map<Long, List<String>> deletableDocuments) {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
+    }
+
+    protected void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
+        simulationTestUtils.verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
     }
 
     protected void verifyHearingDocumentDeletion(final Map<String, List<Long>> deletedFromIndexed) {

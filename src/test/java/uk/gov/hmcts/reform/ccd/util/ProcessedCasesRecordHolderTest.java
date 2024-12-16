@@ -55,8 +55,8 @@ class ProcessedCasesRecordHolderTest {
         processedCasesRecordHolder.addFailedToDeleteCaseRef(caseDataFailed4);
 
         // then
-        assertThat(processedCasesRecordHolder.getSuccessfullyDeletedCases()).contains(caseDataProcessed1);
-        assertThat(processedCasesRecordHolder.getFailedToDeleteDeletedCases()).contains(caseDataFailed3);
+        assertThat(processedCasesRecordHolder.getSuccessfullyDeletedCases()).containsOnly(caseDataProcessed1);
+        assertThat(processedCasesRecordHolder.getFailedToDeleteDeletedCases()).containsOnly(caseDataFailed3);
 
     }
 }
