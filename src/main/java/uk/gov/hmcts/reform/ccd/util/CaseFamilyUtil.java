@@ -14,7 +14,7 @@ public class CaseFamilyUtil {
     }
 
     /**
-     * Flatten case families into a set of case data
+     * Flatten case families into a set of case data.
      *
      * @param caseFamilies the case families
      * @return the set with CaseData entries
