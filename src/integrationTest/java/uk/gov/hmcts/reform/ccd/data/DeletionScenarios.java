@@ -537,6 +537,18 @@ public class DeletionScenarios {
                     List.of(),
                     Map.of("FT_ElasticCaseType", emptyList()),
                     Map.of("FT_ElasticCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "TaskCaseType",
+                    null,
+                    "scenarios/S-032-deletable-failed-cases-due-to-task-delete-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907351192L),
+                    Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    Map.of("TaskCaseType", emptyList())
                 )
         );
     }

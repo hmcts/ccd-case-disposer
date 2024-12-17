@@ -60,6 +60,7 @@ remote:
   log.and.audit:
     host: http://localhost:4603
   tasks:
+    enabled: true
     host: http://localhost:4603
   hearing:
     host: http://localhost:4603

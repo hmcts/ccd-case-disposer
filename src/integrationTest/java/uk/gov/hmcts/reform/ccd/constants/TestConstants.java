@@ -11,7 +11,7 @@ public class TestConstants {
     private TestConstants() {
     }
 
-    public static Map<String, CaseDocumentsDeletionResults> DOCUMENT_DELETE = Map.ofEntries(
+    public static final Map<String, CaseDocumentsDeletionResults> DOCUMENT_DELETE = Map.ofEntries(
             Map.entry("1504259907353529", new CaseDocumentsDeletionResults(1, 1)),
             Map.entry("1504259907353528", new CaseDocumentsDeletionResults(2, 2)),
             Map.entry("1504259907353526", new CaseDocumentsDeletionResults(3, 3)),
@@ -71,7 +71,9 @@ public class TestConstants {
             Map.entry("1504259907351182", new CaseDocumentsDeletionResults(1, 1)),
             Map.entry("1504259907351183", new CaseDocumentsDeletionResults(1, 1)),
             Map.entry("1504259907351184", new CaseDocumentsDeletionResults(1, 1)),
-            Map.entry("1504259907351185", new CaseDocumentsDeletionResults(1, 1))
+            Map.entry("1504259907351185", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907351192", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907351193", new CaseDocumentsDeletionResults(1, 1))
     );
 
     public static Map<String, Integer> ROLE_DELETE = Map.ofEntries(
@@ -136,7 +138,9 @@ public class TestConstants {
             Map.entry("1504259907351182", HttpStatus.OK.value()),
             Map.entry("1504259907351183", HttpStatus.OK.value()),
             Map.entry("1504259907351184", HttpStatus.OK.value()),
-            Map.entry("1504259907351185", HttpStatus.OK.value())
+            Map.entry("1504259907351185", HttpStatus.OK.value()),
+            Map.entry("1504259907351192", HttpStatus.OK.value()),
+            Map.entry("1504259907351193", HttpStatus.OK.value())
     );
 
     public static Map<String, Integer> ROLE_QUERY = Map.ofEntries(
@@ -196,9 +200,11 @@ public class TestConstants {
         Map.entry("1504259907351178", HttpStatus.OK.value()),
         Map.entry("1504259907351179", HttpStatus.OK.value()),
         Map.entry("1504259907351161", HttpStatus.OK.value()),
-        Map.entry("1504259907351162", HttpStatus.OK.value())
-
+        Map.entry("1504259907351162", HttpStatus.OK.value()),
+        Map.entry("1504259907351192", HttpStatus.OK.value()),
+        Map.entry("1504259907351193", HttpStatus.OK.value())
     );
+
     public static Map<String, CaseActionPostRequestResponse> LAU_QUERY = Map.ofEntries(
             Map.entry("1504259907353529", buildCaseActionPostRequest("1504259907353529")),
             Map.entry("1504259907353528", buildCaseActionPostRequest("1504259907353528")),
@@ -260,10 +266,12 @@ public class TestConstants {
             Map.entry("1504259907351182", buildCaseActionPostRequest("1504259907351182")),
             Map.entry("1504259907351183", buildCaseActionPostRequest("1504259907351183")),
             Map.entry("1504259907351184", buildCaseActionPostRequest("1504259907351184")),
-            Map.entry("1504259907351185", buildCaseActionPostRequest("1504259907351185"))
+            Map.entry("1504259907351185", buildCaseActionPostRequest("1504259907351185")),
+            Map.entry("1504259907351192", buildCaseActionPostRequest("1504259907351192")),
+            Map.entry("1504259907351193", buildCaseActionPostRequest("1504259907351193"))
     );
 
-    public static Map<String, Integer> TASKS_DELETE = Map.ofEntries(
+    public static final Map<String, Integer> TASKS_DELETE = Map.<String, Integer>ofEntries(
             Map.entry("1504259907353529", HttpStatus.CREATED.value()),
             Map.entry("1504259907353528", HttpStatus.CREATED.value()),
             Map.entry("1504259907353526", HttpStatus.CREATED.value()),
@@ -325,11 +333,12 @@ public class TestConstants {
             Map.entry("1504259907351182", HttpStatus.CREATED.value()),
             Map.entry("1504259907351183", HttpStatus.CREATED.value()),
             Map.entry("1504259907351184", HttpStatus.CREATED.value()),
-            Map.entry("1504259907351185", HttpStatus.CREATED.value())
-
+            Map.entry("1504259907351185", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351192", HttpStatus.CREATED.value()),
+            Map.entry("1504259907351193", HttpStatus.BAD_GATEWAY.value())
     );
 
-    public static Map<String, Integer> HEARINGS_DELETE = Map.ofEntries(
+    public static final Map<String, Integer> HEARINGS_DELETE = Map.ofEntries(
         Map.entry("4331434790352648", HttpStatus.NO_CONTENT.value()),
         Map.entry("7344069216690734", HttpStatus.NO_CONTENT.value()),
         Map.entry("1504259907445513", HttpStatus.NO_CONTENT.value()),
