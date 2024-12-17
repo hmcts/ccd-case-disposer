@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Named
@@ -40,6 +39,6 @@ public class CaseFamiliesFilter {
                                 .flatMap(Collection::stream)
                                 .map(value -> value.getCaseType())
                                 .collect(toSet())))
-                .collect(toList());
+                .toList();
     }
 }
