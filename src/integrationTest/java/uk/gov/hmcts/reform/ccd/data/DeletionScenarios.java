@@ -537,6 +537,27 @@ public class DeletionScenarios {
                     List.of(),
                     Map.of("FT_ElasticCaseType", emptyList()),
                     Map.of("FT_ElasticCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-032-linked-cases-link-to-same-root-case.sql",
+                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L),
+                    Map.of("FT_MasterCaseType", List.of(
+                        1504259907032001L, 1504259907032002L, 1504259907032003L, 1504259907032004L, 1504259907032005L,
+                        1504259907032006L, 1504259907032007L, 1504259907032008L, 1504259907032009L, 1504259907032010L
+                    )),
+                    emptyList(),
+                    emptyList(),
+                    List.of(
+                        1504259907032001L, 1504259907032002L, 1504259907032003L, 1504259907032004L, 1504259907032005L,
+                        1504259907032006L, 1504259907032007L, 1504259907032008L, 1504259907032009L, 1504259907032010L
+                    ),
+                    Map.of("FT_MasterCaseType", List.of(
+                        1504259907032001L, 1504259907032002L, 1504259907032003L, 1504259907032004L, 1504259907032005L,
+                        1504259907032006L, 1504259907032007L, 1504259907032008L, 1504259907032009L, 1504259907032010L
+                    )),
+                    Map.of("FT_MasterCaseType", emptyList())
                 )
         );
     }
