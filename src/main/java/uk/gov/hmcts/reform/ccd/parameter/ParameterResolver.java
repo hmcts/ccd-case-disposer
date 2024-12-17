@@ -36,4 +36,9 @@ public interface ParameterResolver {
     Integer getThreadQueueCapacity();
 
     Integer getRequestLimit();
+
+    default Integer feignClientRetryAttempts() {
+        return 3;
+    }
+
 }
