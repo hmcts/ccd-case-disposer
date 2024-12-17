@@ -81,7 +81,18 @@ public class TestConstants {
             Map.entry("1504259907032007", new CaseDocumentsDeletionResults(1, 1)),
             Map.entry("1504259907032008", new CaseDocumentsDeletionResults(1, 1)),
             Map.entry("1504259907032009", new CaseDocumentsDeletionResults(1, 1)),
-            Map.entry("1504259907032010", new CaseDocumentsDeletionResults(1, 1))
+            Map.entry("1504259907032010", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033001", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033002", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033003", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033004", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033005", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033006", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033007", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033008", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033009", new CaseDocumentsDeletionResults(1, 1)),
+            Map.entry("1504259907033010", new CaseDocumentsDeletionResults(1, 1))
+
     );
 
     public static Map<String, Integer> ROLE_DELETE = Map.ofEntries(
@@ -156,8 +167,17 @@ public class TestConstants {
             Map.entry("1504259907032007", HttpStatus.OK.value()),
             Map.entry("1504259907032008", HttpStatus.OK.value()),
             Map.entry("1504259907032009", HttpStatus.OK.value()),
-            Map.entry("1504259907032010", HttpStatus.OK.value())
-
+            Map.entry("1504259907032010", HttpStatus.OK.value()),
+            Map.entry("1504259907033001", HttpStatus.OK.value()),
+            Map.entry("1504259907033002", HttpStatus.OK.value()),
+            Map.entry("1504259907033003", HttpStatus.OK.value()),
+            Map.entry("1504259907033004", HttpStatus.OK.value()),
+            Map.entry("1504259907033005", HttpStatus.OK.value()),
+            Map.entry("1504259907033006", HttpStatus.OK.value()),
+            Map.entry("1504259907033007", HttpStatus.OK.value()),
+            Map.entry("1504259907033008", HttpStatus.OK.value()),
+            Map.entry("1504259907033009", HttpStatus.OK.value()),
+            Map.entry("1504259907033010", HttpStatus.OK.value())
     );
 
     public static Map<String, Integer> ROLE_QUERY = Map.ofEntries(
@@ -227,7 +247,17 @@ public class TestConstants {
         Map.entry("1504259907032007", HttpStatus.OK.value()),
         Map.entry("1504259907032008", HttpStatus.OK.value()),
         Map.entry("1504259907032009", HttpStatus.OK.value()),
-        Map.entry("1504259907032010", HttpStatus.OK.value())
+        Map.entry("1504259907032010", HttpStatus.OK.value()),
+        Map.entry("1504259907033001", HttpStatus.OK.value()),
+        Map.entry("1504259907033002", HttpStatus.OK.value()),
+        Map.entry("1504259907033003", HttpStatus.OK.value()),
+        Map.entry("1504259907033004", HttpStatus.OK.value()),
+        Map.entry("1504259907033005", HttpStatus.OK.value()),
+        Map.entry("1504259907033006", HttpStatus.OK.value()),
+        Map.entry("1504259907033007", HttpStatus.OK.value()),
+        Map.entry("1504259907033008", HttpStatus.OK.value()),
+        Map.entry("1504259907033009", HttpStatus.OK.value()),
+        Map.entry("1504259907033010", HttpStatus.OK.value())
 
     );
     public static Map<String, CaseActionPostRequestResponse> LAU_QUERY = Map.ofEntries(
@@ -301,7 +331,18 @@ public class TestConstants {
             Map.entry("1504259907032007", buildCaseActionPostRequest("1504259907032007")),
             Map.entry("1504259907032008", buildCaseActionPostRequest("1504259907032008")),
             Map.entry("1504259907032009", buildCaseActionPostRequest("1504259907032009")),
-            Map.entry("1504259907032010", buildCaseActionPostRequest("1504259907032010"))
+            Map.entry("1504259907032010", buildCaseActionPostRequest("1504259907032010")),
+            Map.entry("1504259907033001", buildCaseActionPostRequest("1504259907033001")),
+            Map.entry("1504259907033002", buildCaseActionPostRequest("1504259907033002")),
+            Map.entry("1504259907033003", buildCaseActionPostRequest("1504259907033003")),
+            Map.entry("1504259907033004", buildCaseActionPostRequest("1504259907033004")),
+            Map.entry("1504259907033005", buildCaseActionPostRequest("1504259907033005")),
+            Map.entry("1504259907033006", buildCaseActionPostRequest("1504259907033006")),
+            Map.entry("1504259907033007", buildCaseActionPostRequest("1504259907033007")),
+            Map.entry("1504259907033008", buildCaseActionPostRequest("1504259907033008")),
+            Map.entry("1504259907033009", buildCaseActionPostRequest("1504259907033009")),
+            Map.entry("1504259907033010", buildCaseActionPostRequest("1504259907033010"))
+
     );
 
     public static Map<String, Integer> TASKS_DELETE = Map.ofEntries(
@@ -376,7 +417,17 @@ public class TestConstants {
             Map.entry("1504259907032007", HttpStatus.CREATED.value()),
             Map.entry("1504259907032008", HttpStatus.CREATED.value()),
             Map.entry("1504259907032009", HttpStatus.CREATED.value()),
-            Map.entry("1504259907032010", HttpStatus.CREATED.value())
+            Map.entry("1504259907032010", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033001", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033002", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033003", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033004", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033005", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033006", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033007", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033008", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033009", HttpStatus.CREATED.value()),
+            Map.entry("1504259907033010", HttpStatus.CREATED.value())
 
     );
 
