@@ -5,13 +5,13 @@ plugins {
   id 'idea'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.3.5'
+  id 'org.springframework.boot' version '3.4.0'
   id 'org.owasp.dependencycheck' version '11.1.1'
   id 'com.github.ben-manes.versions' version '0.51.0'
   id 'org.sonarqube' version '6.0.1.5171'
   id 'uk.gov.hmcts.java' version '0.12.63'
   id 'io.freefair.lombok' version '8.11'
-  id 'org.flywaydb.flyway' version '10.22.0'
+  id 'org.flywaydb.flyway' version '11.1.0'
   id "info.solidsoft.pitest" version '1.15.0'
   id "au.com.dius.pact" version '4.6.16'
 }
@@ -56,7 +56,6 @@ sourceSets {
     }
     resources.srcDir file('src/contractTest/resources')
   }
-
 }
 
 idea {
@@ -69,7 +68,6 @@ idea {
     testResources.from(project.sourceSets.contractTest.resources.srcDirs)
   }
 }
-
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:unchecked" << "-Werror"
@@ -86,7 +84,6 @@ tasks.withType(Test) {
 test {
     failFast = true
 }
-
 
 task functional(type: Test) {
     description = "Runs functional tests"
@@ -108,8 +105,6 @@ task fortifyScan(type: JavaExec)  {
   mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
-  // The line below prevents the build from failing if the Fortify scan detects issues
-  ignoreExitValue = true
 }
 
 task checkoutDataStoreMigrationScripts (type: Exec){
@@ -193,7 +188,7 @@ dependencyCheck {
 dependencyManagement {
     dependencies {
         dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.79'
-        dependencySet(group: 'org.springframework.cloud', version: '4.1.4') {
+        dependencySet(group: 'org.springframework.cloud', version: '4.2.0') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
         }
@@ -249,20 +244,16 @@ def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.18.0',
     elasticsearch       : '7.17.26',
-    flyway              : '10.22.0',
+    flyway              : '11.1.0',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
-    jersey              : '3.1.9',
     junit               : '5.11.4',
-    junitPlatform       : '1.9.2',
     lombok              : '1.18.36',
     reformLogging       : '6.1.7',
     restAssured         : '5.5.0',
     s2sClient           : '5.3.0',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
-    springFramework     : '6.1.14',
-    springSecurity      : '6.4.0',
     testcontainers      : '1.20.4',
     wiremock            : '3.0.1',
     pactVersion         : '4.6.16',
@@ -297,12 +288,6 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
     implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
-    implementation group: 'org.springframework', name:'spring-webmvc', version: versions.springFramework
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: versions.springSecurity
-    implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: versions.jersey
-    implementation group: 'org.glassfish.jersey.core', name: 'jersey-common', version: versions.jersey
-    implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: versions.jersey
-    implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: versions.jersey
     implementation group: 'jakarta.ws.rs', name: 'jakarta.ws.rs-api', version: '4.0.0'
     implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
@@ -343,8 +328,9 @@ dependencies {
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
     testImplementation 'com.github.hmcts:fortify-client:1.4.6:all'
+    testImplementation group: 'io.github.hakky54', name: 'logcaptor', version: '2.10.0'
+
     testRuntimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
-  testImplementation group: 'io.github.hakky54', name: 'logcaptor', version: '2.10.0'
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath
