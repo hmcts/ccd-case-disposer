@@ -36,5 +36,4 @@ public interface ParameterResolver {
     Integer getThreadQueueCapacity();
 
     Integer getRequestLimit();
-
 }
