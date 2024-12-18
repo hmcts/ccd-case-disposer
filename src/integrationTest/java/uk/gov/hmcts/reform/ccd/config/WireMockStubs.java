@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.config;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.google.gson.Gson;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
@@ -52,10 +53,19 @@ public class WireMockStubs {
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
+        String body = new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction("${json-unit.any-string}")));
+        ResponseDefinitionBuilder response = aResponse()
+            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+            .withStatus(201);
+
+        wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
+            .withRequestBody(equalToJson(body))
+            .willReturn(response));
+
         TASKS_DELETE.forEach((key, value) ->
                 wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
-                        .withRequestBody(equalToJson(
-                            new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(key))))
+                        .withRequestBody(
+                            equalToJson(new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(key))))
                         )
                         .willReturn(aResponse()
                             .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)

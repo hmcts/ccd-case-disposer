@@ -17,13 +17,15 @@ public class TasksRemoteDeletionVerifier implements RemoteDeletionVerifier {
 
     public void verifyRemoteDeletion(final List<Long> caseRefs) {
         caseRefs.forEach(caseRef -> {
-            final int tasksDeletionMocks =
-                TASKS_DELETE.get(Long.toString(caseRef));
+            String caseRefStr = Long.toString(caseRef);
+            int expectedResult = 201;
+            if (TASKS_DELETE.containsKey(caseRefStr)) {
+                expectedResult = TASKS_DELETE.get(caseRefStr);
+            }
 
             final int tasksDeletionResults = tasksDeletionRecordHolder
                 .getTasksDeletionResults(Long.toString(caseRef));
-
-            assertThat(tasksDeletionResults).isEqualTo(tasksDeletionMocks);
+            assertThat(tasksDeletionResults).isEqualTo(expectedResult);
         });
     }
 }
