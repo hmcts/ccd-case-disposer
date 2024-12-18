@@ -9,7 +9,7 @@ This micro-service disposes off case records after a certain period of inactivit
 ## Getting Started
 
 ### Prerequisites
-- [JDK 11](https://java.com)
+- [JDK 21](https://openjdk.org/)
 
 ### Building the application
 
