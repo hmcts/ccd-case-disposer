@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.ccd;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +19,6 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
 
     @Autowired
     private ApplicationExecutor executor;
-
-    @AfterEach
-    void tearDown() {
-        WIREMOCK_SERVER.stop();
-    }
 
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
