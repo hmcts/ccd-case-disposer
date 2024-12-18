@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.ccd.util;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,14 +15,14 @@ class SummaryStringLogBuilderTest {
 
     @Test
     void shouldReturnDeletionSummaryString() {
-        final CaseDataView caseDataView1 = new CaseDataView(null, 333L, DELETED_STATE, Arrays.asList(111L, 456L));
-        final CaseDataView caseDataView = new CaseDataView(null, 111L, DELETED_STATE, new ArrayList<>());
+        final CaseDataView caseDataView = new CaseDataView(null, 111L, DELETED_STATE);
+        final CaseDataView caseDataView1 = new CaseDataView(null, 333L, DELETED_STATE);
 
-        final CaseDataView caseDataView2 = new CaseDataView(null, 222L, SIMULATED_STATE, Arrays.asList(111L));
-        final CaseDataView caseDataView3 = new CaseDataView(null, 111L, SIMULATED_STATE, new ArrayList<>());
+        final CaseDataView caseDataView2 = new CaseDataView(null, 222L, SIMULATED_STATE);
+        final CaseDataView caseDataView3 = new CaseDataView(null, 111L, SIMULATED_STATE);
 
-        final CaseDataView caseDataView4 = new CaseDataView(null, 444L, FAILED_STATE, Arrays.asList(555L));
-        final CaseDataView caseDataView5 = new CaseDataView(null, 555L, FAILED_STATE, new ArrayList<>());
+        final CaseDataView caseDataView4 = new CaseDataView(null, 444L, FAILED_STATE);
+        final CaseDataView caseDataView5 = new CaseDataView(null, 555L, FAILED_STATE);
 
         final List<CaseDataView> caseDataViews = Arrays.asList(caseDataView, caseDataView1, caseDataView2,
                 caseDataView3, caseDataView4, caseDataView5);

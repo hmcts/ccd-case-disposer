@@ -1,76 +1,47 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
-import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_FAMILY_SIMULATION;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE_SIMULATION;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 
 class CaseDataViewBuilderTest {
-    @Test
-    void shouldCreateCaseDataViewForDeletableCases() {
-        final List<CaseFamily> deletableCaseFamily = List.of(DELETABLE_CASE_FAMILY);
+
+    @ParameterizedTest
+    @MethodSource("provideCaseTypeAndProcessedState")
+    void shouldCreateCaseDataViewForDeletableCases(String caseType, String state) {
+        final List<CaseData> deletableCaseFamily = List.of(
+            CaseData.builder().id(1L).caseType(caseType).reference(11L).build(),
+            CaseData.builder().id(2L).caseType(caseType).reference(22L).build()
+        );
 
         final List<CaseDataView> caseDataViews = new ArrayList<>();
 
-        new CaseDataViewBuilder().buildCaseDataViewList(deletableCaseFamily, caseDataViews, DELETED_STATE);
+        new CaseDataViewBuilder().buildCaseDataViewList(deletableCaseFamily, caseDataViews, state);
 
-        assertThat(caseDataViews.size()).isEqualTo(4);
-        assertThat(caseDataViews.get(0).getCaseType()).isEqualTo(DELETABLE_CASE_FAMILY.getRootCase().getCaseType());
-        assertThat(caseDataViews.get(0).getCaseRef()).isEqualTo(DELETABLE_CASE_FAMILY.getRootCase().getId());
-        assertThat(caseDataViews.get(0).getState()).isEqualTo(DELETED_STATE);
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(0))
-                .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(0).getId());
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(1))
-                .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(1).getId());
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(2))
-                .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(2).getId());
+        assertThat(caseDataViews).hasSize(2);
+        assertThat(caseDataViews.getFirst().getCaseType()).isEqualTo(caseType);
+        assertThat(caseDataViews.getFirst().getCaseRef()).isEqualTo(11L);
+        assertThat(caseDataViews.getFirst().getState()).isEqualTo(state);
     }
 
-    @Test
-    void shouldCreateCaseDataViewForSimulationCases() {
-        final List<CaseFamily> deletableCaseFamilySimulation = List.of(DELETABLE_CASE_FAMILY_SIMULATION);
-
-        final List<CaseDataView> caseDataViews = new ArrayList<>();
-
-        new CaseDataViewBuilder().buildCaseDataViewList(deletableCaseFamilySimulation, caseDataViews, SIMULATED_STATE);
-
-        assertThat(caseDataViews.size()).isEqualTo(3);
-        assertThat(caseDataViews.get(0).getCaseType())
-                .isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getCaseType());
-        assertThat(caseDataViews.get(0).getCaseRef()).isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getRootCase().getId());
-        assertThat(caseDataViews.get(0).getState()).isEqualTo(SIMULATED_STATE);
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(0))
-                .isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(0).getId());
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(1))
-                .isEqualTo(DELETABLE_CASE_FAMILY_SIMULATION.getLinkedCases().get(1).getId());
-    }
-
-    @Test
-    void shouldCreateCaseDataViewForFailedCases() {
-        final List<CaseFamily> deletableCaseFamily = List.of(DELETABLE_CASE_FAMILY);
-
-        final List<CaseDataView> caseDataViews = new ArrayList<>();
-
-        new CaseDataViewBuilder().buildCaseDataViewList(deletableCaseFamily, caseDataViews, FAILED_STATE);
-
-        assertThat(caseDataViews.size()).isEqualTo(4);
-        assertThat(caseDataViews.get(0).getCaseType()).isEqualTo(DELETABLE_CASE_FAMILY.getRootCase().getCaseType());
-        assertThat(caseDataViews.get(0).getCaseRef()).isEqualTo(DELETABLE_CASE_FAMILY.getRootCase().getId());
-        assertThat(caseDataViews.get(0).getState()).isEqualTo(FAILED_STATE);
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(0))
-                .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(0).getId());
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(1))
-                .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(1).getId());
-        assertThat(caseDataViews.get(0).getLinkedCaseIds().get(2))
-                .isEqualTo(DELETABLE_CASE_FAMILY.getLinkedCases().get(2).getId());
+    private static Stream<Arguments> provideCaseTypeAndProcessedState() {
+        return Stream.of(
+            Arguments.of(DELETABLE_CASE_TYPE, DELETED_STATE),
+            Arguments.of(DELETABLE_CASE_TYPE_SIMULATION, SIMULATED_STATE),
+            Arguments.of(DELETABLE_CASE_TYPE, FAILED_STATE)
+        );
     }
 }

@@ -5,34 +5,30 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
-import uk.gov.hmcts.reform.ccd.service.CaseDeletionResolver;
+import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
+import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
 import java.util.List;
 
 import static java.util.Collections.emptyList;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doNothing;
+import static java.util.Collections.emptySet;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA03_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_ENTITY2_WITH_PAST_TTL;
 
 @ExtendWith(MockitoExtension.class)
 class ApplicationExecutorTest {
     @Mock
     private CaseFinderService caseFindingService;
-    @Mock
-    private CaseDeletionResolver caseDeletionResolver;
 
     @Mock
     private CaseFamiliesFilter caseFamiliesFilter;
@@ -42,6 +38,12 @@ class ApplicationExecutorTest {
 
     @Mock
     private ParameterResolver parameterResolver;
+
+    @Mock
+    private ProcessedCasesRecordHolder processedCasesRecordHolder;
+
+    @Mock
+    private CaseDeletionLoggingService caseDeletionLoggingService;
 
     @InjectMocks
     private ApplicationExecutor applicationExecutor;
@@ -54,145 +56,55 @@ class ApplicationExecutorTest {
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseFamiliesFilter).getDeletableCasesOnly(emptyList());
-        verify(caseDeletionResolver).logCaseDeletion(emptyList(),emptyList());
+        verify(processedCasesRecordHolder).setSimulatedCases(emptySet());
+        verify(caseDeletionService, times(0)).deleteCaseData(any());
     }
 
     @Test
     void testShouldDeleteTheCasesFound() {
-        when(parameterResolver.getRequestLimit()).thenReturn(2);
-        final CaseData caseData1 = new CaseData(
-                DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-                DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
-                DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
-                DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
-                DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
-                DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-                null
-        );
-        final CaseData caseData2 = new CaseData(
-                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
-                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getReference(),
-                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getCaseType(),
-                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getJurisdiction(),
-                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getResolvedTtl(),
-                DELETABLE_CASE_ENTITY2_WITH_PAST_TTL.getId(),
-                null
-        );
+        when(parameterResolver.getRequestLimit()).thenReturn(10);
+
         final List<CaseFamily> caseDataList = List.of(
-                new CaseFamily(caseData1, emptyList()),
-                new CaseFamily(caseData2, emptyList())
+            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
+            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList())
         );
 
         doReturn(caseDataList)
-                .when(caseFindingService).findCasesDueDeletion();
+            .when(caseFindingService).findCasesDueDeletion();
         doReturn(caseDataList)
-                .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList(),anyList());
+            .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
 
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(2)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
+        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDeletionLoggingService, times(1)).logCases();
+        verify(processedCasesRecordHolder, times(2)).addProcessedCase(any());
     }
 
     @Test
     void shouldLimitCaseDeletionToRequestsLimit() {
         // Given
         when(parameterResolver.getRequestLimit()).thenReturn(1);
-        final CaseData caseData1 = new CaseData(
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-            null
-        );
-        final CaseData caseData2 = new CaseData(
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getId(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getReference(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getCaseType(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getJurisdiction(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getId(),
-            null
-        );
-        final CaseData caseData3 = new CaseData(
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-            null
-        );
+
         final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(caseData1, emptyList()),
-            new CaseFamily(caseData2, emptyList()),
-            new CaseFamily(caseData3, emptyList())
+            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
+            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList()),
+            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList())
         );
 
         doReturn(caseDataList)
             .when(caseFindingService).findCasesDueDeletion();
         doReturn(caseDataList)
             .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList(),anyList());
 
         applicationExecutor.execute();
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(1)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
-    }
+        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDeletionLoggingService, times(1)).logCases();
+        verify(processedCasesRecordHolder, times(1)).addProcessedCase(any());
 
-    @Test
-    void shouldDeleteAllCaseDataIfRequestsLimitGreaterThanSize() {
-        // Given
-        when(parameterResolver.getRequestLimit()).thenReturn(10);
-        final CaseData caseData1 = new CaseData(
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getReference(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getCaseType(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getJurisdiction(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA_WITH_PAST_TTL.getId(),
-            null
-        );
-        final CaseData caseData2 = new CaseData(
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getId(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getReference(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getCaseType(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getJurisdiction(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA4_WITH_PAST_TTL.getId(),
-            null
-        );
-        final CaseData caseData3 = new CaseData(
-            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getId(),
-            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getReference(),
-            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getCaseType(),
-            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getJurisdiction(),
-            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getResolvedTtl(),
-            DELETABLE_CASE_DATA03_WITH_PAST_TTL.getId(),
-            null
-        );
-        final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(caseData1, emptyList()),
-            new CaseFamily(caseData2, emptyList()),
-            new CaseFamily(caseData3, emptyList())
-        );
-
-        doReturn(caseDataList)
-            .when(caseFindingService).findCasesDueDeletion();
-        doReturn(caseDataList)
-            .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doNothing().when(caseDeletionResolver).logCaseDeletion(anyList(),anyList());
-
-        applicationExecutor.execute();
-
-        verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(3)).deleteLinkedCaseFamilies(anyList());
-        verify(caseDeletionResolver, times(1)).logCaseDeletion(anyList(),anyList());
     }
 }

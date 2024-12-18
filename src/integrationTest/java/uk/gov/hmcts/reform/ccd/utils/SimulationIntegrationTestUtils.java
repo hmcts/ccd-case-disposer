@@ -2,9 +2,11 @@ package uk.gov.hmcts.reform.ccd.utils;
 
 import jakarta.inject.Inject;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.ccd.util.log.SimulatedCaseDataViewHolder;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,11 +14,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SimulationIntegrationTestUtils {
 
     @Inject
-    private SimulatedCaseDataViewHolder simulatedCaseDataViewHolder;
+    private ProcessedCasesRecordHolder processedCasesRecordHolder;
 
     public void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
-        assertThat(simulatedEndStateRowIds)
+        Set<CaseData> simulatedCases = processedCasesRecordHolder.getSimulatedCases();
+        List<Long> simulatedCaseIds = simulatedCases.stream().map(CaseData::getReference).toList();
+        assertThat(simulatedCaseIds)
                 .isNotNull()
-                .containsExactlyInAnyOrderElementsOf(simulatedCaseDataViewHolder.getSimulatedCaseIds());
+                .containsExactlyInAnyOrderElementsOf(simulatedEndStateRowIds);
     }
 }
