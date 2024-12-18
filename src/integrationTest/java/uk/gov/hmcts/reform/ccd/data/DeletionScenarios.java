@@ -411,15 +411,15 @@ public class DeletionScenarios {
                     null,
                     "scenarios/S-024-deletable-hearings-and-non-hearing-cases.sql",
                     List.of(1L, 2L, 3L),
-                    Map.of("FT_MultiplePages", List.of(6446787681450550L), "HearingRecordings",
-                           List.of(4331434790352648L, 7344069216690734L)),
+                    Map.of(
+                        "FT_MultiplePages", List.of(6446787681450550L),
+                        "HearingRecordings", List.of(4331434790352648L, 7344069216690734L)),
                     emptyList(),
                     emptyList(),
                     List.of(6446787681450550L, 4331434790352648L, 7344069216690734L),
                     Map.of("HearingRecordings", List.of(4331434790352648L, 7344069216690734L),
                            "FT_MultiplePages", List.of(6446787681450550L)),
                     Map.of("FT_MultiplePages", emptyList(),"HearingRecordings", emptyList())
-
                 ),
                 Arguments.of(
                     "FT_MasterCaseType",
@@ -432,43 +432,21 @@ public class DeletionScenarios {
                                                         1504259907351133L, 1504259907351132L,
                                                         1504259907351131L, 1504259907351130L,
                                                         1504259907351129L, 1504259907351128L)),
-                    List.of(6L, 12L),
+                    List.of(11L, 12L),
                     emptyList(),
-                    List.of(1504259907351139L, 1504259907351138L, 1504259907351137L,
-                            1504259907351136L, 1504259907351135L,
+                    List.of(1504259907351139L, 1504259907351138L,
+                            1504259907351137L, 1504259907351136L,
+                            1504259907351135L, 1504259907351134L,
                             1504259907351133L, 1504259907351132L,
-                            1504259907351131L, 1504259907351130L,
-                            1504259907351129L),
+                            1504259907351131L, 1504259907351130L
+                            ),
                     Map.of("FT_MasterCaseType", List.of(1504259907351139L, 1504259907351138L,
-                                                        1504259907351137L,1504259907351136L,
-                                                        1504259907351135L,
-                                                        1504259907351133L,1504259907351132L,
-                                                        1504259907351131L, 1504259907351130L,
-                                                        1504259907351129L)),
-                    Map.of("FT_MasterCaseType", List.of(1504259907351134L,1504259907351128L))
-                ),
-                Arguments.of(
-                    "FT_MasterCaseType",
-                    null,
-                    "scenarios/S-026-deletable-case-linked-to-case-which-is-beyond-request-limit.sql",
-                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 11L),
-                    Map.of("FT_MasterCaseType", List.of(1504259907351189L, 1504259907351188L,
-                                                        1504259907351187L, 1504259907351186L,
-                                                        1504259907351185L, 1504259907351184L,
-                                                        1504259907351183L, 1504259907351182L,
-                                                        1504259907351181L, 1504259907351180L,
-                                                        1504259907351179L)),
-                    List.of(5L, 6L, 11L),
-                    emptyList(),
-                    List.of(1504259907351189L, 1504259907351188L, 1504259907351187L,
-                            1504259907351186L,
-                            1504259907351183L, 1504259907351182L,
-                            1504259907351181L, 1504259907351180L),
-                    Map.of("FT_MasterCaseType", List.of(1504259907351189L, 1504259907351188L,
-                                                        1504259907351187L,1504259907351186L,
-                                                        1504259907351183L,1504259907351182L,
-                                                        1504259907351181L, 1504259907351180L)),
-                    Map.of("FT_MasterCaseType", List.of(1504259907351185L,1504259907351184L,1504259907351179L))
+                                                        1504259907351137L, 1504259907351136L,
+                                                        1504259907351135L, 1504259907351134L,
+                                                        1504259907351133L, 1504259907351132L,
+                                                        1504259907351131L, 1504259907351130L
+                                                        )),
+                    Map.of("FT_MasterCaseType", List.of(1504259907351129L,1504259907351128L))
                 ),
                 Arguments.of(
                     null,
@@ -559,8 +537,58 @@ public class DeletionScenarios {
                     List.of(),
                     Map.of("FT_ElasticCaseType", emptyList()),
                     Map.of("FT_ElasticCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-032-linked-cases-link-to-same-root-case.sql",
+                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L),
+                    Map.of("FT_MasterCaseType", List.of(
+                        1504259907032001L, 1504259907032002L, 1504259907032003L, 1504259907032004L, 1504259907032005L,
+                        1504259907032006L, 1504259907032007L, 1504259907032008L, 1504259907032009L, 1504259907032010L
+                    )),
+                    emptyList(),
+                    emptyList(),
+                    List.of(
+                        1504259907032001L, 1504259907032002L, 1504259907032003L, 1504259907032004L, 1504259907032005L,
+                        1504259907032006L, 1504259907032007L, 1504259907032008L, 1504259907032009L, 1504259907032010L
+                    ),
+                    Map.of("FT_MasterCaseType", List.of(
+                        1504259907032001L, 1504259907032002L, 1504259907032003L, 1504259907032004L, 1504259907032005L,
+                        1504259907032006L, 1504259907032007L, 1504259907032008L, 1504259907032009L, 1504259907032010L
+                    )),
+                    Map.of("FT_MasterCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-033-linked-cases-link-to-same-root-case-with-leaf-non-deletable.sql",
+                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L),
+                    Map.of("FT_MasterCaseType", List.of(
+                        1504259907033001L, 1504259907033002L, 1504259907033003L, 1504259907033004L, 1504259907033005L,
+                        1504259907033006L, 1504259907033007L, 1504259907033008L, 1504259907033009L, 1504259907033010L
+                    )),
+                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L),
+                    emptyList(),
+                    emptyList(),
+                    Map.of("FT_MasterCaseType", emptyList()),
+                    Map.of("FT_MasterCaseType", List.of(
+                        1504259907033001L, 1504259907033002L, 1504259907033003L, 1504259907033004L, 1504259907033005L,
+                        1504259907033006L, 1504259907033007L, 1504259907033008L, 1504259907033009L, 1504259907033010L
+                    ))
+                ),
+                Arguments.of(
+                    "TaskCaseType",
+                    null,
+                    "scenarios/S-034-deletable-failed-cases-due-to-task-delete-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907351192L),
+                    Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    Map.of("TaskCaseType", emptyList())
                 )
-
         );
     }
 }

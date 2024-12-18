@@ -36,7 +36,6 @@ elasticsearch:
 deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
 
-
 request.limit: ${CCD_DISPOSER_REQUEST_LIMIT:1000}
 
 remote:
@@ -47,6 +46,7 @@ remote:
   log.and.audit:
     host: ${LOG_AND_AUDIT_HOST:http://localhost:4550}
   tasks:
+    enabled: ${TASKS_ENABLED:false}
     host: ${TASKS_HOST:http://localhost:4000}
   hearing:
     host: ${HEARING_RECORDING_HOST:http://localhost:4000}

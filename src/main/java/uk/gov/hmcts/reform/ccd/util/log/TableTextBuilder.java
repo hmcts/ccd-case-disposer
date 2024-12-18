@@ -32,7 +32,7 @@ public class TableTextBuilder {
 
         caseDataViews.forEach(caseDataView -> {
             final Object[] caseDataFields = {caseDataView.getCaseType(), caseDataView.getCaseRef().toString(),
-                    caseDataView.getState(), caseDataView.getLinkedCaseIds()};
+                    caseDataView.getState()};
             rowData.add(caseDataFields);
         });
         return rowData;

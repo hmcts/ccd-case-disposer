@@ -67,6 +67,7 @@ public interface TestData {
             JURISDICTION, YESTERDAY, 91L, null);
     CaseData DELETABLE_CASE_DATA08_WITH_PAST_TTL = new CaseData(92L, 92L, DELETABLE_CASE_TYPE, JURISDICTION,
             YESTERDAY, 92L, null);
+
     CaseData DELETABLE_CASE_DATA2_WITH_PAST_TTL =
             new CaseData(1000L, 1000L, DELETABLE_CASE_TYPE, JURISDICTION,
                     YESTERDAY, 1000L, null);

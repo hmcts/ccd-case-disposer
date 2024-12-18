@@ -10,12 +10,11 @@ import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
-import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
-import uk.gov.hmcts.reform.ccd.util.FailedToDeleteCaseFamilyHolder;
-import uk.gov.hmcts.reform.ccd.util.Snooper;
+import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,56 +28,61 @@ public class CaseDeletionService {
     private final CaseEventRepository caseEventRepository;
     private final CaseLinkRepository caseLinkRepository;
     private final RemoteDisposeService remoteDisposeService;
-    private final Snooper snooper;
-    private final FailedToDeleteCaseFamilyHolder failedToDeleteCaseFamilyHolder;
-
+    private final ProcessedCasesRecordHolder processedCasesRecordHolder;
+    private final LogAndAuditRemoteOperation logAndAuditRemoteOperation;
 
     @Transactional
-    public void deleteLinkedCaseFamilies(@NonNull final List<CaseFamily> linkedCaseFamilies) {
-        linkedCaseFamilies.forEach(this::deleteLinkedCases);
-        linkedCaseFamilies.forEach(this::deleteCase);
+    public void deleteCaseData(@NonNull final CaseData caseData) {
+        deleteCaseLinks(caseData);
+        deleteCase(caseData);
     }
 
-    void deleteCase(final CaseFamily caseFamily) {
-        final CaseData rootCaseData = caseFamily.getRootCase();
+    /**
+     * Break links between cases.
+     * Find all the links that involve the case and delete those links
+     * so we don't have any linked cases associated with the case.
+     *
+     * @param caseData - case to delete links for
+     */
+    void deleteCaseLinks(final CaseData caseData) {
         try {
-            final List<CaseData> linkedCases = caseFamily.getLinkedCases();
-            log.info("About to delete case.reference:: {}", rootCaseData.getReference());
-            linkedCases.forEach(this::deleteCaseData);
-            deleteCaseData(rootCaseData);
-            log.info("Deleted case.reference:: {}", rootCaseData.getReference());
+            log.info("About to delete linked case reference:: {}", caseData.getReference());
+
+            final List<CaseLinkEntity> allLinkedCases = caseLinkRepository.findByCaseIdOrLinkedCaseId(caseData.getId());
+            if (!allLinkedCases.isEmpty()) {
+                caseLinkRepository.deleteAll(allLinkedCases);
+            }
+            log.info("Deleted linked case reference:: {}", caseData.getReference());
         } catch (final Exception exception) { // Catch all exceptions
-            final String errorMessage = String.format("Could not delete case.reference:: %s",
-                    rootCaseData.getReference());
-            snooper.snoop(errorMessage, exception);
-            failedToDeleteCaseFamilyHolder.addCaseFamily(caseFamily);
+            final String errorMessage = String.format(
+                "Could not delete linked case reference:: %s",
+                caseData.getReference()
+            );
+            log.error(errorMessage, exception);
+            processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
         }
     }
 
-    void deleteLinkedCases(final CaseFamily caseFamily) {
-        caseFamily.getLinkedCases().forEach(caseData -> {
-            final Long parentCaseId = caseData.getParentCase().getId();
-            try {
-                log.info("About to delete linked case.reference:: {}", caseData.getReference());
-                final CaseLinkPrimaryKey caseLinkPrimaryKey = new CaseLinkPrimaryKey(parentCaseId, caseData.getId());
-                caseLinkRepository.findById(caseLinkPrimaryKey)
-                        .ifPresent(caseLinkRepository::delete);
-                log.info("Deleted linked case.reference:: {}", caseData.getReference());
-            } catch (final Exception exception) { // Catch all exceptions
-                final String errorMessage = String.format("Could not delete linked case.reference:: %s",
-                        caseData.getReference());
-                snooper.snoop(errorMessage, exception);
-                failedToDeleteCaseFamilyHolder.addCaseFamily(caseFamily);
-            }
-        });
-    }
+    void deleteCase(final CaseData caseData) {
+        try {
+            log.info("About to delete case.reference:: {}", caseData.getReference());
 
-    private void deleteCaseData(final CaseData caseData) {
-        final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
-        if (caseDataEntity.isPresent()) {
-            remoteDisposeService.remoteDeleteAll(caseData);
-            caseEventRepository.deleteByCaseDataId(caseData.getId());
-            caseDataRepository.delete(caseDataEntity.get());
+            final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
+            if (caseDataEntity.isPresent()) {
+                remoteDisposeService.remoteDeleteAll(caseData);
+                caseEventRepository.deleteByCaseDataId(caseData.getId());
+                caseDataRepository.delete(caseDataEntity.get());
+                logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
+            }
+
+            log.info("Deleted case reference:: {}", caseData.getReference());
+        } catch (final Exception exception) { // Catch all exceptions
+            final String errorMessage = String.format(
+                "Could not delete case reference:: %s",
+                caseData.getReference()
+            );
+            log.error(errorMessage, exception);
+            processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
         }
     }
 }

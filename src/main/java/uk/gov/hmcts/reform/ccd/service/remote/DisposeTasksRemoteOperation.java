@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
@@ -15,14 +16,13 @@ import uk.gov.hmcts.reform.ccd.util.log.TasksDeletionRecordHolder;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "remote.tasks.enabled", havingValue = "true")
 public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
 
     private final SecurityUtil securityUtil;
     private final TasksDeletionRecordHolder tasksDeletionRecordHolder;
     private final TasksClient tasksClient;
 
-
-    @SuppressWarnings("java:S1135")
     @Override
     public void delete(final CaseData caseData) {
         final String caseRef = caseData.getReference().toString();
@@ -43,14 +43,13 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
                 throw new TasksDeletionException(errorMessage);
             }
         } catch (final Exception ex) {
-            // TODO: we need to re-throw the exception here once task deletion endpoint is enabled in PROD.
-            // TODO: rethrowing the exception will prevent the case deletion in CCD
             final String errorMessage = String.format("Error deleting tasks for case : %s", caseRef);
             log.error(errorMessage, ex);
+            throw new TasksDeletionException(errorMessage, ex);
         }
     }
 
-    ResponseEntity<Void> deleteTasks(final DeleteTasksRequest tasksDeletePostRequest) {
+    private ResponseEntity<Void> deleteTasks(final DeleteTasksRequest tasksDeletePostRequest) {
         return tasksClient.deleteTasks(
             securityUtil.getServiceAuthorization(),
             securityUtil.getIdamClientToken(),

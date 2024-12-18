@@ -52,13 +52,14 @@ public class WireMockStubs {
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
-        TASKS_DELETE.entrySet().forEach(entry ->
+        TASKS_DELETE.forEach((key, value) ->
                 wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
-                        .withRequestBody(equalToJson(new Gson()
-                                .toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(entry.getKey())))))
+                        .withRequestBody(equalToJson(
+                            new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(key))))
+                        )
                         .willReturn(aResponse()
-                                .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                                .withStatus(201))));
+                            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+                            .withStatus(value))));
     }
 
     private void setupLauStub(final WireMockServer wireMockServer) {
