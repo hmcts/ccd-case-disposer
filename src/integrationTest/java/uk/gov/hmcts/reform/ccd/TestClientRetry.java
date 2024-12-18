@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
@@ -14,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
 import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteCaseTasksAction;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteTasksRequest;
-import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.DocumentClient;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.LauClient;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.RoleAssignmentClient;
@@ -68,12 +66,6 @@ class TestClientRetry {
                                                     .withBody("Task Delete : Bad gateway")));
 
     }
-
-    @Autowired
-    protected Environment environment;
-
-    @Autowired
-    ParameterResolver parameterResolver;
 
     @Autowired
     private DocumentClient documentClient;
