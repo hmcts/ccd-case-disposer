@@ -20,6 +20,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
     @Autowired
     private ApplicationExecutor executor;
 
+
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenarios(final String deletableCaseTypes,

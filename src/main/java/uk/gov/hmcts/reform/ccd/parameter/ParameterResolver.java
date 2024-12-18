@@ -37,8 +37,4 @@ public interface ParameterResolver {
 
     Integer getRequestLimit();
 
-    default Integer feignClientRetryAttempts() {
-        return 3;
-    }
-
 }
