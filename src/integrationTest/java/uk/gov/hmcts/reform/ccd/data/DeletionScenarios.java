@@ -576,6 +576,18 @@ public class DeletionScenarios {
                         1504259907033001L, 1504259907033002L, 1504259907033003L, 1504259907033004L, 1504259907033005L,
                         1504259907033006L, 1504259907033007L, 1504259907033008L, 1504259907033009L, 1504259907033010L
                     ))
+                ),
+                Arguments.of(
+                    "TaskCaseType",
+                    null,
+                    "scenarios/S-034-deletable-failed-cases-due-to-task-delete-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907351192L),
+                    Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    Map.of("TaskCaseType", emptyList())
                 )
         );
     }

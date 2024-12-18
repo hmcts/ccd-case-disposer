@@ -10,11 +10,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteTasksRequest;
+import uk.gov.hmcts.reform.ccd.exception.TasksDeletionException;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.TasksClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.TasksDeletionRecordHolder;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
@@ -64,11 +65,11 @@ class DisposeTaskRemoteOperationTest {
 
     @Test
     void shouldThrowTasksDeletionExceptionWhenResponseStatusIsNot201() {
-        CaseData caseData = CaseData.builder().reference(12345L).build();
         ResponseEntity<Void> response = ResponseEntity.status(400).build();
 
         when(tasksClient.deleteTasks(any(), any(), any(DeleteTasksRequest.class))).thenReturn(response);
-
-        assertDoesNotThrow(() -> disposeTasksRemoteOperation.delete(caseData));
+        assertThatExceptionOfType(TasksDeletionException.class)
+            .isThrownBy(() -> disposeTasksRemoteOperation.delete(caseData))
+            .withMessage("Error deleting tasks for case : 1234567890123456");
     }
 }
