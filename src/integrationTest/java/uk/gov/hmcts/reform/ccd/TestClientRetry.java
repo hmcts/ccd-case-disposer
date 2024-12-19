@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -54,8 +55,8 @@ class TestClientRetry {
 
         WIREMOCK_SERVER.stubFor(post(urlPathMatching(DELETE_DOCUMENT_PATH))
                                     .willReturn(aResponse()
-                                                    .withStatus(502)
-                                                    .withBody("Document Delete : Bad gateway")));
+                                                    .withStatus(501)
+                                                    .withBody("Document Delete : Not Implemented")));
 
         WIREMOCK_SERVER.stubFor(post(urlPathMatching(DELETE_ROLE_PATH))
                                     .willReturn(aResponse()
@@ -64,13 +65,13 @@ class TestClientRetry {
 
         WIREMOCK_SERVER.stubFor(post(urlPathMatching(LAU_SAVE_PATH))
                                     .willReturn(aResponse()
-                                                    .withStatus(502)
-                                                    .withBody("Lau Save : Bad gateway")));
+                                                    .withStatus(503)
+                                                    .withBody("Lau Save : Service Unavailable")));
 
         WIREMOCK_SERVER.stubFor(post(urlPathMatching(DELETE_TASKS_PATH))
                                     .willReturn(aResponse()
-                                                    .withStatus(502)
-                                                    .withBody("Task Delete : Bad gateway")));
+                                                    .withStatus(504)
+                                                    .withBody("Task Delete : Gateway Timeout")));
 
         WIREMOCK_SERVER.stubFor(delete(urlPathMatching(DELETE_HEARINGS_PATH))
                                     .willReturn(aResponse()
@@ -95,7 +96,7 @@ class TestClientRetry {
     private HearingClient hearingClient;
 
     @Test
-    void testFeignDocumentClientRetry() throws InterruptedException {
+    void testFeignDocumentClientRetry() {
 
 
         DocumentsDeletePostRequest request = new DocumentsDeletePostRequest("12345");
@@ -103,41 +104,26 @@ class TestClientRetry {
         try {
             documentClient.deleteDocument("serviceAuthHeader", request);
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            Assertions.assertEquals("Feign Client Service unavailable: 501, Reason : Not Implemented", e.getMessage());
         }
         WIREMOCK_SERVER.verify(3, postRequestedFor(urlPathMatching(DELETE_DOCUMENT_PATH)));
-
     }
 
     @Test
-    void testFeignRoleAssignmentDeleteRetry() throws InterruptedException {
+    void testFeignRoleAssignmentDeleteRetry() {
 
         RoleAssignmentsPostRequest request = new RoleAssignmentsPostRequest("12345");
 
         try {
             roleAssignmentClient.deleteRoleAssignment("serviceAuthHeader","authHeader", request);
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            Assertions.assertEquals("Feign Client Service unavailable: 502, Reason : Bad Gateway", e.getMessage());
         }
         WIREMOCK_SERVER.verify(3, postRequestedFor(urlPathMatching(DELETE_ROLE_PATH)));
-
     }
 
     @Test
-    void testFeignTaskDeleteRetry() {
-        DeleteTasksRequest request = new DeleteTasksRequest(new DeleteCaseTasksAction("12345"));
-
-        try {
-            tasksClient.deleteTasks("serviceAuthHeader","authHeader",  request);
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-        WIREMOCK_SERVER.verify(3, postRequestedFor(urlPathMatching(DELETE_TASKS_PATH)));
-
-    }
-
-    @Test
-    void testFeignLauClientRetry() throws InterruptedException {
+    void testFeignLauClientRetry() {
         CaseActionPostRequestResponse request = new CaseActionPostRequestResponse(
             ActionLog.builder()
                 .userId("1")
@@ -151,10 +137,22 @@ class TestClientRetry {
         try {
             lauClient.postLauAudit("serviceAuthHeader", request);
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            Assertions.assertEquals("Feign Client Service unavailable: 503, Reason : Service Unavailable",
+                                    e.getMessage());
         }
         WIREMOCK_SERVER.verify(3, postRequestedFor(urlPathMatching(LAU_SAVE_PATH)));
+    }
 
+    @Test
+    void testFeignTaskDeleteRetry() {
+        DeleteTasksRequest request = new DeleteTasksRequest(new DeleteCaseTasksAction("12345"));
+
+        try {
+            tasksClient.deleteTasks("serviceAuthHeader","authHeader",  request);
+        } catch (Exception e) {
+            Assertions.assertEquals("Feign Client Service unavailable: 504, Reason : Gateway Timeout", e.getMessage());
+        }
+        WIREMOCK_SERVER.verify(3, postRequestedFor(urlPathMatching(DELETE_TASKS_PATH)));
     }
 
     @Test
@@ -165,12 +163,9 @@ class TestClientRetry {
         try {
             hearingClient.deleteHearing("authHeader", "serviceAuthHeader", request);
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            Assertions.assertEquals("Feign Client Service unavailable: 502, Reason : Bad Gateway", e.getMessage());
         }
         WIREMOCK_SERVER.verify(3, deleteRequestedFor(urlPathMatching(DELETE_HEARINGS_PATH)));
-
     }
-
-
 }
 

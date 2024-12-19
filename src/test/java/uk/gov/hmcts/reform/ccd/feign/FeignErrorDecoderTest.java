@@ -33,7 +33,7 @@ public class FeignErrorDecoderTest {
         Exception exception = errorDecoder.decode("methodKey", response);
 
         assertInstanceOf(Exception.class, exception);
-        assertEquals("Non Retryable Exception: 500 Reason : Internal Server Error",
+        assertEquals("Non Retryable Exception: 500, Reason : Internal Server Error",
                      exception.getMessage());
     }
 
@@ -49,7 +49,7 @@ public class FeignErrorDecoderTest {
         Exception exception = errorDecoder.decode("methodKey", response);
 
         assertInstanceOf(Exception.class, exception);
-        assertEquals("Non Retryable Exception: 400 Reason : Bad Request",
+        assertEquals("Non Retryable Exception: 400, Reason : Bad Request",
                      exception.getMessage());
     }
 
@@ -65,7 +65,7 @@ public class FeignErrorDecoderTest {
         Exception exception = errorDecoder.decode("methodKey", response);
 
         assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 502 Reason : Bad Gateway Error",
+        assertEquals("Feign Client Service unavailable: 502, Reason : Bad Gateway Error",
                      exception.getMessage());
     }
 
@@ -81,7 +81,7 @@ public class FeignErrorDecoderTest {
         Exception exception = errorDecoder.decode("methodKey", response);
 
         assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 501 Reason : Not Implemented Error",
+        assertEquals("Feign Client Service unavailable: 501, Reason : Not Implemented Error",
                      exception.getMessage());
     }
 
@@ -97,7 +97,7 @@ public class FeignErrorDecoderTest {
         Exception exception = errorDecoder.decode("methodKey", response);
 
         assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 503 Reason : Service Unavailable Error",
+        assertEquals("Feign Client Service unavailable: 503, Reason : Service Unavailable Error",
                      exception.getMessage());
     }
 
@@ -113,7 +113,7 @@ public class FeignErrorDecoderTest {
         Exception exception = errorDecoder.decode("methodKey", response);
 
         assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 504 Reason : Gateway Timeout Error",
+        assertEquals("Feign Client Service unavailable: 504, Reason : Gateway Timeout Error",
                      exception.getMessage());
     }
 
