@@ -195,6 +195,7 @@ dependencyManagement {
         dependencySet(group: 'org.yaml', version: '2.3') {
             entry 'snakeyaml'
         }
+
         dependencySet(group: 'ch.qos.logback', version: '1.5.14') {
           entry 'logback-core'
           entry 'logback-classic'
@@ -307,6 +308,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.6.2'
+    implementation group: 'ch.qos.logback.access', name: 'common', version: '2.0.3'
 
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok

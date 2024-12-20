@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
-import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.DocumentClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
@@ -43,7 +42,7 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
                         .format("Unexpected response code %d while deleting documents for case: %s",
                                 documentsDeleteResponse.getStatusCode().value(), caseData.getReference());
 
-                    throw new HearingDeletionException(errorMessage);
+                    throw new DocumentDeletionException(errorMessage);
                 }
 
             } catch (final Exception ex) {

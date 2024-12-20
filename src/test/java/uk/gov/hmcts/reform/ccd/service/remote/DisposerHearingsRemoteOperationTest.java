@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import feign.Response;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
@@ -19,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -50,9 +50,8 @@ class DisposerHearingsRemoteOperationTest {
 
     @Test
     void shouldDeleteHearingsSuccessfully() {
-        Response mockResponse = mock(Response.class);
+        ResponseEntity<Void> mockResponse = new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
-        when(mockResponse.status()).thenReturn(204);
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
         when(securityUtil.getIdamClientToken()).thenReturn("123");
         when(securityUtil.getServiceAuthorization()).thenReturn("456");
@@ -68,7 +67,7 @@ class DisposerHearingsRemoteOperationTest {
                                             List.of(String.valueOf(caseData.getReference())));
         verify(hearingDeletionRecordHolder)
             .setHearingDeletionResults(List.of(String.valueOf(caseData.getReference())).getFirst(),
-                                       mockResponse.status());
+                                       mockResponse.getStatusCode().value());
     }
 
     @Test
@@ -100,8 +99,7 @@ class DisposerHearingsRemoteOperationTest {
 
     @Test
     void shouldThrowExceptionWhenResponseCodeNot204() {
-        Response mockResponse = mock(Response.class);
-        when(mockResponse.status()).thenReturn(500);
+        ResponseEntity<Void> mockResponse = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
         when(securityUtil.getIdamClientToken()).thenReturn("123");
         when(securityUtil.getServiceAuthorization()).thenReturn("456");
