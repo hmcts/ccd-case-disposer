@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import feign.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
@@ -30,14 +30,14 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
         if (caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
             final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
             try {
-                final Response deleteHearingsResponse = deleteHearings(caseRef);
+                final ResponseEntity<Void> deleteHearingsResponse = deleteHearings(caseRef);
 
-                logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.status());
+                logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.getStatusCode().value());
 
-                if (deleteHearingsResponse.status() != NO_CONTENT.value()) {
+                if (deleteHearingsResponse.getStatusCode().value() != NO_CONTENT.value()) {
                     final String errorMessage = String
                             .format("Unexpected response code %d while deleting hearing for case: %s",
-                            deleteHearingsResponse.status(), caseRef);
+                            deleteHearingsResponse.getStatusCode().value(), caseRef);
 
                     throw new HearingDeletionException(errorMessage);
                 }
@@ -54,7 +54,7 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
     }
 
 
-    private Response deleteHearings(final List<String> caseRefs) {
+    private ResponseEntity<Void> deleteHearings(final List<String> caseRefs) {
         return hearingClient.deleteHearing(securityUtil.getIdamClientToken(),
                 securityUtil.getServiceAuthorization(),
                 caseRefs);
