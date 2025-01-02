@@ -53,23 +53,17 @@ public class WireMockStubs {
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
-        ResponseDefinitionBuilder response = aResponse()
-            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-            .withStatus(201);
-
         String body = new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction("${json-unit.any-string}")));
         wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
             .withRequestBody(equalToJson(body))
-            .willReturn(response));
+            .willReturn(buildResponseDefinition(201)));
 
         TASKS_DELETE.forEach((key, value) ->
                 wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
                         .withRequestBody(
                             equalToJson(new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(key))))
                         )
-                        .willReturn(aResponse()
-                            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                            .withStatus(value))));
+                        .willReturn(buildResponseDefinition(value))));
     }
 
     private void setupLauStub(final WireMockServer wireMockServer) {
@@ -96,41 +90,29 @@ public class WireMockStubs {
     }
 
     private void setupDeleteRolesStub(final WireMockServer wireMockServer) {
-        ResponseDefinitionBuilder response = aResponse()
-            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-            .withStatus(200);
-
         String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
         wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
             .withRequestBody(equalToJson(body))
-            .willReturn(response));
+            .willReturn(buildResponseDefinition(200)));
 
         ROLE_DELETE.forEach((key, value) ->
                wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
                       .withRequestBody(
                           equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
-                      .willReturn(aResponse()
-                              .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                              .withStatus(value))));
+                      .willReturn(buildResponseDefinition(value))));
     }
 
     private void setupQueryRolesStub(final WireMockServer wireMockServer) {
-        ResponseDefinitionBuilder response = aResponse()
-            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-            .withStatus(200);
-
         String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
         wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
                                    .withRequestBody(equalToJson(body))
-                                   .willReturn(response));
+                                   .willReturn(buildResponseDefinition(200)));
 
         ROLE_QUERY.forEach((key, value) ->
                  wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
                         .withRequestBody(
                             equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
-                        .willReturn(aResponse()
-                            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                            .withStatus(value))));
+                        .willReturn(buildResponseDefinition(value))));
     }
 
     private void setupHearingsStub(final WireMockServer wireMockServer) {
@@ -140,6 +122,13 @@ public class WireMockStubs {
                                           .willReturn(aResponse().withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
                                                           .withBody(new Gson().toJson(entry.getValue()))
                                                           .withStatus(entry.getValue()))));
+    }
+
+
+    private ResponseDefinitionBuilder buildResponseDefinition(int status) {
+        return aResponse()
+            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+            .withStatus(status);
     }
 
 
