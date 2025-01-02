@@ -24,7 +24,7 @@ public class TasksRemoteDeletionVerifier implements RemoteDeletionVerifier {
             }
 
             final int tasksDeletionResults = tasksDeletionRecordHolder
-                .getTasksDeletionResults(Long.toString(caseRef));
+                .getTasksDeletionResults(caseRefStr);
             assertThat(tasksDeletionResults).isEqualTo(expectedResult);
         });
     }

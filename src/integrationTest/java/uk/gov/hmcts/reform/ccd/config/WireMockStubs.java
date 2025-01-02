@@ -96,25 +96,41 @@ public class WireMockStubs {
     }
 
     private void setupDeleteRolesStub(final WireMockServer wireMockServer) {
-        ROLE_DELETE.entrySet().forEach(entry ->
-                wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
-                        .withRequestBody(equalToJson(new Gson()
-                                .toJson(new RoleAssignmentsPostRequest(entry.getKey()))))
-                        .willReturn(aResponse()
-                                .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                                .withStatus(entry.getValue()))));
+        ResponseDefinitionBuilder response = aResponse()
+            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+            .withStatus(200);
+
+        String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
+        wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
+           .withRequestBody(equalToJson(body))
+           .willReturn(response));
+
+        ROLE_DELETE.forEach((key, value) ->
+               wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
+                      .withRequestBody(
+                          equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
+                      .willReturn(aResponse()
+                              .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+                              .withStatus(value))));
     }
 
     private void setupQueryRolesStub(final WireMockServer wireMockServer) {
-        ROLE_QUERY.entrySet().forEach(entry ->
-               wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
-                          .withRequestBody(equalToJson(new Gson()
-                          .toJson(new RoleAssignmentsPostRequest(entry.getKey()))))
-                          .willReturn(aResponse()
-                                          .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                                          .withBody(new Gson()
-                                                        .toJson(roleAssignmentsResponse))
-                                          .withStatus(entry.getValue()))));
+        ResponseDefinitionBuilder response = aResponse()
+            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+            .withStatus(200);
+
+        String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
+        wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
+                                   .withRequestBody(equalToJson(body))
+                                   .willReturn(response));
+
+        ROLE_QUERY.forEach((key, value) ->
+                 wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
+                        .withRequestBody(
+                            equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
+                        .willReturn(aResponse()
+                            .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+                            .withStatus(value))));
     }
 
     private void setupHearingsStub(final WireMockServer wireMockServer) {

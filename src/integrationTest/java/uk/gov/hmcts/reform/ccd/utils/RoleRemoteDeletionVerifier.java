@@ -8,6 +8,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.TASKS_DELETE;
 
 @Component
 public class RoleRemoteDeletionVerifier implements RemoteDeletionVerifier {
@@ -17,13 +18,16 @@ public class RoleRemoteDeletionVerifier implements RemoteDeletionVerifier {
 
     public void verifyRemoteDeletion(final List<Long> caseRefDeletedRoles) {
         caseRefDeletedRoles.forEach(caseRef -> {
-            final int caseRolesDeletionMocks =
-                ROLE_DELETE.get(Long.toString(caseRef));
+            String caseRefStr = Long.toString(caseRef);
+            int expectedResult = 200;
+            if (ROLE_DELETE.containsKey(caseRefStr)) {
+                expectedResult = TASKS_DELETE.get(caseRefStr);
+            }
 
             final int caseRolesDeletionActualResults = roleDeletionRecordHolder
-                .getCaseRolesDeletionResults(Long.toString(caseRef));
+                .getCaseRolesDeletionResults(caseRefStr);
 
-            assertThat(caseRolesDeletionActualResults).isEqualTo(caseRolesDeletionMocks);
+            assertThat(caseRolesDeletionActualResults).isEqualTo(expectedResult);
         });
     }
 }
