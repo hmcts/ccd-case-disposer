@@ -351,6 +351,7 @@ public class TestConstants {
             Map.entry("1504259907351193", buildCaseActionPostRequest("1504259907351193"))
     );
 
+    // Put only responses that are not 201. Any requests with case refs not specified here will return 201.
     public static final Map<String, Integer> TASKS_DELETE = Map.ofEntries(
             Map.entry("1504259907351193", HttpStatus.BAD_GATEWAY.value())
     );

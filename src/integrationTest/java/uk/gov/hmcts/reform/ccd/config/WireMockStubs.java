@@ -53,11 +53,11 @@ public class WireMockStubs {
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
-        String body = new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction("${json-unit.any-string}")));
         ResponseDefinitionBuilder response = aResponse()
             .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
             .withStatus(201);
 
+        String body = new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction("${json-unit.any-string}")));
         wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
             .withRequestBody(equalToJson(body))
             .willReturn(response));
