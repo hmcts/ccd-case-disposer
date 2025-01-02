@@ -102,8 +102,8 @@ public class WireMockStubs {
 
         String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
         wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
-           .withRequestBody(equalToJson(body))
-           .willReturn(response));
+            .withRequestBody(equalToJson(body))
+            .willReturn(response));
 
         ROLE_DELETE.forEach((key, value) ->
                wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
