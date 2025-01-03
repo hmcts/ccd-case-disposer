@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> {
+public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long>,CaseDataInsertRepositoryCustom {
 
     @Query("SELECT c FROM CaseDataEntity c WHERE c.resolvedTtl < CURRENT_DATE "
             + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")

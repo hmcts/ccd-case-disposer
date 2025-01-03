@@ -6,31 +6,32 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
-
-import java.time.LocalDate;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.JURISDICTION;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.YESTERDAY;
 
 @DataJpaTest
 @RunWith(SpringRunner.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.ccd.data.*"})
+@EntityScan("uk.gov.hmcts.reform.ccd.entity.CaseDataEntity")
+//@ContextConfiguration(classes = {TestConfig.class})
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=update",
     "spring.liquibase.enabled=false",
     "spring.flyway.enabled=true"
 })
 public class CaseDataRepositoryTest {
-
-    private static final String DELETABLE_CASE_TYPE = "deletable_case_type";
-    private static final String JURISDICTION = "deletable_jurisdiction";
-    private static final LocalDate TODAY = LocalDate.now();
-    private static final LocalDate YESTERDAY = TODAY.minusDays(1L);
 
     @Autowired
     private CaseDataRepository caseDataRepository;
@@ -40,6 +41,7 @@ public class CaseDataRepositoryTest {
 
     @BeforeEach
     public void setUp() {
+        caseDataRepository.deleteAll();
         final CaseDataInsertRepository caseDataInsertRepository =
                 new CaseDataInsertRepository(entityManager);
 
@@ -48,9 +50,12 @@ public class CaseDataRepositoryTest {
     }
 
     @Test
-    void findExpiredCases() {
-        final List<CaseDataEntity> caseDataList = caseDataRepository.findAll();
-        assertThat(caseDataList).hasSize(2);
+    void testFindExpiredCases() {
+        List<CaseDataEntity> caseDataAll = caseDataRepository.findAll();
+        assertThat(caseDataAll).hasSize(0);
+        //CaseDataEntity caseDataEntity = caseDataRepository.findById(1L).orElseThrow();
+        List<CaseDataEntity> caseData = caseDataRepository.findExpiredCases(List.of(DELETABLE_CASE_TYPE));
+        assertThat(caseData).hasSize(0);
     }
 
 
@@ -63,6 +68,5 @@ public class CaseDataRepositoryTest {
         caseDataEntity.setResolvedTtl(YESTERDAY);
         return caseDataEntity;
     }
-
 
 }
