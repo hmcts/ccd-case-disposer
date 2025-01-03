@@ -3,7 +3,7 @@ spring:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
     url: jdbc:tc:postgresql:15:///localhost?stringtype=unspecified
   flyway:
-    locations: classpath:db/migration
+    locations: classpath:/db/migration
     enabled: true
     out-of-order: true
     ignore-missing-migrations: true
