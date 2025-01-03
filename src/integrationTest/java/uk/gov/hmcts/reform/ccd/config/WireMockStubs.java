@@ -8,13 +8,14 @@ import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
+import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteCaseTasksAction;
 import uk.gov.hmcts.reform.ccd.data.tm.DeleteTasksRequest;
 
 import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -22,7 +23,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static feign.form.ContentProcessor.CONTENT_TYPE_HEADER;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.HEARINGS_DELETE;
-import static uk.gov.hmcts.reform.ccd.constants.TestConstants.LAU_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.TASKS_DELETE;
@@ -67,14 +67,20 @@ public class WireMockStubs {
     }
 
     private void setupLauStub(final WireMockServer wireMockServer) {
-        LAU_QUERY.entrySet().forEach(entry ->
-                wireMockServer.stubFor(post(urlPathMatching(LAU_SAVE_PATH))
-                        .withRequestBody(containing(entry.getKey()))
-                        .willReturn(aResponse()
-                                .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                                .withBody(new Gson()
-                                        .toJson(entry.getValue()))
-                                .withStatus(201))));
+        ActionLog actionLogExample = ActionLog.builder()
+            .caseAction("DELETE")
+            .caseRef("${json-unit.any-string}")
+            .caseJurisdictionId("BEFTA_MASTER")
+            .build();
+        String body = new Gson().toJson(new CaseActionPostRequestResponse(actionLogExample));
+
+        // Return request body in response
+        wireMockServer.stubFor(post(urlPathMatching(LAU_SAVE_PATH))
+            .withRequestBody(equalToJson(body, true, true))
+            .willReturn(
+                buildResponseDefinition(201, "{{request.body}}")
+                    .withTransformers("response-template")
+            ));
     }
 
     private void setupDeleteDocumentsStub(final WireMockServer wireMockServer) {
@@ -82,11 +88,8 @@ public class WireMockStubs {
                 wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
                         .withRequestBody(equalToJson(new Gson()
                                 .toJson(new DocumentsDeletePostRequest(entry.getKey()))))
-                        .willReturn(aResponse()
-                                .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                                .withBody(new Gson()
-                                        .toJson(entry.getValue()))
-                                .withStatus(200))));
+                        .willReturn(buildResponseDefinition(
+                            200, new Gson().toJson(entry.getValue())))));
     }
 
     private void setupDeleteRolesStub(final WireMockServer wireMockServer) {
@@ -119,15 +122,18 @@ public class WireMockStubs {
         HEARINGS_DELETE.entrySet().forEach(entry ->
                wireMockServer.stubFor(delete(urlPathMatching(HEARINGS_DELETE_PATH))
                                           .withRequestBody(equalToJson("[\"" + entry.getKey() + "\"]"))
-                                          .willReturn(aResponse().withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
-                                                          .withBody(new Gson().toJson(entry.getValue()))
-                                                          .withStatus(entry.getValue()))));
+                                          .willReturn(buildResponseDefinition(
+                                              entry.getValue(), new Gson().toJson(entry.getValue())))));
     }
 
-
     private ResponseDefinitionBuilder buildResponseDefinition(int status) {
+        return buildResponseDefinition(status, null);
+    }
+
+    private ResponseDefinitionBuilder buildResponseDefinition(int status, String body) {
         return aResponse()
             .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
+            .withBody(body)
             .withStatus(status);
     }
 

@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.ccd.constants;
 
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
-import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
-import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 
 import java.util.Map;
 
@@ -107,92 +105,6 @@ public class TestConstants {
     public static final Map<String, Integer> ROLE_QUERY = Map.ofEntries(
     );
 
-    public static Map<String, CaseActionPostRequestResponse> LAU_QUERY = Map.ofEntries(
-            Map.entry("1504259907353529", buildCaseActionPostRequest("1504259907353529")),
-            Map.entry("1504259907353528", buildCaseActionPostRequest("1504259907353528")),
-            Map.entry("1504259907353526", buildCaseActionPostRequest("1504259907353526")),
-            Map.entry("1504259907353525", buildCaseActionPostRequest("1504259907353525")),
-            Map.entry("1504259907353524", buildCaseActionPostRequest("1504259907353524")),
-            Map.entry("1504259907353523", buildCaseActionPostRequest("1504259907353523")),
-            Map.entry("1504259907353522", buildCaseActionPostRequest("1504259907353522")),
-            Map.entry("1504259907353519", buildCaseActionPostRequest("1504259907353519")),
-            Map.entry("1504259907353518", buildCaseActionPostRequest("1504259907353518")),
-            Map.entry("1504259907353527", buildCaseActionPostRequest("1504259907353527")),
-            Map.entry("1504259907351111", buildCaseActionPostRequest("1504259907351111")),
-            Map.entry("1504259907350000", buildCaseActionPostRequest("1504259907350000")),
-            Map.entry("4331434790352648", buildCaseActionPostRequest("4331434790352648")),
-            Map.entry("7344069216690734", buildCaseActionPostRequest("7344069216690734")),
-            Map.entry("6446787681450550", buildCaseActionPostRequest("6446787681450550")),
-            Map.entry("1504259907351139", buildCaseActionPostRequest("1504259907351139")),
-            Map.entry("1504259907351138", buildCaseActionPostRequest("1504259907351138")),
-            Map.entry("1504259907351137", buildCaseActionPostRequest("1504259907351137")),
-            Map.entry("1504259907351136", buildCaseActionPostRequest("1504259907351136")),
-            Map.entry("1504259907351135", buildCaseActionPostRequest("1504259907351135")),
-            Map.entry("1504259907351133", buildCaseActionPostRequest("1504259907351133")),
-            Map.entry("1504259907351132", buildCaseActionPostRequest("1504259907351132")),
-            Map.entry("1504259907351131", buildCaseActionPostRequest("1504259907351131")),
-            Map.entry("1504259907351130", buildCaseActionPostRequest("1504259907351130")),
-            Map.entry("1504259907351129", buildCaseActionPostRequest("1504259907351129")),
-            Map.entry("1504259907351189", buildCaseActionPostRequest("1504259907351189")),
-            Map.entry("1504259907351190", buildCaseActionPostRequest("1504259907351190")),
-            Map.entry("1504259907351191", buildCaseActionPostRequest("1504259907351191")),
-            Map.entry("1504259907351188", buildCaseActionPostRequest("1504259907351188")),
-            Map.entry("1504259907351187", buildCaseActionPostRequest("1504259907351187")),
-            Map.entry("1504259907351186", buildCaseActionPostRequest("1504259907351186")),
-            Map.entry("1504259907351181", buildCaseActionPostRequest("1504259907351181")),
-            Map.entry("1504259907351180", buildCaseActionPostRequest("1504259907351180")),
-            Map.entry("1504259907351239", buildCaseActionPostRequest("1504259907351239")),
-            Map.entry("1504259907351238", buildCaseActionPostRequest("1504259907351238")),
-            Map.entry("1504259907351237", buildCaseActionPostRequest("1504259907351237")),
-            Map.entry("1504259907351236", buildCaseActionPostRequest("1504259907351236")),
-            Map.entry("1504259907351233", buildCaseActionPostRequest("1504259907351233")),
-            Map.entry("1504259907351232", buildCaseActionPostRequest("1504259907351232")),
-            Map.entry("1504259907351231", buildCaseActionPostRequest("1504259907351231")),
-            Map.entry("1504259907351230", buildCaseActionPostRequest("1504259907351230")),
-            Map.entry("1504259907351229", buildCaseActionPostRequest("1504259907351229")),
-            Map.entry("1504259907445511", buildCaseActionPostRequest("1504259907445511")),
-            Map.entry("1504259907445512", buildCaseActionPostRequest("1504259907445512")),
-            Map.entry("1504259907445513", buildCaseActionPostRequest("1504259907445513")),
-            Map.entry("1504259907445514", buildCaseActionPostRequest("1504259907445514")),
-            Map.entry("1504259907351171", buildCaseActionPostRequest("1504259907351171")),
-            Map.entry("1504259907351172", buildCaseActionPostRequest("1504259907351172")),
-            Map.entry("1504259907351173", buildCaseActionPostRequest("1504259907351173")),
-            Map.entry("1504259907351174", buildCaseActionPostRequest("1504259907351174")),
-            Map.entry("1504259907351175", buildCaseActionPostRequest("1504259907351175")),
-            Map.entry("1504259907351176", buildCaseActionPostRequest("1504259907351176")),
-            Map.entry("1504259907351177", buildCaseActionPostRequest("1504259907351177")),
-            Map.entry("1504259907351178", buildCaseActionPostRequest("1504259907351178")),
-            Map.entry("1504259907351179", buildCaseActionPostRequest("1504259907351179")),
-            Map.entry("1504259907351161", buildCaseActionPostRequest("1504259907351161")),
-            Map.entry("1504259907351134", buildCaseActionPostRequest("1504259907351134")),
-            Map.entry("1504259907351182", buildCaseActionPostRequest("1504259907351182")),
-            Map.entry("1504259907351183", buildCaseActionPostRequest("1504259907351183")),
-            Map.entry("1504259907351184", buildCaseActionPostRequest("1504259907351184")),
-            Map.entry("1504259907351185", buildCaseActionPostRequest("1504259907351185")),
-            Map.entry("1504259907032001", buildCaseActionPostRequest("1504259907032001")),
-            Map.entry("1504259907032002", buildCaseActionPostRequest("1504259907032002")),
-            Map.entry("1504259907032003", buildCaseActionPostRequest("1504259907032003")),
-            Map.entry("1504259907032004", buildCaseActionPostRequest("1504259907032004")),
-            Map.entry("1504259907032005", buildCaseActionPostRequest("1504259907032005")),
-            Map.entry("1504259907032006", buildCaseActionPostRequest("1504259907032006")),
-            Map.entry("1504259907032007", buildCaseActionPostRequest("1504259907032007")),
-            Map.entry("1504259907032008", buildCaseActionPostRequest("1504259907032008")),
-            Map.entry("1504259907032009", buildCaseActionPostRequest("1504259907032009")),
-            Map.entry("1504259907032010", buildCaseActionPostRequest("1504259907032010")),
-            Map.entry("1504259907033001", buildCaseActionPostRequest("1504259907033001")),
-            Map.entry("1504259907033002", buildCaseActionPostRequest("1504259907033002")),
-            Map.entry("1504259907033003", buildCaseActionPostRequest("1504259907033003")),
-            Map.entry("1504259907033004", buildCaseActionPostRequest("1504259907033004")),
-            Map.entry("1504259907033005", buildCaseActionPostRequest("1504259907033005")),
-            Map.entry("1504259907033006", buildCaseActionPostRequest("1504259907033006")),
-            Map.entry("1504259907033007", buildCaseActionPostRequest("1504259907033007")),
-            Map.entry("1504259907033008", buildCaseActionPostRequest("1504259907033008")),
-            Map.entry("1504259907033009", buildCaseActionPostRequest("1504259907033009")),
-            Map.entry("1504259907033010", buildCaseActionPostRequest("1504259907033010")),
-            Map.entry("1504259907351192", buildCaseActionPostRequest("1504259907351192")),
-            Map.entry("1504259907351193", buildCaseActionPostRequest("1504259907351193"))
-    );
-
     // Put only responses that are not 201. Any requests with case refs not specified here will return 201.
     public static final Map<String, Integer> TASKS_DELETE = Map.ofEntries(
             Map.entry("1504259907351193", HttpStatus.BAD_GATEWAY.value())
@@ -205,14 +117,4 @@ public class TestConstants {
         Map.entry("1504259907445514", HttpStatus.NOT_FOUND.value())
     );
 
-    private static CaseActionPostRequestResponse buildCaseActionPostRequest(final String caseRef) {
-        return new CaseActionPostRequestResponse(ActionLog.builder()
-                .userId("123")
-                .caseAction("DELETE")
-                .caseTypeId("FT_MasterCaseType")
-                .caseRef(caseRef)
-                .caseJurisdictionId("BEFTA_MASTER")
-                .timestamp("2021-08-23T22:20:05.023Z")
-                .build());
-    }
 }
