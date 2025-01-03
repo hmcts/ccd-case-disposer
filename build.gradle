@@ -119,7 +119,7 @@ check.dependsOn integration
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '10.21.0'
+  toolVersion = '10.21.1'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
@@ -196,7 +196,7 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
-        dependencySet(group: 'ch.qos.logback', version: '1.5.14') {
+        dependencySet(group: 'ch.qos.logback', version: '1.5.15') {
           entry 'logback-core'
           entry 'logback-classic'
         }
