@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
+import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
 import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
@@ -84,12 +85,17 @@ public class WireMockStubs {
     }
 
     private void setupDeleteDocumentsStub(final WireMockServer wireMockServer) {
-        DOCUMENT_DELETE.entrySet().forEach(entry ->
+        String body = new Gson().toJson(new DocumentsDeletePostRequest("${json-unit.any-string}"));
+        wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
+            .withRequestBody(equalToJson(body))
+            .willReturn(buildResponseDefinition(
+                200,
+                new Gson().toJson(new CaseDocumentsDeletionResults(8, 8)))));
+
+        DOCUMENT_DELETE.forEach((key, value) ->
                 wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
-                        .withRequestBody(equalToJson(new Gson()
-                                .toJson(new DocumentsDeletePostRequest(entry.getKey()))))
-                        .willReturn(buildResponseDefinition(
-                            200, new Gson().toJson(entry.getValue())))));
+                        .withRequestBody(equalToJson(new Gson().toJson(new DocumentsDeletePostRequest(key))))
+                        .willReturn(buildResponseDefinition(200, new Gson().toJson(value)))));
     }
 
     private void setupDeleteRolesStub(final WireMockServer wireMockServer) {
@@ -100,30 +106,32 @@ public class WireMockStubs {
 
         ROLE_DELETE.forEach((key, value) ->
                wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
-                      .withRequestBody(
-                          equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
+                      .withRequestBody(equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
                       .willReturn(buildResponseDefinition(value))));
     }
 
     private void setupQueryRolesStub(final WireMockServer wireMockServer) {
         String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
         wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
-                                   .withRequestBody(equalToJson(body))
-                                   .willReturn(buildResponseDefinition(200)));
+            .withRequestBody(equalToJson(body))
+            .willReturn(buildResponseDefinition(200)));
 
         ROLE_QUERY.forEach((key, value) ->
                  wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
-                        .withRequestBody(
-                            equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
-                        .willReturn(buildResponseDefinition(value))));
+                         .withRequestBody(equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
+                         .willReturn(buildResponseDefinition(value))));
     }
 
     private void setupHearingsStub(final WireMockServer wireMockServer) {
-        HEARINGS_DELETE.entrySet().forEach(entry ->
+        String body = "[\"${json-unit.any-string}\"]";
+        wireMockServer.stubFor(delete(urlPathMatching(HEARINGS_DELETE_PATH))
+            .withRequestBody(equalToJson(body))
+            .willReturn(buildResponseDefinition(204)));
+
+        HEARINGS_DELETE.forEach((key, value) ->
                wireMockServer.stubFor(delete(urlPathMatching(HEARINGS_DELETE_PATH))
-                                          .withRequestBody(equalToJson("[\"" + entry.getKey() + "\"]"))
-                                          .willReturn(buildResponseDefinition(
-                                              entry.getValue(), new Gson().toJson(entry.getValue())))));
+                          .withRequestBody(equalToJson("[\"" + key + "\"]"))
+                          .willReturn(buildResponseDefinition(value))));
     }
 
     private ResponseDefinitionBuilder buildResponseDefinition(int status) {
