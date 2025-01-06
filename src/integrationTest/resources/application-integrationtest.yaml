@@ -8,6 +8,7 @@ spring:
     out-of-order: true
     ignore-missing-migrations: true
     baseline-version: 0001
+    mixed: true
 
 flyway:
   noop:

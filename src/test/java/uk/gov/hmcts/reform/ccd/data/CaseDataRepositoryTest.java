@@ -6,32 +6,32 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.JURISDICTION;
-import static uk.gov.hmcts.reform.ccd.fixture.TestData.YESTERDAY;
+import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.reform.ccd.fixture.TestData.*;
 
 @DataJpaTest
 @RunWith(SpringRunner.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.ccd.data.*"})
-@EntityScan("uk.gov.hmcts.reform.ccd.entity.CaseDataEntity")
-//@ContextConfiguration(classes = {TestConfig.class})
+@ActiveProfiles("test")
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=update",
     "spring.liquibase.enabled=false",
-    "spring.flyway.enabled=true"
+    "spring.flyway.enabled=true",
+    "spring.flyway.validateMigrationNaming=true"
 })
 public class CaseDataRepositoryTest {
+
+    /*@Autowired
+    private Flyway flyway;*/
 
     @Autowired
     private CaseDataRepository caseDataRepository;
@@ -41,6 +41,9 @@ public class CaseDataRepositoryTest {
 
     @BeforeEach
     public void setUp() {
+        //flyway.clean();
+       // flyway.migrate();
+
         caseDataRepository.deleteAll();
         final CaseDataInsertRepository caseDataInsertRepository =
                 new CaseDataInsertRepository(entityManager);
@@ -68,5 +71,4 @@ public class CaseDataRepositoryTest {
         caseDataEntity.setResolvedTtl(YESTERDAY);
         return caseDataEntity;
     }
-
 }
