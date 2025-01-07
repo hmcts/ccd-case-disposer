@@ -35,14 +35,5 @@ public class CaseDataInsertRepository {
 
         insertQuery.getSingleResult();
 
-
-        /*entityManager.createNativeQuery(INSERT_QUERY)
-            .setParameter("id", caseDataEntity.getId())
-            .setParameter("reference", caseDataEntity.getReference())
-            .setParameter("caseType", caseDataEntity.getCaseType())
-            .setParameter("resolvedTtl", caseDataEntity.getResolvedTtl())
-            .setParameter("jurisdiction", caseDataEntity.getJurisdiction())
-            .getSingleResult();*/
-
     }
 }

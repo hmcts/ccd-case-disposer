@@ -30,9 +30,6 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.*;
 })
 public class CaseDataRepositoryTest {
 
-    /*@Autowired
-    private Flyway flyway;*/
-
     @Autowired
     private CaseDataRepository caseDataRepository;
 
@@ -41,9 +38,6 @@ public class CaseDataRepositoryTest {
 
     @BeforeEach
     public void setUp() {
-        //flyway.clean();
-       // flyway.migrate();
-
         caseDataRepository.deleteAll();
         final CaseDataInsertRepository caseDataInsertRepository =
                 new CaseDataInsertRepository(entityManager);
