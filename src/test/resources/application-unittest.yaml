@@ -1,0 +1,78 @@
+spring:
+  application:
+    name: ccd-case-disposer
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:15:///localhost:ccd_data_store
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+    out-of-order: true
+    ignore-missing-migrations: true
+    placeholders:
+      DATA_STORE_DB_PASSWORD: ccdpass
+
+logging:
+  level:
+    root: ERROR
+    org.flywaydb: DEBUG
+
+flyway:
+  noop:
+    strategy: "false"
+
+elasticsearch:
+  hosts: ${ELASTIC_SEARCH_DATA_NODES_HOSTS:"http://localhost:9200"}
+  request.timeout: ${ELASTICSEARCH_REQUEST_TIMEOUT:6000}
+  global.search:
+    index.name: ${GLOBAL_SEARCH_INDEX_NAME:global_search}
+  cases.index:
+    type: ${ELASTICSEARCH_CASE_INDEX_TYPE:_doc}
+    name.pattern: ${ELASTICSEARCH_CASES_INDEX_NAME_PATTERN:%s_cases}
+
+
+deletable.case.types: ${DELETE_CASE_TYPES:}
+simulated.case.types: ${SIMULATED_CASE_TYPES:}
+
+request.limit: ${CCD_DISPOSER_REQUEST_LIMIT:1000}
+
+remote:
+  document.store:
+    host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
+  role.assignment:
+    host: ${ROLE_ASSIGNMENT_HOST:http://localhost:4096}
+  log.and.audit:
+    host: ${LOG_AND_AUDIT_HOST:http://localhost:4550}
+  tasks:
+    enabled: ${TASKS_ENABLED:false}
+    host: ${TASKS_HOST:http://localhost:4000}
+  hearing:
+    host: ${HEARING_RECORDING_HOST:http://localhost:4000}
+    case.type: HearingRecordings
+
+idam:
+  api:
+    url: ${IDAM_API_URL:http://localhost:5000}
+    username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
+  s2s-auth:
+    name: ${IDAM_S2S_NAME:ccd_case_disposer}
+    url: ${IDAM_S2S_URL:http://localhost:4502}
+    secret: ${IDAM_KEY_CCD_CASE_DISPOSER:AAAAAAAAAAAAAAAA}
+  client:
+    id: ${IDAM_CASE_DISPOSER_CLIENT_ID:ccd-case-disposer}
+    secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
+    redirect_uri: ${IDAM_CASE_DISPOSER_CLIENT_REDIRECT_URL:http://ccd-case-disposer/oauth2redirect}
+
+smoke.test.enabled: false
+
+app.insights.log.size: ${CASE_DISPOSER_SUMMARY_LOG_SIZE:250}
+
+thread:
+  max_pool_size: ${THREAD_MAX_POOL_SIZE:10}
+  core_pool_size: ${THREAD_CORE_POOL_SIZE:5}
+  queue_capacity: ${THREAD_QUEUE_CAPACITY:200}
