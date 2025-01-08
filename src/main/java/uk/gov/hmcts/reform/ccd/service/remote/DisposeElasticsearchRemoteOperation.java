@@ -36,35 +36,40 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
 
     @Override
     public void delete(final CaseData caseData) {
-        final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(getIndex(caseData.getCaseType()),
-                caseData.getReference());
+        try {
+            final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(
+                getIndex(caseData.getCaseType()),
+                caseData.getReference()
+            );
 
-        deleteByQueryRequest(caseIndexDeleteRequest);
+            deleteByQueryRequest(caseIndexDeleteRequest);
 
-        if (globalSearchIndexChecker.isGlobalSearchExist()) {
-            final DeleteByQueryRequest globalSearchIndexDeleteRequest =
-                    buildDeleteByQueryRequest(parameterResolver.getGlobalSearchIndexName(),
-                            caseData.getReference());
-            deleteByQueryRequest(globalSearchIndexDeleteRequest);
+            if (globalSearchIndexChecker.isGlobalSearchExist()) {
+                final DeleteByQueryRequest globalSearchIndexDeleteRequest =
+                    buildDeleteByQueryRequest(
+                        parameterResolver.getGlobalSearchIndexName(),
+                        caseData.getReference()
+                    );
+                deleteByQueryRequest(globalSearchIndexDeleteRequest);
+            }
+        } catch (final Exception e) {
+            throw new ElasticsearchOperationException(e);
         }
     }
 
-    private void deleteByQueryRequest(final DeleteByQueryRequest request) {
-        try {
-            final RequestOptions requestOptions = buildRequestOptions();
-            final BulkByScrollResponse bulkResponse = elasticsearchClient.deleteByQuery(request, requestOptions);
+    private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
 
-            final List<ScrollableHitSource.SearchFailure> searchFailures = bulkResponse.getSearchFailures();
-            final List<BulkItemResponse.Failure> bulkFailures = bulkResponse.getBulkFailures();
+        final RequestOptions requestOptions = buildRequestOptions();
+        final BulkByScrollResponse bulkResponse = elasticsearchClient.deleteByQuery(request, requestOptions);
 
-            if (!isEmpty(searchFailures)) {
-                throwError(SEARCH_FAILURES, searchFailures);
-            }
-            if (!isEmpty(bulkFailures)) {
-                throwError(ELASTICSEARCH_FAILURES, bulkFailures);
-            }
-        } catch (final IOException e) {
-            throw new ElasticsearchOperationException(e);
+        final List<ScrollableHitSource.SearchFailure> searchFailures = bulkResponse.getSearchFailures();
+        final List<BulkItemResponse.Failure> bulkFailures = bulkResponse.getBulkFailures();
+
+        if (!isEmpty(searchFailures)) {
+            throwError(SEARCH_FAILURES, searchFailures);
+        }
+        if (!isEmpty(bulkFailures)) {
+            throwError(ELASTICSEARCH_FAILURES, bulkFailures);
         }
     }
 
@@ -80,11 +85,11 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
 
     private RequestOptions buildRequestOptions() {
         final RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(parameterResolver.getElasticsearchRequestTimeout())
-                .build();
+            .setConnectionRequestTimeout(parameterResolver.getElasticsearchRequestTimeout())
+            .build();
         return RequestOptions.DEFAULT.toBuilder()
-                .setRequestConfig(requestConfig)
-                .build();
+            .setRequestConfig(requestConfig)
+            .build();
     }
 
     private <T> void throwError(final String message, final List<T> list) {
