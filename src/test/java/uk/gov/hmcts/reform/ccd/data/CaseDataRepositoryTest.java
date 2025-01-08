@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.config.TestConfig;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
@@ -49,11 +50,26 @@ public class CaseDataRepositoryTest {
 
     @Test
     void testFindExpiredCases() {
-        System.out.println("testing");
         List<CaseDataEntity> caseDataAll = caseDataRepository.findAll();
         assertThat(caseDataAll).hasSize(2);
         List<CaseDataEntity> caseData = caseDataRepository.findExpiredCases(List.of(DELETABLE_CASE_TYPE));
         assertThat(caseData).hasSize(2);
+    }
+
+    @Test
+    void testFindByCaseReference() {
+        Optional<CaseDataEntity> caseData = caseDataRepository.findByReference(1L);
+        assertThat(caseData).isPresent();
+        assertThat(caseData.get().getReference()).isEqualTo(1L);
+    }
+
+    @Test
+    void testDeleteCaseData() {
+        Optional<CaseDataEntity> caseData = caseDataRepository.findByReference(1L);
+        assertThat(caseData).isPresent();
+        caseDataRepository.delete(caseData.get());
+        List<CaseDataEntity> caseDataEntities = caseDataRepository.findAll();
+        assertThat(caseDataEntities).hasSize(1);
     }
 
 
