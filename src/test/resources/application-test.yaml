@@ -13,7 +13,6 @@ spring:
     enabled: true
     out-of-order: true
     ignore-missing-migrations: true
-    baseline-version: 0001
     placeholders:
       DATA_STORE_DB_PASSWORD: ccdpass
 
@@ -68,16 +67,6 @@ idam:
     id: ${IDAM_CASE_DISPOSER_CLIENT_ID:ccd-case-disposer}
     secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
     redirect_uri: ${IDAM_CASE_DISPOSER_CLIENT_REDIRECT_URL:http://ccd-case-disposer/oauth2redirect}
-
-#application-insights:
-#  default:
-#    modules:
-#      WebSyntheticRequestTelemetryInitializer:
-#        enabled: false
-#
-#azure:
-#  application-insights:
-#    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
 
 smoke.test.enabled: false
 

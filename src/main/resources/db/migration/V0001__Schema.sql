@@ -1189,6 +1189,3 @@ ALTER TABLE ONLY public.case_event_significant_items
 --
 -- PostgreSQL database dump complete
 --
-
-
-
