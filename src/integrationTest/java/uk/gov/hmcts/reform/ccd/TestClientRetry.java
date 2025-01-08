@@ -36,7 +36,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_TASKS_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.LAU_SAVE_PATH;
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("integrationtest")
 @ComponentScan({"uk.gov.hmcts.reform.ccd"})
 @TestPropertySource(properties = {
     "remote.document.store.host=http://localhost:8080",

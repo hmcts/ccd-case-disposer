@@ -9,12 +9,11 @@ spring:
     hibernate:
       ddl-auto: none
   flyway:
-    locations: classpath:/db/migration
+    locations: classpath:db/migration
     enabled: true
     out-of-order: true
     ignore-missing-migrations: true
     baseline-version: 0001
-    mixed: true
     placeholders:
       DATA_STORE_DB_PASSWORD: ccdpass
 

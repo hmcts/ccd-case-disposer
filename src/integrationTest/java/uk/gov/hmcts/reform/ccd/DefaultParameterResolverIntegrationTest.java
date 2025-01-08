@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
-@ActiveProfiles("test")
+@ActiveProfiles("integrationtest")
 @SpringBootTest(classes = {DefaultParameterResolver.class})
 class DefaultParameterResolverIntegrationTest {
     @Inject
