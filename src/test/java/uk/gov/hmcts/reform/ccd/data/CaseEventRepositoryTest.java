@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.ccd.data"})
 @EntityScan(basePackages = {"uk.gov.hmcts.reform.ccd.data.entity"})
-@ActiveProfiles("unittest")
+@ActiveProfiles("test")
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.liquibase.enabled=false",

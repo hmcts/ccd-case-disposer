@@ -13,7 +13,7 @@ import java.util.Map;
 
 
 @SpringBootTest
-@ActiveProfiles("test")
+@ActiveProfiles("integration")
 @ComponentScan({"uk.gov.hmcts.reform.ccd"})
 class CaseDeletionIntegrationTest extends TestDataProvider {
 

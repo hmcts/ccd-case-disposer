@@ -25,7 +25,7 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.ccd.data"})
 @EntityScan(basePackages = {"uk.gov.hmcts.reform.ccd.data.entity"})
-@ActiveProfiles("unittest")
+@ActiveProfiles("test")
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.liquibase.enabled=false",
@@ -40,11 +40,8 @@ public class CaseLinkRepositoryTest {
     @BeforeEach
     public void setUp() {
         caseLinkRepository.deleteAll();
-        CaseLinkEntity caseLinkEntity = new CaseLinkEntity();
-        caseLinkEntity.setCaseId(1L);
-        caseLinkEntity.setLinkedCaseId(2L);
-        caseLinkEntity.setCaseTypeId(DELETABLE_CASE_TYPE);
-        caseLinkRepository.save(caseLinkEntity);
+        caseLinkRepository.save(getCaseLinkEntity(1L,2L));
+        caseLinkRepository.save(getCaseLinkEntity(3L,4L));
     }
 
     @Test
@@ -63,7 +60,7 @@ public class CaseLinkRepositoryTest {
     void testFindByCaseIdOrLinkedCaseId() {
         List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(1L);
         assertThat(caseLinkEntities).hasSize(1);
-        caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(2L);
+        caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(4L);
         assertThat(caseLinkEntities).hasSize(1);
     }
 
@@ -74,5 +71,13 @@ public class CaseLinkRepositoryTest {
         caseLinkRepository.delete(caseLinkEntities.getFirst());
         caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(1L);
         assertThat(caseLinkEntities).hasSize(0);
+    }
+
+    private CaseLinkEntity getCaseLinkEntity(final Long caseId, final Long linkedCaseId) {
+        final CaseLinkEntity caseLinkEntity = new CaseLinkEntity();
+        caseLinkEntity.setCaseId(caseId);
+        caseLinkEntity.setLinkedCaseId(linkedCaseId);
+        caseLinkEntity.setCaseTypeId(DELETABLE_CASE_TYPE);
+        return caseLinkEntity;
     }
 }

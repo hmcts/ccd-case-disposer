@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ccd-case-disposer
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql:15:///localhost:ccd_data_store
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+  flyway:
+    locations: classpath:db/migration
+    enabled: true
+    out-of-order: true
+    ignore-missing-migrations: true
+    placeholders:
+      DATA_STORE_DB_PASSWORD: ccdpass
+
+flyway:
+  noop:
+    strategy: "false"
