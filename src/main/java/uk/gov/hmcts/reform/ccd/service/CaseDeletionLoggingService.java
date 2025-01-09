@@ -19,6 +19,7 @@ import java.util.Set;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.NOT_DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 
 @Named
@@ -67,7 +68,7 @@ public class CaseDeletionLoggingService {
 
     private void logDataIfNoDeletableOrSimulatedCasesFound() {
         final String summaryString = summaryStringLogBuilder
-                .buildSummaryString(0, 0, 0, 0, Collections.emptyMap());
+                .buildSummaryString(0, 0, 0, 0, 0, Collections.emptyMap());
         log.info(summaryString);
     }
 
@@ -76,6 +77,8 @@ public class CaseDeletionLoggingService {
 
         caseDataViewBuilder.buildCaseDataViewList(
             processedCasesRecordHolder.getSuccessfullyDeletedCases(), caseDataViews, DELETED_STATE);
+        caseDataViewBuilder.buildCaseDataViewList(
+            processedCasesRecordHolder.getNonDeletableCases(), caseDataViews, NOT_DELETED_STATE);
         caseDataViewBuilder.buildCaseDataViewList(
             new ArrayList<>(processedCasesRecordHolder.getSimulatedCases()), caseDataViews, SIMULATED_STATE);
         caseDataViewBuilder.buildCaseDataViewList(

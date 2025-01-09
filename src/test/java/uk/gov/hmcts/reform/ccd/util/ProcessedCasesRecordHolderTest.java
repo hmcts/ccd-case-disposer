@@ -45,6 +45,8 @@ class ProcessedCasesRecordHolderTest {
         CaseData caseDataProcessed2 = CaseData.builder().id(1L).reference(1L).build();
         CaseData caseDataFailed3 = CaseData.builder().id(3L).reference(3L).build();
         CaseData caseDataFailed4 = CaseData.builder().id(3L).reference(3L).build();
+        CaseData caseDataUndeletable5 = CaseData.builder().id(5L).reference(5L).build();
+        CaseData caseDataUndeletable6 = CaseData.builder().id(5L).reference(5L).build();
 
         // when
         processedCasesRecordHolder.addProcessedCase(caseDataProcessed1);
@@ -53,6 +55,8 @@ class ProcessedCasesRecordHolderTest {
         processedCasesRecordHolder.addProcessedCase(caseDataFailed4);
         processedCasesRecordHolder.addFailedToDeleteCaseRef(caseDataFailed3);
         processedCasesRecordHolder.addFailedToDeleteCaseRef(caseDataFailed4);
+        processedCasesRecordHolder.addNonDeletableCase(caseDataUndeletable5);
+        processedCasesRecordHolder.addNonDeletableCase(caseDataUndeletable6);
 
         // then
         assertThat(processedCasesRecordHolder.getSuccessfullyDeletedCases()).containsOnly(caseDataProcessed1);

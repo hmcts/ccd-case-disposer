@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.data.model.Retainability;
 import uk.gov.hmcts.reform.ccd.fixture.TestData;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.util.log.UndeletableCasesLogger;
 
 import java.util.Collection;
 import java.util.List;
@@ -55,6 +56,9 @@ class CaseFinderServiceTest {
     private ParameterResolver parameterResolver;
     @Mock
     private CaseFamilyTreeService caseFamilyTreeService;
+    @Mock
+    UndeletableCasesLogger undeletableCasesLogger;
+
     @InjectMocks
     private CaseFinderService caseFinderService;
 

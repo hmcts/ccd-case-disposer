@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import java.util.Map;
 @SpringBootTest
 @ActiveProfiles("integration")
 @ComponentScan({"uk.gov.hmcts.reform.ccd"})
+@Slf4j
 class CaseDeletionIntegrationTest extends TestDataProvider {
 
     @Autowired
@@ -41,6 +43,13 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         processedCasesRecordHolder.clearState();
 
         // WHEN
+        log.info("Case types to delete: {}", deletableCaseTypes);
+        log.info("Case types for simulated deletion: {}", deletableCaseTypesSimulation);
+        log.info("Inserted case ids: {}", initialStateRowIds);
+        log.info("Expected case ids to stay: {}", deletableEndStateRowIds);
+        log.info("Scenario using script {}", scriptPath);
+        log.info("Expected case refs to be deleted: {}", deletableCaseRefs);
+        processedCasesRecordHolder.clearState();
         executor.execute();
 
         // THEN

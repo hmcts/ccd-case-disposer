@@ -20,6 +20,15 @@ public class CaseData {
     CaseData parentCase;
 
     @Override
+    public String toString() {
+        return "CaseData{id=" + id
+            + ", reference=" + reference
+            + ", caseType='" + caseType + "'"
+            + ", resolvedTtl=" + resolvedTtl
+            + "}";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
