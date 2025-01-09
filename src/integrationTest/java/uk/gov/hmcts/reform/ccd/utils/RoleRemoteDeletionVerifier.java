@@ -17,13 +17,16 @@ public class RoleRemoteDeletionVerifier implements RemoteDeletionVerifier {
 
     public void verifyRemoteDeletion(final List<Long> caseRefDeletedRoles) {
         caseRefDeletedRoles.forEach(caseRef -> {
-            final int caseRolesDeletionMocks =
-                ROLE_DELETE.get(Long.toString(caseRef));
+            String caseRefStr = Long.toString(caseRef);
+            int expectedResult = 200;
+            if (ROLE_DELETE.containsKey(caseRefStr)) {
+                expectedResult = ROLE_DELETE.get(caseRefStr);
+            }
 
             final int caseRolesDeletionActualResults = roleDeletionRecordHolder
-                .getCaseRolesDeletionResults(Long.toString(caseRef));
+                .getCaseRolesDeletionResults(caseRefStr);
 
-            assertThat(caseRolesDeletionActualResults).isEqualTo(caseRolesDeletionMocks);
+            assertThat(caseRolesDeletionActualResults).isEqualTo(expectedResult);
         });
     }
 }

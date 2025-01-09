@@ -1,3 +1,7 @@
+-- All 11 cases are deletable and linked in pairs
+-- Expected result that all but one case is deleted
+-- due to default rate limit of 10
+
 DELETE FROM case_event;
 DELETE FROM case_link;
 DELETE FROM case_data;
@@ -10,7 +14,7 @@ VALUES (1, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       1504259907351239,
+       1504259907351238,
        '2016-06-24 20:44:52.824'
 );
 
@@ -22,7 +26,7 @@ VALUES (2, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       1504259907351238,
+       1504259907351237,
        '2016-06-24 20:44:52.824'
 );
 
@@ -34,7 +38,7 @@ VALUES (3, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       1504259907351237,
+       1504259907351236,
        '2016-06-24 20:44:52.824'
 );
 
@@ -46,12 +50,12 @@ VALUES (4, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       1504259907351236,
+       1504259907351235,
        '2016-06-24 20:44:52.824'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (6, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (5, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -63,7 +67,7 @@ VALUES (6, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (7, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (6, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -75,7 +79,7 @@ VALUES (7, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (8, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (7, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -87,7 +91,7 @@ VALUES (8, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (9, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (8, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -99,7 +103,7 @@ VALUES (9, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (10, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (9, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -111,7 +115,7 @@ VALUES (10, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (11, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (10, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -123,7 +127,7 @@ VALUES (11, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (12, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
+VALUES (11, 'FT_MasterCaseType', 'BEFTA_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
@@ -147,7 +151,7 @@ INSERT INTO case_link (case_id, case_type_id, linked_case_id)
 VALUES (4, 'FT_MasterCaseType', 10);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (4, 'FT_MasterCaseType', 11);
+VALUES (5, 'FT_MasterCaseType', 11);
 
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
-VALUES (6, 'FT_MasterCaseType', 12);
+VALUES (6, 'FT_MasterCaseType', 11);
