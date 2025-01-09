@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;s
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,7 +44,6 @@ public class CaseDataRepositoryTest {
     @BeforeEach
     public void setUp() {
         caseDataRepository.deleteAll();
-        CaseDataEntity caseDataEntity = new CaseDataEntity();
         caseDataRepository.save(getCaseDataEntity(1L));
         caseDataRepository.save(getCaseDataEntity(2L));
         caseDataRepository.save(getUnexpiredCaseDataEntity(3L));
