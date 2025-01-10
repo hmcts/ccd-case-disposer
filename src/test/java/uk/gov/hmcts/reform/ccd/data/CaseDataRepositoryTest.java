@@ -2,17 +2,13 @@ package uk.gov.hmcts.reform.ccd.data;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.util.List;
@@ -25,10 +21,7 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.TODAY;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.YESTERDAY;
 
 @DataJpaTest
-@ExtendWith(SpringExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.ccd.data"})
-@EntityScan(basePackages = {"uk.gov.hmcts.reform.ccd.data.entity"})
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
     "spring.jpa.hibernate.ddl-auto=create-drop",
