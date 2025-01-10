@@ -33,25 +33,25 @@ public class CaseLinkRepositoryTest {
     @BeforeEach
     public void setUp() {
         caseLinkRepository.deleteAll();
-        caseLinkRepository.save(getCaseLinkEntity(1L,2L));
         caseLinkRepository.save(getCaseLinkEntity(3L,4L));
+        caseLinkRepository.save(getCaseLinkEntity(5L,6L));
     }
 
     @Test
     void testFindByCaseId() {
-        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseId(1L);
+        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseId(3L);
         assertThat(caseLinkEntities).hasSize(1);
     }
 
     @Test
     void testFindByLinkedCaseId() {
-        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByLinkedCaseId(2L);
+        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByLinkedCaseId(4L);
         assertThat(caseLinkEntities).hasSize(1);
     }
 
     @Test
     void testFindByCaseIdOrLinkedCaseId() {
-        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(1L);
+        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(3L);
         assertThat(caseLinkEntities).hasSize(1);
         caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(4L);
         assertThat(caseLinkEntities).hasSize(1);
@@ -59,10 +59,10 @@ public class CaseLinkRepositoryTest {
 
     @Test
     void testDeleteCaseLink() {
-        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(1L);
+        List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(3L);
         assertThat(caseLinkEntities).hasSize(1);
         caseLinkRepository.delete(caseLinkEntities.getFirst());
-        caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(1L);
+        caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(3L);
         assertThat(caseLinkEntities).hasSize(0);
     }
 

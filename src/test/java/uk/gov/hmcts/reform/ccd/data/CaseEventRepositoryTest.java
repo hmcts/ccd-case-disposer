@@ -34,21 +34,23 @@ public class CaseEventRepositoryTest {
         caseEventRepository.deleteAll();
         CaseEventEntity caseEventEntity = new CaseEventEntity();
         caseEventEntity.setId(1L);
-        caseEventEntity.setCaseDataId(1L);
+        caseEventEntity.setCaseDataId(7L);
         caseEventRepository.save(caseEventEntity);
-    }
-
-    @Test
-    void testDeleteByCaseDataId() {
-        caseEventRepository.deleteByCaseDataId(1L);
-        Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(1L);
-        assertThat(caseEvent).isEmpty();
     }
 
     @Test
     void testFindById() {
         Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(1L);
         assertThat(caseEvent).isPresent();
-        assertThat(caseEvent.get().getCaseDataId()).isEqualTo(1L);
+        assertThat(caseEvent.get().getCaseDataId()).isEqualTo(7L);
     }
+
+    @Test
+    void testDeleteByCaseDataId() {
+        caseEventRepository.deleteByCaseDataId(7L);
+        Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(1L);
+        assertThat(caseEvent).isEmpty();
+    }
+
+
 }

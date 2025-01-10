@@ -45,6 +45,8 @@ public class FlywayConfiguration implements FlywayConfigurationCustomizer {
         PostgreSQLConfigurationExtension configurationExtension =
             configuration.getPluginRegister().getPlugin(PostgreSQLConfigurationExtension.class);
         configurationExtension.setTransactionalLock(false);
+        configuration.locations("filesystem:src/integrationTest/resources/db/migration",
+                                "filesystem:src/test/resources/testData");
     }
 }
 
