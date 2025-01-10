@@ -21,6 +21,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UndeletableCasesLogger {
 
+    public static final String MSG_WITH_LINKS =
+            "Not deleting case ref: {} due to existing link to case(s): {}";
+    public static final String MSG_WITHOUT_LINKS =
+            "Not deleting case ref: {} due to indirectly linked non-deletable case";
+
     private final ProcessedCasesRecordHolder casesRecordHolder;
 
     public void logUndeletableCases(List<CaseFamily> caseFamilies, List<CaseFamily> deletableCaseFamilies) {
@@ -47,7 +52,6 @@ public class UndeletableCasesLogger {
 
     private void logNonDeletableCaseFamilies(Map<Long, CaseFamily> caseFamilies, List<Long> undeletableRootIds) {
         final TtlRetentionPolicyImpl ttlRetentionPolicy = new TtlRetentionPolicyImpl();
-        final String msg = "Not deleting case ref: {} due to existing link to case(s): {}";
 
         undeletableRootIds.forEach(rootId -> {
             CaseFamily caseFamily = caseFamilies.get(rootId);
@@ -63,11 +67,9 @@ public class UndeletableCasesLogger {
                 casesRecordHolder.addNonDeletableCase(caseData);
                 if (!blockers.contains(caseData)) {
                     if (blockers.isEmpty()) {
-                        log.info(
-                            "Not deleting case ref: {} due to indirectly linked non-deletable case",
-                            caseData.getReference());
+                        log.info(MSG_WITHOUT_LINKS, caseData.getReference());
                     } else {
-                        log.info(msg, caseData.getReference(), blockers);
+                        log.info(MSG_WITH_LINKS, caseData.getReference(), blockers);
                     }
                 }
             });
