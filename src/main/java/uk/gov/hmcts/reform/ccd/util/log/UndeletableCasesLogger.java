@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.policy.TtlRetentionPolicyImpl;
+import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -16,7 +18,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class UndeletableCasesLogger {
+
+    private final ProcessedCasesRecordHolder casesRecordHolder;
 
     public void logUndeletableCases(List<CaseFamily> caseFamilies, List<CaseFamily> deletableCaseFamilies) {
         Map<Long, CaseFamily> caseFamiliesMap = caseFamilies.stream().collect(
@@ -55,6 +60,7 @@ public class UndeletableCasesLogger {
                 .toList();
 
             cases.forEach(caseData -> {
+                casesRecordHolder.addNonDeletableCase(caseData);
                 if (!blockers.contains(caseData)) {
                     if (blockers.isEmpty()) {
                         log.info(

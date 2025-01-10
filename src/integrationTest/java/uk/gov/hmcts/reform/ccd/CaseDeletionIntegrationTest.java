@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.data.TestDataProvider;
+import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,9 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
 
     @Autowired
     private ApplicationExecutor executor;
+
+    @Autowired
+    private ProcessedCasesRecordHolder processedCasesRecordHolder;
 
 
     @ParameterizedTest
@@ -39,7 +43,13 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, initialStateRowIds, indexedData);
 
         // WHEN
+        log.info("Case types to delete: {}", deletableCaseTypes);
+        log.info("Case types for simulated deletion: {}", deletableCaseTypesSimulation);
+        log.info("Inserted case ids: {}", initialStateRowIds);
+        log.info("Expected case ids to stay: {}", deletableEndStateRowIds);
         log.info("Scenario using script {}", scriptPath);
+        log.info("Expected case refs to be deleted: {}", deletableCaseRefs);
+        processedCasesRecordHolder.clearState();
         executor.execute();
 
         // THEN

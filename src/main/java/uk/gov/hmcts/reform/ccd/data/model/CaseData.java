@@ -21,11 +21,11 @@ public class CaseData {
 
     @Override
     public String toString() {
-        return "CaseData{id=" + id +
-            ", reference=" + reference +
-            ", caseType='" + caseType + "'" +
-            ", resolvedTtl=" + resolvedTtl +
-            "}";
+        return "CaseData{id=" + id
+            + ", reference=" + reference
+            + ", caseType='" + caseType + "'"
+            + ", resolvedTtl=" + resolvedTtl
+            + "}";
     }
 
     @Override
