@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.sql.SQLException;
@@ -21,10 +20,6 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-@TestPropertySource(properties = {
-    "spring.liquibase.enabled=false",
-    "spring.flyway.enabled=true"
-})
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
 public class CaseDataRepositoryTest extends BaseRepositoryTest {
 
