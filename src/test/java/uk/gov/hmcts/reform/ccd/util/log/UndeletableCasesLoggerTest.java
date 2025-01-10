@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class UndeletableCasesLoggerTest {
@@ -67,7 +68,24 @@ class UndeletableCasesLoggerTest {
 
         undeletableCasesLogger.logUndeletableCases(caseFamilies, deletableCaseFamilies);
         assertThat(output.getOut()).contains("Not deleting case ref: 1 due to existing link to case(s)");
+    }
 
+    @Test
+    void logUndeletableCasesWithDuplicateFamilyShouldNotCauseProblems() {
+        List<CaseFamily> caseFamilies = List.of(
+            new CaseFamily(makeCase(1), List.of(makeCase(2), makeCase(3))),
+            // duplicate families, linked cases discarded (only from the first family used)
+            new CaseFamily(makeCase(1), List.of(makeCase(3), makeCase(4))),
+            new CaseFamily(makeCase(1), List.of(makeCase(5), makeCase(6)))
+        );
+        List<CaseFamily> deletableCaseFamilies = List.of();
+
+        undeletableCasesLogger.logUndeletableCases(caseFamilies, deletableCaseFamilies);
+
+        verify(casesRecordHolder, times(1)).addNonDeletableCase(makeCase(1));
+        verify(casesRecordHolder, times(1)).addNonDeletableCase(makeCase(2));
+        verify(casesRecordHolder, times(1)).addNonDeletableCase(makeCase(3));
+        verifyNoMoreInteractions(casesRecordHolder);
     }
 
     private CaseData makeCase(Integer id, LocalDate resolvedTtl) {
