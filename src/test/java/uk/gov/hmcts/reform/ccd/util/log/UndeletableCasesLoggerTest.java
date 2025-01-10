@@ -34,7 +34,9 @@ class UndeletableCasesLoggerTest {
         List<CaseFamily> caseFamilies = List.of(
             new CaseFamily(makeCase(1),
             List.of(makeCase(2), makeCase(3))));
-        List<CaseFamily> deletableCaseFamilies = List.of(new CaseFamily(makeCase(1), List.of(makeCase(2), makeCase(3))));
+        List<CaseFamily> deletableCaseFamilies = List.of(
+            new CaseFamily(makeCase(1),
+            List.of(makeCase(2), makeCase(3))));
 
         undeletableCasesLogger.logUndeletableCases(caseFamilies, deletableCaseFamilies);
 
