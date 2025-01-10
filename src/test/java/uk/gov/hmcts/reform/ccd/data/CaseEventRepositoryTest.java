@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,36 +20,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
-    "spring.jpa.hibernate.ddl-auto=create-drop",
     "spring.liquibase.enabled=false",
     "spring.flyway.enabled=true"
 })
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
-public class CaseEventRepositoryTest {
+public class CaseEventRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
     private CaseEventRepository caseEventRepository;
 
     @BeforeEach
-    public void setUp() {
-        caseEventRepository.deleteAll();
-        CaseEventEntity caseEventEntity = new CaseEventEntity();
-        caseEventEntity.setId(1L);
-        caseEventEntity.setCaseDataId(7L);
-        caseEventRepository.save(caseEventEntity);
+    public void setUp() throws SQLException {
+        insertDataIntoDatabase("testData/case_event.sql");
     }
 
     @Test
     void testFindById() {
-        Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(1L);
+        Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(5L);
         assertThat(caseEvent).isPresent();
-        assertThat(caseEvent.get().getCaseDataId()).isEqualTo(7L);
+        assertThat(caseEvent.get().getCaseDataId()).isEqualTo(5L);
     }
 
     @Test
     void testDeleteByCaseDataId() {
-        caseEventRepository.deleteByCaseDataId(7L);
-        Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(1L);
+        caseEventRepository.deleteByCaseDataId(5L);
+        Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(5L);
         assertThat(caseEvent).isEmpty();
     }
 
