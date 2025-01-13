@@ -587,6 +587,18 @@ public class DeletionScenarios {
                     List.of(1504259907351192L),
                     Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
                     Map.of("TaskCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    null,
+                    "scenarios/S-035-delete-cases-with-events.sql",
+                    List.of(1L, 2L),
+                    Map.of("FT_MasterCaseType", List.of(1504259907351162L, 1504259907351163L)),
+                    emptyList(),
+                    emptyList(),
+                    List.of(1504259907351162L, 1504259907351163L),
+                    Map.of("FT_MasterCaseType", List.of(1504259907351162L, 1504259907351163L)),
+                    Map.of("FT_MasterCaseType", emptyList())
                 )
         );
     }
