@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
     DisposeElasticsearchRemoteOperation.class,
     GlobalSearchIndexChecker.class
 })
-@ActiveProfiles("test")
+@ActiveProfiles("integration")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ApplicationBootstrapIntegrationTest extends TestContainers {
     private static final String FLAG = "true";

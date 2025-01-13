@@ -332,7 +332,7 @@ dependencies {
     testImplementation 'com.github.hmcts:fortify-client:1.4.6:all'
     testImplementation group: 'io.github.hakky54', name: 'logcaptor', version: '2.10.0'
 
-    testRuntimeOnly group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
+    testImplementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath
