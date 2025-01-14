@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.data;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,13 +13,15 @@ import java.util.Optional;
 @Repository
 public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> {
 
-    @Query("SELECT c FROM CaseDataEntity c WHERE c.resolvedTtl < CURRENT_DATE "
-            + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")
+    @Query(value = "SELECT * FROM case_data WHERE resolved_ttl < CURRENT_DATE AND case_type_id IN (:queryCaseTypes) "
+        + "ORDER BY resolved_ttl DESC", nativeQuery = true)
     List<CaseDataEntity> findExpiredCases(@Param("queryCaseTypes") List<String> queryCaseTypes);
 
-    @Query("SELECT c FROM CaseDataEntity c WHERE c.reference = :queryCaseReference")
+    @Query(value = "SELECT * FROM case_data WHERE reference = :queryCaseReference", nativeQuery = true)
     Optional<CaseDataEntity> findByReference(@Param("queryCaseReference") Long queryCaseReference);
 
+    @Modifying
+    @Query(value = "DELETE FROM case_data WHERE id = :#{#caseDataEntity.id}", nativeQuery = true)
+    void delete(@Param("caseDataEntity") CaseDataEntity caseDataEntity);
 
-    void delete(final CaseDataEntity caseDataEntity);
 }

@@ -41,6 +41,8 @@ public class CaseEventRepositoryTest extends BaseRepositoryTest {
         caseEventRepository.deleteByCaseDataId(5L);
         Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(5L);
         assertThat(caseEvent).isEmpty();
+        caseEvent = caseEventRepository.findById(7L);
+        assertThat(caseEvent).isEmpty();
     }
 
 

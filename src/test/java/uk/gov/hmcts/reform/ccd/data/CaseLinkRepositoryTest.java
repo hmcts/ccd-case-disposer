@@ -32,7 +32,7 @@ public class CaseLinkRepositoryTest extends BaseRepositoryTest {
     @Test
     void testFindByCaseId() {
         List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseId(7L);
-        assertThat(caseLinkEntities).hasSize(1);
+        assertThat(caseLinkEntities).hasSize(2);
     }
 
     @Test
@@ -44,7 +44,7 @@ public class CaseLinkRepositoryTest extends BaseRepositoryTest {
     @Test
     void testFindByCaseIdOrLinkedCaseId() {
         List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(7L);
-        assertThat(caseLinkEntities).hasSize(1);
+        assertThat(caseLinkEntities).hasSize(2);
         caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(10L);
         assertThat(caseLinkEntities).hasSize(1);
     }
@@ -52,8 +52,9 @@ public class CaseLinkRepositoryTest extends BaseRepositoryTest {
     @Test
     void testDeleteCaseLink() {
         List<CaseLinkEntity> caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(7L);
-        assertThat(caseLinkEntities).hasSize(1);
+        assertThat(caseLinkEntities).hasSize(2);
         caseLinkRepository.delete(caseLinkEntities.getFirst());
+        caseLinkRepository.delete(caseLinkEntities.getLast());
         caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(7L);
         assertThat(caseLinkEntities).hasSize(0);
     }
