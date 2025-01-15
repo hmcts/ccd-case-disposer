@@ -37,6 +37,7 @@ deletable.case.types: ${DELETE_CASE_TYPES:}
 simulated.case.types: ${SIMULATED_CASE_TYPES:}
 
 request.limit: ${CCD_DISPOSER_REQUEST_LIMIT:1000}
+cut-off-time: ${CCD_DISPOSER_CUT_OFF_TIME:06:00}
 
 remote:
   document.store:

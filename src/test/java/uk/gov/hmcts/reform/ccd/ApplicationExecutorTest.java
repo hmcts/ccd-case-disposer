@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,6 +14,8 @@ import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
+import java.time.Clock;
+import java.time.LocalTime;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -45,8 +48,18 @@ class ApplicationExecutorTest {
     @Mock
     private CaseDeletionLoggingService caseDeletionLoggingService;
 
+    @Mock
+    private Clock clock;
+
     @InjectMocks
     private ApplicationExecutor applicationExecutor;
+
+    @BeforeEach
+    void setUp() {
+        when(clock.instant()).thenReturn(Clock.systemUTC().instant());
+        when(clock.getZone()).thenReturn(Clock.systemUTC().getZone());
+        when(parameterResolver.getCutOffTime()).thenReturn(LocalTime.parse("06:00"));
+    }
 
     @Test
     void testFindDeletableCandidatesWhenNoDeletableCandidatesFound() {

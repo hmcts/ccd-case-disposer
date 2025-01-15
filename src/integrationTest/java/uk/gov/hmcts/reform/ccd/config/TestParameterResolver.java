@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.ccd.config;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +49,10 @@ public class TestParameterResolver implements ParameterResolver {
 
     @Value("${request.limit}")
     private Integer requestLimit;
+
+    @Getter
+    @Value("${cut-off-time:06:00}")
+    private LocalTime cutOffTime;
 
     @Override
     public Integer getElasticsearchRequestTimeout() {
