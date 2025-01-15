@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -80,6 +81,8 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                 THREAD_QUEUE_CAPACITY, 200);
+
+        ReflectionTestUtils.setField(defaultParameterResolver, "cutOffTime", LocalTime.parse("06:00"));
     }
 
     @Test
@@ -165,6 +168,12 @@ class DefaultParameterResolverTest {
     void shouldGetCorrectValueForGetThreadMaxPoolSize() {
         assertThat(defaultParameterResolver.getThreadMaxPoolSize(),
                 is(equalTo(10)));
+    }
+
+    @Test
+    @DisplayName("should get correct value for getCutOffTime")
+    void shouldGetCorrectValueForGetCutOffTime() {
+        assertThat(defaultParameterResolver.getCutOffTime(), is(equalTo(LocalTime.parse("06:00"))));
     }
 
 }
