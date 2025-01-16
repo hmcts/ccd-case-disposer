@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.ccd.parameter;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +57,10 @@ public class TestParameterResolver implements ParameterResolver {
 
     @Value("${remote.hearing.case.type}")
     private String hearingCaseType;
+
+    @Getter
+    @Value("${cut-off-time:06:00}")
+    private LocalTime cutOffTime;
 
     @Override
     public List<String> getElasticsearchHosts() {

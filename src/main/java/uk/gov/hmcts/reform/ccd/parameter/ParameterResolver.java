@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.parameter;
 
+import java.time.LocalTime;
 import java.util.List;
 
 public interface ParameterResolver {
@@ -36,4 +37,6 @@ public interface ParameterResolver {
     Integer getThreadQueueCapacity();
 
     Integer getRequestLimit();
+
+    LocalTime getCutOffTime();
 }
