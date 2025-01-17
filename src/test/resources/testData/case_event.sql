@@ -38,17 +38,6 @@ VALUES (5,'CREATED','CREATED', 5,5,'deletable_case_type',5,'CaseCreated',
     'PUBLIC'
  );
 
- INSERT INTO case_event (id, event_id, event_name, case_data_id,user_id,case_type_id,case_type_version,state_id,data,
-user_first_name,user_last_name,security_classification)
-VALUES (7,'CREATED','CREATED', 5,5,'deletable_case_type',5,'CaseCreated',
-  '{
-      "PersonFirstName": "Janet"
-   }',
-  'Janet',
-  'Doe',
-  'PUBLIC'
-);
-
 INSERT INTO case_event (id, event_id, event_name, case_data_id,user_id,case_type_id,case_type_version,state_id,data,
 user_first_name,user_last_name,security_classification)
 VALUES (6,'CREATED','CREATED', 6,6,'deletable_case_type',6,'CaseCreated',

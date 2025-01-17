@@ -13,11 +13,11 @@ import java.util.Optional;
 @Repository
 public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> {
 
-    @Query(value = "SELECT * FROM case_data WHERE resolved_ttl < CURRENT_DATE AND case_type_id IN (:queryCaseTypes) "
-        + "ORDER BY resolved_ttl DESC", nativeQuery = true)
+    @Query("SELECT c FROM CaseDataEntity c WHERE c.resolvedTtl < CURRENT_DATE "
+        + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")
     List<CaseDataEntity> findExpiredCases(@Param("queryCaseTypes") List<String> queryCaseTypes);
 
-    @Query(value = "SELECT * FROM case_data WHERE reference = :queryCaseReference", nativeQuery = true)
+    @Query("SELECT c FROM CaseDataEntity c WHERE c.reference = :queryCaseReference")
     Optional<CaseDataEntity> findByReference(@Param("queryCaseReference") Long queryCaseReference);
 
     @Modifying

@@ -13,14 +13,12 @@ import java.util.List;
 @Repository
 public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseLinkPrimaryKey> {
 
-    @Query(value = "SELECT * FROM case_link WHERE case_id = :caseId", nativeQuery = true)
-    List<CaseLinkEntity> findByCaseId(@Param("caseId") Long caseId);
+    List<CaseLinkEntity> findByCaseId(final Long caseId);
 
-    @Query(value = "SELECT * FROM case_link WHERE case_id = :caseId OR linked_case_id = :caseId", nativeQuery = true)
-    List<CaseLinkEntity> findByCaseIdOrLinkedCaseId(@Param("caseId") Long caseId);
+    @Query("SELECT c FROM CaseLinkEntity c WHERE c.caseId = :caseId OR c.linkedCaseId = :caseId")
+    List<CaseLinkEntity> findByCaseIdOrLinkedCaseId(final Long caseId);
 
-    @Query(value = "SELECT * FROM case_link WHERE linked_case_id = :linkedCaseId", nativeQuery = true)
-    List<CaseLinkEntity> findByLinkedCaseId(@Param("linkedCaseId") Long linkedCaseId);
+    List<CaseLinkEntity> findByLinkedCaseId(final Long linkedCaseId);
 
     @Modifying
     @Query(value = "DELETE FROM case_link WHERE case_id = :caseId "
