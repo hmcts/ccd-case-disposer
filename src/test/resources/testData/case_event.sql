@@ -48,5 +48,3 @@ VALUES (6,'CREATED','CREATED', 6,6,'deletable_case_type',6,'CaseCreated',
   'Doe',
   'PUBLIC'
 );
-
-

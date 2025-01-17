@@ -50,6 +50,8 @@ VALUES (10, 'deletable_case_type', 'deletable_jurisdiction', 'CaseCreated', 'PUB
        '2016-06-24 20:44:52.824'
 );
 
+
+
 INSERT INTO case_link (case_id, case_type_id, linked_case_id)
 VALUES (7, 'FT_MasterCaseType', 8);
 

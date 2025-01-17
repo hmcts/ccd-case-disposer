@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.ccd.data;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,6 +19,6 @@ public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> 
     @Query("SELECT c FROM CaseDataEntity c WHERE c.reference = :queryCaseReference")
     Optional<CaseDataEntity> findByReference(@Param("queryCaseReference") Long queryCaseReference);
 
-    void delete(final CaseDataEntity caseDataEntity);
 
+    void delete(final CaseDataEntity caseDataEntity);
 }
