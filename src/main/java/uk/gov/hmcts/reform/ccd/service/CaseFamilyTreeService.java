@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.ccd.service;
 
+import com.google.common.base.Stopwatch;
 import jakarta.inject.Named;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.reform.ccd.util.ListUtil.distinctByKey;
 
 @Named
 @RequiredArgsConstructor
+@Slf4j
 public class CaseFamilyTreeService {
     private static final String CASE_DATA_NOT_FOUND = "Case data for case_id=%d is not found";
     private final CaseDataRepository caseDataRepository;
@@ -49,7 +52,10 @@ public class CaseFamilyTreeService {
     private final Function<CaseTreeNode, Set<CaseTreeNode>> leafNodesFunction = this::findLeafNodes;
 
     private List<CaseDataEntity> getExpiredCases() {
-        return caseDataRepository.findExpiredCases(parameterResolver.getAllDeletableCaseTypes());
+        Stopwatch timer = Stopwatch.createStarted();
+        List<CaseDataEntity> cases = caseDataRepository.findExpiredCases(parameterResolver.getAllDeletableCaseTypes());
+        log.debug("Performance: DB query to get expired cases took {}", timer.stop());
+        return cases;
     }
 
     private CaseTreeNode findParents(@NonNull final LinkedEntities<CaseDataEntity> linkedEntities) {

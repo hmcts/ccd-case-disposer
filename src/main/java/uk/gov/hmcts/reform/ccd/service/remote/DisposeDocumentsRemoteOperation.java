@@ -63,10 +63,10 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
                 documentsDeletionResults
             );
 
-            final String message = getLogMessage(documentsDeletionResults);
-
             log.info(
-                message + "Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
+                "{}{}Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
+                log.isDebugEnabled() ? "Performance: " : "",
+                getLogMessage(documentsDeletionResults),
                 documentsDeleteRequest.getCaseRef(),
                 documentsDeletionResults.getCaseDocumentsFound(),
                 documentsDeletionResults.getMarkedForDeletion()
@@ -93,5 +93,10 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
                                                                           documentsDeletePostRequest) {
         return documentClient
             .deleteDocument(securityUtil.getServiceAuthorization(), documentsDeletePostRequest);
+    }
+
+    @Override
+    public String toString() {
+        return "Documents Disposer";
     }
 }

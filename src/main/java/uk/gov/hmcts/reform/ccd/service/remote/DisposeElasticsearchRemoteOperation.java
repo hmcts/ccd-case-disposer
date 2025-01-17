@@ -83,4 +83,8 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
         return String.format(parameterResolver.getCasesIndexNamePattern(), caseType).toLowerCase();
     }
 
+    @Override
+    public String toString() {
+        return "Elasticsearch Disposer";
+    }
 }
