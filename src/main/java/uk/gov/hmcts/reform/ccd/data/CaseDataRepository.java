@@ -14,14 +14,12 @@ import java.util.Optional;
 public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> {
 
     @Query("SELECT c FROM CaseDataEntity c WHERE c.resolvedTtl < CURRENT_DATE "
-        + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")
+            + "AND c.caseType IN :queryCaseTypes ORDER BY c.resolvedTtl DESC")
     List<CaseDataEntity> findExpiredCases(@Param("queryCaseTypes") List<String> queryCaseTypes);
 
     @Query("SELECT c FROM CaseDataEntity c WHERE c.reference = :queryCaseReference")
     Optional<CaseDataEntity> findByReference(@Param("queryCaseReference") Long queryCaseReference);
 
-    @Modifying
-    @Query(value = "DELETE FROM case_data WHERE id = :#{#caseDataEntity.id}", nativeQuery = true)
-    void delete(@Param("caseDataEntity") CaseDataEntity caseDataEntity);
+    void delete(final CaseDataEntity caseDataEntity);
 
 }
