@@ -65,7 +65,7 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
             log.info(
                 "{}{}Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
-                log.isDebugEnabled() ? "Performance: ": "",
+                log.isDebugEnabled() ? "Performance: " : "",
                 getLogMessage(documentsDeletionResults),
                 documentsDeleteRequest.getCaseRef(),
                 documentsDeletionResults.getCaseDocumentsFound(),

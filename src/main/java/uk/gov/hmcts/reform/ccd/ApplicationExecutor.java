@@ -38,7 +38,7 @@ public class ApplicationExecutor {
 
     public void execute() {
         applicationStartTime = LocalDateTime.now(clock);
-        Stopwatch timer = Stopwatch.createStarted();
+        final Stopwatch timer = Stopwatch.createStarted();
         log.info("Case-Disposer started...");
         final List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
         final List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
@@ -72,7 +72,7 @@ public class ApplicationExecutor {
         int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
         cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
 
-        Stopwatch timer = Stopwatch.createUnstarted();
+        final Stopwatch timer = Stopwatch.createUnstarted();
         for (CaseData caseData : cases) {
             if (requestLimit == 0 || isCutOffTimeReached()) {
                 break;

@@ -24,7 +24,11 @@ public class RemoteDisposeService {
         disposeRemoteOperations.forEach(disposeRemoteOperation -> {
             timer.start();
             disposeRemoteOperation.delete(caseData);
-            log.debug("Performance: {} for case {} took {}", disposeRemoteOperation, caseData.getReference(), timer.stop());
+            log.debug(
+                "Performance: {} for case {} took {}",
+                disposeRemoteOperation,
+                caseData.getReference(),
+                timer.stop());
             timer.reset();
         });
     }
