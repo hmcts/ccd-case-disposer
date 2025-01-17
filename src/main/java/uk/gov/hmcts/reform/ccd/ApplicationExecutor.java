@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import com.google.common.base.Stopwatch;
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,7 @@ public class ApplicationExecutor {
 
     public void execute() {
         applicationStartTime = LocalDateTime.now(clock);
+        Stopwatch timer = Stopwatch.createStarted();
         log.info("Case-Disposer started...");
         final List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
         final List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
@@ -55,6 +57,12 @@ public class ApplicationExecutor {
         caseDeletionLoggingService.logCases();
 
         log.info("Case-Disposer finished.");
+
+        log.debug(
+            "Performance: Case disposer took {} to process {} cases",
+            timer.stop(),
+            Math.min(allDeletableCases.size(), requestLimit)
+        );
     }
 
 
@@ -64,13 +72,17 @@ public class ApplicationExecutor {
         int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
         cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
 
+        Stopwatch timer = Stopwatch.createUnstarted();
         for (CaseData caseData : cases) {
             if (requestLimit == 0 || isCutOffTimeReached()) {
                 break;
             }
+            timer.start();
             caseDeletionService.deleteCaseData(caseData);
             requestLimit--;
             processedCasesRecordHolder.addProcessedCase(caseData);
+            log.debug("Performance: case {} took {} to delete", caseData.getReference(), timer.stop());
+            timer.reset();
         }
     }
 
