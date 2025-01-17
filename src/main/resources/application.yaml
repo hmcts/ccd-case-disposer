@@ -80,3 +80,7 @@ thread:
 case-collector:
   version: ${CASE_COLLECTOR_VERSION:1}
   max-run-duration-minutes: ${CASE_COLLECTOR_RUN_DURATION_IN_MINUTES:480}
+
+logging:
+  level:
+    uk.gov.hmcts.reform.ccd: ${CCD_DISPOSER_LOG_LEVEL:info}
