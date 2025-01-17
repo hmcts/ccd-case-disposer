@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
+import com.google.common.base.Stopwatch;
 import com.google.gson.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ public class LogAndAuditRemoteOperation {
 
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
         try {
+            Stopwatch timer = Stopwatch.createStarted();
             final CaseActionPostRequestResponse caseActionPostRequestResponse =
                 buildCaseActionPostRequest(caseData);
             final ResponseEntity<CaseActionPostRequestResponse> logAndAuditPostResponse = lauClient.postLauAudit(
@@ -53,7 +55,7 @@ public class LogAndAuditRemoteOperation {
 
                 throw new LogAndAuditException(errorMessage);
             }
-
+            log.debug("Performance: {} post message took {}", this, timer.stop());
 
         } catch (final Exception exception) {
             final String errorMessage = String.format(
@@ -97,5 +99,10 @@ public class LogAndAuditRemoteOperation {
 
     private String getTimestamp() {
         return new SimpleDateFormat(TIMESTAMP_PATTERN).format(valueOf(now()));
+    }
+
+    @Override
+    public String toString() {
+        return "Log And Audit";
     }
 }
