@@ -59,7 +59,9 @@ For more information:
 ./bin/run-in-docker.sh -h
 ```
 
-Script includes bare minimum environment variables necessary to start api instance. Whenever any variable is changed or any other script regarding docker image/container build, the suggested way to ensure all is cleaned up properly is by this command:
+Script includes bare minimum environment variables necessary to start api instance. Whenever any variable
+is changed or any other script regarding docker image/container build, the suggested way to ensure all is
+cleaned up properly is by this command:
 
 ```bash
 docker-compose rm
