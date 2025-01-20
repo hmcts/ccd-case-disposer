@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.ccd.parameter;
 
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toUnmodifiableList;
 
 @SuppressWarnings("ALL")
 public class DefaultParameterResolver implements ParameterResolver {
@@ -71,11 +70,15 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("${request.limit}")
     private Integer requestLimit;
 
+    @Getter
+    @Value("${cut-off-time}")
+    private LocalTime cutOffTime;
+
     @Override
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
                 .map(quotedHost -> quotedHost.replace("\"", "").strip())
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Override
@@ -118,20 +121,20 @@ public class DefaultParameterResolver implements ParameterResolver {
     public List<String> getDeletableCaseTypes() {
         return deletableCaseTypes.stream()
                 .map(quotedItem -> quotedItem.replace("\"", "").strip())
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Override
     public List<String> getDeletableCaseTypesSimulation() {
         return deletableCaseTypeSimulation.stream()
                 .map(quotedItem -> quotedItem.replace("\"", "").strip())
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Override
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

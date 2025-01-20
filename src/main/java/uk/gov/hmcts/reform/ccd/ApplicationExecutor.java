@@ -12,6 +12,9 @@ import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -27,8 +30,13 @@ public class ApplicationExecutor {
     private final ParameterResolver parameterResolver;
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
+    private final Clock clock;
+
+    private LocalDateTime applicationStartTime;
+    private LocalDateTime cutOff;
 
     public void execute() {
+        applicationStartTime = LocalDateTime.now(clock);
         log.info("Case-Disposer started...");
         final List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
         final List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
@@ -51,14 +59,28 @@ public class ApplicationExecutor {
 
 
     private void processCases(final Set<CaseData> cases, int requestLimit) {
+        LocalTime cutOffTime = parameterResolver.getCutOffTime();
+        // check if we need to add one day to the cut off time
+        int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
+        cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
+
         for (CaseData caseData : cases) {
-            if (requestLimit == 0) {
+            if (requestLimit == 0 || isCutOffTimeReached()) {
                 break;
             }
             caseDeletionService.deleteCaseData(caseData);
             requestLimit--;
             processedCasesRecordHolder.addProcessedCase(caseData);
-
         }
+    }
+
+    private boolean isCutOffTimeReached() {
+        LocalDateTime now = LocalDateTime.now(clock);
+        boolean afterCutOff = now.isAfter(cutOff);
+
+        if (afterCutOff) {
+            log.info("Current time ({}) is after cut off time {}, stopping ...", now, cutOff);
+        }
+        return afterCutOff;
     }
 }
