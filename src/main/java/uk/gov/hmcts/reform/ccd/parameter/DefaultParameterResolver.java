@@ -37,6 +37,21 @@ public class DefaultParameterResolver implements ParameterResolver {
     @Value("#{'${simulated.case.types}'.split(',')}")
     private List<String> deletableCaseTypeSimulation;
 
+    @Value("${remote.document.store.host}")
+    private String documentStoreHost;
+
+    @Value("${remote.role.assignment.host}")
+    private String roleAssignmentHost;
+
+    @Value("${remote.log.and.audit.host}")
+    private String logAndAuditHost;
+
+    @Value("${remote.tasks.host}")
+    private String tasksHost;
+
+    @Value("${remote.hearing.host}")
+    private String hearingHost;
+
     @Value("${remote.hearing.case.type}")
     private String hearingCaseType;
 

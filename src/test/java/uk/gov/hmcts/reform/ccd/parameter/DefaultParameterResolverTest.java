@@ -27,6 +27,10 @@ class DefaultParameterResolverTest {
     private static final String DELETABLE_CASE_TYPES = "deletableCaseTypes";
     private static final String DELETABLE_CASE_TYPE_SIMULATION = "deletableCaseTypeSimulation";
 
+    private static final String DOCUMENT_STORE_HOST = "documentStoreHost";
+    private static final String ROLE_ASSIGNMENT_HOST = "roleAssignmentHost";
+    private static final String TASKS_HOST = "tasksHost";
+
     private static final String THREAD_MAX_POOL_SIZE = "threadMaxPoolSize";
 
     private static final String THREAD_CORE_POOL_SIZE = "threadCorePoolSize";
@@ -58,6 +62,16 @@ class DefaultParameterResolverTest {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      DELETABLE_CASE_TYPE_SIMULATION, Arrays.asList("Case_Type_02"));
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                DOCUMENT_STORE_HOST, "http://localhost:4603");
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                                     ROLE_ASSIGNMENT_HOST, "http://localhost:4096");
+
+        ReflectionTestUtils.setField(defaultParameterResolver,
+                                     TASKS_HOST, "http://localhost:4000");
+
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                 THREAD_MAX_POOL_SIZE, 10);
