@@ -18,5 +18,6 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
 
     List<CaseLinkEntity> findByLinkedCaseId(final Long linkedCaseId);
 
+
     void delete(CaseLinkEntity caseLinkEntity);
 }
