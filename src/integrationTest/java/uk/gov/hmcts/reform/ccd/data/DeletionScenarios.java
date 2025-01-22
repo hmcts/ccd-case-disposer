@@ -587,7 +587,24 @@ public class DeletionScenarios {
                     List.of(1504259907351192L),
                     Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
                     Map.of("TaskCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "FT_MasterCaseType",
+                    "FT_SimulatedCaseType",
+                    "scenarios/S-035-deletable-linked-to-simulated.sql",
+                    List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L),
+                    Map.of("FT_MasterCaseType", List.of(
+                        1504259907035001L, 1504259907035002L, 1504259907035003L, 1504259907035005L,
+                        1504259907035006L, 1504259907035007L, 1504259907035008L, 1504259907035009L, 1504259907035010L),
+                           "FT_SimulatedCaseType", List.of(1504259907035004L)
+                    ),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907351192L),
+                    Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    Map.of("TaskCaseType", emptyList())
                 )
+
         );
     }
 }
