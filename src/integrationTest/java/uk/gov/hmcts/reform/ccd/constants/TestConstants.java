@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.ccd.constants;
 
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
+import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
+import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 
 import java.util.Map;
 
@@ -34,5 +36,21 @@ public class TestConstants {
     public static final Map<String, Integer> HEARINGS_DELETE = Map.ofEntries(
         Map.entry("1504259907445514", HttpStatus.NOT_FOUND.value())
     );
+
+    public static Map<String, CaseActionPostRequestResponse> LAU_QUERY = Map.ofEntries(
+        Map.entry("1504259907351163", buildCaseActionPostRequest("1504259907351163"))
+    );
+
+    private static CaseActionPostRequestResponse buildCaseActionPostRequest(final String caseRef) {
+        return new CaseActionPostRequestResponse(ActionLog.builder()
+                                                     .userId(null)
+                                                     .caseAction("DELETE")
+                                                     .caseTypeId("FT_MasterCaseType")
+                                                     .caseRef(caseRef)
+                                                     .caseJurisdictionId("BEFTA_MASTER")
+                                                     .timestamp("2021-08-23T22:20:05.023Z")
+                                                     .build());
+    }
+
 
 }

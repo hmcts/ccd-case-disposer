@@ -18,12 +18,15 @@ import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static feign.form.ContentProcessor.CONTENT_TYPE_HEADER;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.HEARINGS_DELETE;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.LAU_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.TASKS_DELETE;
@@ -82,7 +85,15 @@ public class WireMockStubs {
                 buildResponseDefinition(201, "{{request.body}}")
                     .withTransformers("response-template")
             ));
-    }
+
+        LAU_QUERY.entrySet().forEach(entry ->
+             wireMockServer.stubFor(post(urlPathMatching(LAU_SAVE_PATH))
+            .withRequestBody(matchingJsonPath("$.actionLog.caseRef", equalTo(entry.getKey())))
+            .willReturn(
+                buildResponseDefinition(404, new Gson().toJson(entry.getValue()))
+            )));
+
+}
 
     private void setupDeleteDocumentsStub(final WireMockServer wireMockServer) {
         String body = new Gson().toJson(new DocumentsDeletePostRequest("${json-unit.any-string}"));

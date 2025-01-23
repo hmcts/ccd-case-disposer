@@ -587,7 +587,19 @@ public class DeletionScenarios {
                     List.of(1504259907351192L),
                     Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
                     Map.of("TaskCaseType", emptyList())
-                )
+                ),
+            Arguments.of(
+                "FT_MasterCaseType",
+                null,
+                "scenarios/S-035-deletable-failed-cases-due-to-logAndAudit-exception.sql",
+                List.of(1L, 2L),
+                Map.of("FT_MasterCaseType", List.of(1504259907351164L, 1504259907351163L)),
+                List.of(2L),
+                emptyList(),
+                List.of(1504259907351164L),
+                Map.of("FT_MasterCaseType", List.of(1504259907351164L,1504259907351163L)),
+                Map.of("FT_MasterCaseType", emptyList())
+            )
         );
     }
 }
