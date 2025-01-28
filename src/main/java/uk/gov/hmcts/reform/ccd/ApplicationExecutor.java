@@ -37,6 +37,7 @@ public class ApplicationExecutor {
     private LocalDateTime cutOff;
 
     public void execute() {
+        logParameters();
         applicationStartTime = LocalDateTime.now(clock);
         final Stopwatch timer = Stopwatch.createStarted();
         log.info("Case-Disposer started...");
@@ -65,6 +66,13 @@ public class ApplicationExecutor {
         );
     }
 
+    private void logParameters() {
+        log.info("Request limit: {}", parameterResolver.getRequestLimit());
+        log.info("Deletable case types: {}", parameterResolver.getDeletableCaseTypes());
+        log.info("Deletion simulated case types: {}", parameterResolver.getDeletableCaseTypesSimulation());
+        parameterResolver.getElasticsearchHosts().forEach(host -> log.info("Elasticsearch host: {}", host));
+        log.info("Hearing Case Type: {}", parameterResolver.getHearingCaseType());
+    }
 
     private void processCases(final Set<CaseData> cases, int requestLimit) {
         LocalTime cutOffTime = parameterResolver.getCutOffTime();
