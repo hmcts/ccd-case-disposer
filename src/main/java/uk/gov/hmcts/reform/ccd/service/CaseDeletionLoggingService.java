@@ -67,7 +67,6 @@ public class CaseDeletionLoggingService {
         Set<CaseData> simulatedCases = processedCasesRecordHolder.getSimulatedCases();
         log.info("Total Simulated Cases: " + simulatedCases.size());
         List<List<CaseData>> partitions = Lists.partition(new ArrayList<>(simulatedCases), parameterResolver.getAppInsightsLogSize());
-        final AtomicInteger partCounter = new AtomicInteger(0);
 
         for (List<CaseData> partition : partitions) {
             StringBuilder batchLog = new StringBuilder();
