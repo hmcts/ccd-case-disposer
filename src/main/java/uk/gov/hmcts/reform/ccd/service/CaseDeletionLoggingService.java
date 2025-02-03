@@ -6,6 +6,7 @@ import dnl.utils.text.table.TextTable;
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
@@ -17,6 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
@@ -62,14 +64,20 @@ public class CaseDeletionLoggingService {
     }
 
     private void logSimulatedCases() {
-        processedCasesRecordHolder.getSimulatedCases().forEach(caseData -> {
-            final String logMessage = String.format(
-                "Simulated case type: %s, Case ref: %s",
-                caseData.getCaseType(), caseData.getReference()
-            );
+        Set<CaseData> simulatedCases = processedCasesRecordHolder.getSimulatedCases();
+        log.info("Total Simulated Cases: " + simulatedCases.size());
+        List<List<CaseData>> partitions = Lists.partition(new ArrayList<>(simulatedCases), parameterResolver.getAppInsightsLogSize());
+        final AtomicInteger partCounter = new AtomicInteger(0);
 
-            log.info(logMessage);
-        });
+        for (List<CaseData> partition : partitions) {
+            StringBuilder batchLog = new StringBuilder();
+            partition.forEach(caseData -> {
+                batchLog.append(String.format("Simulated case type: %s, Case ref: %s%n",
+                                              caseData.getCaseType(), caseData.getReference()));
+            });
+
+            log.info(batchLog.toString());
+        }
     }
 
     private ByteArrayOutputStream buildTextTable(final List<CaseDataView> caseViewListPartition) {
