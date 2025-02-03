@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.data.TestDataProvider;
+import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,8 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
     @Autowired
     private ApplicationExecutor executor;
 
+    @Autowired
+    private ProcessedCasesRecordHolder processedCasesRecordHolder;
 
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
@@ -35,6 +38,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
                        final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
         // GIVEN
         setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, initialStateRowIds, indexedData);
+        processedCasesRecordHolder.clearState();
 
         // WHEN
         executor.execute();
