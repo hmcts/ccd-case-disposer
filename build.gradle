@@ -250,7 +250,7 @@ def versions = [
     idamClient          : '3.0.3',
     junit               : '5.11.4',
     lombok              : '1.18.36',
-    reformLogging       : '6.1.7',
+    reformLogging       : '6.1.8',
     restAssured         : '5.5.0',
     s2sClient           : '5.3.0',
     sonarPitest         : '0.5',
