@@ -85,3 +85,6 @@ thread:
   max_pool_size: ${THREAD_MAX_POOL_SIZE:10}
   core_pool_size: ${THREAD_CORE_POOL_SIZE:5}
   queue_capacity: ${THREAD_QUEUE_CAPACITY:200}
+logging:
+  level:
+    uk.gov.hmcts.reform.ccd: ${CCD_DISPOSER_LOG_LEVEL:info}
