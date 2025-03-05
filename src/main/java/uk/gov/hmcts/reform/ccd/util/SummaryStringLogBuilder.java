@@ -5,12 +5,12 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.CR_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
@@ -27,18 +27,13 @@ public class SummaryStringLogBuilder {
 
     public String buildSummaryString(final List<CaseDataView> caseDataViews,
                                      final int partCounter,
-                                     final int totalSize,
-                                     final List<String> deletedCaseTypes,
-                                     final List<String> simulatedCaseTypes) {
+                                     final int totalSize) {
         final int deletedCases = countCaseFamilies(caseDataViews, DELETED_STATE);
         final int simulatedCases = countCaseFamilies(caseDataViews, SIMULATED_STATE);
         final int failedCases = countCaseFamilies(caseDataViews, FAILED_STATE);
         final int totalCases = deletedCases + simulatedCases + failedCases;
 
-        Map<String, Integer> deletedCaseTypeAndCounts = getCaseTypeAndCountByState(
-            caseDataViews,DELETED_STATE,deletedCaseTypes);
-        Map<String, Integer> simulatedCaseTypeAndCounts = getCaseTypeAndCountByState(
-            caseDataViews,SIMULATED_STATE,simulatedCaseTypes);
+        Map<String, Long> caseTypeAndStateCount = getCaseTypeAndStateCount(caseDataViews);
 
         return buildSummaryString(
             deletedCases,
@@ -47,8 +42,7 @@ public class SummaryStringLogBuilder {
             totalCases,
             partCounter,
             totalSize,
-            deletedCaseTypeAndCounts,
-            simulatedCaseTypeAndCounts
+            caseTypeAndStateCount
         );
     }
 
@@ -58,8 +52,7 @@ public class SummaryStringLogBuilder {
                                      final int total,
                                      final int partCounter,
                                      final int totalSize,
-                                     final Map<String, Integer> deletedCaseTypeAndCounts,
-                                     final Map<String, Integer> simulatedCaseTypeAndCounts) {
+                                     final Map<String, Long> caseTypeAndStateCount) {
 
         final StringBuilder stringBuilder = new StringBuilder(String.format(SUMMARY_HEADING_STRING, partCounter,
                                                                             totalSize
@@ -68,26 +61,16 @@ public class SummaryStringLogBuilder {
         stringBuilder.append(dateFormat.format(new Date()))
             .append(CR_STRING)
             .append(TOTAL_CASES_STRING).append(total)
-            .append(CR_STRING)
             .append(DELETED_CASES_STRING).append(deleted)
-            .append(CR_STRING)
             .append(SIMULATED_CASES_STRING).append(simulated)
             .append(FAILED_CASES_STRING).append(failed)
             .append(CR_STRING);
-        if (simulatedCaseTypeAndCounts != null && !simulatedCaseTypeAndCounts.isEmpty()) {
-            stringBuilder.append(CR_STRING);
-            simulatedCaseTypeAndCounts.forEach((caseType, count) ->
-                   stringBuilder.append(TOTAL_STRING).append(caseType).append(" ")
-                       .append(SIMULATED_CASES_STRING).append(count).append(CR_STRING)
-            );
-        }
-        if (deletedCaseTypeAndCounts != null && !deletedCaseTypeAndCounts.isEmpty()) {
-            deletedCaseTypeAndCounts.forEach((caseType, count) ->
-                   stringBuilder.append(TOTAL_STRING).append(caseType).append(" ")
-                    .append(DELETED_CASES_STRING).append(count).append(CR_STRING)
-            );
-            stringBuilder.append(CR_STRING);
-        }
+
+        caseTypeAndStateCount.forEach((caseTypeAndState, count) ->
+            stringBuilder.append(TOTAL_STRING).append(caseTypeAndState).append(CASES_STRING)
+                .append(count)
+        );
+        stringBuilder.append(CR_STRING);
         return stringBuilder.toString();
     }
 
@@ -97,24 +80,12 @@ public class SummaryStringLogBuilder {
             .collect(Collectors.toList()).size();
     }
 
-    private int countCaseFamiliesByCaseTypeAndState(final List<CaseDataView> caseDataViews,
-                                                    final String caseType, final String state) {
-        return (int) caseDataViews.stream()
-            .filter(caseDataView -> caseDataView.getCaseType() != null
-                && caseDataView.getCaseType().equals(caseType)
-                && caseDataView.getState().equals(state))
-            .count();
-    }
-
-    private Map<String, Integer> getCaseTypeAndCountByState(final List<CaseDataView> caseDataViews,
-                                                            String state, List<String> caseTypes) {
-
-        Map<String, Integer> caseTypeAndCounts = new HashMap<>();
-        for (String caseType : caseTypes) {
-            int caseTypeCount = countCaseFamiliesByCaseTypeAndState(caseDataViews, caseType, state);
-            caseTypeAndCounts.put(caseType, caseTypeCount);
-        }
-        return caseTypeAndCounts;
+    private Map<String, Long> getCaseTypeAndStateCount(final List<CaseDataView> caseDataViews) {
+        return caseDataViews.stream()
+            .collect(Collectors.groupingBy(
+                caseDataView -> caseDataView.getCaseType() + " " + caseDataView.getState(),
+                Collectors.counting()
+            ));
     }
 
 }

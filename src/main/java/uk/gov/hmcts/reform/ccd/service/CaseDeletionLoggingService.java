@@ -47,17 +47,13 @@ public class CaseDeletionLoggingService {
         final List<List<CaseDataView>> caseViewPartition = Lists.partition(caseDataViews,
                 parameterResolver.getAppInsightsLogSize());
 
-        List<String> deletedCaseTypes = parameterResolver.getDeletableCaseTypes();
-        List<String> simulatedCaseTypes = parameterResolver.getDeletableCaseTypesSimulation();
-
         if (!caseViewPartition.isEmpty()) {
             final AtomicInteger partCounter = new AtomicInteger(0);
 
             caseViewPartition.forEach(caseViewListPartition -> {
                 final String summaryString = summaryStringLogBuilder.buildSummaryString(caseDataViews,
                         partCounter.incrementAndGet(),
-                        caseViewPartition.size(),
-                        deletedCaseTypes,simulatedCaseTypes);
+                        caseViewPartition.size());
 
                 final ByteArrayOutputStream outputStream = buildTextTable(caseViewListPartition);
 
@@ -98,7 +94,7 @@ public class CaseDeletionLoggingService {
     private void logDataIfNoDeletableOrSimulatedCasesFound() {
         final String summaryString = summaryStringLogBuilder
                 .buildSummaryString(0, 0, 0, 0, 0, 0,
-                                    Collections.emptyMap(), Collections.emptyMap());
+                                    Collections.emptyMap());
         log.info(summaryString);
     }
 

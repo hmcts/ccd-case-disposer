@@ -62,7 +62,7 @@ class CaseDeletionLoggingServiceTest {
 
         verify(tableTextBuilder, times(1)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
-                .buildSummaryString(anyList(), anyInt(), anyInt(), anyList(), anyList());
+                .buildSummaryString(anyList(), anyInt(), anyInt());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
     }
 
@@ -77,15 +77,13 @@ class CaseDeletionLoggingServiceTest {
             .thenReturn(Collections.emptyList());
 
         when(parameterResolver.getAppInsightsLogSize()).thenReturn(10);
-        when(parameterResolver.getDeletableCaseTypes()).thenReturn(Collections.emptyList());
-        when(parameterResolver.getDeletableCaseTypesSimulation()).thenReturn(Collections.emptyList());
 
         caseDeletionLoggingService.logCases();
 
         verify(tableTextBuilder, times(0)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
                 .buildSummaryString(0, 0, 0, 0, 0, 0,
-                                    Collections.emptyMap(), Collections.emptyMap());
+                                    Collections.emptyMap());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
     }
 }
