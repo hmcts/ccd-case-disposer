@@ -1,15 +1,19 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.ElasticsearchException;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.config.RequestConfig;
+/*import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
 import org.elasticsearch.index.reindex.DeleteByQueryRequest;
-import org.elasticsearch.index.reindex.ScrollableHitSource;
+import org.elasticsearch.index.reindex.ScrollableHitSource;*/
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.config.es.GlobalSearchIndexChecker;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
@@ -29,7 +33,8 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
     private static final String SEARCH_FAILURES = "Search failures occurred";
     private static final String ELASTICSEARCH_FAILURES = "Elasticsearch operation failures occurred";
 
-    private final RestHighLevelClient elasticsearchClient;
+    //private final RestHighLevelClient elasticsearchClient;
+    private final ElasticsearchClient elasticsearchClient;
     private final ParameterResolver parameterResolver;
     private final GlobalSearchIndexChecker globalSearchIndexChecker;
 
@@ -57,7 +62,9 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
         }
     }
 
-    private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
+
+
+    /*private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
 
         final RequestOptions requestOptions = buildRequestOptions();
         final BulkByScrollResponse bulkResponse = elasticsearchClient.deleteByQuery(request, requestOptions);
@@ -71,9 +78,21 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
         if (!isEmpty(bulkFailures)) {
             throwError(ELASTICSEARCH_FAILURES, bulkFailures);
         }
+    }*/
+
+     private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
+        try {
+            final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
+
+            if (!isEmpty(response.failures())) {
+                throwError(SEARCH_FAILURES, response.failures());
+            }
+        } catch (ElasticsearchException e) {
+            throw new ElasticsearchOperationException(e);
+        }
     }
 
-    private DeleteByQueryRequest buildDeleteByQueryRequest(final String caseIndex, final Long caseReference) {
+    /*private DeleteByQueryRequest buildDeleteByQueryRequest(final String caseIndex, final Long caseReference) {
         final DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(caseIndex);
         deleteByQueryRequest.setConflicts("proceed");
         // Option to take a list of caseReferences and use TermsQueryBuilder if needed
@@ -81,16 +100,29 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
         deleteByQueryRequest.setRefresh(true);
 
         return deleteByQueryRequest;
+    }*/
+
+    private DeleteByQueryRequest buildDeleteByQueryRequest(final String caseIndex, final Long caseReference) {
+        return DeleteByQueryRequest.of(b -> b
+            .index(caseIndex)
+            .query(q -> q
+                .term(t -> t
+                    .field(CASE_REFERENCE_FIELD)
+                    .value(caseReference)
+                )
+            )
+            .refresh(true)
+        );
     }
 
-    private RequestOptions buildRequestOptions() {
+    /*private RequestOptions buildRequestOptions() {
         final RequestConfig requestConfig = RequestConfig.custom()
             .setConnectionRequestTimeout(parameterResolver.getElasticsearchRequestTimeout())
             .build();
         return RequestOptions.DEFAULT.toBuilder()
             .setRequestConfig(requestConfig)
             .build();
-    }
+    }*/
 
     private <T> void throwError(final String message, final List<T> list) {
         log.error("{}:: {}", message, list);
@@ -100,4 +132,5 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
     private String getIndex(final String caseType) {
         return String.format(parameterResolver.getCasesIndexNamePattern(), caseType).toLowerCase();
     }
+
 }

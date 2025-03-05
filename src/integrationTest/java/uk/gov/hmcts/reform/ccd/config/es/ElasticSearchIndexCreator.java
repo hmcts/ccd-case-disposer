@@ -1,14 +1,17 @@
 package uk.gov.hmcts.reform.ccd.config.es;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pivovarit.function.ThrowingConsumer;
 import jakarta.inject.Inject;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+/*import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.xcontent.XContentType;
+import org.elasticsearch.xcontent.XContentType;*/
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
@@ -25,14 +28,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 public class ElasticSearchIndexCreator {
 
     @Inject
-    private RestHighLevelClient elasticsearchClient;
+    private ElasticsearchClient elasticsearchClient;
 
     @Inject
     private ParameterResolver parameterResolver;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public void insertDataIntoElasticsearch(final String indexName, final List<Long> caseRefs) throws IOException {
+    /*public void insertDataIntoElasticsearch(final String indexName, final List<Long> caseRefs) throws IOException {
         final String caseIndex = getIndexName(indexName);
         final List<CaseDataEntity> caseDataEntities = buildCaseDataEntity(
                 getIndexName(indexName),
@@ -42,6 +45,30 @@ public class ElasticSearchIndexCreator {
         final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest, DEFAULT);
 
         assertFalse(bulkResponse.hasFailures());
+
+        refreshIndex(caseIndex);
+    }*/
+
+    public void insertDataIntoElasticsearch(final String indexName, final List<Long> caseRefs) throws IOException {
+        final String caseIndex = getIndexName(indexName);
+        final List<CaseDataEntity> caseDataEntities = buildCaseDataEntity(
+            getIndexName(indexName),
+            caseRefs);
+
+        final BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
+        caseDataEntities.forEach(ThrowingConsumer.unchecked(data -> {
+            final String value = objectMapper.writeValueAsString(data);
+            bulkRequestBuilder.operations(op -> op
+                .index(idx -> idx
+                    .index(caseIndex)
+                    .document(value)
+                )
+            );
+        }));
+
+        final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequestBuilder.build());
+
+        assertFalse(bulkResponse.errors());
 
         refreshIndex(caseIndex);
     }
@@ -55,7 +82,7 @@ public class ElasticSearchIndexCreator {
                 .collect(Collectors.toList());
     }
 
-    private BulkRequest buildBulkRequest(final String caseIndex, final List<CaseDataEntity> caseDataEntities) {
+    /*private BulkRequest buildBulkRequest(final String caseIndex, final List<CaseDataEntity> caseDataEntities) {
         final BulkRequest bulkRequest = new BulkRequest();
         caseDataEntities.forEach(ThrowingConsumer.unchecked(data -> {
             final String value = objectMapper.writeValueAsString(data);
@@ -66,7 +93,7 @@ public class ElasticSearchIndexCreator {
         }));
 
         return bulkRequest;
-    }
+    }*/
 
     private void refreshIndex(final String caseIndex) throws IOException {
         final RefreshRequest refreshRequest = new RefreshRequest(caseIndex);
