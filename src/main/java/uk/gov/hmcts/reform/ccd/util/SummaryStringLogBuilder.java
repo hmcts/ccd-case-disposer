@@ -35,9 +35,9 @@ public class SummaryStringLogBuilder {
         final int failedCases = countCaseFamilies(caseDataViews, FAILED_STATE);
         final int totalCases = deletedCases + simulatedCases + failedCases;
 
-        Map<String, Integer> deletedCaseTypeCounts = getCaseTypeAndCountByState(
+        Map<String, Integer> deletedCaseTypeAndCounts = getCaseTypeAndCountByState(
             caseDataViews,DELETED_STATE,deletedCaseTypes);
-        Map<String, Integer> simulatedCaseTypeCounts = getCaseTypeAndCountByState(
+        Map<String, Integer> simulatedCaseTypeAndCounts = getCaseTypeAndCountByState(
             caseDataViews,SIMULATED_STATE,simulatedCaseTypes);
 
         return buildSummaryString(
@@ -47,8 +47,8 @@ public class SummaryStringLogBuilder {
             totalCases,
             partCounter,
             totalSize,
-            deletedCaseTypeCounts,
-            simulatedCaseTypeCounts
+            deletedCaseTypeAndCounts,
+            simulatedCaseTypeAndCounts
         );
     }
 
@@ -58,8 +58,8 @@ public class SummaryStringLogBuilder {
                                      final int total,
                                      final int partCounter,
                                      final int totalSize,
-                                     final Map<String, Integer> deletedCaseTypeCounts,
-                                     final Map<String, Integer> simulatedCaseTypeCounts) {
+                                     final Map<String, Integer> deletedCaseTypeAndCounts,
+                                     final Map<String, Integer> simulatedCaseTypeAndCounts) {
 
         final StringBuilder stringBuilder = new StringBuilder(String.format(SUMMARY_HEADING_STRING, partCounter,
                                                                             totalSize
@@ -74,14 +74,14 @@ public class SummaryStringLogBuilder {
             .append(SIMULATED_CASES_STRING).append(simulated)
             .append(FAILED_CASES_STRING).append(failed)
             .append(CR_STRING);
-        if (simulatedCaseTypeCounts != null && !simulatedCaseTypeCounts.isEmpty()) {
-            simulatedCaseTypeCounts.forEach((caseType, count) ->
+        if (simulatedCaseTypeAndCounts != null && !simulatedCaseTypeAndCounts.isEmpty()) {
+            simulatedCaseTypeAndCounts.forEach((caseType, count) ->
                    stringBuilder.append(TOTAL_STRING).append(caseType).append(" ")
                        .append(SIMULATED_CASES_STRING).append(count).append(CR_STRING)
             );
         }
-        if (deletedCaseTypeCounts != null && !deletedCaseTypeCounts.isEmpty()) {
-            deletedCaseTypeCounts.forEach((caseType, count) ->
+        if (deletedCaseTypeAndCounts != null && !deletedCaseTypeAndCounts.isEmpty()) {
+            deletedCaseTypeAndCounts.forEach((caseType, count) ->
                    stringBuilder.append(TOTAL_STRING).append(caseType).append(" ")
                     .append(DELETED_CASES_STRING).append(count).append(CR_STRING)
             );
@@ -107,12 +107,12 @@ public class SummaryStringLogBuilder {
     private Map<String, Integer> getCaseTypeAndCountByState(final List<CaseDataView> caseDataViews,
                                                             String state, List<String> caseTypes) {
 
-        Map<String, Integer> caseTypeCounts = new HashMap<>();
+        Map<String, Integer> caseTypeAndCounts = new HashMap<>();
         for (String caseType : caseTypes) {
             int caseTypeCount = countCaseFamiliesByCaseTypeAndState(caseDataViews, caseType, state);
-            caseTypeCounts.put(caseType, caseTypeCount);
+            caseTypeAndCounts.put(caseType, caseTypeCount);
         }
-        return caseTypeCounts;
+        return caseTypeAndCounts;
     }
 
 }
