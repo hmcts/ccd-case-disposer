@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -86,7 +85,7 @@ class CaseDeletionLoggingServiceTest {
         verify(tableTextBuilder, times(0)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
                 .buildSummaryString(0, 0, 0, 0, 0, 0,
-                                    new HashMap<>(), new HashMap<>());
+                                    Collections.emptyMap(), Collections.emptyMap());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
     }
 }
