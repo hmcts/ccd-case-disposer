@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -62,7 +63,7 @@ class CaseDeletionLoggingServiceTest {
 
         verify(tableTextBuilder, times(1)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
-                .buildSummaryString(anyList(), anyInt(), anyInt());
+                .buildSummaryString(anyList(), anyInt(), anyInt(), anyList(), anyList());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
     }
 
@@ -77,12 +78,15 @@ class CaseDeletionLoggingServiceTest {
             .thenReturn(Collections.emptyList());
 
         when(parameterResolver.getAppInsightsLogSize()).thenReturn(10);
+        when(parameterResolver.getDeletableCaseTypes()).thenReturn(Collections.emptyList());
+        when(parameterResolver.getDeletableCaseTypesSimulation()).thenReturn(Collections.emptyList());
 
         caseDeletionLoggingService.logCases();
 
         verify(tableTextBuilder, times(0)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
-                .buildSummaryString(0, 0, 0, 0, 0, 0);
+                .buildSummaryString(0, 0, 0, 0, 0, 0,
+                                    new HashMap<>(), new HashMap<>());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
     }
 }

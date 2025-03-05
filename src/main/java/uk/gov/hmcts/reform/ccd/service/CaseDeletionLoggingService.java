@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -46,13 +47,17 @@ public class CaseDeletionLoggingService {
         final List<List<CaseDataView>> caseViewPartition = Lists.partition(caseDataViews,
                 parameterResolver.getAppInsightsLogSize());
 
+        List<String> deletedCaseTypes = parameterResolver.getDeletableCaseTypes();
+        List<String> simulatedCaseTypes = parameterResolver.getDeletableCaseTypesSimulation();
+
         if (!caseViewPartition.isEmpty()) {
             final AtomicInteger partCounter = new AtomicInteger(0);
 
             caseViewPartition.forEach(caseViewListPartition -> {
                 final String summaryString = summaryStringLogBuilder.buildSummaryString(caseDataViews,
                         partCounter.incrementAndGet(),
-                        caseViewPartition.size());
+                        caseViewPartition.size(),
+                        deletedCaseTypes,simulatedCaseTypes);
 
                 final ByteArrayOutputStream outputStream = buildTextTable(caseViewListPartition);
 
@@ -92,7 +97,8 @@ public class CaseDeletionLoggingService {
 
     private void logDataIfNoDeletableOrSimulatedCasesFound() {
         final String summaryString = summaryStringLogBuilder
-                .buildSummaryString(0, 0,0, 0, 0, 0);
+                .buildSummaryString(0, 0, 0, 0, 0, 0,
+                                    Collections.emptyMap(), Collections.emptyMap());
         log.info(summaryString);
     }
 
