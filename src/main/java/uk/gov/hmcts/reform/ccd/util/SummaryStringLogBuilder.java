@@ -75,6 +75,7 @@ public class SummaryStringLogBuilder {
             .append(FAILED_CASES_STRING).append(failed)
             .append(CR_STRING);
         if (simulatedCaseTypeAndCounts != null && !simulatedCaseTypeAndCounts.isEmpty()) {
+            stringBuilder.append(CR_STRING);
             simulatedCaseTypeAndCounts.forEach((caseType, count) ->
                    stringBuilder.append(TOTAL_STRING).append(caseType).append(" ")
                        .append(SIMULATED_CASES_STRING).append(count).append(CR_STRING)
@@ -85,6 +86,7 @@ public class SummaryStringLogBuilder {
                    stringBuilder.append(TOTAL_STRING).append(caseType).append(" ")
                     .append(DELETED_CASES_STRING).append(count).append(CR_STRING)
             );
+            stringBuilder.append(CR_STRING);
         }
         return stringBuilder.toString();
     }
