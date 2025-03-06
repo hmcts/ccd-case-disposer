@@ -20,9 +20,9 @@
         "telemetryKind": "dependency",
         "attributes": [
           {
-            "key": "type",
-            "value": "postgresql",
-            "matchType": "strict"
+            "key": "target",
+            "value": ".*postgres\\.database.*",
+            "matchType": "regexp"
           }
         ],
         "percentage": 0
