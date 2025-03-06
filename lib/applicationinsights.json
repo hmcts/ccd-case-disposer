@@ -3,32 +3,30 @@
   "role": {
     "name": "ccd-case-disposer"
   },
-  "preview": {
-    "sampling": {
-      "overrides": [
-        {
-          "telemetryType": "request",
-          "attributes": [
-            {
-              "key": "http.url",
-              "value": "https?://[^/]+/health.*",
-              "matchType": "regexp"
-            }
-          ],
-          "percentage": 1
-        },
-        {
-          "telemetryType": "dependency",
-          "attributes": [
-            {
-              "key": "type",
-              "value": "postgresql",
-              "matchType": "strict"
-            }
-          ],
-          "percentage": 0
-        }
-      ]
-    }
+  "sampling": {
+    "overrides": [
+      {
+        "telemetryKind": "request",
+        "attributes": [
+          {
+            "key": "http.url",
+            "value": "https?://[^/]+/health.*",
+            "matchType": "regexp"
+          }
+        ],
+        "percentage": 1
+      },
+      {
+        "telemetryKind": "dependency",
+        "attributes": [
+          {
+            "key": "type",
+            "value": "postgresql",
+            "matchType": "strict"
+          }
+        ],
+        "percentage": 0
+      }
+    ]
   }
 }
