@@ -16,6 +16,17 @@
             }
           ],
           "percentage": 1
+        },
+        {
+          "telemetryType": "dependency",
+          "attributes": [
+            {
+              "key": "type",
+              "value": "postgresql",
+              "matchType": "strict"
+            }
+          ],
+          "percentage": 0
         }
       ]
     }
