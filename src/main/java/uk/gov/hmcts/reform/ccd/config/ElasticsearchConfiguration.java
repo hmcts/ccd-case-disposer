@@ -12,7 +12,6 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
-import org.elasticsearch.client.RestClientBuilder;
 
 @Configuration
 public class ElasticsearchConfiguration {
@@ -33,9 +32,7 @@ public class ElasticsearchConfiguration {
         final HttpHost[] httpHosts = parameterResolver.getElasticsearchHosts().stream()
             .map(HttpHost::create)
             .toArray(HttpHost[]::new);
-        final RestClientBuilder restClientBuilder = RestClient.builder(httpHosts);
-
-        restClient = restClientBuilder.build();
+        restClient = RestClient.builder(httpHosts).build();
         transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         elasticsearchClient = new ElasticsearchClient(transport);
     }

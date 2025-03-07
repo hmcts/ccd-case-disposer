@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.ccd.config.es;
 
 
-import jakarta.inject.Named;
-import lombok.RequiredArgsConstructor;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.transport.endpoints.BooleanResponse;
+import jakarta.inject.Named;
+import lombok.RequiredArgsConstructor;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
