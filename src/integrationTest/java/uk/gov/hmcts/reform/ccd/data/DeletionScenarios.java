@@ -92,7 +92,7 @@ public class DeletionScenarios {
                         "FT_MasterCaseType, FT_MultiplePages",
                         null,
                         "scenarios/S-005-unexpired-cases-and-nondeletable-case-types-present.sql",
-                        List.of(1L, 2L, 3L, 4L),
+                        List.of(1L, 2L, 3L, 4L, 5L),
                         Map.of("FT_MasterCaseType", List.of(1504259907353527L, 1504259907353528L,
                                         1504259907353529L, 1504259907353526L),
                                 "FT_MultiplePages", List.of(1504259907353525L)
@@ -586,6 +586,18 @@ public class DeletionScenarios {
                     emptyList(),
                     List.of(1504259907351192L),
                     Map.of("TaskCaseType", List.of(1504259907351192L, 1504259907351193L)),
+                    Map.of("TaskCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "TaskCaseType",
+                    null,
+                    "scenarios/S-035-deletable-failed-cases-due-to-log-and-audit-exception.sql",
+                    List.of(1L, 2L),
+                    Map.of("TaskCaseType", List.of(1504259907033001L, 1504259907033002L)),
+                    List.of(2L),
+                    emptyList(),
+                    List.of(1504259907033001L),
+                    Map.of("TaskCaseType", List.of(1504259907033001L, 1504259907033002L)),
                     Map.of("TaskCaseType", emptyList())
                 )
         );

@@ -24,6 +24,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static feign.form.ContentProcessor.CONTENT_TYPE_HEADER;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.HEARINGS_DELETE;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.LAU_SAVE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_DELETE;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_QUERY;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.TASKS_DELETE;
@@ -82,6 +83,17 @@ public class WireMockStubs {
                 buildResponseDefinition(201, "{{request.body}}")
                     .withTransformers("response-template")
             ));
+
+
+        LAU_SAVE.forEach((key, value) -> {
+            actionLogExample.setCaseRef(key);
+            String specificBody = new Gson().toJson(new CaseActionPostRequestResponse(actionLogExample));
+
+            wireMockServer.stubFor(
+                post(urlPathMatching(LAU_SAVE_PATH))
+                    .withRequestBody(equalToJson(specificBody, true, true))
+                    .willReturn(buildResponseDefinition(value)));
+        });
     }
 
     private void setupDeleteDocumentsStub(final WireMockServer wireMockServer) {
