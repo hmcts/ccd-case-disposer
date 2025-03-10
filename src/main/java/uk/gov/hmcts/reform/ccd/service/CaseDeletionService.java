@@ -33,8 +33,9 @@ public class CaseDeletionService {
 
     @Transactional
     public void deleteCaseData(@NonNull final CaseData caseData) {
-        deleteCaseLinks(caseData);
-        deleteCase(caseData);
+        if (deleteCaseLinks(caseData)) {
+            deleteCase(caseData);
+        }
     }
 
     /**
@@ -44,28 +45,27 @@ public class CaseDeletionService {
      *
      * @param caseData - case to delete links for
      */
-    void deleteCaseLinks(final CaseData caseData) {
+    boolean deleteCaseLinks(final CaseData caseData) {
         try {
-            log.info("About to delete linked case reference:: {}", caseData.getReference());
-
             final List<CaseLinkEntity> allLinkedCases = caseLinkRepository.findByCaseIdOrLinkedCaseId(caseData.getId());
-            if (!allLinkedCases.isEmpty()) {
+            if (allLinkedCases.isEmpty()) {
+                log.info("No linked cases found for case reference:: {}", caseData.getReference());
+            } else {
+                log.info("About to delete linked case reference:: {}", caseData.getReference());
                 caseLinkRepository.deleteAll(allLinkedCases);
+                log.info("Deleted linked case reference:: {}", caseData.getReference());
             }
-            log.info("Deleted linked case reference:: {}", caseData.getReference());
+            return true;
         } catch (final Exception exception) { // Catch all exceptions
-            final String errorMessage = String.format(
-                "Could not delete linked case reference:: %s",
-                caseData.getReference()
-            );
-            log.error(errorMessage, exception);
+            log.error("Could not delete linked case reference:: {}", caseData.getReference(), exception);
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+            return false;
         }
     }
 
     void deleteCase(final CaseData caseData) {
         try {
-            log.info("About to delete case.reference:: {}", caseData.getReference());
+            log.info("About to delete case reference:: {}", caseData.getReference());
 
             final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
             if (caseDataEntity.isPresent()) {
@@ -77,11 +77,7 @@ public class CaseDeletionService {
 
             log.info("Deleted case reference:: {}", caseData.getReference());
         } catch (final Exception exception) { // Catch all exceptions
-            final String errorMessage = String.format(
-                "Could not delete case reference:: %s",
-                caseData.getReference()
-            );
-            log.error(errorMessage, exception);
+            log.error("Could not delete case reference:: {}", caseData.getReference(), exception);
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
         }
     }

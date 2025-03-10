@@ -38,4 +38,13 @@ public class ProcessedCasesRecordHolder {
             .filter(caseData -> failedToDeleteCaseRefs.contains(caseData.getReference()))
             .toList();
     }
+
+    // Clearing state for integration tests
+    // This could be done by using @DirtiesContext annotation
+    // on the tests, but it slows tests down significantly
+    public void clearState() {
+        failedToDeleteCaseRefs.clear();
+        processedCases.clear();
+        simulatedCases.clear();
+    }
 }
