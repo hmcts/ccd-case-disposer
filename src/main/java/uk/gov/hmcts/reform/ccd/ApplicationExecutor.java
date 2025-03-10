@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
@@ -76,7 +77,11 @@ public class ApplicationExecutor {
             if (requestLimit == 0 || isCutOffTimeReached()) {
                 break;
             }
-            caseDeletionService.deleteCaseData(caseData);
+            try {
+                caseDeletionService.deleteCaseData(caseData);
+            } catch (LogAndAuditException logAndAuditException) {
+                log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
+            }
             requestLimit--;
             processedCasesRecordHolder.addProcessedCase(caseData);
         }
