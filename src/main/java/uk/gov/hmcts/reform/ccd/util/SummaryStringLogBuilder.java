@@ -7,8 +7,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.CR_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
@@ -18,6 +20,7 @@ import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SUMMARY_HEADING_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.TOTAL_CASES_STRING;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.TOTAL_STRING;
 
 @Named
 public class SummaryStringLogBuilder {
@@ -30,7 +33,17 @@ public class SummaryStringLogBuilder {
         final int failedCases = countCaseFamilies(caseDataViews, FAILED_STATE);
         final int totalCases = deletedCases + simulatedCases + failedCases;
 
-        return buildSummaryString(deletedCases, simulatedCases, failedCases, totalCases, partCounter, totalSize);
+        Map<String, Long> caseTypeAndStateCount = getCaseTypeAndStateCount(caseDataViews);
+
+        return buildSummaryString(
+            deletedCases,
+            simulatedCases,
+            failedCases,
+            totalCases,
+            partCounter,
+            totalSize,
+            caseTypeAndStateCount
+        );
     }
 
     public String buildSummaryString(final int deleted,
@@ -38,7 +51,8 @@ public class SummaryStringLogBuilder {
                                      final int failed,
                                      final int total,
                                      final int partCounter,
-                                     final int totalSize) {
+                                     final int totalSize,
+                                     final Map<String, Long> caseTypeAndStateCount) {
 
         final StringBuilder stringBuilder = new StringBuilder(String.format(SUMMARY_HEADING_STRING, partCounter,
                                                                             totalSize
@@ -51,6 +65,12 @@ public class SummaryStringLogBuilder {
             .append(SIMULATED_CASES_STRING).append(simulated)
             .append(FAILED_CASES_STRING).append(failed)
             .append(CR_STRING);
+
+        caseTypeAndStateCount.forEach((caseTypeAndState, count) ->
+            stringBuilder.append(TOTAL_STRING).append(caseTypeAndState).append(CASES_STRING)
+                .append(count)
+        );
+        stringBuilder.append(CR_STRING);
         return stringBuilder.toString();
     }
 
@@ -59,4 +79,13 @@ public class SummaryStringLogBuilder {
             .filter(caseDataView -> caseDataView.getState().equals(state))
             .collect(Collectors.toList()).size();
     }
+
+    private Map<String, Long> getCaseTypeAndStateCount(final List<CaseDataView> caseDataViews) {
+        return caseDataViews.stream()
+            .collect(Collectors.groupingBy(
+                caseDataView -> caseDataView.getCaseType() + " " + caseDataView.getState(),
+                Collectors.counting()
+            ));
+    }
+
 }

@@ -15,17 +15,19 @@ class SummaryStringLogBuilderTest {
 
     @Test
     void shouldReturnDeletionSummaryString() {
-        final CaseDataView caseDataView = new CaseDataView(null, 111L, DELETED_STATE);
-        final CaseDataView caseDataView1 = new CaseDataView(null, 333L, DELETED_STATE);
+        final CaseDataView caseDataView = new CaseDataView("NFD", 111L, DELETED_STATE);
+        final CaseDataView caseDataView1 = new CaseDataView("Caveat", 333L, DELETED_STATE);
+        final CaseDataView caseDataView6 = new CaseDataView("Caveat", 666L, DELETED_STATE);
 
-        final CaseDataView caseDataView2 = new CaseDataView(null, 222L, SIMULATED_STATE);
-        final CaseDataView caseDataView3 = new CaseDataView(null, 111L, SIMULATED_STATE);
+        final CaseDataView caseDataView2 = new CaseDataView("MoneyClaimCase", 222L, SIMULATED_STATE);
+        final CaseDataView caseDataView3 = new CaseDataView("A58", 111L, SIMULATED_STATE);
+        final CaseDataView caseDataView7 = new CaseDataView("A58", 777L, SIMULATED_STATE);
 
-        final CaseDataView caseDataView4 = new CaseDataView(null, 444L, FAILED_STATE);
-        final CaseDataView caseDataView5 = new CaseDataView(null, 555L, FAILED_STATE);
+        final CaseDataView caseDataView4 = new CaseDataView("Caveat", 444L, FAILED_STATE);
+        final CaseDataView caseDataView5 = new CaseDataView("A58", 555L, FAILED_STATE);
 
-        final List<CaseDataView> caseDataViews = Arrays.asList(caseDataView, caseDataView1, caseDataView2,
-                caseDataView3, caseDataView4, caseDataView5);
+        final List<CaseDataView> caseDataViews = Arrays.asList(caseDataView, caseDataView1, caseDataView6,caseDataView2,
+                caseDataView3,caseDataView7, caseDataView4, caseDataView5);
 
 
         final SummaryStringLogBuilder summaryStringLogBuilder = new SummaryStringLogBuilder();
@@ -34,9 +36,15 @@ class SummaryStringLogBuilderTest {
 
         assertThat(buildSummaryString).contains("Case Disposer Deletion Summary 1 of 1");
 
-        assertThat(buildSummaryString).contains("Total cases : 6");
-        assertThat(buildSummaryString).contains("Deleted cases : 2");
-        assertThat(buildSummaryString).contains("Simulated cases : 2");
+        assertThat(buildSummaryString).contains("Total cases : 8");
+        assertThat(buildSummaryString).contains("Deleted cases : 3");
+        assertThat(buildSummaryString).contains("Simulated cases : 3");
         assertThat(buildSummaryString).contains("Failed cases : 2");
+        assertThat(buildSummaryString).contains("Total MoneyClaimCase SIMULATED cases : 1");
+        assertThat(buildSummaryString).contains("Total A58 SIMULATED cases : 2");
+        assertThat(buildSummaryString).contains("Total NFD DELETED cases : 1");
+        assertThat(buildSummaryString).contains("Total Caveat DELETED cases : 2");
+        assertThat(buildSummaryString).contains("Total Caveat FAILED cases : 1");
+        assertThat(buildSummaryString).contains("Total A58 FAILED cases : 1");
     }
 }

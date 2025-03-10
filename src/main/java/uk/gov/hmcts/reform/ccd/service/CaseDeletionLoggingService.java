@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -92,7 +93,8 @@ public class CaseDeletionLoggingService {
 
     private void logDataIfNoDeletableOrSimulatedCasesFound() {
         final String summaryString = summaryStringLogBuilder
-                .buildSummaryString(0, 0,0, 0, 0, 0);
+                .buildSummaryString(0, 0, 0, 0, 0, 0,
+                                    Collections.emptyMap());
         log.info(summaryString);
     }
 
