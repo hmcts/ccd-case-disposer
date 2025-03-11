@@ -81,7 +81,7 @@ class DisposeElasticsearchRemoteOperationTest {
     }
 
     @Test
-    void testShouldRaiseSearchFailuresWhenDeleteByReference() throws Exception {
+    void testShouldRaiseFailuresWhenDeleteByReference() throws Exception {
         DeleteByQueryResponse deleteByQueryResponse = mock(DeleteByQueryResponse.class);
         doReturn(deleteByQueryResponse).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class));
@@ -95,24 +95,6 @@ class DisposeElasticsearchRemoteOperationTest {
         verify(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class));
     }
-
-    /*@Test
-    void testShouldRaiseElasticsearchFailuresWhenDeleteByReference() throws Exception {
-        DeleteByQueryResponse deleteByQueryResponse = mock(DeleteByQueryResponse.class);
-        doReturn(deleteByQueryResponse).when(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class));
-        //doReturn(emptyList()).when(deleteByQueryResponse).failures();
-
-        BulkIndexByScrollFailure failure = mock(BulkIndexByScrollFailure.class);
-        doReturn(List.of(failure)).when(deleteByQueryResponse).failures();
-
-        assertThatExceptionOfType(ElasticsearchOperationException.class)
-            .isThrownBy(() -> underTest.delete(caseData))
-            .withMessage("uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException: "
-                             + "Elasticsearch operation failures occurred");
-        verify(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class));
-    }*/
 
     @Test
     void testShouldRaiseExceptionWhenDeleteByQueryFails() throws Exception {
