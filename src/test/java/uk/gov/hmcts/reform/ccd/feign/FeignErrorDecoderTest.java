@@ -1,18 +1,20 @@
 package uk.gov.hmcts.reform.ccd.feign;
 
 import feign.Request;
+import feign.RequestTemplate;
 import feign.Response;
+import feign.RetryableException;
 import feign.codec.ErrorDecoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class FeignErrorDecoderTest {
+class FeignErrorDecoderTest {
 
     private ErrorDecoder errorDecoder;
 
@@ -21,101 +23,36 @@ public class FeignErrorDecoderTest {
         errorDecoder = new FeignErrorDecoder();
     }
 
-    @Test
-    void testDecode_InternalServerError() {
+    @ParameterizedTest
+    @CsvSource({
+        "400, Bad Request",
+        "401, Unauthorized",
+        "403, Forbidden",
+        "500, Internal Server Error",
+        "502, Bad Gateway",
+        "503, Service Unavailable",
+        "504, Gateway Timeout"
+    })
+    void decodeErrorReturnsRetryableException(int status, String reason) {
         Response response = Response.builder()
-            .status(500)
-            .reason("Internal Server Error")
-            .request(Request.create(Request.HttpMethod.GET, "/test", Collections.emptyMap(),
-                                    null, StandardCharsets.UTF_8))
+            .status(status)
+            .reason(reason)
+            .request(Request.create(Request.HttpMethod.GET, "/", Map.of(), null, new RequestTemplate()))
             .build();
-
-        Exception exception = errorDecoder.decode("methodKey", response);
-
-        assertInstanceOf(Exception.class, exception);
-        assertEquals("Non Retryable Exception: 500, Reason : Internal Server Error",
-                     exception.getMessage());
+        Exception exc = errorDecoder.decode("methodKey", response);
+        assertThat(exc).isInstanceOf(RetryableException.class);
     }
 
     @Test
-    void testDecode_GenericError() {
+    void decodeErrorNonRetryableException() {
         Response response = Response.builder()
-            .status(400)
-            .reason("Bad Request")
-            .request(Request.create(Request.HttpMethod.GET, "/test", Collections.emptyMap(),
-                                    null, StandardCharsets.UTF_8))
+            .status(302)
+            .reason("Found")
+            .request(Request.create(Request.HttpMethod.GET, "/", Map.of(), null, new RequestTemplate()))
             .build();
-
-        Exception exception = errorDecoder.decode("methodKey", response);
-
-        assertInstanceOf(Exception.class, exception);
-        assertEquals("Non Retryable Exception: 400, Reason : Bad Request",
-                     exception.getMessage());
+        Exception exc = errorDecoder.decode("methodKey", response);
+        assertThat(exc)
+            .isInstanceOf(feign.FeignException.class)
+            .isNotInstanceOf(RetryableException.class);
     }
-
-    @Test
-    void testDecode_BadGatewayError() {
-        Response response = Response.builder()
-            .status(502)
-            .reason("Bad Gateway Error")
-            .request(Request.create(Request.HttpMethod.GET, "/test", Collections.emptyMap(),
-                                    null, StandardCharsets.UTF_8))
-            .build();
-
-        Exception exception = errorDecoder.decode("methodKey", response);
-
-        assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 502, Reason : Bad Gateway Error",
-                     exception.getMessage());
-    }
-
-    @Test
-    void testDecode_NotImplementedError() {
-        Response response = Response.builder()
-            .status(501)
-            .reason("Not Implemented Error")
-            .request(Request.create(Request.HttpMethod.GET, "/test", Collections.emptyMap(),
-                                    null, StandardCharsets.UTF_8))
-            .build();
-
-        Exception exception = errorDecoder.decode("methodKey", response);
-
-        assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 501, Reason : Not Implemented Error",
-                     exception.getMessage());
-    }
-
-    @Test
-    void testDecode_ServiceUnavailableError() {
-        Response response = Response.builder()
-            .status(503)
-            .reason("Service Unavailable Error")
-            .request(Request.create(Request.HttpMethod.GET, "/test", Collections.emptyMap(),
-                                    null, StandardCharsets.UTF_8))
-            .build();
-
-        Exception exception = errorDecoder.decode("methodKey", response);
-
-        assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 503, Reason : Service Unavailable Error",
-                     exception.getMessage());
-    }
-
-    @Test
-    void testDecode_GatewayTimeoutError() {
-        Response response = Response.builder()
-            .status(504)
-            .reason("Gateway Timeout Error")
-            .request(Request.create(Request.HttpMethod.GET, "/test", Collections.emptyMap(),
-                                    null, StandardCharsets.UTF_8))
-            .build();
-
-        Exception exception = errorDecoder.decode("methodKey", response);
-
-        assertInstanceOf(Exception.class, exception);
-        assertEquals("Feign Client Service unavailable: 504, Reason : Gateway Timeout Error",
-                     exception.getMessage());
-    }
-
-
 }
