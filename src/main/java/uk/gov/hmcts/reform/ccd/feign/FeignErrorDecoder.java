@@ -1,27 +1,29 @@
 package uk.gov.hmcts.reform.ccd.feign;
 
+import feign.FeignException;
 import feign.Response;
 import feign.RetryableException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 
 @Configuration
+@Slf4j
 public class FeignErrorDecoder implements feign.codec.ErrorDecoder {
 
     @Override
     public Exception decode(String methodKey, Response response) {
-        if (response.status() == HttpStatus.NOT_IMPLEMENTED.value()
-            || response.status() == HttpStatus.BAD_GATEWAY.value()
-            || response.status() == HttpStatus.SERVICE_UNAVAILABLE.value()
-            || response.status() == HttpStatus.GATEWAY_TIMEOUT.value()) {
+        int status = response.status();
+        FeignException exception = FeignException.errorStatus(methodKey, response);
+        log.info("Feign response status: {}, message - {}", status, exception.getMessage());
+        if (response.status() >= 400) {
             return new RetryableException(
-                response.status(),
-                "Feign Client Service unavailable: " + response.status() + ", Reason : " + response.reason(),
+                status,
+                exception.getMessage(),
                 response.request().httpMethod(),
-                Long.valueOf(1000),
+                (Long) null, // unix timestamp *at which time* the request can be retried
                 response.request()
             );
         }
-        return new Exception("Non Retryable Exception: " + response.status() + ", Reason : " + response.reason());
+        return exception;
     }
 }

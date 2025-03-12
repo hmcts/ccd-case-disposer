@@ -53,6 +53,7 @@ azure:
     instrumentation-key: appinsights_key
 
 remote:
+  delayOnError: 1
   document.store:
     host: http://localhost:4603
   role.assignment:
