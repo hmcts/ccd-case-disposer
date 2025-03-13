@@ -40,6 +40,7 @@ request.limit: ${CCD_DISPOSER_REQUEST_LIMIT:1000}
 cut-off-time: ${CCD_DISPOSER_CUT_OFF_TIME:06:00}
 
 remote:
+  delayOnError: 30
   document.store:
     host: ${DOCUMENT_STORE_HOST:http://localhost:4506}
   role.assignment:
