@@ -8,7 +8,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
@@ -23,15 +26,17 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL;
 import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ApplicationExecutorTest {
 
     private static final LocalTime CUT_OFF_TIME = LocalTime.parse("06:00");
@@ -153,5 +158,33 @@ class ApplicationExecutorTest {
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(expectedDeleteCount)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+    }
+
+    @Test
+    void shouldContinueDeletionsAfterLogAndAuditError(CapturedOutput output) {
+        when(parameterResolver.getRequestLimit()).thenReturn(10);
+
+        final List<CaseFamily> caseDataList = List.of(
+            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
+            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList())
+        );
+
+        doReturn(caseDataList)
+            .when(caseFindingService).findCasesDueDeletion();
+        doReturn(caseDataList)
+            .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
+        doThrow(new LogAndAuditException("Log and Audit error"))
+            .when(caseDeletionService)
+            .deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+
+        applicationExecutor.execute();
+
+        verify(caseFindingService).findCasesDueDeletion();
+        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDeletionLoggingService, times(1)).logCases();
+        verify(processedCasesRecordHolder, times(2)).addProcessedCase(any());
+        assertThat(output).asString().contains("Error deleting case:");
+
     }
 }
