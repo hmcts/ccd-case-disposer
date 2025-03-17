@@ -1,16 +1,28 @@
 package uk.gov.hmcts.reform.ccd.feign;
 
 import feign.Retryer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Configuration
 public class RetryableFeignConfig {
 
+    @Value("${remote.delayOnError:30}")
+    long initialDelay;
+    long maxDelay = 120;
+    int maxRetries = 3;
 
     @Bean
     public Retryer feignRetryer() {
-        // Example: Retry 3 times, waiting 100ms, then 200ms, then 300ms, etc.
-        return new Retryer.Default(100, 200, 3);
+        // Default backoff calculated using the following formula:
+        // Math.min(period * Math.pow(1.5, attempt - 1), maxPeriod)
+        // First retry will be after 30s, second after 45s, third after 67.5s
+        return new Retryer.Default(
+            SECONDS.toMillis(initialDelay),
+            SECONDS.toMillis(maxDelay),
+            maxRetries);
     }
 }

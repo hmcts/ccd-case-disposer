@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
+import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -211,5 +213,28 @@ class CaseDeletionServiceTest {
         verify(caseEventRepository, times(0)).deleteByCaseDataId(anyLong());
         verify(caseDataRepository, times(0)).delete(any(CaseDataEntity.class));
         verify(processedCasesRecordHolder, times(1)).addFailedToDeleteCaseRef(caseData);
+    }
+
+    @Test
+    void shouldThrowExceptionOnLogAndAuditException() {
+        doReturn(List.of(caseLinkEntity1)).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
+
+        doThrow(LogAndAuditException.class)
+            .when(logAndAuditRemoteOperation)
+            .postCaseDeletionToLogAndAudit(any(CaseData.class));
+
+        // WHEN
+        Throwable thrown = catchThrowable(() -> underTest.deleteCaseData(caseData));
+
+        // THEN
+        verify(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
+        verify(remoteDisposeService, times(1)).remoteDeleteAll(any(CaseData.class));
+        verify(caseEventRepository, times(1)).deleteByCaseDataId(anyLong());
+        verify(caseDataRepository, times(1)).delete(any(CaseDataEntity.class));
+        verify(processedCasesRecordHolder, times(1)).addFailedToDeleteCaseRef(caseData);
+        verify(logAndAuditRemoteOperation, times(1)).postCaseDeletionToLogAndAudit(any());
+        assertThat(thrown).isInstanceOf(LogAndAuditException.class);
+
     }
 }

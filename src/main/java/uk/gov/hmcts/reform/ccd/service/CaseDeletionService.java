@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
@@ -76,6 +77,14 @@ public class CaseDeletionService {
             }
 
             log.info("Deleted case reference:: {}", caseData.getReference());
+        } catch (LogAndAuditException logAndAuditException) {
+            processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+            log.error(
+                "Log and Audit exception while deleting case reference:: {}",
+                caseData.getReference(),
+                logAndAuditException
+            );
+            throw logAndAuditException;
         } catch (final Exception exception) { // Catch all exceptions
             log.error("Could not delete case reference:: {}", caseData.getReference(), exception);
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
