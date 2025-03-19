@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.ccd.service;
 
 
 import com.google.common.collect.Lists;
-import dnl.utils.text.table.TextTable;
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,15 +11,11 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.SummaryStringLogBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
-import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
@@ -31,7 +26,6 @@ import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 @RequiredArgsConstructor
 public class CaseDeletionLoggingService {
 
-    private final TableTextBuilder tableTextBuilder;
     private final CaseDataViewBuilder caseDataViewBuilder;
     private final ParameterResolver parameterResolver;
     private final SummaryStringLogBuilder summaryStringLogBuilder;
@@ -44,21 +38,11 @@ public class CaseDeletionLoggingService {
 
         final List<CaseDataView> caseDataViews = buildCaseDataViews();
 
-        final List<List<CaseDataView>> caseViewPartition = Lists.partition(caseDataViews,
-                parameterResolver.getAppInsightsLogSize());
+        if (!caseDataViews.isEmpty()) {
 
-        if (!caseViewPartition.isEmpty()) {
-            final AtomicInteger partCounter = new AtomicInteger(0);
+            final String summaryString = summaryStringLogBuilder.buildSummaryString(caseDataViews);
 
-            caseViewPartition.forEach(caseViewListPartition -> {
-                final String summaryString = summaryStringLogBuilder.buildSummaryString(caseDataViews,
-                        partCounter.incrementAndGet(),
-                        caseViewPartition.size());
-
-                final ByteArrayOutputStream outputStream = buildTextTable(caseViewListPartition);
-
-                log.info(summaryString.concat(outputStream.toString()));
-            });
+            log.info(summaryString);
         } else {
             logDataIfNoDeletableOrSimulatedCasesFound();
         }
@@ -72,29 +56,18 @@ public class CaseDeletionLoggingService {
 
         for (List<CaseData> partition : partitions) {
             StringBuilder batchLog = new StringBuilder();
-            partition.forEach(caseData -> {
+            partition.forEach(caseData ->
                 batchLog.append(String.format("Simulated case type: %s, Case ref: %s%n",
-                                              caseData.getCaseType(), caseData.getReference()));
-            });
+                                              caseData.getCaseType(), caseData.getReference()))
+            );
 
             log.info(batchLog.toString());
         }
     }
 
-    private ByteArrayOutputStream buildTextTable(final List<CaseDataView> caseViewListPartition) {
-        final TextTable textTable = tableTextBuilder.buildTextTable(caseViewListPartition);
-
-        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        final PrintStream printStream = new PrintStream(outputStream, true);
-
-        textTable.printTable(printStream, 0);
-        return outputStream;
-    }
-
     private void logDataIfNoDeletableOrSimulatedCasesFound() {
         final String summaryString = summaryStringLogBuilder
-                .buildSummaryString(0, 0, 0, 0, 0, 0,
-                                    Collections.emptyMap());
+                .buildSummaryString(0, 0, 0, 0, Collections.emptyMap());
         log.info(summaryString);
     }
 
