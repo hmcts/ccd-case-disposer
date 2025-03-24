@@ -5,7 +5,7 @@ plugins {
   id 'idea'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.4.3'
+  id 'org.springframework.boot' version '3.4.4'
   id 'org.owasp.dependencycheck' version '12.1.0'
   id 'com.github.ben-manes.versions' version '0.52.0'
   id 'org.sonarqube' version '6.0.1.5171'
@@ -188,7 +188,7 @@ dependencyCheck {
 dependencyManagement {
     dependencies {
         dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.80'
-        dependencySet(group: 'org.springframework.cloud', version: '4.2.0') {
+        dependencySet(group: 'org.springframework.cloud', version: '4.2.1') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
         }
@@ -196,7 +196,7 @@ dependencyManagement {
             entry 'snakeyaml'
         }
 
-        dependencySet(group: 'ch.qos.logback', version: '1.5.17') {
+        dependencySet(group: 'ch.qos.logback', version: '1.5.18') {
           entry 'logback-core'
           entry 'logback-classic'
         }
@@ -245,7 +245,7 @@ def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.18.0',
     elasticsearch       : '8.17.2',
-    flyway              : '11.3.4',
+    flyway              : '11.4.1',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
     junit               : '5.12.1',
@@ -296,12 +296,9 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.12.1'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.0-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.5-jre'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'commons-net', name: 'commons-net', version: '3.11.1'
-    implementation group: 'com.massisframework', name: 'j-text-utils', version: '0.3.4', {
-      exclude group: 'com.google.guava', module: 'guava'
-    }
 
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
