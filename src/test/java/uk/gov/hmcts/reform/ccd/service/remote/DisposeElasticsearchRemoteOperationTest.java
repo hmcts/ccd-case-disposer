@@ -32,7 +32,7 @@ class DisposeElasticsearchRemoteOperationTest {
     private static final String CASE_INDEX = "test_case_index";
     private static final String GLOBAL_SEARCH_INDEX = "global_search";
     private static final Long CASE_REFERENCE = 1902145L;
-    //private final BulkByScrollResponse bulkByScrollResponse = mock(BulkByScrollResponse.class);
+
     @Mock
     private ElasticsearchClient elasticsearchClient;
     @Mock

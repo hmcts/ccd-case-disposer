@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.elasticsearch.core.GetRequest;
 import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
@@ -12,7 +14,9 @@ import co.elastic.clients.elasticsearch.indices.RefreshResponse;
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
 import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
@@ -24,9 +28,11 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.with;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @SuppressWarnings("unchecked")
 @Component
+@Slf4j
 public class ElasticSearchTestUtils {
 
     private static final String INDEX_TYPE = "_doc";
@@ -91,14 +97,21 @@ public class ElasticSearchTestUtils {
         for (String caseType : caseTypes) {
             final String indexName = getIndexName(caseType);
             if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
-                final List<String> documents = getAllDocuments(indexName);
-                for (String documentId : documents) {
-                    elasticsearchClient.delete(d -> d
-                        .index(indexName)
-                        .id(documentId)
-                    );
-                }
+                final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
+                    .index(indexName)
+                    .query(q -> q
+                        .matchAll(m -> m)
+                    )
+                );
+                deleteByQueryRequest(request);
             }
+        }
+    }
+
+    private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
+        final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
+        if (!isEmpty(response.failures())) {
+            throwError("Errors resetting indices", response.failures());
         }
     }
 
@@ -164,6 +177,11 @@ public class ElasticSearchTestUtils {
             .await()
             .untilAsserted(() -> assertThat(refreshResponse.shards().failures().size())
                 .isEqualTo(0));
+    }
+
+    private <T> void throwError(final String message, final List<T> list) {
+        log.error("{}:: {}", message, list);
+        throw new ElasticsearchOperationException(message);
     }
 
 

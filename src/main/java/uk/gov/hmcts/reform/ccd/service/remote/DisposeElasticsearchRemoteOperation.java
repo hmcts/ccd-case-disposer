@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import lombok.RequiredArgsConstructor;
@@ -54,14 +53,9 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
     }
 
     private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
-        try {
-            final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
-
-            if (!isEmpty(response.failures())) {
-                throwError(SEARCH_FAILURES, response.failures());
-            }
-        } catch (ElasticsearchException e) {
-            throw new ElasticsearchOperationException(e);
+        final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
+        if (!isEmpty(response.failures())) {
+            throwError(SEARCH_FAILURES, response.failures());
         }
     }
 

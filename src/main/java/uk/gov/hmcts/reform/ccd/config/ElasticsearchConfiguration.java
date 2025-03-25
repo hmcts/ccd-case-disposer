@@ -9,6 +9,7 @@ import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
@@ -32,7 +33,12 @@ public class ElasticsearchConfiguration {
         final HttpHost[] httpHosts = parameterResolver.getElasticsearchHosts().stream()
             .map(HttpHost::create)
             .toArray(HttpHost[]::new);
-        restClient = RestClient.builder(httpHosts).build();
+
+        RestClientBuilder builder = RestClient.builder(httpHosts)
+            .setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder
+                .setConnectTimeout(parameterResolver.getElasticsearchRequestTimeout())
+            );
+        restClient = builder.build();
         transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         elasticsearchClient = new ElasticsearchClient(transport);
     }
