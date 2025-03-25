@@ -32,9 +32,9 @@ class SummaryStringLogBuilderTest {
 
         final SummaryStringLogBuilder summaryStringLogBuilder = new SummaryStringLogBuilder();
         final String buildSummaryString = summaryStringLogBuilder
-                .buildSummaryString(caseDataViews, 1, 1);
+                .buildSummaryString(caseDataViews);
 
-        assertThat(buildSummaryString).contains("Case Disposer Deletion Summary 1 of 1");
+        assertThat(buildSummaryString).contains("Case Disposer Deletion Summary");
 
         assertThat(buildSummaryString).contains("Total cases : 8");
         assertThat(buildSummaryString).contains("Deleted cases : 3");

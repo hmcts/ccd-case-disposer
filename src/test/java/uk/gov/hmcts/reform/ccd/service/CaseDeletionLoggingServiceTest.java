@@ -10,13 +10,11 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.SummaryStringLogBuilder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseDataViewBuilder;
-import uk.gov.hmcts.reform.ccd.util.log.TableTextBuilder;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -28,9 +26,6 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_
 
 @ExtendWith(MockitoExtension.class)
 class CaseDeletionLoggingServiceTest {
-
-    @Spy
-    private TableTextBuilder tableTextBuilder;
 
     @Spy
     private CaseDataViewBuilder caseDataViewBuilder;
@@ -60,9 +55,8 @@ class CaseDeletionLoggingServiceTest {
         when(parameterResolver.getAppInsightsLogSize()).thenReturn(10);
         caseDeletionLoggingService.logCases();
 
-        verify(tableTextBuilder, times(1)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
-                .buildSummaryString(anyList(), anyInt(), anyInt());
+                .buildSummaryString(anyList());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
     }
 
@@ -80,10 +74,8 @@ class CaseDeletionLoggingServiceTest {
 
         caseDeletionLoggingService.logCases();
 
-        verify(tableTextBuilder, times(0)).buildTextTable(anyList());
         verify(summaryStringLogBuilder, times(1))
-                .buildSummaryString(0, 0, 0, 0, 0, 0,
-                                    Collections.emptyMap());
+                .buildSummaryString(0, 0, 0, 0, Collections.emptyMap());
         verify(caseDataViewBuilder, times(3)).buildCaseDataViewList(anyList(), anyList(), anyString());
     }
 }

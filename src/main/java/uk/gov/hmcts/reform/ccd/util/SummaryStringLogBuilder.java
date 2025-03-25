@@ -25,9 +25,7 @@ import static uk.gov.hmcts.reform.ccd.util.LogConstants.TOTAL_STRING;
 @Named
 public class SummaryStringLogBuilder {
 
-    public String buildSummaryString(final List<CaseDataView> caseDataViews,
-                                     final int partCounter,
-                                     final int totalSize) {
+    public String buildSummaryString(final List<CaseDataView> caseDataViews) {
         final int deletedCases = countCaseFamilies(caseDataViews, DELETED_STATE);
         final int simulatedCases = countCaseFamilies(caseDataViews, SIMULATED_STATE);
         final int failedCases = countCaseFamilies(caseDataViews, FAILED_STATE);
@@ -40,8 +38,6 @@ public class SummaryStringLogBuilder {
             simulatedCases,
             failedCases,
             totalCases,
-            partCounter,
-            totalSize,
             caseTypeAndStateCount
         );
     }
@@ -50,13 +46,9 @@ public class SummaryStringLogBuilder {
                                      final int simulated,
                                      final int failed,
                                      final int total,
-                                     final int partCounter,
-                                     final int totalSize,
                                      final Map<String, Long> caseTypeAndStateCount) {
 
-        final StringBuilder stringBuilder = new StringBuilder(String.format(SUMMARY_HEADING_STRING, partCounter,
-                                                                            totalSize
-        ));
+        final StringBuilder stringBuilder = new StringBuilder(SUMMARY_HEADING_STRING);
         final SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMMM yyyy, HH:mm", Locale.UK);
         stringBuilder.append(dateFormat.format(new Date()))
             .append(CR_STRING)
@@ -77,7 +69,7 @@ public class SummaryStringLogBuilder {
     private int countCaseFamilies(final List<CaseDataView> caseDataViews, final String state) {
         return caseDataViews.stream()
             .filter(caseDataView -> caseDataView.getState().equals(state))
-            .collect(Collectors.toList()).size();
+            .toList().size();
     }
 
     private Map<String, Long> getCaseTypeAndStateCount(final List<CaseDataView> caseDataViews) {

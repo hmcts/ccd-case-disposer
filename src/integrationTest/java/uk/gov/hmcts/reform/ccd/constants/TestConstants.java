@@ -35,4 +35,8 @@ public class TestConstants {
         Map.entry("1504259907445514", HttpStatus.NOT_FOUND.value())
     );
 
+    public static final Map<String, Integer> LAU_SAVE = Map.ofEntries(
+        Map.entry("1504259907033002", HttpStatus.GATEWAY_TIMEOUT.value())
+    );
+
 }
