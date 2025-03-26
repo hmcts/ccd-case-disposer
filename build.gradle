@@ -296,7 +296,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.12.1'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.5-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.6-jre'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'commons-net', name: 'commons-net', version: '3.11.1'
 
@@ -326,7 +326,7 @@ dependencies {
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.6.1'
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
-    testImplementation 'com.github.hmcts:fortify-client:1.4.7:all'
+    testImplementation 'com.github.hmcts:fortify-client:1.4.8:all'
     testImplementation group: 'io.github.hakky54', name: 'logcaptor', version: '2.10.1'
 
     testImplementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
