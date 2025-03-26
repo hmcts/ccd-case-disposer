@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Conflicts;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,7 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
                     .value(caseReference)
                 )
             )
+            .conflicts(Conflicts.Proceed)
             .refresh(true)
         );
     }
