@@ -1,28 +1,25 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
+import co.elastic.clients.elasticsearch.core.GetRequest;
+import co.elastic.clients.elasticsearch.core.GetResponse;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.SourceConfig;
+import co.elastic.clients.elasticsearch.indices.RefreshRequest;
+import co.elastic.clients.elasticsearch.indices.RefreshResponse;
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
 import jakarta.inject.Inject;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.admin.indices.refresh.RefreshResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.WriteRequest;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,16 +28,18 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.with;
-import static org.elasticsearch.client.RequestOptions.DEFAULT;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
+@SuppressWarnings("unchecked")
 @Component
+@Slf4j
 public class ElasticSearchTestUtils {
 
     private static final String INDEX_TYPE = "_doc";
     private static final String CASE_REFERENCE_FIELD = "reference";
 
     @Inject
-    private RestHighLevelClient elasticsearchClient;
+    private ElasticsearchClient elasticsearchClient;
 
     @Inject
     private ParameterResolver parameterResolver;
@@ -78,43 +77,41 @@ public class ElasticSearchTestUtils {
     }
 
     public List<String> getAllDocuments(final String indexName) throws IOException {
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(QueryBuilders.matchAllQuery());
-        final SearchRequest searchRequest = new SearchRequest(indexName)
-                .source(searchSourceBuilder);
+        final SearchRequest searchRequest = SearchRequest.of(s -> s
+            .index(indexName)
+            .query(q -> q
+                .matchAll(m -> m)
+            )
+            .source(SourceConfig.of(sc -> sc.fetch(true)))
+        );
 
-        final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, DEFAULT);
+        final SearchResponse<Map> searchResponse = elasticsearchClient.search(searchRequest, Map.class);
 
-        return Arrays.stream(searchResponse.getHits().getHits())
-                .filter(hit -> indexName.startsWith(hit.getIndex()))
-                .map(SearchHit::getId)
-                .collect(Collectors.toUnmodifiableList());
+        return searchResponse.hits().hits().stream()
+            .filter(hit -> indexName.startsWith(hit.index()))
+            .map(Hit::id)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     public void resetIndices(final Set<String> caseTypes) throws Exception {
-        final BulkRequest bulkRequest = new BulkRequest()
-                .setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
-
-        caseTypes.forEach(ThrowingConsumer.unchecked(caseType -> {
-
+        for (String caseType : caseTypes) {
             final String indexName = getIndexName(caseType);
-            if (elasticsearchClient.indices().exists(new GetIndexRequest(indexName), DEFAULT)) {
-                final List<String> documents = getAllDocuments(indexName);
-                documents.forEach(documentId -> {
-                    final DeleteRequest deleteRequest = new DeleteRequest(indexName)
-                            .id(documentId)
-                            .type(parameterResolver.getCasesIndexType());
-                    bulkRequest.add(deleteRequest);
-                });
+            if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
+                final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
+                    .index(indexName)
+                    .query(q -> q
+                        .matchAll(m -> m)
+                    )
+                );
+                deleteByQueryRequest(request);
             }
-        }));
+        }
+    }
 
-        if (bulkRequest.numberOfActions() > 0) {
-            final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest, DEFAULT);
-
-            if (bulkResponse.hasFailures()) {
-                throw new Exception("Errors resetting indices::: " + bulkResponse.buildFailureMessage());
-            }
+    private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
+        final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
+        if (!isEmpty(response.failures())) {
+            throwError("Errors resetting indices", response.failures());
         }
     }
 
@@ -141,38 +138,50 @@ public class ElasticSearchTestUtils {
     }
 
     private Optional<Long> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(QueryBuilders.termQuery(CASE_REFERENCE_FIELD, caseReference))
-                .from(0);
+        final SearchRequest searchRequest = SearchRequest.of(s -> s
+            .index(caseIndex)
+            .query(q -> q
+                .term(t -> t
+                    .field(CASE_REFERENCE_FIELD)
+                    .value(caseReference)
+                )
+            )
+            .from(0)
+        );
 
-        final SearchRequest searchRequest = new SearchRequest(caseIndex)
-                .types(INDEX_TYPE)
-                .source(searchSourceBuilder);
-
-        final SearchResponse searchResponse = elasticsearchClient.search(searchRequest, DEFAULT);
-        final Optional<String> first = Arrays.stream(searchResponse.getHits().getHits())
-                .map(SearchHit::getId)
-                .findFirst();
+        final SearchResponse<Map> searchResponse = elasticsearchClient.search(searchRequest, Map.class);
+        final Optional<String> first = searchResponse.hits().hits().stream()
+            .map(Hit::id)
+            .findFirst();
 
         return first.map(ThrowingFunction.unchecked(id -> {
-            final GetRequest getRequest = new GetRequest(caseIndex, INDEX_TYPE, id);
-            final GetResponse getResponse = elasticsearchClient.get(getRequest, DEFAULT);
+            final GetRequest getRequest = GetRequest.of(g -> g
+                .index(caseIndex)
+                .id(id)
+            );
+            final GetResponse<Map> getResponse = elasticsearchClient.get(getRequest, Map.class);
 
-            if (!getResponse.isExists()) {
+            if (!getResponse.found()) {
                 return null;
             }
-            final Map<String, Object> sourceAsMap = getResponse.getSourceAsMap();
+            final Map<String, Object> sourceAsMap = getResponse.source();
             return (Long) sourceAsMap.get(CASE_REFERENCE_FIELD);
         }));
     }
 
     private void refreshIndex(final String index) throws IOException {
-        final RefreshRequest request = new RefreshRequest(index);
-        final RefreshResponse refreshResponse = elasticsearchClient.indices().refresh(request, DEFAULT);
+        final RefreshRequest request = RefreshRequest.of(r -> r.index(index));
+        final RefreshResponse refreshResponse = elasticsearchClient.indices().refresh(request);
+
         with()
-                .await()
-                .untilAsserted(() -> assertThat(Arrays.asList(refreshResponse.getShardFailures()).size())
-                        .isEqualTo(0));
+            .await()
+            .untilAsserted(() -> assertThat(refreshResponse.shards().failures().size())
+                .isEqualTo(0));
+    }
+
+    private <T> void throwError(final String message, final List<T> list) {
+        log.error("{}:: {}", message, list);
+        throw new ElasticsearchOperationException(message);
     }
 
 

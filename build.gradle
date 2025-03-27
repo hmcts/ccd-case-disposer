@@ -244,7 +244,7 @@ project.tasks['pitest'].group = "Verification"
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.18.0',
-    elasticsearch       : '7.17.28',
+    elasticsearch       : '8.17.2',
     flyway              : '11.5.0',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
@@ -309,9 +309,7 @@ dependencies {
 
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    implementation group: 'org.elasticsearch', name: 'elasticsearch', version: versions.elasticsearch
-    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-client', version: versions.elasticsearch
-    implementation group: 'org.elasticsearch.client', name: 'elasticsearch-rest-high-level-client', version: versions.elasticsearch
+    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: versions.elasticsearch
 
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
