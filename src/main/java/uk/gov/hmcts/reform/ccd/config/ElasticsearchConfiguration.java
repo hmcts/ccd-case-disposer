@@ -5,7 +5,6 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
@@ -18,9 +17,6 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 public class ElasticsearchConfiguration {
 
     private final ParameterResolver parameterResolver;
-
-    private RestClient restClient;
-    private ElasticsearchTransport transport;
     private ElasticsearchClient elasticsearchClient;
 
     @Inject
@@ -38,19 +34,11 @@ public class ElasticsearchConfiguration {
             .setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder
                 .setConnectTimeout(parameterResolver.getElasticsearchRequestTimeout())
             );
-        restClient = builder.build();
-        transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchTransport transport = new RestClientTransport(builder.build(), new JacksonJsonpMapper());
         elasticsearchClient = new ElasticsearchClient(transport);
     }
 
-    @PreDestroy
-    public void cleanUp() throws Exception {
-        if (restClient != null) {
-            restClient.close();
-        }
-    }
-
-    @Bean
+    @Bean(destroyMethod = "close")
     public ElasticsearchClient provideElasticsearchClient() {
         return elasticsearchClient;
     }
