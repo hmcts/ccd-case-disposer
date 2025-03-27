@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Conflicts;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.elasticsearch.core.GetRequest;
@@ -102,6 +103,7 @@ public class ElasticSearchTestUtils {
                     .query(q -> q
                         .matchAll(m -> m)
                     )
+                    .conflicts(Conflicts.Proceed)
                 );
                 deleteByQueryRequest(request);
             }
