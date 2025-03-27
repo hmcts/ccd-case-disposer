@@ -20,7 +20,7 @@ public class ProcessedCasesRecordHolder {
     private Set<CaseData> simulatedCases = new HashSet<>();
 
     public void addFailedToDeleteCaseRef(final CaseData caseData) {
-        failedToDeleteCaseRefs.add(caseData.getReference());
+        failedToDeleteCaseRefs.add(caseData.reference());
     }
 
     public void addProcessedCase(final CaseData caseData) {
@@ -29,13 +29,13 @@ public class ProcessedCasesRecordHolder {
 
     public List<CaseData> getSuccessfullyDeletedCases() {
         return processedCases.stream()
-            .filter(caseData -> !failedToDeleteCaseRefs.contains(caseData.getReference()))
+            .filter(caseData -> !failedToDeleteCaseRefs.contains(caseData.reference()))
             .toList();
     }
 
     public List<CaseData> getFailedToDeleteDeletedCases() {
         return processedCases.stream()
-            .filter(caseData -> failedToDeleteCaseRefs.contains(caseData.getReference()))
+            .filter(caseData -> failedToDeleteCaseRefs.contains(caseData.reference()))
             .toList();
     }
 

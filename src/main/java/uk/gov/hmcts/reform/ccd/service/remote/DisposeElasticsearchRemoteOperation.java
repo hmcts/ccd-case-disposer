@@ -34,8 +34,8 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
     public void delete(final CaseData caseData) {
         try {
             final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(
-                getIndex(caseData.getCaseType()),
-                caseData.getReference()
+                getIndex(caseData.caseType()),
+                caseData.reference()
             );
 
             deleteByQueryRequest(caseIndexDeleteRequest);
@@ -44,7 +44,7 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
                 final DeleteByQueryRequest globalSearchIndexDeleteRequest =
                     buildDeleteByQueryRequest(
                         parameterResolver.getGlobalSearchIndexName(),
-                        caseData.getReference()
+                        caseData.reference()
                     );
                 deleteByQueryRequest(globalSearchIndexDeleteRequest);
             }

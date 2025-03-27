@@ -25,7 +25,7 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
 
     @Override
     public void delete(final CaseData caseData) {
-        final String caseRef = caseData.getReference().toString();
+        final String caseRef = caseData.reference().toString();
         try {
             final DeleteTasksRequest tasksDeletePostRequest =
                 new DeleteTasksRequest(new DeleteCaseTasksAction(caseRef));
@@ -37,7 +37,7 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
             if (!taskDeleteResponse.getStatusCode().is2xxSuccessful()) {
                 final String errorMessage = String
                     .format("Unexpected response code %d while deleting tasks for case: %s",
-                            taskDeleteResponse.getStatusCode().value(), caseData.getReference()
+                            taskDeleteResponse.getStatusCode().value(), caseData.reference()
                     );
 
                 throw new TasksDeletionException(errorMessage);

@@ -2,12 +2,11 @@ package uk.gov.hmcts.reform.ccd.util.log;
 
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -24,7 +23,7 @@ public class CaseFamiliesFilter {
         );
     }
 
-    public List<CaseFamily> geSimulationCasesOnly(final List<CaseFamily> linkedFamilies) {
+    public List<CaseFamily> getSimulationCasesOnly(final List<CaseFamily> linkedFamilies) {
         return filterCaseFamiliesByCaseTypes(
                 linkedFamilies,
                 parameterResolver.getDeletableCaseTypesSimulation()
@@ -35,10 +34,10 @@ public class CaseFamiliesFilter {
                                                            final List<String> caseTypes) {
         return caseFamilies.stream()
                 .filter(caseFamily ->
-                        caseTypes.containsAll(Stream.of(List.of(caseFamily.getRootCase()), caseFamily.getLinkedCases())
-                                .flatMap(Collection::stream)
-                                .map(value -> value.getCaseType())
+                        caseTypes.containsAll(
+                            caseFamily.linkedCases().stream()
+                                .map(CaseData::caseType)
                                 .collect(toSet())))
-                .toList();
+            .toList();
     }
 }

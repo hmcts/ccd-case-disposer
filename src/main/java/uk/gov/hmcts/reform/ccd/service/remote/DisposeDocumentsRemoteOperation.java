@@ -27,10 +27,10 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     @Override
     public void delete(final CaseData caseData) {
-        if (!caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
+        if (!caseData.caseType().equals(parameterResolver.getHearingCaseType())) {
             try {
                 final DocumentsDeletePostRequest documentsDeleteRequest =
-                    new DocumentsDeletePostRequest(caseData.getReference().toString());
+                    new DocumentsDeletePostRequest(caseData.reference().toString());
 
                 final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse =
                     postDocument(documentsDeleteRequest);
@@ -40,14 +40,14 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
                 if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
                     final String errorMessage = String
                         .format("Unexpected response code %d while deleting documents for case: %s",
-                                documentsDeleteResponse.getStatusCode().value(), caseData.getReference());
+                                documentsDeleteResponse.getStatusCode().value(), caseData.reference());
 
                     throw new DocumentDeletionException(errorMessage);
                 }
 
             } catch (final Exception ex) {
                 final String errorMessage = String.format(
-                    "Error deleting documents for case : %s", caseData.getReference().toString());
+                    "Error deleting documents for case : %s", caseData.reference().toString());
                 log.error(errorMessage, ex);
                 throw new DocumentDeletionException(errorMessage, ex);
             }

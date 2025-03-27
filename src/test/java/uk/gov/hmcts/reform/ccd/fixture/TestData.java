@@ -45,93 +45,76 @@ public interface TestData {
             .build();
     CaseData DELETABLE_CASE_DATA_WITH_PAST_TTL = new CaseData(1L, 1L, DELETABLE_CASE_TYPE,
             JURISDICTION,
-            YESTERDAY, 1L, null);
+            YESTERDAY);
     CaseData DELETABLE_CASE_DATA4_WITH_PAST_TTL = new CaseData(4L, 4L, DELETABLE_CASE_TYPE,
             JURISDICTION,
-            YESTERDAY, 4L, null);
-    CaseFamily DELETABLE_CASE_FAMILY = new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL,
-            asList(DELETABLE_CASE_DATA4_WITH_PAST_TTL,
+            YESTERDAY);
+    CaseFamily DELETABLE_CASE_FAMILY = new CaseFamily(
+            asList(DELETABLE_CASE_DATA_WITH_PAST_TTL,
+                   DELETABLE_CASE_DATA4_WITH_PAST_TTL,
                     DELETABLE_CASE_DATA_WITH_PAST_TTL,
                     DELETABLE_CASE_DATA_WITH_PAST_TTL));
     CaseData DELETABLE_CASE_DATA5_WITH_PAST_TTL = new CaseData(5L, 5L, DELETABLE_CASE_TYPE,
-            JURISDICTION, YESTERDAY, 5L, null);
+            JURISDICTION, YESTERDAY);
     CaseData DELETABLE_CASE_DATA03_WITH_PAST_TTL = new CaseData(6L, 6L, DELETABLE_CASE_TYPE, JURISDICTION,
-            YESTERDAY, 6L, null);
+            YESTERDAY);
     CaseData DELETABLE_CASE_DATA04_WITH_PAST_TTL = new CaseData(7L, 7L, DELETABLE_CASE_TYPE,
-            JURISDICTION, YESTERDAY, 7L, null);
+            JURISDICTION, YESTERDAY);
     CaseData DELETABLE_CASE_DATA05_WITH_PAST_TTL = new CaseData(8L, 8L, DELETABLE_CASE_TYPE, JURISDICTION,
-            YESTERDAY, 8L, null);
+            YESTERDAY);
     CaseData DELETABLE_CASE_DATA06_WITH_PAST_TTL = new CaseData(9L, 9L, DELETABLE_CASE_TYPE, JURISDICTION,
-            YESTERDAY, 9L, null);
+            YESTERDAY);
     CaseData DELETABLE_CASE_DATA07_WITH_PAST_TTL = new CaseData(91L, 91L, DELETABLE_CASE_TYPE,
-            JURISDICTION, YESTERDAY, 91L, null);
+            JURISDICTION, YESTERDAY);
     CaseData DELETABLE_CASE_DATA08_WITH_PAST_TTL = new CaseData(92L, 92L, DELETABLE_CASE_TYPE, JURISDICTION,
-            YESTERDAY, 92L, null);
+            YESTERDAY);
 
     CaseData DELETABLE_CASE_DATA2_WITH_PAST_TTL =
             new CaseData(1000L, 1000L, DELETABLE_CASE_TYPE, JURISDICTION,
-                    YESTERDAY, 1000L, null);
+                    YESTERDAY);
     CaseData NON_DELETABLE_CASE_DATA_WITH_PAST_TTL =
             new CaseData(21L, 21L, NON_DELETABLE_CASE_TYPE, JURISDICTION,
-                    YESTERDAY, 21L, null);
+                    YESTERDAY);
     CaseData NON_DELETABLE_CASE_DATA_WITH_MISSING_TTL =
-        new CaseData(22L, 22L, NON_DELETABLE_CASE_TYPE, JURISDICTION, null, 22L, null);
-    CaseFamily NON_DELETABLE_CASE_FAMILY = new CaseFamily(NON_DELETABLE_CASE_DATA_WITH_PAST_TTL,
+        new CaseData(22L, 22L, NON_DELETABLE_CASE_TYPE, JURISDICTION, null);
+    CaseFamily NON_DELETABLE_CASE_FAMILY = new CaseFamily(
             asList(NON_DELETABLE_CASE_DATA_WITH_PAST_TTL,
+                   NON_DELETABLE_CASE_DATA_WITH_PAST_TTL,
                     NON_DELETABLE_CASE_DATA_WITH_PAST_TTL));
     CaseData DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1 = new CaseData(30L,
             30L,
             DELETABLE_CASE_TYPE_SIMULATION,
             JURISDICTION,
-            YESTERDAY,
-            30L,
-            null);
+            YESTERDAY);
     CaseData DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2 = new CaseData(31L,
             31L,
             DELETABLE_CASE_TYPE_SIMULATION,
             JURISDICTION,
-            YESTERDAY,
-            31L,
-            null);
-    CaseFamily DELETABLE_CASE_FAMILY_SIMULATION = new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
+            YESTERDAY);
+    CaseFamily DELETABLE_CASE_FAMILY_SIMULATION = new CaseFamily(
             asList(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
+                   DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
                     DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2));
 
-    CaseFamily FAILED_CASE_FAMILY = new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
+    CaseFamily FAILED_CASE_FAMILY = new CaseFamily(
             asList(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
+                   DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
                     DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2));
     CaseData LINKED_CASE_DATA_R10 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, JURISDICTION,
-            YESTERDAY, 10L, null);
-    CaseData LINKED_CASE_DATA_R11 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, JURISDICTION, YESTERDAY,
-            11L,
-             null);
-    CaseData LINKED_CASE_DATA_R12 = new CaseData(12L, 12L, DELETABLE_CASE_TYPE, JURISDICTION, YESTERDAY,
-            12L,
-            null);
-    CaseData LINKED_CASE_DATA_R13 = new CaseData(13L, 13L, DELETABLE_CASE_TYPE, JURISDICTION,YESTERDAY,
-            13L,
-            null);
-    CaseData LINKED_CASE_DATA_R100 = new CaseData(100L, 100L, NON_DELETABLE_CASE_TYPE, JURISDICTION,
-            YESTERDAY,
-            100L,
-            null);
+            YESTERDAY);
+    CaseData LINKED_CASE_DATA_R11 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, JURISDICTION, YESTERDAY);
+    CaseData LINKED_CASE_DATA_R12 = new CaseData(12L, 12L, DELETABLE_CASE_TYPE, JURISDICTION, YESTERDAY);
+    CaseData LINKED_CASE_DATA_R13 = new CaseData(13L, 13L, DELETABLE_CASE_TYPE, JURISDICTION,YESTERDAY);
+    CaseData LINKED_CASE_DATA_R100 = new CaseData(100L, 100L, NON_DELETABLE_CASE_TYPE, JURISDICTION, YESTERDAY);
     LocalDate TOMORROW = TODAY.plusDays(1L);
     CaseDataEntity DELETABLE_CASE_ENTITY_WITH_FUTURE_TTL = new CaseDataEntityBuilder(3L)
             .withReference(3L)
             .withCaseType(DELETABLE_CASE_TYPE)
             .withResolvedTtl(TOMORROW)
             .build();
-    CaseData DELETABLE_CASE_DATA_WITH_FUTURE_TTL = new CaseData(3L, 3L, DELETABLE_CASE_TYPE, JURISDICTION,
-            TOMORROW,
-            3L,
-            null);
-    CaseData LINKED_CASE_DATA_R101 = new CaseData(101L, 101L, DELETABLE_CASE_TYPE, JURISDICTION,TOMORROW,
-            101L,
-            null);
-    CaseData LINKED_CASE_DATA_MISSING_TTL_R102 = new CaseData(102L, 102L, DELETABLE_CASE_TYPE, JURISDICTION,
-            null,
-            101L,
-            null);
+    CaseData DELETABLE_CASE_DATA_WITH_FUTURE_TTL = new CaseData(3L, 3L, DELETABLE_CASE_TYPE, JURISDICTION, TOMORROW);
+    CaseData LINKED_CASE_DATA_R101 = new CaseData(101L, 101L, DELETABLE_CASE_TYPE, JURISDICTION,TOMORROW);
+    CaseData LINKED_CASE_DATA_MISSING_TTL_R102 = new CaseData(102L, 102L, DELETABLE_CASE_TYPE, JURISDICTION, null);
     CaseDataEntity DELETABLE_CASE_ENTITY_WITH_TODAY_TTL = new CaseDataEntityBuilder(2L)
             .withReference(2L)
             .withCaseType(DELETABLE_CASE_TYPE)
@@ -142,8 +125,5 @@ public interface TestData {
             DELETABLE_CASE_ENTITY_WITH_TODAY_TTL,
             DELETABLE_CASE_ENTITY_WITH_FUTURE_TTL
     );
-    CaseData DELETABLE_CASE_DATA_WITH_TODAY_TTL = new CaseData(2L, 2L, DELETABLE_CASE_TYPE, JURISDICTION,
-            TODAY,
-            2L,
-            null);
+    CaseData DELETABLE_CASE_DATA_WITH_TODAY_TTL = new CaseData(2L, 2L, DELETABLE_CASE_TYPE, JURISDICTION, TODAY);
 }

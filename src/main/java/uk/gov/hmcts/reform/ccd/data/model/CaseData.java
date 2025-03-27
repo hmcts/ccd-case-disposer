@@ -1,23 +1,23 @@
 package uk.gov.hmcts.reform.ccd.data.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Value
+
 @Builder
-@AllArgsConstructor
-public class CaseData {
-    Long id;
-    Long reference;
-    String caseType;
-    String jurisdiction;
-    LocalDate resolvedTtl;
-    Long familyId;
-    CaseData parentCase;
+public record CaseData(Long id, Long reference, String caseType, String jurisdiction, LocalDate resolvedTtl) {
+    public static CaseData fromEntity(CaseDataEntity caseDataEntity) {
+        return CaseData.builder()
+            .id(caseDataEntity.getId())
+            .reference(caseDataEntity.getReference())
+            .caseType(caseDataEntity.getCaseType())
+            .jurisdiction(caseDataEntity.getJurisdiction())
+            .resolvedTtl(caseDataEntity.getResolvedTtl())
+            .build();
+    }
 
     @Override
     public boolean equals(Object o) {

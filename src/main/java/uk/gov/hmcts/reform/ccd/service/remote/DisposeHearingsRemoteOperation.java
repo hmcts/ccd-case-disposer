@@ -27,8 +27,8 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
 
     @Override
     public void delete(final CaseData caseData) {
-        if (caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
-            final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
+        if (caseData.caseType().equals(parameterResolver.getHearingCaseType())) {
+            final List<String> caseRef = List.of(String.valueOf(caseData.reference()));
             try {
                 final ResponseEntity<Void> deleteHearingsResponse = deleteHearings(caseRef);
 

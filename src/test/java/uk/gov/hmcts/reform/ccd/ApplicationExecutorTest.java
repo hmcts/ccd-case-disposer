@@ -89,8 +89,8 @@ class ApplicationExecutorTest {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
 
         final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
-            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList())
+            new CaseFamily(List.of(DELETABLE_CASE_DATA_WITH_PAST_TTL)),
+            new CaseFamily(List.of(DELETABLE_CASE_DATA4_WITH_PAST_TTL))
         );
 
         doReturn(caseDataList)
@@ -113,9 +113,9 @@ class ApplicationExecutorTest {
         when(parameterResolver.getRequestLimit()).thenReturn(1);
 
         final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
-            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList()),
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList())
+            new CaseFamily(List.of(DELETABLE_CASE_DATA_WITH_PAST_TTL)),
+            new CaseFamily(List.of(DELETABLE_CASE_DATA4_WITH_PAST_TTL)),
+            new CaseFamily(List.of(DELETABLE_CASE_DATA_WITH_PAST_TTL))
         );
 
         doReturn(caseDataList)
@@ -139,9 +139,9 @@ class ApplicationExecutorTest {
     void shouldNotRunAfterCutoffTime(String firstNow, String secondNow, int expectedDeleteCount) {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
         final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
-            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList()),
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList())
+            new CaseFamily(List.of(DELETABLE_CASE_DATA_WITH_PAST_TTL)),
+            new CaseFamily(List.of(DELETABLE_CASE_DATA4_WITH_PAST_TTL)),
+            new CaseFamily(List.of(DELETABLE_CASE_DATA_WITH_PAST_TTL))
         );
 
         doReturn(caseDataList)
@@ -165,8 +165,8 @@ class ApplicationExecutorTest {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
 
         final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
-            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList())
+            new CaseFamily(List.of(DELETABLE_CASE_DATA_WITH_PAST_TTL)),
+            new CaseFamily(List.of(DELETABLE_CASE_DATA4_WITH_PAST_TTL))
         );
 
         doReturn(caseDataList)

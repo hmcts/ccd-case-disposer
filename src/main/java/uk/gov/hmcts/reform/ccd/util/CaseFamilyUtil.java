@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CaseFamilyUtil {
 
@@ -21,8 +20,8 @@ public class CaseFamilyUtil {
      */
     public static Set<CaseData> getCaseData(final List<CaseFamily> caseFamilies) {
         return  caseFamilies.stream()
-            .flatMap(caseFamily ->
-                         Stream.concat(Stream.of(caseFamily.getRootCase()), caseFamily.getLinkedCases().stream()))
+            .map(CaseFamily::linkedCases)
+            .flatMap(List::stream)
             .collect(Collectors.toSet());
     }
 }

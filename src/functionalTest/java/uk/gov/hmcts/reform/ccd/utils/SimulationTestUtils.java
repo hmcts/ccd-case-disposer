@@ -18,7 +18,7 @@ public class SimulationTestUtils {
     public void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
         List<Long> processedRowIds = processedCasesRecordHolder.getSimulatedCases()
             .stream()
-            .map(CaseData::getReference)
+            .map(CaseData::reference)
             .toList();
 
         assertThat(simulatedEndStateRowIds)
