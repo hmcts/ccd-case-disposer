@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.policy.CaseTypeRetentionPolicyImpl;
 import uk.gov.hmcts.reform.ccd.policy.RetentionPolicy;
 import uk.gov.hmcts.reform.ccd.policy.TtlRetentionPolicyImpl;
+import uk.gov.hmcts.reform.ccd.util.log.UndeletableCasesLogger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +33,7 @@ import static uk.gov.hmcts.reform.ccd.util.ListUtil.distinctByKey;
 public class CaseFinderService {
     private final ParameterResolver parameterResolver;
     private final CaseFamilyTreeService caseFamilyTreeService;
+    private final UndeletableCasesLogger undeletableCasesLogger;
 
     static final BiFunction<Set<Long>, Set<Long>, Set<Long>> INTERSECTION_FUNCTION = (setX, setY) -> {
         Set<Long> x = new HashSet<>(setX);
@@ -42,8 +44,11 @@ public class CaseFinderService {
 
     public List<CaseFamily> findCasesDueDeletion() {
         final List<CaseFamily> caseFamilies = caseFamilyTreeService.getCaseFamilies();
+        final List<CaseFamily> deletableCaseFamilies = getDeletableCases(caseFamilies);
 
-        return getDeletableCases(caseFamilies);
+        undeletableCasesLogger.logUndeletableCases(caseFamilies, deletableCaseFamilies);
+
+        return deletableCaseFamilies;
     }
 
     private boolean isCaseRetainable(final CaseData caseData) {
@@ -114,7 +119,7 @@ public class CaseFinderService {
 
         return retentionList.stream()
             .sorted(Comparator.comparing(caseFamily -> caseFamily.getRootCase().getId()))
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     }
 
     private List<CaseFamily> getDeletableCases(final List<CaseFamily> caseFamilies) {
@@ -129,7 +134,7 @@ public class CaseFinderService {
         return caseFamilies.stream()
             .filter(distinctByKey(caseFamily -> caseFamily.getRootCase().getId()))
             .filter(caseFamily -> !caseFamiliesToRetainCaseIds.contains(caseFamily.getRootCase().getId()))
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     }
 
 }
