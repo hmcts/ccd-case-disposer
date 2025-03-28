@@ -58,7 +58,7 @@ public class CaseDeletionLoggingService {
             StringBuilder batchLog = new StringBuilder();
             partition.forEach(caseData ->
                 batchLog.append(String.format("Simulated case type: %s, Case ref: %s%n",
-                                              caseData.getCaseType(), caseData.getReference()))
+                                              caseData.caseType(), caseData.reference()))
             );
 
             log.info(batchLog.toString());
