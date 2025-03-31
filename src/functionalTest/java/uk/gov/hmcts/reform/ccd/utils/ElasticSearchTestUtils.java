@@ -73,24 +73,22 @@ public class ElasticSearchTestUtils {
         }));
     }
 
-    public void resetIndices(final  Map<String, List<Long>> caseTypes) throws Exception {
-        for (Map.Entry<String, List<Long>> caseType : caseTypes.entrySet()) {
-            final String indexName = getIndexName(caseType.getKey());
+    public void resetIndices(final Set<String> caseTypes) throws Exception {
+        for (String caseType : caseTypes) {
+            final String indexName = getIndexName(caseType);
             if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
-                caseType.getValue().forEach(ThrowingConsumer.unchecked(caseReference -> {
-                    final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
-                        .index(indexName)
-                        .query(q -> q
-                            .term(t -> t
-                                .field(JURISDICTION)
-                                .value("DISPOSER_MASTER")
-                            )
+                final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
+                    .index(indexName)
+                    .query(q -> q
+                        .term(t -> t
+                            .field(JURISDICTION)
+                            .value("DISPOSER_MASTER")
                         )
-                        .conflicts(Conflicts.Proceed)
-                        .refresh(true)
-                    );
-                    deleteByQueryRequest(request);
-                }));
+                    )
+                    .conflicts(Conflicts.Proceed)
+                    .refresh(true)
+                );
+                deleteByQueryRequest(request);
             }
         }
     }

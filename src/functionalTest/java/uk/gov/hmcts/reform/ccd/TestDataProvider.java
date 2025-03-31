@@ -68,7 +68,7 @@ public class TestDataProvider {
         documentDeleteTestUtils.uploadDocument(deletableDocuments);
         roleDeleteTestUtils.createRoleAssignment(deletableRoles);
 
-        elasticSearchTestUtils.resetIndices(indexedData);
+       elasticSearchTestUtils.resetIndices(indexedData.keySet() );
 
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);

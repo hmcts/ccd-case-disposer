@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.with;
@@ -60,24 +61,22 @@ public class ElasticSearchIntegrationTestUtils {
         });
     }
 
-    public void resetIndices(final Map<String, List<Long>> caseTypes) throws Exception {
-        for (Map.Entry<String, List<Long>> caseType : caseTypes.entrySet()) {
-            final String indexName = getIndexName(caseType.getKey());
+    public void resetIndices(final Set<String> caseTypes) throws Exception {
+        for (String caseType : caseTypes) {
+            final String indexName = getIndexName(caseType);
             if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
-                caseType.getValue().forEach(ThrowingConsumer.unchecked(caseReference -> {
-                    final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
-                        .index(indexName)
-                        .query(q -> q
-                            .term(t -> t
-                                .field(JURISDICTION)
-                                .value("BEFTA_MASTER")
-                            )
+                final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
+                    .index(indexName)
+                    .query(q -> q
+                        .term(t -> t
+                            .field(JURISDICTION)
+                            .value("BEFTA_MASTER")
                         )
-                        .conflicts(Conflicts.Proceed)
-                        .refresh(true)
-                    );
-                    deleteByQueryRequest(request);
-                }));
+                    )
+                    .conflicts(Conflicts.Proceed)
+                    .refresh(true)
+                );
+                deleteByQueryRequest(request);
             }
         }
     }

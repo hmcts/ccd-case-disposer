@@ -46,7 +46,7 @@ public class TestDataProvider extends TestContainers {
 
         wireMockStubs.setUpStubs(WIREMOCK_SERVER);
 
-        elasticSearchIntegrationTestUtils.resetIndices(indexedData);
+        elasticSearchIntegrationTestUtils.resetIndices(indexedData.keySet());
         elasticSearchIntegrationTestUtils.createElasticSearchIndex(indexedData);
 
         databaseIntegrationTestUtils.insertDataIntoDatabase(ccdScriptPath);
