@@ -71,9 +71,9 @@ public class ElasticSearchIntegrationTestUtils {
                 final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
                     .index(indexName)
                     .query(q -> q
-                        .term(t -> t
+                        .match(m -> m
                             .field(JURISDICTION)
-                            .value("BEFTA_MASTER")
+                            .query("DISPOSER_MASTER")
                         )
                     )
                     .conflicts(Conflicts.Proceed)
