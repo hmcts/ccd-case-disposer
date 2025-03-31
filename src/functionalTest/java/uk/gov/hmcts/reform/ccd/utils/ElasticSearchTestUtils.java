@@ -77,14 +77,13 @@ public class ElasticSearchTestUtils {
     public void resetIndices(final Set<String> indexes) throws Exception {
         for (String index : indexes) {
             final String indexName = getIndexName(index);
-            log.info("Resetting index: {}", indexName);
             if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
                 final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
                     .index(indexName)
                     .query(q -> q
-                        .match(m -> m
+                        .term(t -> t
                             .field(JURISDICTION)
-                            .query("DISPOSER_MASTER")
+                            .value("DISPOSER_MASTER")
                         )
                     )
                     .conflicts(Conflicts.Proceed)
