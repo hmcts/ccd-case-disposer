@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.ccd.utils;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.Conflicts;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.elasticsearch.core.GetRequest;
+import co.elastic.clients.elasticsearch.core.GetResponse;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshResponse;
@@ -28,8 +32,8 @@ import static org.awaitility.Awaitility.with;
 @Slf4j
 public class ElasticSearchTestUtils {
 
-    private static final String INDEX_TYPE = "_doc";
     private static final String CASE_REFERENCE_FIELD = "reference";
+    private static final String JURISDICTION = "jurisdiction";
 
     @Inject
     private ElasticsearchClient elasticsearchClient;
@@ -69,17 +73,25 @@ public class ElasticSearchTestUtils {
         }));
     }
 
-    public void resetIndices() throws Exception {
-        if (elasticsearchClient.indices().exists(e -> e.index("DISPOSER_MASTER")).value()) {
-            final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
-                .index("DISPOSER_MASTER")
-                .query(q -> q
-                    .matchAll(m -> m)
-                )
-                .conflicts(Conflicts.Proceed)
-                .refresh(true)
-            );
-            deleteByQueryRequest(request);
+    public void resetIndices(final  Map<String, List<Long>> caseTypes) throws Exception {
+        for (Map.Entry<String, List<Long>> caseType : caseTypes.entrySet()) {
+            final String indexName = getIndexName(caseType.getKey());
+            if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
+                caseType.getValue().forEach(ThrowingConsumer.unchecked(caseReference -> {
+                    final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
+                        .index(indexName)
+                        .query(q -> q
+                            .term(t -> t
+                                .field(JURISDICTION)
+                                .value("DISPOSER_MASTER")
+                            )
+                        )
+                        .conflicts(Conflicts.Proceed)
+                        .refresh(true)
+                    );
+                    deleteByQueryRequest(request);
+                }));
+            }
         }
     }
 
