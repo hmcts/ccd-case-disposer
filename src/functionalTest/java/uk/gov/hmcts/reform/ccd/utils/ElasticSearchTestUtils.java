@@ -1,12 +1,9 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch.core.GetRequest;
-import co.elastic.clients.elasticsearch.core.GetResponse;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch._types.Conflicts;
+import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.core.search.SourceConfig;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshResponse;
 import com.pivovarit.function.ThrowingConsumer;
@@ -21,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.with;
@@ -72,35 +68,24 @@ public class ElasticSearchTestUtils {
         }));
     }
 
-    public List<String> getAllDocuments(final String indexName) throws IOException {
-        final SearchRequest searchRequest = SearchRequest.of(s -> s
-            .index(indexName)
-            .query(q -> q
-                .matchAll(m -> m)
-            )
-            .source(SourceConfig.of(sc -> sc.fetch(true)))
-        );
-
-        final SearchResponse<Map> searchResponse = elasticsearchClient.search(searchRequest, Map.class);
-
-        return searchResponse.hits().hits().stream()
-            .filter(hit -> indexName.startsWith(hit.index()))
-            .map(Hit::id)
-            .collect(Collectors.toUnmodifiableList());
+    public void resetIndices() throws Exception {
+        if (elasticsearchClient.indices().exists(e -> e.index("DISPOSER_MASTER")).value()) {
+            final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
+                .index("DISPOSER_MASTER")
+                .query(q -> q
+                    .matchAll(m -> m)
+                )
+                .conflicts(Conflicts.Proceed)
+                .refresh(true)
+            );
+            deleteByQueryRequest(request);
+        }
     }
 
-    public void resetIndices(final Set<String> caseTypes) throws Exception {
-        for (String caseType : caseTypes) {
-            final String indexName = getIndexName(caseType);
-            if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
-                final List<String> documents = getAllDocuments(indexName);
-                for (String documentId : documents) {
-                    elasticsearchClient.delete(d -> d
-                        .index(indexName)
-                        .id(documentId)
-                    );
-                }
-            }
+    private void deleteByQueryRequest(DeleteByQueryRequest request) throws IOException {
+        final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
+        if (!response.failures().isEmpty()) {
+            throw new IOException("Errors resetting indices: " + response.failures());
         }
     }
 
