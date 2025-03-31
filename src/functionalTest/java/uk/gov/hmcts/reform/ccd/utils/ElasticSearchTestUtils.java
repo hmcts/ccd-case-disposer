@@ -16,6 +16,7 @@ import com.pivovarit.function.ThrowingFunction;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
@@ -96,7 +97,7 @@ public class ElasticSearchTestUtils {
     private void deleteByQueryRequest(DeleteByQueryRequest request) throws IOException {
         final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
         if (!response.failures().isEmpty()) {
-            throw new IOException("Errors resetting indices: " + response.failures());
+            throwError("Errors resetting indices", response.failures());
         }
     }
 
@@ -164,6 +165,10 @@ public class ElasticSearchTestUtils {
                 .isEqualTo(0));
     }
 
+    private <T> void throwError(final String message, final List<T> list) {
+        log.error("{}:: {}", message, list);
+        throw new ElasticsearchOperationException(message);
+    }
 
     public String getIndexName(String caseType) {
         if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {

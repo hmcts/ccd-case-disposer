@@ -14,8 +14,10 @@ import co.elastic.clients.elasticsearch.indices.RefreshResponse;
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
 import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.config.es.ElasticSearchIndexCreator;
+import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
@@ -29,6 +31,7 @@ import static org.awaitility.Awaitility.with;
 
 @SuppressWarnings("unchecked")
 @Component
+@Slf4j
 public class ElasticSearchIntegrationTestUtils {
 
     private static final String CASE_REFERENCE_FIELD = "reference";
@@ -84,7 +87,7 @@ public class ElasticSearchIntegrationTestUtils {
     private void deleteByQueryRequest(DeleteByQueryRequest request) throws IOException {
         final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
         if (!response.failures().isEmpty()) {
-            throw new IOException("Errors resetting indices: " + response.failures());
+            throwError("Errors resetting indices", response.failures());
         }
     }
 
@@ -159,6 +162,11 @@ public class ElasticSearchIntegrationTestUtils {
             return String.format("%s_cases", caseType.toLowerCase());
         }
         return caseType;
+    }
+
+    private <T> void throwError(final String message, final List<T> list) {
+        log.error("{}:: {}", message, list);
+        throw new ElasticsearchOperationException(message);
     }
 
 }
