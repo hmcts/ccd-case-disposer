@@ -61,9 +61,9 @@ public class ElasticSearchIntegrationTestUtils {
         });
     }
 
-    public void resetIndices(final Set<String> caseTypes) throws Exception {
-        for (String caseType : caseTypes) {
-            final String indexName = getIndexName(caseType);
+    public void resetIndices(final Set<String> indexes) throws Exception {
+        for (String index : indexes) {
+            final String indexName = getIndexName(index);
             if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
                 final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
                     .index(indexName)
