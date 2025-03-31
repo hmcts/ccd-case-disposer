@@ -34,7 +34,7 @@ import static org.awaitility.Awaitility.with;
 public class ElasticSearchTestUtils {
 
     private static final String CASE_REFERENCE_FIELD = "reference";
-    private static final String JURISDICTION = "jurisdiction";
+    private static final String JURISDICTION = "jurisdiction.keyword";
 
     @Inject
     private ElasticsearchClient elasticsearchClient;

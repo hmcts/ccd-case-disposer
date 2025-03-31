@@ -35,7 +35,7 @@ import static org.awaitility.Awaitility.with;
 public class ElasticSearchIntegrationTestUtils {
 
     private static final String CASE_REFERENCE_FIELD = "reference";
-    private static final String JURISDICTION = "jurisdiction";
+    private static final String JURISDICTION = "jurisdiction.keyword";
 
     @Inject
     private ElasticsearchClient elasticsearchClient;
@@ -71,9 +71,9 @@ public class ElasticSearchIntegrationTestUtils {
                 final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
                     .index(indexName)
                     .query(q -> q
-                        .match(m -> m
+                        .term(t -> t
                             .field(JURISDICTION)
-                            .query("DISPOSER_MASTER")
+                            .value("DISPOSER_MASTER")
                         )
                     )
                     .conflicts(Conflicts.Proceed)
