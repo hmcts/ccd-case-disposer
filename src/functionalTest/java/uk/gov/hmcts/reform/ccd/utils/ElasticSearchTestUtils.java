@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Conflicts;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
 import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import co.elastic.clients.elasticsearch.core.GetRequest;
@@ -8,7 +9,6 @@ import co.elastic.clients.elasticsearch.core.GetResponse;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
-import co.elastic.clients.elasticsearch.core.search.SourceConfig;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshResponse;
 import com.pivovarit.function.ThrowingConsumer;
@@ -24,19 +24,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.with;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 @SuppressWarnings("unchecked")
 @Component
 @Slf4j
 public class ElasticSearchTestUtils {
 
-    private static final String INDEX_TYPE = "_doc";
     private static final String CASE_REFERENCE_FIELD = "reference";
+    private static final String JURISDICTION = "jurisdiction.keyword";
 
     @Inject
     private ElasticsearchClient elasticsearchClient;
@@ -76,41 +74,29 @@ public class ElasticSearchTestUtils {
         }));
     }
 
-    public List<String> getAllDocuments(final String indexName) throws IOException {
-        final SearchRequest searchRequest = SearchRequest.of(s -> s
-            .index(indexName)
-            .query(q -> q
-                .matchAll(m -> m)
-            )
-            .source(SourceConfig.of(sc -> sc.fetch(true)))
-        );
-
-        final SearchResponse<Map> searchResponse = elasticsearchClient.search(searchRequest, Map.class);
-
-        return searchResponse.hits().hits().stream()
-            .filter(hit -> indexName.startsWith(hit.index()))
-            .map(Hit::id)
-            .collect(Collectors.toUnmodifiableList());
-    }
-
-    public void resetIndices(final Set<String> caseTypes) throws Exception {
-        for (String caseType : caseTypes) {
-            final String indexName = getIndexName(caseType);
+    public void resetIndices(final Set<String> indexes) throws Exception {
+        for (String index : indexes) {
+            final String indexName = getIndexName(index);
             if (elasticsearchClient.indices().exists(e -> e.index(indexName)).value()) {
                 final DeleteByQueryRequest request = DeleteByQueryRequest.of(b -> b
                     .index(indexName)
                     .query(q -> q
-                        .matchAll(m -> m)
+                        .term(t -> t
+                            .field(JURISDICTION)
+                            .value("DISPOSER_MASTER")
+                        )
                     )
+                    .conflicts(Conflicts.Proceed)
+                    .refresh(true)
                 );
                 deleteByQueryRequest(request);
             }
         }
     }
 
-    private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {
+    private void deleteByQueryRequest(DeleteByQueryRequest request) throws IOException {
         final DeleteByQueryResponse response = elasticsearchClient.deleteByQuery(request);
-        if (!isEmpty(response.failures())) {
+        if (!response.failures().isEmpty()) {
             throwError("Errors resetting indices", response.failures());
         }
     }
@@ -183,7 +169,6 @@ public class ElasticSearchTestUtils {
         log.error("{}:: {}", message, list);
         throw new ElasticsearchOperationException(message);
     }
-
 
     public String getIndexName(String caseType) {
         if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {
