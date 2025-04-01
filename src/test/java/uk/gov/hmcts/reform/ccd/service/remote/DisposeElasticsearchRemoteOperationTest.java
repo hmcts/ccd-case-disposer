@@ -1,11 +1,9 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryRequest;
-import org.elasticsearch.index.reindex.ScrollableHitSource;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.BulkIndexByScrollFailure;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryRequest;
+import co.elastic.clients.elasticsearch.core.DeleteByQueryResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,9 +32,9 @@ class DisposeElasticsearchRemoteOperationTest {
     private static final String CASE_INDEX = "test_case_index";
     private static final String GLOBAL_SEARCH_INDEX = "global_search";
     private static final Long CASE_REFERENCE = 1902145L;
-    private final BulkByScrollResponse bulkByScrollResponse = mock(BulkByScrollResponse.class);
+
     @Mock
-    private RestHighLevelClient elasticsearchClient;
+    private ElasticsearchClient elasticsearchClient;
     @Mock
     private ParameterResolver parameterResolver;
     @Mock
@@ -49,74 +47,59 @@ class DisposeElasticsearchRemoteOperationTest {
     @BeforeEach
     void prepare() {
         doReturn(CASE_INDEX).when(parameterResolver).getCasesIndexNamePattern();
-        doReturn(1).when(parameterResolver).getElasticsearchRequestTimeout();
     }
 
     @Test
     void testShouldDeleteByReferenceSuccessfully() throws Exception {
         doReturn(GLOBAL_SEARCH_INDEX).when(parameterResolver).getGlobalSearchIndexName();
-        doReturn(bulkByScrollResponse).when(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
-        doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
-        doReturn(emptyList()).when(bulkByScrollResponse).getBulkFailures();
+        DeleteByQueryResponse deleteByQueryResponse = mock(DeleteByQueryResponse.class);
+        doReturn(deleteByQueryResponse).when(elasticsearchClient)
+            .deleteByQuery(any(DeleteByQueryRequest.class));
+        doReturn(emptyList()).when(deleteByQueryResponse).failures();
 
         doReturn(true).when(globalSearchIndexChecker).isGlobalSearchExist();
 
         underTest.delete(caseData);
 
         verify(elasticsearchClient, times(2))
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+            .deleteByQuery(any(DeleteByQueryRequest.class));
     }
 
     @Test
     void testShouldIgnoreDeleteByQueryRequestIfGlobalSearchNotDefined() throws Exception {
-        doReturn(bulkByScrollResponse).when(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+        DeleteByQueryResponse deleteByQueryResponse = mock(DeleteByQueryResponse.class);
+        doReturn(deleteByQueryResponse).when(elasticsearchClient)
+            .deleteByQuery(any(DeleteByQueryRequest.class));
+        doReturn(emptyList()).when(deleteByQueryResponse).failures();
 
         doReturn(false).when(globalSearchIndexChecker).isGlobalSearchExist();
 
         underTest.delete(caseData);
 
         verify(elasticsearchClient, times(1))
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+            .deleteByQuery(any(DeleteByQueryRequest.class));
     }
 
     @Test
-    void testShouldRaiseSearchFailuresWhenDeleteByReference() throws Exception {
-        doReturn(bulkByScrollResponse).when(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
-        doReturn(List.of(new ScrollableHitSource.SearchFailure(new Throwable())))
-            .when(bulkByScrollResponse).getSearchFailures();
-        doReturn(emptyList()).when(bulkByScrollResponse).getBulkFailures();
+    void testShouldRaiseFailuresWhenDeleteByReference() throws Exception {
+        DeleteByQueryResponse deleteByQueryResponse = mock(DeleteByQueryResponse.class);
+        doReturn(deleteByQueryResponse).when(elasticsearchClient)
+            .deleteByQuery(any(DeleteByQueryRequest.class));
+        BulkIndexByScrollFailure failure = mock(BulkIndexByScrollFailure.class);
+        doReturn(List.of(failure)).when(deleteByQueryResponse).failures();
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
             .isThrownBy(() -> underTest.delete(caseData))
             .withMessage("uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException: "
                              + "Search failures occurred");
         verify(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
-    }
-
-    @Test
-    void testShouldRaiseElasticsearchFailuresWhenDeleteByReference() throws Exception {
-        doReturn(bulkByScrollResponse).when(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
-        doReturn(emptyList()).when(bulkByScrollResponse).getSearchFailures();
-        doReturn(List.of(new BulkItemResponse.Failure(CASE_INDEX, "_doc", "101", new Exception())))
-            .when(bulkByScrollResponse).getBulkFailures();
-
-        assertThatExceptionOfType(ElasticsearchOperationException.class)
-            .isThrownBy(() -> underTest.delete(caseData))
-            .withMessage("uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException: "
-                             + "Elasticsearch operation failures occurred");
-        verify(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+            .deleteByQuery(any(DeleteByQueryRequest.class));
     }
 
     @Test
     void testShouldRaiseExceptionWhenDeleteByQueryFails() throws Exception {
         doThrow(new IOException()).when(elasticsearchClient)
-            .deleteByQuery(any(DeleteByQueryRequest.class), any(RequestOptions.class));
+            .deleteByQuery(any(DeleteByQueryRequest.class));
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
             .isThrownBy(() -> underTest.delete(caseData));
