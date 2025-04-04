@@ -16,6 +16,8 @@ import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.NOT_DELETED_CASES_STRING;
+import static uk.gov.hmcts.reform.ccd.util.LogConstants.NOT_DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_CASES_STRING;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SIMULATED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.SUMMARY_HEADING_STRING;
@@ -28,6 +30,7 @@ public class SummaryStringLogBuilder {
     public String buildSummaryString(final List<CaseDataView> caseDataViews) {
         final int deletedCases = countCaseFamilies(caseDataViews, DELETED_STATE);
         final int simulatedCases = countCaseFamilies(caseDataViews, SIMULATED_STATE);
+        final int notDeleted = countCaseFamilies(caseDataViews, NOT_DELETED_STATE);
         final int failedCases = countCaseFamilies(caseDataViews, FAILED_STATE);
         final int totalCases = deletedCases + simulatedCases + failedCases;
 
@@ -36,6 +39,7 @@ public class SummaryStringLogBuilder {
         return buildSummaryString(
             deletedCases,
             simulatedCases,
+            notDeleted,
             failedCases,
             totalCases,
             caseTypeAndStateCount
@@ -44,6 +48,7 @@ public class SummaryStringLogBuilder {
 
     public String buildSummaryString(final int deleted,
                                      final int simulated,
+                                     final int notDeleted,
                                      final int failed,
                                      final int total,
                                      final Map<String, Long> caseTypeAndStateCount) {
@@ -54,6 +59,7 @@ public class SummaryStringLogBuilder {
             .append(CR_STRING)
             .append(TOTAL_CASES_STRING).append(total)
             .append(DELETED_CASES_STRING).append(deleted)
+            .append(NOT_DELETED_CASES_STRING).append(notDeleted)
             .append(SIMULATED_CASES_STRING).append(simulated)
             .append(FAILED_CASES_STRING).append(failed)
             .append(CR_STRING);
