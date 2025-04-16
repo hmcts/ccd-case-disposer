@@ -296,7 +296,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.0'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.7-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'commons-net', name: 'commons-net', version: '3.11.1'
 
