@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '6.1.0.5360'
   id 'uk.gov.hmcts.java' version '0.12.65'
   id 'io.freefair.lombok' version '8.13.1'
-  id 'org.flywaydb.flyway' version '11.7.0'
+  id 'org.flywaydb.flyway' version '11.7.2'
   id "info.solidsoft.pitest" version '1.15.0'
   id "au.com.dius.pact" version '4.6.17'
 }
@@ -244,8 +244,8 @@ project.tasks['pitest'].group = "Verification"
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.19.0',
-    elasticsearch       : '8.17.4',
-    flyway              : '11.7.0',
+    elasticsearch       : '8.18.0',
+    flyway              : '11.7.2',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.3',
     junit               : '5.12.2',
@@ -296,7 +296,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.0'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.7-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'commons-net', name: 'commons-net', version: '3.11.1'
 
@@ -304,7 +304,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.1'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.2'
     implementation group: 'ch.qos.logback.access', name: 'common', version: '2.0.3'
 
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
@@ -325,7 +325,7 @@ dependencies {
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
     testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
     testImplementation 'com.github.hmcts:fortify-client:1.4.8:all'
-    testImplementation group: 'io.github.hakky54', name: 'logcaptor', version: '2.10.2'
+    testImplementation group: 'io.github.hakky54', name: 'logcaptor', version: '2.11.0'
 
     testImplementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
 
