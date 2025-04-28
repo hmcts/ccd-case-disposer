@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.ccd.config.es;
 
-import org.elasticsearch.client.IndicesClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.GetIndexRequest;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.indices.ElasticsearchIndicesClient;
+import co.elastic.clients.transport.endpoints.BooleanResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,58 +12,65 @@ import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings({"unchecked"})
 @ExtendWith(MockitoExtension.class)
 class GlobalSearchIndexCheckerTest {
 
     @Mock
-    private RestHighLevelClient elasticsearchClient;
+    private ElasticsearchClient elasticsearchClient;
     @Mock
     private ParameterResolver parameterResolver;
 
     @InjectMocks
     private GlobalSearchIndexChecker globalSearchIndexChecker;
 
-
     @Test
     void shouldReturnTrueWhenGlobalSearchExist() throws IOException {
         doReturn("global_search").when(parameterResolver).getGlobalSearchIndexName();
-        final IndicesClient indices = mock(IndicesClient.class);
-        when(elasticsearchClient.indices()).thenReturn(indices);
 
-        doReturn(true).when(indices).exists(any(GetIndexRequest.class), any());
+        BooleanResponse booleanResponse = mock(BooleanResponse.class);
+        when(booleanResponse.value()).thenReturn(true);
+
+        ElasticsearchIndicesClient indicesClient = mock(ElasticsearchIndicesClient.class);
+        when(elasticsearchClient.indices()).thenReturn(indicesClient);
+        when(elasticsearchClient.indices().exists(any(Function.class))).thenReturn(booleanResponse);
+
         assertThat(globalSearchIndexChecker.isGlobalSearchExist()).isEqualTo(true);
     }
 
     @Test
     void shouldReturnFalseWhenGlobalSearchExist() throws IOException {
         doReturn("global_search").when(parameterResolver).getGlobalSearchIndexName();
-        final IndicesClient indices = mock(IndicesClient.class);
-        when(elasticsearchClient.indices()).thenReturn(indices);
 
-        doReturn(false).when(indices).exists(any(GetIndexRequest.class), any());
+        BooleanResponse booleanResponse = mock(BooleanResponse.class);
+        when(booleanResponse.value()).thenReturn(false);
+
+        ElasticsearchIndicesClient indicesClient = mock(ElasticsearchIndicesClient.class);
+        when(elasticsearchClient.indices()).thenReturn(indicesClient);
+        when(elasticsearchClient.indices().exists(any(Function.class))).thenReturn(booleanResponse);
+
         assertThat(globalSearchIndexChecker.isGlobalSearchExist()).isEqualTo(false);
     }
 
 
     @Test
-    void shouldThrowExceptionWhenGlobalSearchExist() throws Exception {
-
+    void shouldThrowExceptionWhenGlobalSearchExist() throws IOException {
         doReturn("global_search").when(parameterResolver).getGlobalSearchIndexName();
-        final IndicesClient indices = mock(IndicesClient.class);
-        when(elasticsearchClient.indices()).thenReturn(indices);
 
-        doThrow(new IOException()).when(indices).exists(any(GetIndexRequest.class), any());
+        ElasticsearchIndicesClient indicesClient = mock(ElasticsearchIndicesClient.class);
+        when(elasticsearchClient.indices()).thenReturn(indicesClient);
+        when(elasticsearchClient.indices().exists(any(Function.class))).thenThrow(new IOException());
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
-                .isThrownBy(() -> globalSearchIndexChecker.isGlobalSearchExist());
+            .isThrownBy(() -> globalSearchIndexChecker.isGlobalSearchExist());
     }
 }

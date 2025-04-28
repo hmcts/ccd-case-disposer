@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.ccd.config.es;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.indices.RefreshRequest;
+import co.elastic.clients.elasticsearch.indices.RefreshResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pivovarit.function.ThrowingConsumer;
 import jakarta.inject.Inject;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.xcontent.XContentType;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.fixture.CaseDataEntityBuilder;
@@ -18,14 +17,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.elasticsearch.client.RequestOptions.DEFAULT;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.awaitility.Awaitility.with;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @Component
 public class ElasticSearchIndexCreator {
 
     @Inject
-    private RestHighLevelClient elasticsearchClient;
+    private ElasticsearchClient elasticsearchClient;
 
     @Inject
     private ParameterResolver parameterResolver;
@@ -35,13 +35,22 @@ public class ElasticSearchIndexCreator {
     public void insertDataIntoElasticsearch(final String indexName, final List<Long> caseRefs) throws IOException {
         final String caseIndex = getIndexName(indexName);
         final List<CaseDataEntity> caseDataEntities = buildCaseDataEntity(
-                getIndexName(indexName),
-                caseRefs);
-        final BulkRequest bulkRequest = buildBulkRequest(caseIndex, caseDataEntities);
+            getIndexName(indexName),
+            caseRefs);
 
-        final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequest, DEFAULT);
+        final BulkRequest.Builder bulkRequestBuilder = new BulkRequest.Builder();
+        caseDataEntities.forEach(ThrowingConsumer.unchecked(data -> {
+            bulkRequestBuilder.operations(op -> op
+                .index(idx -> idx
+                    .index(caseIndex)
+                    .document(data) // Pass the object directly
+                )
+            );
+        }));
 
-        assertFalse(bulkResponse.hasFailures());
+        final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequestBuilder.build());
+
+        assertFalse(bulkResponse.errors());
 
         refreshIndex(caseIndex);
     }
@@ -55,22 +64,14 @@ public class ElasticSearchIndexCreator {
                 .collect(Collectors.toList());
     }
 
-    private BulkRequest buildBulkRequest(final String caseIndex, final List<CaseDataEntity> caseDataEntities) {
-        final BulkRequest bulkRequest = new BulkRequest();
-        caseDataEntities.forEach(ThrowingConsumer.unchecked(data -> {
-            final String value = objectMapper.writeValueAsString(data);
-            final IndexRequest indexRequest = new IndexRequest(caseIndex)
-                    .source(value, XContentType.JSON);
-
-            bulkRequest.add(indexRequest);
-        }));
-
-        return bulkRequest;
-    }
-
     private void refreshIndex(final String caseIndex) throws IOException {
-        final RefreshRequest refreshRequest = new RefreshRequest(caseIndex);
-        elasticsearchClient.indices().refresh(refreshRequest, DEFAULT);
+        final RefreshRequest request = RefreshRequest.of(r -> r.index(caseIndex));
+        final RefreshResponse refreshResponse = elasticsearchClient.indices().refresh(request);
+
+        with()
+            .await()
+            .untilAsserted(() -> assertThat(refreshResponse.shards().failures().size())
+                .isEqualTo(0));
     }
 
     public String getIndexName(String caseType) {
