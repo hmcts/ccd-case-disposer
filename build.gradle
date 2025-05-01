@@ -252,7 +252,7 @@ def versions = [
     lombok              : '1.18.38',
     reformLogging       : '6.1.8',
     restAssured         : '5.5.1',
-    s2sClient           : '5.3.0',
+    s2sClient           : '5.3.2',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
     testcontainers      : '1.20.6',
