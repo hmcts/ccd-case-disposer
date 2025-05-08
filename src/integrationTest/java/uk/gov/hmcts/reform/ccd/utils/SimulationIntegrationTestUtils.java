@@ -18,7 +18,7 @@ public class SimulationIntegrationTestUtils {
 
     public void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
         Set<CaseData> simulatedCases = processedCasesRecordHolder.getSimulatedCases();
-        List<Long> simulatedCaseIds = simulatedCases.stream().map(CaseData::getReference).toList();
+        List<Long> simulatedCaseIds = simulatedCases.stream().map(CaseData::reference).toList();
         assertThat(simulatedCaseIds)
                 .isNotNull()
                 .containsExactlyInAnyOrderElementsOf(simulatedEndStateRowIds);
