@@ -15,7 +15,7 @@ public class CaseDataViewBuilder {
                                       final List<CaseDataView> caseDataViews,
                                       final String state) {
         caseDataList.forEach(family ->
-            caseDataViews.add(new CaseDataView(family.getCaseType(), family.getReference(), state))
+            caseDataViews.add(new CaseDataView(family.caseType(), family.reference(), state))
         );
     }
 }
