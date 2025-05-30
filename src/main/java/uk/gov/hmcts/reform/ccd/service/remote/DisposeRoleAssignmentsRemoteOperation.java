@@ -24,7 +24,7 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
 
     @Override
     public void delete(final CaseData caseData) {
-        final String caseRef = caseData.getReference().toString();
+        final String caseRef = caseData.reference().toString();
         try {
             final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
                 new RoleAssignmentsPostRequest(caseRef);
@@ -38,7 +38,7 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
             if (!roleAssignmentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
                 final String errorMessage = String
                     .format("Unexpected response code %d while deleting role assignments for case: %s",
-                            roleAssignmentsDeleteResponse.getStatusCode().value(), caseData.getReference()
+                            roleAssignmentsDeleteResponse.getStatusCode().value(), caseData.reference()
                     );
 
                 throw new RoleAssignmentDeletionException(errorMessage);
