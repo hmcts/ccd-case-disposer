@@ -187,7 +187,7 @@ dependencyCheck {
 
 dependencyManagement {
     dependencies {
-        dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.80'
+        dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.81'
         dependencySet(group: 'org.springframework.cloud', version: '4.2.1') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
