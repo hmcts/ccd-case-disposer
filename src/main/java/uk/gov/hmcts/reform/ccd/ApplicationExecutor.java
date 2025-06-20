@@ -40,9 +40,11 @@ public class ApplicationExecutor {
         logParameters();
         applicationStartTime = LocalDateTime.now(clock);
         log.info("Case-Disposer started...");
+
         final List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
+
         final List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
-        final List<CaseFamily> deletableLinkedFamiliesSimulation = caseFamiliesFilter.geSimulationCasesOnly(
+        final List<CaseFamily> deletableLinkedFamiliesSimulation = caseFamiliesFilter.getSimulationCasesOnly(
             caseFamiliesDueDeletion);
 
         Integer requestLimit = parameterResolver.getRequestLimit();
@@ -80,7 +82,7 @@ public class ApplicationExecutor {
             try {
                 caseDeletionService.deleteCaseData(caseData);
             } catch (LogAndAuditException logAndAuditException) {
-                log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
+                log.error("Error deleting case: {} due to log and audit exception", caseData.reference());
             }
             requestLimit--;
             processedCasesRecordHolder.addProcessedCase(caseData);

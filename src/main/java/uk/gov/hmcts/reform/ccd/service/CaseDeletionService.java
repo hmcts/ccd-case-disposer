@@ -48,17 +48,17 @@ public class CaseDeletionService {
      */
     boolean deleteCaseLinks(final CaseData caseData) {
         try {
-            final List<CaseLinkEntity> allLinkedCases = caseLinkRepository.findByCaseIdOrLinkedCaseId(caseData.getId());
+            final List<CaseLinkEntity> allLinkedCases = caseLinkRepository.findByCaseIdOrLinkedCaseId(caseData.id());
             if (allLinkedCases.isEmpty()) {
-                log.info("No linked cases found for case reference:: {}", caseData.getReference());
+                log.info("No linked cases found for case reference:: {}", caseData.reference());
             } else {
-                log.info("About to delete linked case reference:: {}", caseData.getReference());
+                log.info("About to delete linked case reference:: {}", caseData.reference());
                 caseLinkRepository.deleteAll(allLinkedCases);
-                log.info("Deleted linked case reference:: {}", caseData.getReference());
+                log.info("Deleted linked case reference:: {}", caseData.reference());
             }
             return true;
         } catch (final Exception exception) { // Catch all exceptions
-            log.error("Could not delete linked case reference:: {}", caseData.getReference(), exception);
+            log.error("Could not delete linked case reference:: {}", caseData.reference(), exception);
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
             return false;
         }
@@ -66,30 +66,30 @@ public class CaseDeletionService {
 
     void deleteCase(final CaseData caseData) {
         try {
-            log.info("About to delete case reference:: {} ({})", caseData.getReference(), caseData.getJurisdiction());
+            log.info("About to delete case reference:: {} ({})", caseData.reference(), caseData.jurisdiction());
 
-            final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
+            final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.id());
             if (caseDataEntity.isPresent()) {
                 remoteDisposeService.remoteDeleteAll(caseData);
-                caseEventRepository.deleteByCaseDataId(caseData.getId());
+                caseEventRepository.deleteByCaseDataId(caseData.id());
                 caseDataRepository.delete(caseDataEntity.get());
                 logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
             }
 
-            log.info("Deleted case reference:: {} ({})", caseData.getReference(), caseData.getJurisdiction());
+            log.info("Deleted case reference:: {} ({})", caseData.reference(), caseData.jurisdiction());
         } catch (LogAndAuditException logAndAuditException) {
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
             log.error(
                 "Log and Audit exception while deleting case reference:: {} ({})",
-                caseData.getReference(),
-                caseData.getJurisdiction(),
+                caseData.reference(),
+                caseData.jurisdiction(),
                 logAndAuditException
             );
             throw logAndAuditException;
         } catch (final Exception exception) { // Catch all exceptions
             log.error(
                 "Could not delete case reference:: {} ({})",
-                caseData.getReference(), caseData.getJurisdiction(), exception);
+                caseData.reference(), caseData.jurisdiction(), exception);
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
         }
     }
