@@ -248,7 +248,7 @@ def versions = [
     flyway              : '11.10.2',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.4',
-    junit               : '5.13.3',
+    junit               : '5.13.4',
     lombok              : '1.18.38',
     reformLogging       : '6.1.9',
     restAssured         : '5.5.5',
