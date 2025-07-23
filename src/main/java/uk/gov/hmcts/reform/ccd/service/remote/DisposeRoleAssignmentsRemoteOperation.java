@@ -60,4 +60,9 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
             roleAssignmentsPostRequest
         );
     }
+
+    @Override
+    public String toString() {
+        return "Role Assignment (AM) Disposer";
+    }
 }

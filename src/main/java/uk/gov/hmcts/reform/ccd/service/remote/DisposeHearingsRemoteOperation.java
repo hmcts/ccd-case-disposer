@@ -59,4 +59,9 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
                 securityUtil.getServiceAuthorization(),
                 caseRefs);
     }
+
+    @Override
+    public String toString() {
+        return "Hearing Recording Disposer";
+    }
 }
