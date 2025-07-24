@@ -13,7 +13,7 @@ public class CaseTypeRetentionPolicyImpl implements RetentionPolicy {
 
     @Override
     public Boolean mustRetain(@NonNull final CaseData caseData) {
-        return !isDeletableCaseType(caseData.getCaseType());
+        return !isDeletableCaseType(caseData.caseType());
     }
 
     private Boolean isDeletableCaseType(@NonNull final String caseType) {
