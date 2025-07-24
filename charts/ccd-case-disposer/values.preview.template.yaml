@@ -282,8 +282,14 @@ ccd:
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       environment:
-        USER_PROFILE_DB_HOST: "${SERVICE_NAME}-postgresql"
-      disableKeyVaults: true
+        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified"
+        USER_PROFILE_DB_PASSWORD: '{{ tpl .Values.global.postgresPassword $}}'
+        secrets:
+          USER_PROFILE_DB_PASSWORD:
+            secretRef: "{{ .Values.global.postgresSecret }}"
+            key: PASSWORD
+            disabled: true
 
   ccd-data-store-api:
     java:
