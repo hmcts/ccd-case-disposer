@@ -225,7 +225,7 @@ pitest {
 project.tasks['pitest'].group = "Verification"
 
 def versions = [
-    springCloudVersion: '2025.0.0',
+    springCloudVersion  : '2025.0.0',
     elasticsearch       : '8.18.3',
     flyway              : '11.10.3',
     junit               : '5.13.4',
@@ -280,10 +280,7 @@ dependencies {
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
     implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.3'
-    // implementation group: 'commons-net', name: 'commons-net', version: '3.11.1'
     implementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.5'
-    // implementation group: 'jakarta.ws.rs', name: 'jakarta.ws.rs-api', version: '4.0.0'
-    // implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
     implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
@@ -303,7 +300,6 @@ dependencies {
     testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.6.1'
     testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.15.0'
     testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
-    // testImplementation group: 'io.github.hakky54', name: 'logcaptor', version: '2.11.0'
 
     testImplementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
 
