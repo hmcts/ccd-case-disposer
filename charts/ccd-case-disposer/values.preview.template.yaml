@@ -57,8 +57,8 @@ elasticsearch:
       - es-${SERVICE_FQDN}
 
 logstash:
-  image: "hmctspublic.azurecr.io/imported/logstash/logstash"
-  imageTag: "7.16.1"
+  image: hmctspublic.azurecr.io/ccd/logstash
+  imageTag: "latest"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
@@ -253,6 +253,11 @@ ccd:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       ingressHost: ccd-definition-store-${SERVICE_NAME}.preview.platform.hmcts.net
       imagePullPolicy: Always
+      secrets:
+        DEFINITION_STORE_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
       environment:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "${SERVICE_NAME}-es-master"
@@ -277,8 +282,14 @@ ccd:
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       environment:
-        USER_PROFILE_DB_HOST: "${SERVICE_NAME}-postgresql"
-      disableKeyVaults: true
+        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified"
+        USER_PROFILE_DB_PASSWORD: '{{ tpl .Values.global.postgresPassword $}}'
+        secrets:
+          USER_PROFILE_DB_PASSWORD:
+            secretRef: "{{ .Values.global.postgresSecret }}"
+            key: PASSWORD
+            disabled: true
 
   ccd-data-store-api:
     java:
