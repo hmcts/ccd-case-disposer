@@ -71,15 +71,9 @@ logstash:
   extraVolumes: |
     - name: logstash-lib
       emptyDir: {}
-    - name: database-secret-volume
-      secret:
-        secretName: postgres
   extraVolumeMounts: |
     - name: logstash-lib
       mountPath: /usr/share/logstash/ccd
-    - name: database-secret-volume
-      mountPath: /etc/logstash/secrets
-      readOnly: true
   logstashConfig:
     logstash.yml: |
       http.host: 0.0.0.0
