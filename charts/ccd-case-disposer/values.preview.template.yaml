@@ -8,7 +8,7 @@ job:
   concurrencyPolicy: Forbid
   environment:
     APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
-    DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+    DATA_STORE_DB_HOST: '{{ .Values.global.postgresHostname }}'
     DATA_STORE_DB_PORT: 5432
     DATA_STORE_DB_NAME: "{{ .Values.global.databaseNamePrefix }}data-store"
     DATA_STORE_DB_USERNAME: hmcts
@@ -264,7 +264,7 @@ ccd:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "${SERVICE_NAME}-es-master"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
-        DEFINITION_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+        DEFINITION_STORE_DB_HOST: '{{ .Values.global.postgresHostname }}'
         DEFINITION_STORE_DB_NAME: ccd_definition_store
         DEFINITION_STORE_DB_PORT: 5432
         DEFINITION_STORE_DB_USE_SSL: "true"
@@ -284,7 +284,7 @@ ccd:
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       environment:
-        USER_PROFILE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+        USER_PROFILE_DB_HOST: '{{ .Values.global.postgresHostname }}'
 
 
   ccd-data-store-api:
@@ -295,7 +295,7 @@ ccd:
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
       environment:
-        DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+        DATA_STORE_DB_HOST: '{{ .Values.global.postgresHostname }}'
         DATA_STORE_DB_PORT: 5432
         DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-data-store"
         DATA_STORE_DB_OPTIONS: "?sslmode=allow"
