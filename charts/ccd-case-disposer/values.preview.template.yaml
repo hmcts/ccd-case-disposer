@@ -8,9 +8,9 @@ job:
   concurrencyPolicy: Forbid
   environment:
     APPLICATIONINSIGHTS_INSTRUMENTATIONKEY: "00000000-0000-0000-0000-000000000000"
-    DATA_STORE_DB_HOST: case-disposer-preview.postgres.database.azure.com
+    DATA_STORE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
     DATA_STORE_DB_PORT: 5432
-    DATA_STORE_DB_NAME: pr-${CHANGE_ID}-data-store
+    DATA_STORE_DB_NAME: "{{ .Values.global.databaseNamePrefix }}data-store"
     DATA_STORE_DB_USERNAME: hmcts
     DATA_STORE_DB_PASSWORD: hmcts
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
