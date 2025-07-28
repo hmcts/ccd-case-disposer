@@ -268,7 +268,7 @@ ccd:
         DEFINITION_STORE_DB_PORT: 5432
         DEFINITION_STORE_DB_USE_SSL: "true"
         DEFINITION_STORE_DB_OPTIONS: "?sslmode=allow"
-        DEFINITION_STORE_DB_PASSWORD: hmcts
+        DEFINITION_STORE_DB_PASSWORD: "hmcts"
         DEFINITION_STORE_IDAM_KEY: "${CCD_DEFINITION_STORE_S2S_SECRET}"
         WELSH_TRANSLATION_ENABLED: "false"
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
@@ -299,7 +299,7 @@ ccd:
         DATA_STORE_DB_PORT: 5432
         DATA_STORE_DB_NAME: "ccd_data_store"
         DATA_STORE_DB_OPTIONS: "?sslmode=allow"
-        DATA_STORE_DB_PASSWORD: hmcts
+        DATA_STORE_DB_PASSWORD: "hmcts"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
