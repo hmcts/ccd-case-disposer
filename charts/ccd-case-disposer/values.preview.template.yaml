@@ -278,18 +278,12 @@ ccd:
 
   ccd-user-profile-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
+      disableKeyVaults: true
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       environment:
-        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
-        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified"
-        USER_PROFILE_DB_PASSWORD: '{{ tpl .Values.global.postgresPassword $}}'
-        secrets:
-          USER_PROFILE_DB_PASSWORD:
-            secretRef: "{{ .Values.global.postgresSecret }}"
-            key: PASSWORD
-            disabled: true
+        USER_PROFILE_DB_HOST: '{{ tpl .Values.global.postgresHostname $}}'
+
 
   ccd-data-store-api:
     java:
