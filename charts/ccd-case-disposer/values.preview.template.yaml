@@ -235,7 +235,7 @@ ccd:
     apiGatewayWeb:
       enabled: false
     postgresql:
-      enabled: true
+      enabled: false
     s2s:
       enabled: false
     elastic:
