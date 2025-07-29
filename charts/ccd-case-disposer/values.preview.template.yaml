@@ -24,8 +24,13 @@ job:
     HEARING_RECORDING_HOST: http://em-hrs-api-aat.service.core-compute-aat.internal
     IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+
 global:
   jobKind: CronJob
+  postgresHostname: "case-disposer-preview.postgres.database.azure.com"
+  postgresSecret: postgres
+  databaseNamePrefix: "pr-${CHANGE_ID}-"
+
 
 elastic:
   enabled: true
@@ -251,9 +256,6 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}.preview.platform.hmcts.net
     enableKeyVaults: true
     devMode: true
-    postgresHostname: "case-disposer-preview.postgres.database.azure.com"
-    postgresSecret: postgres
-    databaseNamePrefix: "pr-${CHANGE_ID}-"
 
   ccd-definition-store-api:
     java:
