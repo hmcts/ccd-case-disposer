@@ -329,11 +329,11 @@ ccd:
           key: PASSWORD
           disabled: false
 
-  postgresql:
-    enabled: true
-    flexibleserver: case-disposer-preview
-    setup:
-      databases:
-        - name: "pr-${CHANGE_ID}-data-store"
-        - name: "pr-${CHANGE_ID}-definition-store"
-        - name: "pr-${CHANGE_ID}-user-profile"
+postgresql:
+  enabled: true
+  flexibleserver: case-disposer-preview
+  setup:
+    databases:
+      - name: "pr-${CHANGE_ID}-data-store"
+      - name: "pr-${CHANGE_ID}-definition-store"
+      - name: "pr-${CHANGE_ID}-user-profile"
