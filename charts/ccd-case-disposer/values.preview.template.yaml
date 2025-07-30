@@ -27,7 +27,7 @@ job:
 
 global:
   jobKind: CronJob
-  postgresHostname: "case-disposer-preview.postgres.database.azure.com"
+  postgresHostname: "chart-tests-flexibleserver-postgres-preview.postgres.database.azure.com"
   postgresSecret: postgres
   databaseNamePrefix: "pr-${CHANGE_ID}-"
 
@@ -100,7 +100,7 @@ logstash:
     01_input.conf: |
       input  {
         jdbc {
-          jdbc_connection_string => "jdbc:postgresql://case-disposer-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?sslmode-require&stringtype=unspecified"
+          jdbc_connection_string => "jdbc:postgresql://chart-tests-flexibleserver-postgres-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?sslmode-require&stringtype=unspecified"
           jdbc_user => "hmcts"
           jdbc_password => "hmcts"
           jdbc_validate_connection => true
@@ -331,7 +331,7 @@ ccd:
 
 postgresql:
   enabled: true
-  flexibleserver: case-disposer-preview
+  flexibleserver: chart-tests-flexibleserver-postgres-preview
   setup:
     databases:
       - name: "pr-${CHANGE_ID}-data-store"
