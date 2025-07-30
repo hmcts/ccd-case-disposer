@@ -300,17 +300,16 @@ ccd:
         DB_USER_NAME: "hmcts"
         DB_PASSWORD: "hmcts"
         USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin
-        keyVaults: [ ]
-        secrets:
-          USER_PROFILE_DB_PASSWORD:
-            secretRef: "{{ .Values.global.postgresSecret }}"
-            key: PASSWORD
-            disabled: true
-          USER_PROFILE_DB_USERNAME:
-            secretRef: "{{ .Values.global.postgresSecret }}"
-            key: PASSWORD
-            disabled: true
-
+      keyVaults: [ ]
+      secrets:
+        USER_PROFILE_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
+        USER_PROFILE_DB_USERNAME:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
 
   ccd-data-store-api:
     java:
