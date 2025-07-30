@@ -305,6 +305,13 @@ ccd:
       postgresql:
         enabled: true
         primary:
+          service:
+            ports:
+              postgresql: 5432
+            type: LoadBalancer
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
+              service.beta.kubernetes.io/azure-load-balancer-internal: "true"
           persistence:
             enabled: false
           initdb:
