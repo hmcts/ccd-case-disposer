@@ -245,20 +245,29 @@ ccd:
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}.preview.platform.hmcts.net
     enableKeyVaults: true
     devMode: true
-    postgresUsername: hmcts
-    postgresPassword: hmcts
+    postgresHostname: ${SERVICE_NAME}-postgresql
+    postgresql:
+      auth:
+        postgresUsername: hmcts
+        postgresPassword: hmcts
 
   ccd-definition-store-api:
     java:
       image: hmctspublic.azurecr.io/ccd/definition-store-api:latest
       ingressHost: ccd-definition-store-${SERVICE_NAME}.preview.platform.hmcts.net
       imagePullPolicy: Always
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 1
       environment:
         ELASTIC_SEARCH_ENABLED: true
         ELASTIC_SEARCH_HOST: "${SERVICE_NAME}-es-master"
         ELASTIC_SEARCH_FAIL_ON_IMPORT: true
         DEFINITION_STORE_DB_HOST: "${SERVICE_NAME}-postgresql"
         DEFINITION_STORE_DB_NAME: ccd_definition_store
+        DEFINITION_STORE_DB_USERNAME: hmcts
+        DEFINITION_STORE_DB_PASSWORD: hmcts
         DEFINITION_STORE_DB_PORT: 5432
         DEFINITION_STORE_DB_USE_SSL: "true"
         DEFINITION_STORE_DB_OPTIONS: "?sslmode=allow"
@@ -269,16 +278,63 @@ ccd:
         OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat2.internal:8443/openam/oauth2/hmcts
       devmemoryRequests: "1024Mi"
       devmemoryLimits: "2048Mi"
-      disableKeyVaults: true
+      keyVaults: [ ]
+      secrets:
+        DEFINITION_STORE_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
 
   ccd-user-profile-api:
     java:
-      image: hmctspublic.azurecr.io/ccd/user-profile-api:latest
       ingressHost: ccd-user-profile-api-${SERVICE_FQDN}
       imagePullPolicy: Always
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 1
       environment:
-        USER_PROFILE_DB_HOST: "${SERVICE_NAME}-postgresql"
-      disableKeyVaults: true
+        USER_PROFILE_S2S_AUTHORISED_SERVICES: ccd_data,ccd_definition,ccd_admin,sscs
+        USER_PROFILE_DB_HOST: ${SERVICE_NAME}-postgresql
+        USER_PROFILE_DB_USERNAME: hmcts
+        USER_PROFILE_DB_PASSWORD: hmcts
+        USER_PROFILE_DB_OPTIONS: "?stringtype=unspecified&sslmode=disable"
+        DB_HOST: "{{ .Release.Name }}-postgresql"
+        DB_USER_NAME: "hmcts"
+        DB_PASSWORD: "hmcts"
+      postgresql:
+        enabled: true
+        primary:
+          service:
+            ports:
+              postgresql: 5432
+            type: LoadBalancer
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
+              service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+          persistence:
+            enabled: false
+          initdb:
+            scripts:
+              init.sql: |
+                CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+                CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
+        auth:
+          username: "hmcts"
+          password: "hmcts"
+        postgresHostname: ${SERVICE_NAME}-postgresql
+      keyVaults: [ ]
+      secrets:
+        USER_PROFILE_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
+        USER_PROFILE_DB_USERNAME:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
 
   ccd-data-store-api:
     java:
@@ -287,10 +343,16 @@ ccd:
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 1
       environment:
         DATA_STORE_DB_HOST: "${SERVICE_NAME}-postgresql"
         DATA_STORE_DB_PORT: 5432
         DATA_STORE_DB_NAME: "ccd_data_store"
+        DATA_STORE_DB_USERNAME: hmcts
+        DATA_STORE_DB_PASSWORD: hmcts
         DATA_STORE_DB_OPTIONS: "?sslmode=allow"
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
@@ -312,31 +374,9 @@ ccd:
         IDAM_DATA_STORE_SYSTEM_USER_PASSWORD: ${IDAM_DATA_STORE_SYSTEM_USER_PASSWORD}
         IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET: ${IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET}
         ROLE_ASSIGNMENT_URL: http://am-role-assignment-service-aat.service.core-compute-aat.internal
-      disableKeyVaults: true
-      autoscaling:
-        enabled: false
-
-  postgresql:
-    enabled: true
-    image:
-      tag: '15.0.0'
-    auth:
-      username: hmcts
-      password: hmcts
-    primary:
-      service:
-        ports:
-          postgresql: 5432
-        type: LoadBalancer
-        annotations:
-          external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
-          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-      initdb:
-        scripts:
-          init.sql: |-
-            CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-            CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-      persistence:
-        enabled: false
+      keyVaults: [ ]
+      secrets:
+        DATA_STORE_DB_PASSWORD:
+          secretRef: "{{ .Values.global.postgresSecret }}"
+          key: PASSWORD
+          disabled: true
