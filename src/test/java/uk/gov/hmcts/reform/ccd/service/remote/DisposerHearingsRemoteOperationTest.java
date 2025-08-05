@@ -57,16 +57,16 @@ class DisposerHearingsRemoteOperationTest {
         when(securityUtil.getServiceAuthorization()).thenReturn("456");
         when(hearingClient.deleteHearing("123",
                                          "456",
-                                         List.of(caseData.getReference().toString())))
+                                         List.of(caseData.reference().toString())))
             .thenReturn(mockResponse);
 
         disposeHearingsRemoteOperation.delete(caseData);
 
         verify(hearingClient).deleteHearing("123",
                                             "456",
-                                            List.of(String.valueOf(caseData.getReference())));
+                                            List.of(String.valueOf(caseData.reference())));
         verify(hearingDeletionRecordHolder)
-            .setHearingDeletionResults(List.of(String.valueOf(caseData.getReference())).getFirst(),
+            .setHearingDeletionResults(List.of(String.valueOf(caseData.reference())).getFirst(),
                                        mockResponse.getStatusCode().value());
     }
 
@@ -105,7 +105,7 @@ class DisposerHearingsRemoteOperationTest {
         when(securityUtil.getServiceAuthorization()).thenReturn("456");
         when(hearingClient.deleteHearing("123",
                                          "456",
-                                         List.of(caseData.getReference().toString())))
+                                         List.of(caseData.reference().toString())))
             .thenReturn(mockResponse);
 
         assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));
