@@ -262,57 +262,64 @@ ext.libraries = [
 
 dependencies {
 
-    // Spring dependencies
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
+  // start::CVE Vulnerability dependency overrides                                                    // MAIN PARENT DEPENDEDNCY
 
-    // HMCTS dependencies
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.4'
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
-    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
+  // put CVE Vulnerability (sub)dependency overrides here e.g.
+  // implementation group: 'com.example', name: 'example-lib', version: '1.0.0' //  parent dependency name
 
-    implementation group: 'ch.qos.logback.access', name: 'common', version: '2.0.3'
-    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: versions.elasticsearch
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.3'
-    implementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.5'
-    implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
-    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
-    implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  // end::CVE Vulnerability dependency overrides                                                      // MAIN PARENT DEPENDEDNCY
 
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  // Spring dependencies
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
+  implementation group: 'org.springframework.cloud', name: 'spring-cloud-openfeign-core'
 
-    testImplementation libraries.junit5
-    testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.6.1'
-    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.15.0'
-    testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
-    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.3.0'
-    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
-    testImplementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
+  // HMCTS dependencies
+  implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.4'
+  implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.3'
+  implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
+
+  implementation group: 'ch.qos.logback.access', name: 'common', version: '2.0.3'
+  implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: versions.elasticsearch
+  implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
+  implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+  implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.3'
+  implementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.5'
+  implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
+  implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
+  implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
+  implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+
+  testImplementation libraries.junit5
+  testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.6.1'
+  testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.15.0'
+  testImplementation group: 'org.codehaus.sonar-plugins', name: 'sonar-pitest-plugin', version: '0.5'
+  testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.3.0'
+  testImplementation group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
+  testImplementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
+  testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+  testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
+  testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
 
 
-    integrationTestImplementation sourceSets.main.runtimeClasspath
-    integrationTestImplementation sourceSets.test.runtimeClasspath
+  integrationTestImplementation sourceSets.main.runtimeClasspath
+  integrationTestImplementation sourceSets.test.runtimeClasspath
 
-    functionalTestImplementation sourceSets.main.runtimeClasspath
-    functionalTestImplementation sourceSets.test.runtimeClasspath
-    functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
+  functionalTestImplementation sourceSets.main.runtimeClasspath
+  functionalTestImplementation sourceSets.test.runtimeClasspath
+  functionalTestImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
 
-    //pact contract testing
-    contractTestImplementation sourceSets.main.runtimeClasspath
-    contractTestImplementation sourceSets.test.runtimeClasspath
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit', version: versions.pactVersion
+  //pact contract testing
+  contractTestImplementation sourceSets.main.runtimeClasspath
+  contractTestImplementation sourceSets.test.runtimeClasspath
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
+  contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit', version: versions.pactVersion
 
 }
 
