@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.ccd.service;
 
 
 import jakarta.inject.Named;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
@@ -25,6 +29,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CaseDeletionService {
 
+    @PersistenceContext
+    private EntityManager em;
     private final CaseDataRepository caseDataRepository;
     private final CaseEventRepository caseEventRepository;
     private final CaseLinkRepository caseLinkRepository;
@@ -74,9 +80,15 @@ public class CaseDeletionService {
                 caseEventRepository.deleteByCaseDataId(caseData.getId());
                 caseDataRepository.delete(caseDataEntity.get());
                 logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
+                em.flush();
             }
 
             log.info("Deleted case reference:: {} ({})", caseData.getReference(), caseData.getJurisdiction());
+        } catch (DataIntegrityViolationException | PersistenceException ex) {
+            log.error("Constraint/persistence error deleting case:: {} ({}) {}",
+                      caseData.getReference(), caseData.getJurisdiction(), ex.getMessage(), ex);
+            processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+            em.clear();
         } catch (LogAndAuditException logAndAuditException) {
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
             log.error(
