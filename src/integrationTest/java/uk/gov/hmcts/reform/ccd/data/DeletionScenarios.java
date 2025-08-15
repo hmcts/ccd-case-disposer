@@ -599,6 +599,18 @@ public class DeletionScenarios {
                     List.of(1504259907033001L),
                     Map.of("TaskCaseType", List.of(1504259907033001L, 1504259907033002L)),
                     Map.of("TaskCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "TaskCaseType",
+                    null,
+                    "scenarios/S-036-deletable-failed-cases-due-to-data-integrity-exception.sql",
+                    List.of(1L,2L),
+                    Map.of("TaskCaseType", List.of(1504259909035001L, 1504259909035002L)),
+                    List.of(1L),
+                    emptyList(),
+                    List.of(1504259909035002L),
+                    Map.of("TaskCaseType", List.of(1504259909035001L,1504259909035002L)),
+                    Map.of("TaskCaseType", emptyList())
                 )
         );
     }
