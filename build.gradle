@@ -244,7 +244,7 @@ project.tasks['pitest'].group = "Verification"
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.20.0',
-    elasticsearch       : '8.19.0',
+    elasticsearch       : '8.19.1',
     flyway              : '11.10.5',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.4',
@@ -304,7 +304,7 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.3'
+    implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.4'
     implementation group: 'ch.qos.logback.access', name: 'common', version: '2.0.3'
 
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
