@@ -8,8 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
+import uk.gov.hmcts.reform.ccd.data.CaseEventSignificantItemsRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
@@ -28,6 +31,7 @@ public class CaseDeletionService {
     private final CaseDataRepository caseDataRepository;
     private final CaseEventRepository caseEventRepository;
     private final CaseLinkRepository caseLinkRepository;
+    private final CaseEventSignificantItemsRepository caseEventSignificantItemsRepository;
     private final RemoteDisposeService remoteDisposeService;
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final LogAndAuditRemoteOperation logAndAuditRemoteOperation;
@@ -71,7 +75,7 @@ public class CaseDeletionService {
             final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
             if (caseDataEntity.isPresent()) {
                 remoteDisposeService.remoteDeleteAll(caseData);
-                caseEventRepository.deleteByCaseDataId(caseData.getId());
+                deleteCaseEvent(caseData);
                 caseDataRepository.delete(caseDataEntity.get());
                 logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
             }
@@ -91,6 +95,24 @@ public class CaseDeletionService {
                 "Could not delete case reference:: {} ({})",
                 caseData.getReference(), caseData.getJurisdiction(), exception);
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+        }
+    }
+
+    void deleteCaseEvent(final CaseData caseData) throws Exception {
+        List<CaseEventEntity> caseEvents = caseEventRepository.findByCaseDataId(caseData.getId());
+        for (CaseEventEntity caseEvent : caseEvents) {
+            List<CaseEventSignificantItemsEntity> significantItems =
+                caseEventSignificantItemsRepository.findByCaseEventId(caseEvent.getId());
+            if (!significantItems.isEmpty()) {
+                for (CaseEventSignificantItemsEntity item : significantItems) {
+                    log.info("Deleting significant item id: {} for case event id: {}",
+                             item.getId(), caseEvent.getId()
+                    );
+                    caseEventSignificantItemsRepository.delete(item);
+                }
+
+            }
+            caseEventRepository.delete(caseEvent);
         }
     }
 }

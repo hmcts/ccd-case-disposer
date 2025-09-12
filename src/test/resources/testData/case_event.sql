@@ -1,3 +1,4 @@
+DELETE FROM case_event_significant_items;
 DELETE FROM case_event;
 DELETE FROM case_link;
 DELETE FROM case_data;

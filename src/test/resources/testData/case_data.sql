@@ -1,6 +1,8 @@
+DELETE FROM case_event_significant_items;
 DELETE FROM case_event;
 DELETE FROM case_link;
 DELETE FROM case_data;
+
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
 VALUES (1, 'deletable_case_type', 'deletable_jurisdiction', 'CaseCreated', 'PUBLIC',
