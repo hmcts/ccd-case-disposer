@@ -42,4 +42,6 @@ public class CaseEventRepositoryTest extends BaseRepositoryTest {
         Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(5L);
         assertThat(caseEvent).isEmpty();
     }
+
+    
 }
