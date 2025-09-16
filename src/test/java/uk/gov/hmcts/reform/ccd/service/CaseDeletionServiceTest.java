@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.data.CaseEventSignificantItemsRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
 import uk.gov.hmcts.reform.ccd.fixture.CaseEventEntityBuilder;
-import uk.gov.hmcts.reform.ccd.fixture.CaseEventSignificantItemsBuilder;
 import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
@@ -73,16 +71,12 @@ class CaseDeletionServiceTest {
     private final CaseLinkEntity caseLinkEntity1 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L).build();
     private final CaseLinkEntity caseLinkEntity2 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 11L).build();
     private final CaseEventEntity caseEventEntity1 = new CaseEventEntityBuilder(1L, "TEST","TEST", 1L).build();
-    private final CaseEventSignificantItemsEntity caseEventSignificantItemsEntity1 =
-        new CaseEventSignificantItemsBuilder(1L, 1L).build();
 
     @Test
     void shouldDeleteCase() {
         doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
-        List<CaseEventEntity> caseEventEntities = List.of(caseEventEntity1);
-        doReturn(caseEventEntities).when(caseEventRepository).findByCaseDataId(anyLong());
 
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
@@ -102,8 +96,6 @@ class CaseDeletionServiceTest {
         doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
-        List<CaseEventEntity> caseEventEntities = List.of(caseEventEntity1);
-        doReturn(caseEventEntities).when(caseEventRepository).findByCaseDataId(anyLong());
 
 
         doReturn(linkedCaseEntity).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
@@ -126,8 +118,6 @@ class CaseDeletionServiceTest {
         // GIVEN
         doThrow(IllegalArgumentException.class).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doReturn(Optional.of(mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
-        List<CaseEventEntity> caseEventEntities = List.of(mock(CaseEventEntity.class), mock(CaseEventEntity.class));
-        doReturn(caseEventEntities).when(caseEventRepository).findByCaseDataId(anyLong());
 
         // WHEN
         catchThrowable(() -> underTest.deleteCase(caseData));
@@ -265,11 +255,6 @@ class CaseDeletionServiceTest {
         doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
         List<CaseEventEntity> caseEventEntities = List.of(caseEventEntity1);
         doReturn(caseEventEntities).when(caseEventRepository).findByCaseDataId(1L);
-        List<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntities =
-            List.of(caseEventSignificantItemsEntity1);
-        doReturn(caseEventSignificantItemsEntities)
-            .when(caseEventSignificantItemsRepository)
-            .findByCaseEventId(1L);
 
 
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
@@ -277,7 +262,8 @@ class CaseDeletionServiceTest {
         underTest.deleteCaseData(caseData);
 
         verify(caseLinkRepository, never()).deleteAll(anyList());
-        verify(caseEventSignificantItemsRepository).delete(caseEventSignificantItemsEntity1);
+        verify(caseEventRepository).findByCaseDataId(1L);
+        verify(caseEventSignificantItemsRepository).deleteByCaseEventId(1L);
         verify(caseEventRepository).deleteByCaseDataId(1L);
         verify(caseDataRepository).findById(1L);
         verify(caseDataRepository).delete(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
@@ -288,22 +274,17 @@ class CaseDeletionServiceTest {
     void shouldLogErrorWhenDeleteEventSignificantItemsFails() {
         // GIVEN
         doThrow(IllegalArgumentException.class).when(caseEventSignificantItemsRepository)
-            .delete(any(CaseEventSignificantItemsEntity.class));
+            .deleteByCaseEventId(anyLong());
         doReturn(Optional.of(mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
         List<CaseEventEntity> caseEventEntities = List.of(mock(CaseEventEntity.class));
         doReturn(caseEventEntities).when(caseEventRepository).findByCaseDataId(anyLong());
-        List<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntities =
-            List.of(mock(CaseEventSignificantItemsEntity.class));
-        doReturn(caseEventSignificantItemsEntities).when(caseEventSignificantItemsRepository)
-            .findByCaseEventId(anyLong());
 
         // WHEN
         catchThrowable(() -> underTest.deleteCase(caseData));
 
         // THEN
         verify(processedCasesRecordHolder).addFailedToDeleteCaseRef(caseData);
-        verify(caseEventRepository).findByCaseDataId(anyLong());
-        verify(caseEventSignificantItemsRepository).delete(any(CaseEventSignificantItemsEntity.class));
+        verify(caseEventSignificantItemsRepository).deleteByCaseEventId(anyLong());
         verify(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         verifyNoInteractions(caseLinkRepository);

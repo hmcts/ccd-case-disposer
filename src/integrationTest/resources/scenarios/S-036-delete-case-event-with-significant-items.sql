@@ -51,4 +51,7 @@ VALUES (2,'CREATED','CREATED', 2,2,'TaskCaseType',1,'CaseCreated',
  );
 
  INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
-VALUES (1,'TEST_MEDICINE','DOCUMENT','test url', 1);
+VALUES (1,'TEST_MEDICINE1','DOCUMENT','test url1', 1);
+
+ INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
+VALUES (2,'TEST_MEDICINE2','DOCUMENT','test url2', 1);

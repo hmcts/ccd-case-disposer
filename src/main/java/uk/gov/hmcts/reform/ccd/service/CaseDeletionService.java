@@ -12,7 +12,6 @@ import uk.gov.hmcts.reform.ccd.data.CaseEventSignificantItemsRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
@@ -102,17 +101,10 @@ public class CaseDeletionService {
     void deleteCaseEventSignificantItems(final CaseData caseData) throws Exception {
         List<CaseEventEntity> caseEvents = caseEventRepository.findByCaseDataId(caseData.getId());
         for (CaseEventEntity caseEvent : caseEvents) {
-            List<CaseEventSignificantItemsEntity> significantItems =
-                caseEventSignificantItemsRepository.findByCaseEventId(caseEvent.getId());
-            if (!significantItems.isEmpty()) {
-                for (CaseEventSignificantItemsEntity item : significantItems) {
-                    log.info("Deleting significant item id: {} for case event id: {}",
-                             item.getId(), caseEvent.getId()
-                    );
-                    caseEventSignificantItemsRepository.delete(item);
-                }
-
-            }
+            log.info("Deleting significant items for case event id: {} for case id: {}",
+                     caseEvent.getId(), caseData.getId()
+            );
+            caseEventSignificantItemsRepository.deleteByCaseEventId(caseEvent.getId());
         }
     }
 }
