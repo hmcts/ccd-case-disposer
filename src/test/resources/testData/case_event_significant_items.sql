@@ -30,4 +30,11 @@ VALUES (12,'CREATED','CREATED', 12,12,'deletable_case_type',12,'CaseCreated',
  );
 
 INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
-VALUES (12,'TEST_MEDICINE','DOCUMENT','test url', 12);
+VALUES (12,'TEST_MEDICINE1','DOCUMENT','test url1', 12);
+
+INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
+VALUES (13,'TEST_MEDICINE2','DOCUMENT','test url2', 12);
+
+INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
+VALUES (14,'TEST_MEDICINE3','DOCUMENT','test url3', 12);
+

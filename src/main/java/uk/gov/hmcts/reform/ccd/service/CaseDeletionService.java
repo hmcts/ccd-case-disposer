@@ -75,7 +75,8 @@ public class CaseDeletionService {
             final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
             if (caseDataEntity.isPresent()) {
                 remoteDisposeService.remoteDeleteAll(caseData);
-                deleteCaseEvent(caseData);
+                deleteCaseEventSignificantItems(caseData);
+                caseEventRepository.deleteByCaseDataId(caseData.getId());
                 caseDataRepository.delete(caseDataEntity.get());
                 logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
             }
@@ -98,7 +99,7 @@ public class CaseDeletionService {
         }
     }
 
-    void deleteCaseEvent(final CaseData caseData) throws Exception {
+    void deleteCaseEventSignificantItems(final CaseData caseData) throws Exception {
         List<CaseEventEntity> caseEvents = caseEventRepository.findByCaseDataId(caseData.getId());
         for (CaseEventEntity caseEvent : caseEvents) {
             List<CaseEventSignificantItemsEntity> significantItems =
@@ -112,7 +113,6 @@ public class CaseDeletionService {
                 }
 
             }
-            caseEventRepository.delete(caseEvent);
         }
     }
 }
