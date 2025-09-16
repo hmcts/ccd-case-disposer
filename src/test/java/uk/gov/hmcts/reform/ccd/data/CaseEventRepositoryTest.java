@@ -43,5 +43,5 @@ public class CaseEventRepositoryTest extends BaseRepositoryTest {
         assertThat(caseEvent).isEmpty();
     }
 
-    
+
 }
