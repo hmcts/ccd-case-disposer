@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,24 +42,21 @@ public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest 
     void testDeleteCaseEventSignificantItem() {
         Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity =
             caseEventSignificantItemsRepository.findById(12L);
-        caseEventSignificantItemsRepository.delete(caseEventSignificantItemsEntity.get());
+        assertThat(caseEventSignificantItemsEntity).isPresent();
 
         Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity1 =
             caseEventSignificantItemsRepository.findById(13L);
-        caseEventSignificantItemsRepository.delete(caseEventSignificantItemsEntity1.get());
+        assertThat(caseEventSignificantItemsEntity1).isPresent();
 
         Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity2 =
             caseEventSignificantItemsRepository.findById(14L);
-        caseEventSignificantItemsRepository.delete(caseEventSignificantItemsEntity2.get());
+        assertThat(caseEventSignificantItemsEntity2).isPresent();
 
-        caseEventSignificantItemsEntity = caseEventSignificantItemsRepository.findById(12L);
-        assertThat(caseEventSignificantItemsEntity).isEmpty();
+        caseEventSignificantItemsRepository.deleteByCaseEventId(12L);
 
-        caseEventSignificantItemsEntity1 = caseEventSignificantItemsRepository.findById(13L);
-        assertThat(caseEventSignificantItemsEntity1).isEmpty();
-
-        caseEventSignificantItemsEntity2 = caseEventSignificantItemsRepository.findById(14L);
-        assertThat(caseEventSignificantItemsEntity2).isEmpty();
+        List<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntities =
+            caseEventSignificantItemsRepository.findByCaseEventId(12L);
+        assertThat(caseEventSignificantItemsEntities.size()).isEqualTo(0);
     }
 
 }
