@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 
 import java.sql.SQLException;
@@ -52,9 +53,13 @@ public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest 
             caseEventSignificantItemsRepository.findById(14L);
         assertThat(caseEventSignificantItemsEntity2).isPresent();
 
+        List<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntities =
+            caseEventSignificantItemsRepository.findByCaseEventId(12L);
+        assertThat(caseEventSignificantItemsEntities.size()).isEqualTo(3);
+
         caseEventSignificantItemsRepository.deleteByCaseEventId(12L);
 
-        List<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntities =
+        caseEventSignificantItemsEntities =
             caseEventSignificantItemsRepository.findByCaseEventId(12L);
         assertThat(caseEventSignificantItemsEntities.size()).isEqualTo(0);
     }
