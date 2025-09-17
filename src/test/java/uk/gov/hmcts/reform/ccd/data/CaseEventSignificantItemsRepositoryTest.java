@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.test.context.ActiveProfiles;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseEventEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 
 import java.sql.SQLException;
