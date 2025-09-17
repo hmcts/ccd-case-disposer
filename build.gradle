@@ -187,7 +187,7 @@ dependencyCheck {
 
 dependencyManagement {
     dependencies {
-        dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.81'
+        dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.82'
         dependencySet(group: 'org.springframework.cloud', version: '4.3.0') {
             entry 'spring-cloud-starter-openfeign'
             entry 'spring-cloud-openfeign-core'
@@ -244,7 +244,7 @@ project.tasks['pitest'].group = "Verification"
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.20.0',
-    elasticsearch       : '8.19.3',
+    elasticsearch       : '8.19.4',
     flyway              : '11.13.0',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.4',
