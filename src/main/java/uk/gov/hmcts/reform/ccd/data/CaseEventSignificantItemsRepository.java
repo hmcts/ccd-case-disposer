@@ -12,9 +12,9 @@ import java.util.List;
 @Repository
 public interface CaseEventSignificantItemsRepository extends JpaRepository<CaseEventSignificantItemsEntity, Long> {
 
-    @Modifying
-    @Query(value = "DELETE FROM case_event_significant_items WHERE case_event_id = :caseEventId", nativeQuery = true)
-    void deleteByCaseEventId(@Param("caseEventId") Long caseEventId);
-
     List<CaseEventSignificantItemsEntity> findByCaseEventId(final Long caseEventId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM CaseEventSignificantItemsEntity sf WHERE sf.caseEventId = :caseEventId")
+    void deleteByCaseEventId(@Param("caseEventId") Long caseEventId);
 }

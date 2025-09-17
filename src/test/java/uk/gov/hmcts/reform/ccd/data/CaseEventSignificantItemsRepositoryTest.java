@@ -61,6 +61,18 @@ public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest 
         caseEventSignificantItemsEntities =
             caseEventSignificantItemsRepository.findByCaseEventId(12L);
         assertThat(caseEventSignificantItemsEntities.size()).isEqualTo(0);
+        Optional<CaseEventSignificantItemsEntity> caseEventSfItem =
+            caseEventSignificantItemsRepository.findById(12L);
+        assertThat(caseEventSfItem).isEmpty();
+
+        caseEventSfItem =
+            caseEventSignificantItemsRepository.findById(13L);
+        assertThat(caseEventSfItem).isEmpty();
+
+        caseEventSfItem =
+            caseEventSignificantItemsRepository.findById(14L);
+        assertThat(caseEventSfItem).isEmpty();
+
     }
 
 }
