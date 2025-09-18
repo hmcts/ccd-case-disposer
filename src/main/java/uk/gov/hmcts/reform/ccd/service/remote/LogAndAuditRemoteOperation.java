@@ -47,7 +47,7 @@ public class LogAndAuditRemoteOperation {
             if (!logAndAuditPostResponse.getStatusCode().is2xxSuccessful()) {
                 final String errorMessage = String
                     .format("Unexpected response code %d while sending data to Log and Audit for case: %s",
-                            logAndAuditPostResponse.getStatusCode().value(), caseData.getReference());
+                            logAndAuditPostResponse.getStatusCode().value(), caseData.reference());
 
                 log.error(errorMessage);
 
@@ -58,7 +58,7 @@ public class LogAndAuditRemoteOperation {
         } catch (final Exception exception) {
             final String errorMessage = String.format(
                 "Error posting to Log and Audit for case : %s",
-                caseData.getReference()
+                caseData.reference()
             );
             log.error(errorMessage, exception);
             throw new LogAndAuditException(errorMessage, exception);
@@ -87,9 +87,9 @@ public class LogAndAuditRemoteOperation {
         return new CaseActionPostRequestResponse(ActionLog.builder()
                                                      .userId(securityUtil.getUserDetails().getId())
                                                      .caseAction("DELETE")
-                                                     .caseTypeId(caseData.getCaseType())
-                                                     .caseRef(caseData.getReference().toString())
-                                                     .caseJurisdictionId(caseData.getJurisdiction())
+                                                     .caseTypeId(caseData.caseType())
+                                                     .caseRef(caseData.reference().toString())
+                                                     .caseJurisdictionId(caseData.jurisdiction())
                                                      .timestamp(getTimestamp())
                                                      .build());
     }
