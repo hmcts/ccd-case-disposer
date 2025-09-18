@@ -245,7 +245,7 @@ def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.20.0',
     elasticsearch       : '8.19.4',
-    flyway              : '11.13.0',
+    flyway              : '11.13.1',
     gradlePitest        : '1.15.0',
     idamClient          : '3.0.4',
     junit               : '5.13.4',
