@@ -11,7 +11,6 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,15 +51,8 @@ public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest 
             caseEventSignificantItemsRepository.findById(14L);
         assertThat(caseEventSignificantItemsEntity2).isPresent();
 
-        List<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntities =
-            caseEventSignificantItemsRepository.findByCaseEventId(12L);
-        assertThat(caseEventSignificantItemsEntities.size()).isEqualTo(3);
+        caseEventSignificantItemsRepository.deleteByCaseDataId(12L);
 
-        caseEventSignificantItemsRepository.deleteByCaseEventId(12L);
-
-        caseEventSignificantItemsEntities =
-            caseEventSignificantItemsRepository.findByCaseEventId(12L);
-        assertThat(caseEventSignificantItemsEntities.size()).isEqualTo(0);
         Optional<CaseEventSignificantItemsEntity> caseEventSfItem =
             caseEventSignificantItemsRepository.findById(12L);
         assertThat(caseEventSfItem).isEmpty();
