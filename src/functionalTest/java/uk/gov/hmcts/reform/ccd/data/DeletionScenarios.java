@@ -62,7 +62,7 @@ public class DeletionScenarios {
                      "DPR_FT_MasterCaseType",
                      "",
                      "scenarios/S-004-delete-cases-with-significant-items.sql",
-                     List.of( 1004259907353628L,1004259907353629L),
+                     List.of(1004259907353628L,1004259907353629L),
                      Map.of("DPR_FT_MasterCaseType", List.of(1004259907353628L,1004259907353629L)),
                      emptyList(),
                      emptyList(),
