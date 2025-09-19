@@ -18,7 +18,6 @@ public interface CaseEventSignificantItemsRepository extends JpaRepository<CaseE
         + "    WHERE si.case_event_id = ce.id AND ce.case_data_id = :caseDataId;", nativeQuery = true)
     void deleteByCaseDataId(@Param("caseDataId") Long caseDataId);
 
-    @Modifying(clearAutomatically = true)
     @Query(value = "SELECT si.id FROM case_event_significant_items si"
         + "    INNER JOIN case_event ce"
         + "    ON si.case_event_id = ce.id"
