@@ -611,6 +611,18 @@ public class DeletionScenarios {
                     List.of(1504259909035001L,1504259909035002L),
                     Map.of("TaskCaseType", List.of(1504259909035001L,1504259909035002L)),
                     Map.of("TaskCaseType", emptyList())
+                ),
+                Arguments.of(
+                    "TaskCaseType",
+                    null,
+                    "scenarios/S-037-not-delete-case-significant-items-for-unrelated-case.sql",
+                    List.of(1L,2L,3L),
+                    Map.of("TaskCaseType", List.of(1504259909037001L, 1504259909037002L,1504259909037003L)),
+                    List.of(2L,3L),
+                    emptyList(),
+                    List.of(1504259909037001L),
+                    Map.of("TaskCaseType", List.of(1504259909037001L)),
+                    Map.of("TaskCaseType", List.of(1504259909037002L,1504259909037003L))
                 )
         );
     }

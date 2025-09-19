@@ -7,6 +7,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 
+import java.util.List;
+
 @Repository
 public interface CaseEventSignificantItemsRepository extends JpaRepository<CaseEventSignificantItemsEntity, Long> {
 
@@ -15,4 +17,11 @@ public interface CaseEventSignificantItemsRepository extends JpaRepository<CaseE
         + "    USING case_event ce"
         + "    WHERE si.case_event_id = ce.id AND ce.case_data_id = :caseDataId;", nativeQuery = true)
     void deleteByCaseDataId(@Param("caseDataId") Long caseDataId);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "SELECT si.id FROM case_event_significant_items si"
+        + "    INNER JOIN case_event ce"
+        + "    ON si.case_event_id = ce.id"
+        + "    where ce.case_data_id = :caseDataId;", nativeQuery = true)
+    List<Long> findByCaseDataId(@Param("caseDataId") Long caseDataId);
 }
