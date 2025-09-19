@@ -51,6 +51,10 @@ public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest 
             caseEventSignificantItemsRepository.findById(14L);
         assertThat(caseEventSignificantItemsEntity2).isPresent();
 
+        Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity3 =
+            caseEventSignificantItemsRepository.findById(15L);
+        assertThat(caseEventSignificantItemsEntity2).isPresent();
+
         caseEventSignificantItemsRepository.deleteByCaseDataId(12L);
 
         Optional<CaseEventSignificantItemsEntity> caseEventSfItem =
@@ -64,6 +68,10 @@ public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest 
         caseEventSfItem =
             caseEventSignificantItemsRepository.findById(14L);
         assertThat(caseEventSfItem).isEmpty();
+
+        caseEventSfItem =
+            caseEventSignificantItemsRepository.findById(15L);
+        assertThat(caseEventSfItem).isPresent();
 
     }
 
