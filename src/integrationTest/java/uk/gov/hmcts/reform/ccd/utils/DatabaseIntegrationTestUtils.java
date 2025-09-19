@@ -62,15 +62,11 @@ public class DatabaseIntegrationTestUtils {
 
     public void verifySignificantItemsDeletion(final List<Long> rowIds) {
         final List<CaseEventSignificantItemsEntity> all = caseEventSignificantItemsRepository.findAll();
-        if (all.isEmpty()) {
-            return;
-        }
         final List<Long> actualSfIds = all.stream()
             .map(CaseEventSignificantItemsEntity::getId)
             .toList();
 
         List<Long> allSignificantItemIds = new ArrayList<>();;
-
         rowIds.forEach(rowId -> {
             List<Long> significantItemIds = caseEventSignificantItemsRepository.findByCaseDataId(rowId);
             allSignificantItemIds.addAll(significantItemIds);
