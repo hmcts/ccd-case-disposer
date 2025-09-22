@@ -11,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,13 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
-public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest {
+class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
     private CaseEventSignificantItemsRepository caseEventSignificantItemsRepository;
 
     @BeforeEach
-    public void setUp() throws SQLException {
+    void setUp() throws SQLException {
         insertDataIntoDatabase("testData/case_event_significant_items.sql");
     }
 
@@ -39,40 +40,19 @@ public class CaseEventSignificantItemsRepositoryTest extends BaseRepositoryTest 
 
     @Test
     void testDeleteCaseEventSignificantItem() {
-        Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity =
-            caseEventSignificantItemsRepository.findById(12L);
-        assertThat(caseEventSignificantItemsEntity).isPresent();
-
-        Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity1 =
-            caseEventSignificantItemsRepository.findById(13L);
-        assertThat(caseEventSignificantItemsEntity1).isPresent();
-
-        Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity2 =
-            caseEventSignificantItemsRepository.findById(14L);
-        assertThat(caseEventSignificantItemsEntity2).isPresent();
-
-        Optional<CaseEventSignificantItemsEntity> caseEventSignificantItemsEntity3 =
-            caseEventSignificantItemsRepository.findById(15L);
-        assertThat(caseEventSignificantItemsEntity2).isPresent();
+        List<CaseEventSignificantItemsEntity> entities =
+            caseEventSignificantItemsRepository.findAllById(List.of(12L, 13L, 14L, 15L));
+        assertThat(entities).hasSize(4);
 
         caseEventSignificantItemsRepository.deleteByCaseDataId(12L);
 
-        Optional<CaseEventSignificantItemsEntity> caseEventSfItem =
-            caseEventSignificantItemsRepository.findById(12L);
-        assertThat(caseEventSfItem).isEmpty();
+        List<CaseEventSignificantItemsEntity> deleted =
+            caseEventSignificantItemsRepository.findAllById(List.of(12L, 13L, 14L));
+        assertThat(deleted).isEmpty();
 
-        caseEventSfItem =
-            caseEventSignificantItemsRepository.findById(13L);
-        assertThat(caseEventSfItem).isEmpty();
-
-        caseEventSfItem =
-            caseEventSignificantItemsRepository.findById(14L);
-        assertThat(caseEventSfItem).isEmpty();
-
-        caseEventSfItem =
-            caseEventSignificantItemsRepository.findById(15L);
+        Optional<CaseEventSignificantItemsEntity> caseEventSfItem = caseEventSignificantItemsRepository.findById(15L);
         assertThat(caseEventSfItem).isPresent();
-
+        assertThat(caseEventSfItem.get().getId()).isEqualTo(15L);
     }
 
 }
