@@ -5,7 +5,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
-import uk.gov.hmcts.reform.ccd.data.CaseEventSignificantItemsRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 
 import java.sql.Connection;
@@ -25,9 +24,6 @@ public class DatabaseIntegrationTestUtils {
 
     @Inject
     private CaseDataRepository caseDataRepository;
-
-    @Inject
-    private CaseEventSignificantItemsRepository caseEventSignificantItemsRepository;
 
     public void verifyDatabaseIsPopulated(final List<Long> rowIds) {
         rowIds.forEach(item -> {
