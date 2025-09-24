@@ -4,33 +4,35 @@ DELETE FROM case_link;
 DELETE FROM case_data;
 
 
+
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (5, 'deletable_case_type', 'deletable_jurisdiction', 'CaseCreated', 'PUBLIC',
+VALUES (12, 'deletable_case_type', 'deletable_jurisdiction', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       5,
+       12,
        '2016-06-24 20:44:52.824'
 );
 
 INSERT INTO case_data (id, case_type_id, jurisdiction, state, security_classification, data, data_classification, reference, resolved_ttl)
-VALUES (6, 'deletable_case_type', 'deletable_jurisdiction', 'CaseCreated', 'PUBLIC',
+VALUES (13, 'deletable_case_type', 'deletable_jurisdiction', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet"
         }',
        '{
          "PersonFirstName": "PUBLIC"
        }',
-       6,
+       13,
        '2016-06-24 20:44:52.824'
 );
+
 
 INSERT INTO case_event (id, event_id, event_name, case_data_id,user_id,case_type_id,case_type_version,state_id,data,
 user_first_name,user_last_name,security_classification)
-VALUES (5,'CREATED','CREATED', 5,5,'deletable_case_type',5,'CaseCreated',
+VALUES (12,'CREATED','CREATED', 12,12,'deletable_case_type',12,'CaseCreated',
     '{
       "PersonFirstName": "Janet"
     }',
@@ -41,11 +43,23 @@ VALUES (5,'CREATED','CREATED', 5,5,'deletable_case_type',5,'CaseCreated',
 
 INSERT INTO case_event (id, event_id, event_name, case_data_id,user_id,case_type_id,case_type_version,state_id,data,
 user_first_name,user_last_name,security_classification)
-VALUES (6,'CREATED','CREATED', 6,6,'deletable_case_type',6,'CaseCreated',
-  '{
+VALUES (13,'CREATED','CREATED', 13,13,'deletable_case_type',13,'CaseCreated',
+    '{
       "PersonFirstName": "Janet"
-   }',
-  'Janet',
-  'Doe',
-  'PUBLIC'
-);
+    }',
+    'Janet',
+    'Doe',
+    'PUBLIC'
+ );
+
+INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
+VALUES (12,'TEST_MEDICINE1','DOCUMENT','test url1', 12);
+
+INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
+VALUES (13,'TEST_MEDICINE2','DOCUMENT','test url2', 12);
+
+INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
+VALUES (14,'TEST_MEDICINE3','DOCUMENT','test url3', 12);
+
+INSERT INTO case_event_significant_items (id, description, type, url,case_event_id)
+VALUES (15,'TEST_MEDICINE3','DOCUMENT','test url3', 13);
