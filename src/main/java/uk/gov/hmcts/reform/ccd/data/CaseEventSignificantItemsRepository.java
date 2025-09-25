@@ -14,5 +14,5 @@ public interface CaseEventSignificantItemsRepository extends JpaRepository<CaseE
     @Query(value = "DELETE FROM case_event_significant_items si"
         + "    USING case_event ce"
         + "    WHERE si.case_event_id = ce.id AND ce.case_data_id = :caseDataId;", nativeQuery = true)
-    void deleteByCaseDataId(@Param("caseDataId") Long caseDataId);
+    int deleteByCaseDataId(@Param("caseDataId") Long caseDataId);
 }
