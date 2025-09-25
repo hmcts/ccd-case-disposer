@@ -69,17 +69,20 @@ public class CaseDeletionService {
     void deleteCase(final CaseData caseData) {
         try {
             log.info("About to delete case reference:: {} ({})", caseData.getReference(), caseData.getJurisdiction());
-
+            int deletedSignificantItems = 0;
+            int deletedEvents = 0;
             final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
             if (caseDataEntity.isPresent()) {
                 remoteDisposeService.remoteDeleteAll(caseData);
-                caseEventSignificantItemsRepository.deleteByCaseDataId(caseData.getId());
-                caseEventRepository.deleteByCaseDataId(caseData.getId());
+                deletedSignificantItems = caseEventSignificantItemsRepository.deleteByCaseDataId(caseData.getId());
+                deletedEvents = caseEventRepository.deleteByCaseDataId(caseData.getId());
                 caseDataRepository.delete(caseDataEntity.get());
                 logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
             }
 
-            log.info("Deleted case reference:: {} ({})", caseData.getReference(), caseData.getJurisdiction());
+            log.info("Deleted case reference:: {} ({}) (Deleted events: {}, significant items: {})",
+                     caseData.getReference(), caseData.getJurisdiction(),
+                     deletedEvents, deletedSignificantItems);
         } catch (LogAndAuditException logAndAuditException) {
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
             log.error(

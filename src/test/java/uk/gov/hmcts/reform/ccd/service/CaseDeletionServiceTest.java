@@ -71,8 +71,8 @@ class CaseDeletionServiceTest {
 
     @Test
     void shouldDeleteCase() {
-        doNothing().when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
-        doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
+        doReturn(0).when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
+        doReturn(0).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
 
@@ -91,8 +91,8 @@ class CaseDeletionServiceTest {
     void shouldDeleteCaseWithLinkedCases() {
         final List<CaseLinkEntity> linkedCaseEntity = List.of(caseLinkEntity1, caseLinkEntity2);
 
-        doNothing().when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
-        doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
+        doReturn(0).when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
+        doReturn(0).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
 
@@ -251,8 +251,8 @@ class CaseDeletionServiceTest {
 
     @Test
     void shouldDeleteCaseWithSignificantItems() {
-        doNothing().when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
-        doNothing().when(caseEventRepository).deleteByCaseDataId(anyLong());
+        doReturn(1).when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
+        doReturn(1).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
         doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
 
