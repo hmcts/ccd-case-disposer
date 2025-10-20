@@ -12,6 +12,6 @@ public interface CaseEventRepository extends JpaRepository<CaseEventEntity, Long
 
     @Modifying
     @Query(value = "DELETE FROM case_event WHERE case_data_id = :caseDataId", nativeQuery = true)
-    void deleteByCaseDataId(@Param("caseDataId") Long caseDataId);
+    int deleteByCaseDataId(@Param("caseDataId") Long caseDataId);
 
 }

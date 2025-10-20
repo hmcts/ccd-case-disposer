@@ -52,4 +52,5 @@ public class DatabaseIntegrationTestUtils {
             ScriptUtils.executeSqlScript(connection, resource);
         }
     }
+
 }

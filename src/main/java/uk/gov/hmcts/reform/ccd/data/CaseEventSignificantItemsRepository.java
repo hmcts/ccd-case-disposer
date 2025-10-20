@@ -1,0 +1,18 @@
+package uk.gov.hmcts.reform.ccd.data;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseEventSignificantItemsEntity;
+
+@Repository
+public interface CaseEventSignificantItemsRepository extends JpaRepository<CaseEventSignificantItemsEntity, Long> {
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "DELETE FROM case_event_significant_items si"
+        + "    USING case_event ce"
+        + "    WHERE si.case_event_id = ce.id AND ce.case_data_id = :caseDataId;", nativeQuery = true)
+    int deleteByCaseDataId(@Param("caseDataId") Long caseDataId);
+}

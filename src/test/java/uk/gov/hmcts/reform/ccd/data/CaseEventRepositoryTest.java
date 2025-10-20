@@ -38,9 +38,10 @@ public class CaseEventRepositoryTest extends BaseRepositoryTest {
 
     @Test
     void testDeleteByCaseDataId() {
-        caseEventRepository.deleteByCaseDataId(5L);
+        int deletedEvent = caseEventRepository.deleteByCaseDataId(5L);
         Optional<CaseEventEntity> caseEvent = caseEventRepository.findById(5L);
         assertThat(caseEvent).isEmpty();
+        assertThat(deletedEvent).isEqualTo(1);
     }
 
 
