@@ -51,7 +51,39 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                 initialStateRowIds, indexedData);
 
         // WHEN
-        executor.execute();
+        executor.execute(1);
+
+        // THEN
+        verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
+        verifyDocumentDeletion(deletableDocuments);
+        verifyHearingDocumentDeletion(deletedFromIndexed);
+        verifyRoleDeletion(deletableRoles);
+        verifyTaskDeletion(deletableRowIds);
+        verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
+        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+        verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+    }
+
+    @ParameterizedTest
+    @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
+    void testScenariosNewVersion(final String deletableCaseTypes,
+                       final String deletableCaseTypesSimulation,
+                       final String scriptPath,
+                       final List<Long> initialStateRowIds,
+                       final Map<String, List<Long>> indexedData,
+                       final List<Long> deletableEndStateRowIds,
+                       final List<Long> simulatedEndStateRowIds,
+                       final Map<Long, List<String>> deletableDocuments,
+                       final Map<Long, List<String>> deletableRoles,
+                       final Map<String, List<Long>> deletedFromIndexed,
+                       final Map<String, List<Long>> notDeletedFromIndexed,
+                       final List<Long> deletableRowIds) throws Exception {
+        // GIVEN
+        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
+                  initialStateRowIds, indexedData);
+
+        // WHEN
+        executor.execute(2);
 
         // THEN
         verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
