@@ -7,6 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 
 import static org.mockito.Mockito.doNothing;
@@ -33,10 +34,11 @@ class ApplicationBootstrapTest {
     @Test
     void testShouldRunExecutor() throws Exception {
         doNothing().when(securityUtil).generateTokens();
+        ReflectionTestUtils.setField(underTest, "caseCollectorVersion", 1);
 
         underTest.run(applicationArguments);
 
         verify(client).flush();
-        verify(applicationExecutor).execute();
+        verify(applicationExecutor).execute(1);
     }
 }
