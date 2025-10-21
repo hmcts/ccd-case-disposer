@@ -76,7 +76,7 @@ class ApplicationExecutorTest {
     void testFindDeletableCandidatesWhenNoDeletableCandidatesFound() {
         doReturn(emptyList()).when(caseFindingService).findCasesDueDeletion();
 
-        applicationExecutor.execute();
+        applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseFamiliesFilter).getDeletableCasesOnly(emptyList());
@@ -98,7 +98,7 @@ class ApplicationExecutorTest {
         doReturn(caseDataList)
             .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
 
-        applicationExecutor.execute();
+        applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
@@ -123,7 +123,7 @@ class ApplicationExecutorTest {
         doReturn(caseDataList)
             .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
 
-        applicationExecutor.execute();
+        applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
@@ -154,7 +154,7 @@ class ApplicationExecutorTest {
             .thenReturn(Instant.parse(firstNow)) // first "now" in loop
             .thenReturn(Instant.parse(secondNow)); // second "now" in loop
 
-        applicationExecutor.execute();
+        applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(expectedDeleteCount)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
@@ -177,7 +177,7 @@ class ApplicationExecutorTest {
             .when(caseDeletionService)
             .deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
 
-        applicationExecutor.execute();
+        applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
         verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
