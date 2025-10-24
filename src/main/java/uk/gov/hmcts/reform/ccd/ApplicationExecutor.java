@@ -62,7 +62,11 @@ public class ApplicationExecutor {
         Integer requestLimit = parameterResolver.getRequestLimit();
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
 
-        processCases(allDeletableCases, requestLimit);
+        if (version == 1) {
+            processCases(allDeletableCases, requestLimit);
+        } else {
+            log.warn("Version 2 is not currently allowed to delete cases");
+        }
 
         caseDeletionLoggingService.logCases();
 
