@@ -62,6 +62,7 @@ public class ApplicationExecutor {
         Integer requestLimit = parameterResolver.getRequestLimit();
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
 
+        log.info("Found deletable cases {}...", allDeletableCases.size());
         processCases(allDeletableCases, requestLimit);
 
         caseDeletionLoggingService.logCases();

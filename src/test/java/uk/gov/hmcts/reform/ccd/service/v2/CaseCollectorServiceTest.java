@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class CaseCollectorServiceTest {
@@ -121,6 +124,17 @@ class CaseCollectorServiceTest {
         given(caseLinkRepository.findByCaseIdInOrLinkedCaseIdIn(Set.of(3L))).willReturn(List.of(link(1, 3)));
         Set<CaseData> result = service.getDeletableCases(List.of("TYPE"));
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getDeletableCases_ReturnsEmptyIfNoDeletableCaseTypesSet() {
+        Set<CaseData> result = service.getDeletableCases(null);
+        assertThat(result).isEmpty();
+        verify(caseDataRepository, times(0)).findExpiredCases(any());
+
+        result = service.getDeletableCases(List.of());
+        assertThat(result).isEmpty();
+        verify(caseDataRepository, times(0)).findExpiredCases(any());
     }
 
     private static CaseDataEntity entity(long id) {

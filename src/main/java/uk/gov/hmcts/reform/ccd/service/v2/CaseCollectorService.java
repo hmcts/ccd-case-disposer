@@ -23,6 +23,9 @@ public class CaseCollectorService {
     private final CaseLinkRepository caseLinkRepository;
 
     public Set<CaseData> getDeletableCases(List<String> caseTypes) {
+        if (caseTypes == null || caseTypes.isEmpty()) {
+            return new HashSet<>();
+        }
         List<CaseData> expiredCases = getExpiredCases(caseTypes);
         Set<CaseData> deletableCases = new HashSet<>();
         Set<Long> expiredIds = expiredCases.stream().map(CaseData::getId).collect(Collectors.toUnmodifiableSet());
