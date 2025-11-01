@@ -34,12 +34,15 @@ public class ApplicationBootstrap implements ApplicationRunner {
     @Value("${telemetry.wait.period:10000}")
     private int waitPeriod;
 
+    @Value("${case-collector.version:1}")
+    private int caseCollectorVersion;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         try {
             log.info("Starting the Case-Disposer job.");
             securityUtil.generateTokens();
-            applicationExecutor.execute();
+            applicationExecutor.execute(caseCollectorVersion);
             log.info("Completed the Case-Disposer job successfully.");
         } catch (Exception e) {
             log.error("Error executing Case-Disposer job.", e);
