@@ -43,6 +43,4 @@ public class CaseEventRepositoryTest extends BaseRepositoryTest {
         assertThat(caseEvent).isEmpty();
         assertThat(deletedEvent).isEqualTo(1);
     }
-
-
 }
