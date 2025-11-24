@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
+import uk.gov.hmcts.reform.ccd.data.CaseEventSignificantItemsRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
@@ -28,6 +29,7 @@ public class CaseDeletionService {
     private final CaseDataRepository caseDataRepository;
     private final CaseEventRepository caseEventRepository;
     private final CaseLinkRepository caseLinkRepository;
+    private final CaseEventSignificantItemsRepository caseEventSignificantItemsRepository;
     private final RemoteDisposeService remoteDisposeService;
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final LogAndAuditRemoteOperation logAndAuditRemoteOperation;
@@ -67,16 +69,20 @@ public class CaseDeletionService {
     void deleteCase(final CaseData caseData) {
         try {
             log.info("About to delete case reference:: {} ({})", caseData.getReference(), caseData.getJurisdiction());
-
+            int deletedSignificantItems = 0;
+            int deletedEvents = 0;
             final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
             if (caseDataEntity.isPresent()) {
                 remoteDisposeService.remoteDeleteAll(caseData);
-                caseEventRepository.deleteByCaseDataId(caseData.getId());
+                deletedSignificantItems = caseEventSignificantItemsRepository.deleteByCaseDataId(caseData.getId());
+                deletedEvents = caseEventRepository.deleteByCaseDataId(caseData.getId());
                 caseDataRepository.delete(caseDataEntity.get());
                 logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(caseData);
             }
 
-            log.info("Deleted case reference:: {} ({})", caseData.getReference(), caseData.getJurisdiction());
+            log.info("Deleted case reference:: {} ({}) (Deleted events: {}, significant items: {})",
+                     caseData.getReference(), caseData.getJurisdiction(),
+                     deletedEvents, deletedSignificantItems);
         } catch (LogAndAuditException logAndAuditException) {
             processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
             log.error(

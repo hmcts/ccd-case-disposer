@@ -20,7 +20,7 @@ public abstract class TestContainers {
 
     protected static final WireMockServer WIREMOCK_SERVER = new WireMockServer(4603);
     private static final Logger LOGGER = LoggerFactory.getLogger(TestContainers.class);
-    private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:7.17.1";
+    private static final String IMAGE = "docker.elastic.co/elasticsearch/elasticsearch:7.17.29";
     private static final ElasticsearchContainer ELASTICSEARCH_CONTAINER = new ElasticsearchContainer(IMAGE)
             .withLogConsumer(new Slf4jLogConsumer(LOGGER))
             .waitingFor(Wait.forListeningPort());

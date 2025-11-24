@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
+import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
@@ -31,27 +32,37 @@ public class ApplicationExecutor {
     private final ParameterResolver parameterResolver;
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
+    private final CaseCollectorService caseCollectorService;
     private final Clock clock;
 
     private LocalDateTime applicationStartTime;
     private LocalDateTime cutOff;
 
-    public void execute() {
+    public void execute(int version) {
         logParameters();
         applicationStartTime = LocalDateTime.now(clock);
         log.info("Case-Disposer started...");
-        final List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
-        final List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
-        final List<CaseFamily> deletableLinkedFamiliesSimulation = caseFamiliesFilter.geSimulationCasesOnly(
-            caseFamiliesDueDeletion);
+        Set<CaseData> allDeletableCases;
+        Set<CaseData> simulatedCases;
+        if (version == 1) {
+            log.info("Running version 1...");
+            List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
+            List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
+            List<CaseFamily> deletableLinkedFamiliesSimulation = caseFamiliesFilter.geSimulationCasesOnly(
+                caseFamiliesDueDeletion);
+            allDeletableCases = getCaseData(deletableCasesOnly);
+            simulatedCases = getCaseData(deletableLinkedFamiliesSimulation);
+        } else {
+            log.info("Running version 2...");
+            allDeletableCases = caseCollectorService.getDeletableCases(parameterResolver.getDeletableCaseTypes());
+            simulatedCases = caseCollectorService.getDeletableCases(
+                parameterResolver.getDeletableCaseTypesSimulation());
+        }
 
         Integer requestLimit = parameterResolver.getRequestLimit();
-
-        final Set<CaseData> allDeletableCases = getCaseData(deletableCasesOnly);
-        final Set<CaseData> simulatedCases = getCaseData(deletableLinkedFamiliesSimulation);
-
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
 
+        log.info("Found deletable cases {}...", allDeletableCases.size());
         processCases(allDeletableCases, requestLimit);
 
         caseDeletionLoggingService.logCases();
