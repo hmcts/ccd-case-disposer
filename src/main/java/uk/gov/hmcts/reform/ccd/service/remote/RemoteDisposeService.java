@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class RemoteDisposeService {
@@ -16,7 +17,11 @@ public class RemoteDisposeService {
      * Each class that implements DisposeRemoteOperation is responsible for handling the deletion logic.
      * The implementation will decide whether the deletion should take place or not, based on the provided CaseData.
      */
-    public void remoteDeleteAll(final CaseData caseData) {
-        disposeRemoteOperations.forEach(disposeRemoteOperation -> disposeRemoteOperation.delete(caseData));
+    public CompletableFuture<Void> remoteDeleteAll(CaseData caseData) {
+        List<CompletableFuture<Void>> futures = disposeRemoteOperations
+            .stream()
+            .map(op -> op.delete(caseData))
+            .toList();
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 }

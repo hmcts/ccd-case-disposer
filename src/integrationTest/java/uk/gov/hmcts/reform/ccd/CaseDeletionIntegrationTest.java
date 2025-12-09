@@ -41,7 +41,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         processedCasesRecordHolder.clearState();
 
         // WHEN
-        executor.execute(1);
+        executor.execute(2);
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);

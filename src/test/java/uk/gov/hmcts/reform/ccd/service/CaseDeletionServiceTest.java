@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -74,7 +75,8 @@ class CaseDeletionServiceTest {
         doReturn(0).when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
         doReturn(0).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
-        doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
+        doReturn(CompletableFuture.completedFuture(null))
+            .when(remoteDisposeService).remoteDeleteAll(caseData);
 
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
@@ -94,7 +96,8 @@ class CaseDeletionServiceTest {
         doReturn(0).when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
         doReturn(0).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
-        doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
+        doReturn(CompletableFuture.completedFuture(null))
+            .when(remoteDisposeService).remoteDeleteAll(caseData);
 
         doReturn(linkedCaseEntity).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
 
@@ -114,6 +117,8 @@ class CaseDeletionServiceTest {
     @Test
     void shouldLogErrorWhenDeleteFails() {
         // GIVEN
+        doReturn(CompletableFuture.completedFuture(null))
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
         doThrow(IllegalArgumentException.class).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doReturn(Optional.of(mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
 
@@ -151,7 +156,9 @@ class CaseDeletionServiceTest {
         doReturn(List.of(caseLinkEntity1)).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
-        doThrow(DocumentDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+        doReturn(CompletableFuture.failedFuture(new DocumentDeletionException("fail")))
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+
 
         // WHEN
         underTest.deleteCaseData(caseData);
@@ -170,8 +177,9 @@ class CaseDeletionServiceTest {
         // GIVEN
         doReturn(List.of(caseLinkEntity1)).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
+        doReturn(CompletableFuture.failedFuture(new ElasticsearchOperationException("fail")))
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
-        doThrow(ElasticsearchOperationException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         // WHEN
         underTest.deleteCaseData(caseData);
@@ -191,7 +199,8 @@ class CaseDeletionServiceTest {
         doReturn(List.of(caseLinkEntity1)).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
-        doThrow(RoleAssignmentDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+        doReturn(CompletableFuture.failedFuture(new RoleAssignmentDeletionException("fail")))
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         // WHEN
         underTest.deleteCaseData(caseData);
@@ -211,7 +220,8 @@ class CaseDeletionServiceTest {
         doReturn(List.of(caseLinkEntity1)).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
-        doThrow(HearingDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+        doReturn(CompletableFuture.failedFuture(new HearingDeletionException("fail")))
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         // WHEN
         underTest.deleteCaseData(caseData);
@@ -227,6 +237,8 @@ class CaseDeletionServiceTest {
 
     @Test
     void shouldThrowExceptionOnLogAndAuditException() {
+        doReturn(CompletableFuture.completedFuture(null))
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
         doReturn(List.of(caseLinkEntity1)).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
@@ -254,7 +266,8 @@ class CaseDeletionServiceTest {
         doReturn(1).when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
         doReturn(1).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));
-        doNothing().when(remoteDisposeService).remoteDeleteAll(caseData);
+        doReturn(CompletableFuture.completedFuture(null))
+            .when(remoteDisposeService).remoteDeleteAll(caseData);
 
 
         doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
@@ -272,6 +285,8 @@ class CaseDeletionServiceTest {
     @Test
     void shouldLogErrorWhenDeleteEventSignificantItemsFails() {
         // GIVEN
+        doReturn(CompletableFuture.completedFuture(null))
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
         doThrow(IllegalArgumentException.class).when(caseEventSignificantItemsRepository)
             .deleteByCaseDataId(anyLong());
         doReturn(Optional.of(mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
@@ -285,5 +300,31 @@ class CaseDeletionServiceTest {
         verify(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         verifyNoInteractions(caseLinkRepository);
+    }
+
+    @Test
+    void shouldDeleteCaseOnlyAfterAsyncRemoteDeleteCompletes() throws InterruptedException {
+        CompletableFuture<Void> controlledFuture = new CompletableFuture<>();
+        doReturn(controlledFuture).when(remoteDisposeService).remoteDeleteAll(caseData);
+        doReturn(Optional.of(DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
+
+        // Run deleteCaseData in a separate thread to simulate async behavior
+        Thread thread = new Thread(() -> underTest.deleteCaseData(caseData));
+        thread.start();
+
+        // Give some time for the method to reach the async call
+        Thread.sleep(200);
+
+        // Verify that repository delete methods have NOT been called yet
+        verify(caseDataRepository, never()).delete(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
+
+        // Complete the future to allow the method to proceed
+        controlledFuture.complete(null);
+
+        // Wait for the thread to finish
+        thread.join();
+
+        // Now verify that repository delete methods have been called
+        verify(caseDataRepository, times(1)).delete(DELETABLE_CASE_ENTITY_WITH_PAST_TTL);
     }
 }

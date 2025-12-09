@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.util.Optional;
+import java.util.concurrent.CompletionException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -64,7 +65,7 @@ class DisposeDocumentsRemoteOperationTest {
         when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
             .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
 
-        disposeDocumentsRemoteOperation.delete(caseData);
+        disposeDocumentsRemoteOperation.delete(caseData).join();
 
         verify(documentDeletionRecordHolder, times(1)).setCaseDocumentsDeletionResults(
             eq("1234567890123456"),
@@ -79,44 +80,44 @@ class DisposeDocumentsRemoteOperationTest {
 
     @Test
     void shouldThrowExceptionWhenRequestInvalid() {
+        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
+            .thenThrow(new DocumentDeletionException("1234567890123456"));
+
         try {
-            when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-            doThrow(new DocumentDeletionException("1234567890123456"))
-                .when(documentClient)
-                .deleteDocument(anyString(), any(DocumentsDeletePostRequest.class));
-
-            disposeDocumentsRemoteOperation.delete(caseData);
-
+            disposeDocumentsRemoteOperation.delete(caseData).join();
             fail("The method should have thrown DocumentDeletionException when request is invalid");
-        } catch (final DocumentDeletionException documentDeletionException) {
-            assertThat(documentDeletionException.getMessage())
-                .isEqualTo("Error deleting documents for case : 1234567890123456");
+        } catch (CompletionException ex) {
+            assertThat(ex.getCause())
+                .isInstanceOf(DocumentDeletionException.class)
+                .hasMessage("Error deleting documents for case : 1234567890123456");
         }
     }
 
     @Test
     void shouldThrowExceptionWhenResponseIsUnableToMapToObject() {
+        final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(1, 1);
+
+        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
+            .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
+
+        doThrow(new JsonSyntaxException("Unable to map document post response to object"))
+            .when(documentDeletionRecordHolder)
+            .setCaseDocumentsDeletionResults(
+                eq("1234567890123456"),
+                any(CaseDocumentsDeletionResults.class)
+            );
+
         try {
-            final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(1, 1);
-
-            when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-            when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
-                .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
-
-            doThrow(new JsonSyntaxException("Unable to map document post response to object"))
-                .when(documentDeletionRecordHolder)
-                .setCaseDocumentsDeletionResults(
-                    eq("1234567890123456"),
-                    any(CaseDocumentsDeletionResults.class)
-                );
-
-            disposeDocumentsRemoteOperation.delete(caseData);
-
-            fail("The method should have thrown JsonParseException when request is invalid");
-        } catch (final DocumentDeletionException documentDeletionException) {
-            assertThat(documentDeletionException.getCause().getMessage())
-                .contains("Unable to map json to object document deletion endpoint response due to following "
-                              + "endpoint response:");
+            disposeDocumentsRemoteOperation.delete(caseData).join();
+            fail("The method should have thrown DocumentDeletionException when request is invalid");
+        } catch (CompletionException ex) {
+            assertThat(ex.getCause())
+                .isInstanceOf(DocumentDeletionException.class);
+            assertThat(ex.getCause().getCause().getMessage())
+                .contains("Unable to map json to object document deletion endpoint response "
+                             + "due to following endpoint response:");
         }
     }
 
@@ -127,7 +128,7 @@ class DisposeDocumentsRemoteOperationTest {
             .reference(1234567890123456L)
             .caseType(HEARING_RECORDINGS_CASE_TYPE).build();
 
-        disposeDocumentsRemoteOperation.delete(caseData);
+        disposeDocumentsRemoteOperation.delete(caseData).join();
 
         verifyNoInteractions(documentDeletionRecordHolder);
         verifyNoInteractions(documentClient);

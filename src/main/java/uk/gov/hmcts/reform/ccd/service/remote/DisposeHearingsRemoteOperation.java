@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.HearingDeletionRecordHolder;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
@@ -26,27 +27,29 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
     private final ParameterResolver parameterResolver;
 
     @Override
-    public void delete(final CaseData caseData) {
-        if (caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
-            final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
-            try {
-                final ResponseEntity<Void> deleteHearingsResponse = deleteHearings(caseRef);
+    public CompletableFuture<Void> delete(final CaseData caseData) {
+        return CompletableFuture.runAsync(() -> {
+            if (caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
+                final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
+                try {
+                    final ResponseEntity<Void> deleteHearingsResponse = deleteHearings(caseRef);
 
-                logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.getStatusCode().value());
+                    logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.getStatusCode().value());
 
-                if (deleteHearingsResponse.getStatusCode().value() != NO_CONTENT.value()) {
-                    final String errorMessage = String
-                            .format("Unexpected response code %d while deleting hearing for case: %s",
-                            deleteHearingsResponse.getStatusCode().value(), caseRef);
+                    if (deleteHearingsResponse.getStatusCode().value() != NO_CONTENT.value()) {
+                        final String errorMessage = String
+                                .format("Unexpected response code %d while deleting hearing for case: %s",
+                                deleteHearingsResponse.getStatusCode().value(), caseRef);
 
-                    throw new HearingDeletionException(errorMessage);
+                        throw new HearingDeletionException(errorMessage);
+                    }
+                } catch (final Exception ex) {
+                    final String errorMessage = String.format("Error deleting hearing for case : %s", caseRef);
+                    log.error(errorMessage, ex);
+                    throw new HearingDeletionException(errorMessage, ex);
                 }
-            } catch (final Exception ex) {
-                final String errorMessage = String.format("Error deleting hearing for case : %s", caseRef);
-                log.error(errorMessage, ex);
-                throw new HearingDeletionException(errorMessage, ex);
             }
-        }
+        });
     }
 
     private void logHearingDisposal(final String caseRef, final int status) {

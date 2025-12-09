@@ -402,9 +402,8 @@ public class DeletionScenarios {
                         List.of(2L, 3L),
                         List.of(1504259907353527L),
                         List.of(1504259907353529L),
-                        Map.of("FT_MasterCaseType", List.of(1504259907353529L)),
-                        Map.of("FT_MultiplePages", List.of(1504259907353527L), "FT_MasterCaseType",
-                                List.of(1504259907350000L))
+                        Map.of("FT_MasterCaseType", List.of(1504259907353529L,1504259907350000L)),
+                        Map.of("FT_MultiplePages", List.of(1504259907353527L))
                 ),
                 Arguments.of(
                     "FT_MultiplePages,HearingRecordings",

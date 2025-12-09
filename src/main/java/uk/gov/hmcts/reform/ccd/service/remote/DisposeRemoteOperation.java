@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface DisposeRemoteOperation {
-    void delete(final CaseData caseData) throws RuntimeException;
+
+    CompletableFuture<Void> delete(final CaseData caseData);
 }

@@ -17,9 +17,10 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -65,7 +66,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         ))
             .thenReturn(ResponseEntity.ok(roleAssignmentsPostResponse));
 
-        disposeRoleAssignmentsRemoteOperation.delete(caseData);
+        disposeRoleAssignmentsRemoteOperation.delete(caseData).join();
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults(
             "1234567890123456",
@@ -80,45 +81,41 @@ class DisposeRoleAssignmentsRemoteOperationTest {
 
     @Test
     void shouldThrowExceptionWhenQueryRequestInvalid() {
-        try {
-            final RoleAssignmentsPostResponse roleAssignmentsPostResponse = new RoleAssignmentsPostResponse();
-            roleAssignmentsPostResponse.setRoleAssignmentResponse(List.of(mock(QueryResponse.class)));
+        final RoleAssignmentsPostResponse roleAssignmentsPostResponse = new RoleAssignmentsPostResponse();
+        roleAssignmentsPostResponse.setRoleAssignmentResponse(List.of(mock(QueryResponse.class)));
 
-            when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-            when(securityUtil.getIdamClientToken()).thenReturn("some_cool_idam_token");
+        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(securityUtil.getIdamClientToken()).thenReturn("some_cool_idam_token");
 
+        when(roleAssignmentClient.deleteRoleAssignment(
+            anyString(),
+            anyString(),
+            any(RoleAssignmentsPostRequest.class)
+        ))
+            .thenReturn(ResponseEntity.status(500).body(roleAssignmentsPostResponse));
 
-            when(roleAssignmentClient.deleteRoleAssignment(
-                anyString(),
-                anyString(),
-                any(RoleAssignmentsPostRequest.class)
-            ))
-                .thenReturn(ResponseEntity.status(500).body(roleAssignmentsPostResponse));
-
-            disposeRoleAssignmentsRemoteOperation.delete(caseData);
-
-            fail("The method should have thrown DocumentDeletionException when request is invalid");
-        } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {
-            assertThat(roleAssignmentDeletionException.getMessage())
-                .isEqualTo("Error deleting role assignments for case : 1234567890123456");
-        }
+        CompletionException ex = assertThrows(CompletionException.class, () ->
+            disposeRoleAssignmentsRemoteOperation.delete(caseData).join()
+        );
+        assertThat(ex.getCause())
+            .isInstanceOf(RoleAssignmentDeletionException.class)
+            .hasMessage("Error deleting role assignments for case : 1234567890123456");
     }
+
 
     @Test
     void shouldThrowExceptionWhenDeleteRequestInvalid() {
-        try {
-            final String caseRef = "1234567890123456";
+        final String caseRef = "1234567890123456";
 
-            doThrow(new RoleAssignmentDeletionException(caseRef))
-                .when(roleAssignmentClient)
-                .deleteRoleAssignment(anyString(), anyString(), any(RoleAssignmentsPostRequest.class));
+        doThrow(new RoleAssignmentDeletionException(caseRef))
+            .when(roleAssignmentClient)
+            .deleteRoleAssignment(anyString(), anyString(), any(RoleAssignmentsPostRequest.class));
 
-            disposeRoleAssignmentsRemoteOperation.delete(caseData);
-
-            fail("The method should have thrown DocumentDeletionException when request is invalid");
-        } catch (final RoleAssignmentDeletionException roleAssignmentDeletionException) {
-            assertThat(roleAssignmentDeletionException.getMessage())
-                .isEqualTo("Error deleting role assignments for case : 1234567890123456");
-        }
+        CompletionException ex = assertThrows(CompletionException.class, () ->
+            disposeRoleAssignmentsRemoteOperation.delete(caseData).join()
+        );
+        assertThat(ex.getCause())
+            .isInstanceOf(RoleAssignmentDeletionException.class)
+            .hasMessage("Error deleting role assignments for case : 1234567890123456");
     }
 }

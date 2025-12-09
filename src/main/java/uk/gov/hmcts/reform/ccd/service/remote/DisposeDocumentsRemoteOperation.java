@@ -14,6 +14,8 @@ import uk.gov.hmcts.reform.ccd.service.remote.clients.DocumentClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
+import java.util.concurrent.CompletableFuture;
+
 
 @Service
 @Slf4j
@@ -26,32 +28,39 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
     private final ParameterResolver parameterResolver;
 
     @Override
-    public void delete(final CaseData caseData) {
-        if (!caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
-            try {
-                final DocumentsDeletePostRequest documentsDeleteRequest =
-                    new DocumentsDeletePostRequest(caseData.getReference().toString());
+    public CompletableFuture<Void> delete(final CaseData caseData) {
+        return CompletableFuture.runAsync(() -> {
+            if (!caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
+                try {
+                    final DocumentsDeletePostRequest documentsDeleteRequest =
+                        new DocumentsDeletePostRequest(caseData.getReference().toString());
 
-                final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse =
-                    postDocument(documentsDeleteRequest);
+                    final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse =
+                        postDocument(documentsDeleteRequest);
 
-                logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse.getBody());
+                    logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse.getBody());
 
-                if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
-                    final String errorMessage = String
-                        .format("Unexpected response code %d while deleting documents for case: %s",
-                                documentsDeleteResponse.getStatusCode().value(), caseData.getReference());
+                    if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
+                        final String errorMessage = String
+                            .format("Unexpected response code %d while deleting documents for case: %s",
+                                    documentsDeleteResponse.getStatusCode().value(), caseData.getReference()
+                            );
 
-                    throw new DocumentDeletionException(errorMessage);
+                        throw new DocumentDeletionException(errorMessage);
+                    }
+
+
+                }  catch (final Exception ex) {
+                    final String errorMessage = String.format(
+                        "Error deleting documents for case : %s", caseData.getReference().toString());
+                    log.error(errorMessage, ex);
+                    throw new DocumentDeletionException(errorMessage, ex);
                 }
 
-            } catch (final Exception ex) {
-                final String errorMessage = String.format(
-                    "Error deleting documents for case : %s", caseData.getReference().toString());
-                log.error(errorMessage, ex);
-                throw new DocumentDeletionException(errorMessage, ex);
             }
-        }
+        });
+
+
     }
 
 

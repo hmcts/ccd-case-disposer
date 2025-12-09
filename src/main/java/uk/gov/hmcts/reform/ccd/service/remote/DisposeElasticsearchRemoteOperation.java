@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -31,26 +32,28 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
 
 
     @Override
-    public void delete(final CaseData caseData) {
-        try {
-            final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(
-                getIndex(caseData.getCaseType()),
-                caseData.getReference()
-            );
+    public CompletableFuture<Void> delete(final CaseData caseData) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                final DeleteByQueryRequest caseIndexDeleteRequest = buildDeleteByQueryRequest(
+                    getIndex(caseData.getCaseType()),
+                    caseData.getReference()
+                );
 
-            deleteByQueryRequest(caseIndexDeleteRequest);
+                deleteByQueryRequest(caseIndexDeleteRequest);
 
-            if (globalSearchIndexChecker.isGlobalSearchExist()) {
-                final DeleteByQueryRequest globalSearchIndexDeleteRequest =
-                    buildDeleteByQueryRequest(
-                        parameterResolver.getGlobalSearchIndexName(),
-                        caseData.getReference()
-                    );
-                deleteByQueryRequest(globalSearchIndexDeleteRequest);
+                if (globalSearchIndexChecker.isGlobalSearchExist()) {
+                    final DeleteByQueryRequest globalSearchIndexDeleteRequest =
+                        buildDeleteByQueryRequest(
+                            parameterResolver.getGlobalSearchIndexName(),
+                            caseData.getReference()
+                        );
+                    deleteByQueryRequest(globalSearchIndexDeleteRequest);
+                }
+            } catch (final Exception e) {
+                throw new ElasticsearchOperationException(e);
             }
-        } catch (final Exception e) {
-            throw new ElasticsearchOperationException(e);
-        }
+        });
     }
 
     private void deleteByQueryRequest(final DeleteByQueryRequest request) throws IOException {

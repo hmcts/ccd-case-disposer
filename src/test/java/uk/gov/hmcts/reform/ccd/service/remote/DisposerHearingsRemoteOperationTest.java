@@ -15,7 +15,9 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.HearingDeletionRecordHolder;
 
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -60,7 +62,7 @@ class DisposerHearingsRemoteOperationTest {
                                          List.of(caseData.getReference().toString())))
             .thenReturn(mockResponse);
 
-        disposeHearingsRemoteOperation.delete(caseData);
+        disposeHearingsRemoteOperation.delete(caseData).join();
 
         verify(hearingClient).deleteHearing("123",
                                             "456",
@@ -78,7 +80,10 @@ class DisposerHearingsRemoteOperationTest {
         doThrow(new RuntimeException("Delete request failed"))
             .when(hearingClient).deleteHearing(any(), eq(DELETE_HEARINGS_PATH), eq(caseRefs));
 
-        assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));
+        CompletionException ex = assertThrows(CompletionException.class, () ->
+            disposeHearingsRemoteOperation.delete(caseData).join()
+        );
+        assertThat(ex.getCause()).isInstanceOf(HearingDeletionException.class);
     }
 
 
@@ -89,7 +94,7 @@ class DisposerHearingsRemoteOperationTest {
             .reference(1234567890123456L)
             .caseType("someRandomCaseType").build();
 
-        disposeHearingsRemoteOperation.delete(caseData);
+        disposeHearingsRemoteOperation.delete(caseData).join();
 
         verifyNoInteractions(hearingDeletionRecordHolder);
         verifyNoInteractions(hearingClient);
@@ -108,6 +113,10 @@ class DisposerHearingsRemoteOperationTest {
                                          List.of(caseData.getReference().toString())))
             .thenReturn(mockResponse);
 
-        assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));
+        CompletionException ex = assertThrows(CompletionException.class, () ->
+            disposeHearingsRemoteOperation.delete(caseData).join()
+        );
+        assertThat(ex.getCause()).isInstanceOf(HearingDeletionException.class);
     }
+
 }

@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.ccd.service.remote.clients.TasksClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.TasksDeletionRecordHolder;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -24,29 +26,34 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
     private final TasksClient tasksClient;
 
     @Override
-    public void delete(final CaseData caseData) {
-        final String caseRef = caseData.getReference().toString();
-        try {
-            final DeleteTasksRequest tasksDeletePostRequest =
-                new DeleteTasksRequest(new DeleteCaseTasksAction(caseRef));
+    public CompletableFuture<Void> delete(final CaseData caseData) {
+        return CompletableFuture.runAsync(() -> {
+            log.info("Running remote task delete for case {} on thread {}", caseData.getReference(),
+                               Thread.currentThread().getName());
+            final String caseRef = caseData.getReference().toString();
+            try {
+                final DeleteTasksRequest tasksDeletePostRequest =
+                    new DeleteTasksRequest(new DeleteCaseTasksAction(caseRef));
 
-            final ResponseEntity<Void> taskDeleteResponse = deleteTasks(tasksDeletePostRequest);
+                final ResponseEntity<Void> taskDeleteResponse = deleteTasks(tasksDeletePostRequest);
 
-            tasksDeletionRecordHolder.setCaseTasksDeletionResults(caseRef, taskDeleteResponse.getStatusCode().value());
+                tasksDeletionRecordHolder.setCaseTasksDeletionResults(caseRef,
+                    taskDeleteResponse.getStatusCode().value());
 
-            if (!taskDeleteResponse.getStatusCode().is2xxSuccessful()) {
-                final String errorMessage = String
-                    .format("Unexpected response code %d while deleting tasks for case: %s",
-                            taskDeleteResponse.getStatusCode().value(), caseData.getReference()
-                    );
+                if (!taskDeleteResponse.getStatusCode().is2xxSuccessful()) {
+                    final String errorMessage = String
+                        .format("Unexpected response code %d while deleting tasks for case: %s",
+                                taskDeleteResponse.getStatusCode().value(), caseData.getReference()
+                        );
 
-                throw new TasksDeletionException(errorMessage);
+                    throw new TasksDeletionException(errorMessage);
+                }
+            } catch (final Exception ex) {
+                final String errorMessage = String.format("Error deleting tasks for case : %s", caseRef);
+                log.error(errorMessage, ex);
+                throw new TasksDeletionException(errorMessage, ex);
             }
-        } catch (final Exception ex) {
-            final String errorMessage = String.format("Error deleting tasks for case : %s", caseRef);
-            log.error(errorMessage, ex);
-            throw new TasksDeletionException(errorMessage, ex);
-        }
+        });
     }
 
     private ResponseEntity<Void> deleteTasks(final DeleteTasksRequest tasksDeletePostRequest) {

@@ -15,7 +15,10 @@ import uk.gov.hmcts.reform.ccd.service.remote.clients.TasksClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.TasksDeletionRecordHolder;
 
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import java.util.concurrent.CompletionException;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
@@ -50,7 +53,7 @@ class DisposeTaskRemoteOperationTest {
         when(tasksClient.deleteTasks(anyString(), anyString(), any(DeleteTasksRequest.class)))
             .thenReturn(response);
 
-        disposeTasksRemoteOperation.delete(caseData);
+        disposeTasksRemoteOperation.delete(caseData).join();
 
         verify(tasksDeletionRecordHolder, times(1)).setCaseTasksDeletionResults(
             "1234567890123456",
@@ -68,8 +71,13 @@ class DisposeTaskRemoteOperationTest {
         ResponseEntity<Void> response = ResponseEntity.status(400).build();
 
         when(tasksClient.deleteTasks(any(), any(), any(DeleteTasksRequest.class))).thenReturn(response);
-        assertThatExceptionOfType(TasksDeletionException.class)
-            .isThrownBy(() -> disposeTasksRemoteOperation.delete(caseData))
-            .withMessage("Error deleting tasks for case : 1234567890123456");
+
+        CompletionException ex = assertThrows(CompletionException.class, () ->
+            disposeTasksRemoteOperation.delete(caseData).join()
+        );
+        assertThat(ex.getCause())
+            .isInstanceOf(TasksDeletionException.class)
+            .hasMessage("Error deleting tasks for case : 1234567890123456");
     }
+
 }

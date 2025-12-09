@@ -17,9 +17,12 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -59,7 +62,7 @@ class DisposeElasticsearchRemoteOperationTest {
 
         doReturn(true).when(globalSearchIndexChecker).isGlobalSearchExist();
 
-        underTest.delete(caseData);
+        underTest.delete(caseData).join();
 
         verify(elasticsearchClient, times(2))
             .deleteByQuery(any(DeleteByQueryRequest.class));
@@ -74,7 +77,7 @@ class DisposeElasticsearchRemoteOperationTest {
 
         doReturn(false).when(globalSearchIndexChecker).isGlobalSearchExist();
 
-        underTest.delete(caseData);
+        underTest.delete(caseData).join();
 
         verify(elasticsearchClient, times(1))
             .deleteByQuery(any(DeleteByQueryRequest.class));
@@ -88,20 +91,27 @@ class DisposeElasticsearchRemoteOperationTest {
         BulkIndexByScrollFailure failure = mock(BulkIndexByScrollFailure.class);
         doReturn(List.of(failure)).when(deleteByQueryResponse).failures();
 
-        assertThatExceptionOfType(ElasticsearchOperationException.class)
-            .isThrownBy(() -> underTest.delete(caseData))
-            .withMessage("uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException: "
-                             + "Search failures occurred");
+        CompletionException ex = assertThrows(CompletionException.class, () ->
+            underTest.delete(caseData).join()
+        );
+        assertThat(ex.getCause())
+            .isInstanceOf(ElasticsearchOperationException.class)
+            .hasMessage("uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException: Search failures occurred");
         verify(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class));
     }
 
     @Test
-    void testShouldRaiseExceptionWhenDeleteByQueryFails() throws Exception {
+    void testShouldRaiseExceptionWhenDeleteByQueryFails() throws IOException {
         doThrow(new IOException()).when(elasticsearchClient)
             .deleteByQuery(any(DeleteByQueryRequest.class));
 
-        assertThatExceptionOfType(ElasticsearchOperationException.class)
-            .isThrownBy(() -> underTest.delete(caseData));
+        try {
+            underTest.delete(caseData).join();
+            fail("Expected ElasticsearchOperationException to be thrown");
+        } catch (CompletionException ex) {
+            assertThat(ex.getCause())
+                .isInstanceOf(ElasticsearchOperationException.class);
+        }
     }
 }

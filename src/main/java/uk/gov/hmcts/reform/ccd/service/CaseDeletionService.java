@@ -20,6 +20,8 @@ import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 @Named
 @Slf4j
@@ -73,7 +75,8 @@ public class CaseDeletionService {
             int deletedEvents = 0;
             final Optional<CaseDataEntity> caseDataEntity = caseDataRepository.findById(caseData.getId());
             if (caseDataEntity.isPresent()) {
-                remoteDisposeService.remoteDeleteAll(caseData);
+                CompletableFuture<Void> future = remoteDisposeService.remoteDeleteAll(caseData);
+                future.join();
                 deletedSignificantItems = caseEventSignificantItemsRepository.deleteByCaseDataId(caseData.getId());
                 deletedEvents = caseEventRepository.deleteByCaseDataId(caseData.getId());
                 caseDataRepository.delete(caseDataEntity.get());
@@ -92,6 +95,13 @@ public class CaseDeletionService {
                 logAndAuditException
             );
             throw logAndAuditException;
+        } catch (CompletionException ce) {
+            Throwable root = ce.getCause();
+            log.error("Error in async remote deletion for case:: {} ({}): {}",
+                caseData.getReference(), caseData.getJurisdiction(),root.getMessage(), root);
+
+            processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+
         } catch (final Exception exception) { // Catch all exceptions
             log.error(
                 "Could not delete case reference:: {} ({})",

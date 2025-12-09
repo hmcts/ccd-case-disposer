@@ -13,6 +13,8 @@ import uk.gov.hmcts.reform.ccd.service.remote.clients.RoleAssignmentClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.RoleDeletionRecordHolder;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -23,32 +25,34 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
     private final SecurityUtil securityUtil;
 
     @Override
-    public void delete(final CaseData caseData) {
-        final String caseRef = caseData.getReference().toString();
-        try {
-            final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
-                new RoleAssignmentsPostRequest(caseRef);
+    public CompletableFuture<Void> delete(final CaseData caseData) {
+        return CompletableFuture.runAsync(() -> {
+            final String caseRef = caseData.getReference().toString();
+            try {
+                final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
+                    new RoleAssignmentsPostRequest(caseRef);
 
-            final ResponseEntity<RoleAssignmentsPostResponse> roleAssignmentsDeleteResponse =
-                deleteRoleAssignment(roleAssignmentsDeleteRequest);
+                final ResponseEntity<RoleAssignmentsPostResponse> roleAssignmentsDeleteResponse =
+                    deleteRoleAssignment(roleAssignmentsDeleteRequest);
 
-            roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef,
-                                                                 roleAssignmentsDeleteResponse.getStatusCode().value());
+                roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef,
+                      roleAssignmentsDeleteResponse.getStatusCode().value());
 
-            if (!roleAssignmentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
-                final String errorMessage = String
-                    .format("Unexpected response code %d while deleting role assignments for case: %s",
-                            roleAssignmentsDeleteResponse.getStatusCode().value(), caseData.getReference()
-                    );
+                if (!roleAssignmentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
+                    final String errorMessage = String
+                        .format("Unexpected response code %d while deleting role assignments for case: %s",
+                                roleAssignmentsDeleteResponse.getStatusCode().value(), caseData.getReference()
+                        );
 
-                throw new RoleAssignmentDeletionException(errorMessage);
+                    throw new RoleAssignmentDeletionException(errorMessage);
+                }
+
+            } catch (final Exception ex) {
+                final String errorMessage = String.format("Error deleting role assignments for case : %s", caseRef);
+                log.error(errorMessage, ex);
+                throw new RoleAssignmentDeletionException(errorMessage, ex);
             }
-
-        } catch (final Exception ex) {
-            final String errorMessage = String.format("Error deleting role assignments for case : %s", caseRef);
-            log.error(errorMessage, ex);
-            throw new RoleAssignmentDeletionException(errorMessage, ex);
-        }
+        });
     }
 
 
