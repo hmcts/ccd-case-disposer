@@ -68,16 +68,6 @@ idam:
     secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
     redirect_uri: ${IDAM_CASE_DISPOSER_CLIENT_REDIRECT_URL:http://ccd-case-disposer/oauth2redirect}
 
-#application-insights:
-#  default:
-#    modules:
-#      WebSyntheticRequestTelemetryInitializer:
-#        enabled: false
-#
-#azure:
-#  application-insights:
-#    instrumentation-key: ${APPINSIGHTS_INSTRUMENTATIONKEY:00000000-0000-0000-0000-000000000000}
-
 smoke.test.enabled: false
 
 app.insights.log.size: ${CASE_DISPOSER_SUMMARY_LOG_SIZE:250}
@@ -89,3 +79,4 @@ thread:
 
 case-collector:
   version: ${CASE_COLLECTOR_VERSION:1}
+  max-run-duration-minutes: ${CASE_COLLECTOR_RUN_DURATION_IN_MINUTES:480}
