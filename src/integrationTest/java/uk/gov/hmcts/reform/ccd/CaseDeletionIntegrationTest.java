@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,10 +8,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.data.TestDataProvider;
+import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
+import uk.gov.hmcts.reform.ccd.utils.DocumentRemoteDeletionVerifier;
+import uk.gov.hmcts.reform.ccd.utils.HearingRemoteDeletionVerifier;
+import uk.gov.hmcts.reform.ccd.utils.LauRemoteDeletionVerifier;
+import uk.gov.hmcts.reform.ccd.utils.RemoteDeletionVerifier;
+import uk.gov.hmcts.reform.ccd.utils.RoleRemoteDeletionVerifier;
+import uk.gov.hmcts.reform.ccd.utils.TasksRemoteDeletionVerifier;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
 
 
 @SpringBootTest
@@ -23,6 +35,29 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
 
     @Autowired
     private ProcessedCasesRecordHolder processedCasesRecordHolder;
+
+    @Autowired
+    private List<RemoteDeletionVerifier<?>> remoteDeletionVerifiers;
+
+    @Autowired
+    private LauRemoteDeletionVerifier lauVerifier;
+
+    @Autowired
+    private RoleRemoteDeletionVerifier roleVerifier;
+
+    @Autowired
+    private HearingRemoteDeletionVerifier hearingVerifier;
+
+    @Autowired
+    private DocumentRemoteDeletionVerifier documentVerifier;
+
+    @Autowired
+    private TasksRemoteDeletionVerifier tasksVerifier;
+
+    @BeforeEach
+    void resetWireMock() {
+        WIREMOCK_SERVER.resetAll();
+    }
 
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
@@ -44,10 +79,16 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         executor.execute(1);
 
         // THEN
+        await().atMost(20, SECONDS).untilAsserted(() ->
+            verifyAllRemoteDeletions(deletableCaseRefs)
+        );
+
         verifyDatabaseDeletion(deletableEndStateRowIds);
-        verifyRemoteDeletion(deletableCaseRefs);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+
+        // Clear AFTER success
+        remoteDeletionVerifiers.forEach(RemoteDeletionVerifier::clear);
     }
 
     @ParameterizedTest
@@ -70,9 +111,38 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         executor.execute(2);
 
         // THEN
+        await().atMost(20, SECONDS).untilAsserted(() ->
+            verifyAllRemoteDeletions(deletableCaseRefs)
+        );
+
         verifyDatabaseDeletion(deletableEndStateRowIds);
-        verifyRemoteDeletion(deletableCaseRefs);
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+
+        // Clear AFTER success
+        remoteDeletionVerifiers.forEach(RemoteDeletionVerifier::clear);
+    }
+
+    private void verifyAllRemoteDeletions(List<Long> deletableCaseRefs) {
+
+        // LAU
+        Set<String> lauSnapshot = lauVerifier.snapshot();
+        lauVerifier.assertDeletionResults(lauSnapshot, deletableCaseRefs);
+
+        // Documents
+        Map<String, CaseDocumentsDeletionResults> documentSnapshot = documentVerifier.snapshot();
+        documentVerifier.assertDeletionResults(documentSnapshot, deletableCaseRefs);
+
+        // Hearings
+        Map<String, Integer> hearingSnapshot = hearingVerifier.snapshot();
+        hearingVerifier.assertDeletionResults(hearingSnapshot, deletableCaseRefs);
+
+        // Roles
+        Map<String, Integer> roleSnapshot = roleVerifier.snapshot();
+        roleVerifier.assertDeletionResults(roleSnapshot, deletableCaseRefs);
+
+        // Tasks
+        Map<String, Integer> tasksSnapshot = tasksVerifier.snapshot();
+        tasksVerifier.assertDeletionResults(tasksSnapshot, deletableCaseRefs);
     }
 }

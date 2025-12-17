@@ -7,34 +7,48 @@ import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_DELETE;
 
 @Component
-public class DocumentRemoteDeletionVerifier implements RemoteDeletionVerifier {
+public class DocumentRemoteDeletionVerifier implements
+    RemoteDeletionVerifier<Map<String, CaseDocumentsDeletionResults>> {
 
     @Inject
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
-    public void verifyRemoteDeletion(final List<Long> caseRefDeletedDocuments) {
+    @Override
+    public Map<String, CaseDocumentsDeletionResults> snapshot() {
+        return documentDeletionRecordHolder.snapshot();
+    }
+
+    @Override
+    public void clear() {
+        documentDeletionRecordHolder.clear();
+    }
+
+    public void assertDeletionResults(Map<String, CaseDocumentsDeletionResults> snapshot,
+        List<Long> caseRefDeletedDocuments) {
+
         caseRefDeletedDocuments.forEach(caseRef -> {
-            final CaseDocumentsDeletionResults caseDocumentsDeletionMocks = DOCUMENT_DELETE.get(Long.toString(caseRef));
+            String caseRefStr = caseRef.toString();
+            CaseDocumentsDeletionResults expected = DOCUMENT_DELETE.get(caseRefStr);
+            if (expected != null) {
+                CaseDocumentsDeletionResults actual = snapshot.get(caseRefStr);
+                assertThat(actual)
+                    .as("Document deletion results missing for caseRef %s", caseRefStr)
+                    .isNotNull();
 
-            // This if statement guards against hearing cases. Some caseRefs might be of type HearingRecordings,
-            // which means that the document endpoint will not be called; instead, the hearing endpoint will be used.
-            if (caseDocumentsDeletionMocks != null) {
-                final CaseDocumentsDeletionResults caseDocumentsDeletionActualResults = documentDeletionRecordHolder
-                    .getCaseDocumentsDeletionResults(Long.toString(caseRef));
+                assertThat(actual.getCaseDocumentsFound())
+                    .as("caseDocumentsFound mismatch for caseRef %s", caseRefStr)
+                    .isEqualTo(expected.getCaseDocumentsFound());
 
-                assertThat(caseDocumentsDeletionActualResults).isNotNull();
-                assertThat(caseDocumentsDeletionActualResults.getCaseDocumentsFound())
-                    .isEqualTo(caseDocumentsDeletionMocks.getCaseDocumentsFound());
-                assertThat(caseDocumentsDeletionActualResults.getMarkedForDeletion())
-                    .isEqualTo(caseDocumentsDeletionMocks.getMarkedForDeletion());
+                assertThat(actual.getMarkedForDeletion())
+                    .as("markedForDeletion mismatch for caseRef %s", caseRefStr)
+                    .isEqualTo(expected.getMarkedForDeletion());
             }
-
-
         });
     }
 }

@@ -5,20 +5,15 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.google.gson.Gson;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.data.am.QueryResponse;
-import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostResponse;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
-import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
-import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
-import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
-import uk.gov.hmcts.reform.ccd.data.tm.DeleteCaseTasksAction;
-import uk.gov.hmcts.reform.ccd.data.tm.DeleteTasksRequest;
 
 import java.util.Collections;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
-import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static feign.form.ContentProcessor.CONTENT_TYPE_HEADER;
@@ -55,96 +50,119 @@ public class WireMockStubs {
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
-        String body = new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction("${json-unit.any-string}")));
-        wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
-            .withRequestBody(equalToJson(body))
-            .willReturn(buildResponseDefinition(201)));
-
         TASKS_DELETE.forEach((key, value) ->
-                wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
-                        .withRequestBody(
-                            equalToJson(new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(key))))
-                        )
-                        .willReturn(buildResponseDefinition(value))));
+             wireMockServer.stubFor(
+                 post(urlPathMatching(TASKS_DELETE_PATH))
+                     .withRequestBody(
+                         matchingJsonPath("$.deleteCaseTasksAction.caseRef", equalTo(key))
+                     ).willReturn(buildResponseDefinition(value)).atPriority(1)
+             )
+        );
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(TASKS_DELETE_PATH))
+                .withRequestBody(
+                    matchingJsonPath("$.deleteCaseTasksAction.caseRef")
+                ).willReturn(buildResponseDefinition(201)).atPriority(10)
+        );
     }
 
     private void setupLauStub(final WireMockServer wireMockServer) {
-        ActionLog actionLogExample = ActionLog.builder()
-            .caseAction("DELETE")
-            .caseRef("${json-unit.any-string}")
-            .caseJurisdictionId("BEFTA_MASTER")
-            .build();
-        String body = new Gson().toJson(new CaseActionPostRequestResponse(actionLogExample));
 
-        // Return request body in response
-        wireMockServer.stubFor(post(urlPathMatching(LAU_SAVE_PATH))
-            .withRequestBody(equalToJson(body, true, true))
-            .willReturn(
-                buildResponseDefinition(201, "{{request.body}}")
-                    .withTransformers("response-template")
-            ));
+        LAU_SAVE.forEach((key, value) ->
+             wireMockServer.stubFor(
+                 post(urlPathMatching(LAU_SAVE_PATH))
+                     .withRequestBody(
+                         matchingJsonPath("$.actionLog.caseRef", equalTo(key))
+                     ).willReturn(buildResponseDefinition(value)).atPriority(1)
+             )
+        );
 
-
-        LAU_SAVE.forEach((key, value) -> {
-            actionLogExample.setCaseRef(key);
-            String specificBody = new Gson().toJson(new CaseActionPostRequestResponse(actionLogExample));
-
-            wireMockServer.stubFor(
-                post(urlPathMatching(LAU_SAVE_PATH))
-                    .withRequestBody(equalToJson(specificBody, true, true))
-                    .willReturn(buildResponseDefinition(value)));
-        });
+        wireMockServer.stubFor(
+            post(urlPathMatching(LAU_SAVE_PATH))
+                .withRequestBody(matchingJsonPath("$.actionLog.caseRef"))
+                .willReturn(
+                    buildResponseDefinition(201, "{{request.body}}")
+                        .withTransformers("response-template")
+                ).atPriority(10)
+        );
     }
+
 
     private void setupDeleteDocumentsStub(final WireMockServer wireMockServer) {
-        String body = new Gson().toJson(new DocumentsDeletePostRequest("${json-unit.any-string}"));
-        wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
-            .withRequestBody(equalToJson(body))
-            .willReturn(buildResponseDefinition(
-                200,
-                new Gson().toJson(new CaseDocumentsDeletionResults(8, 8)))));
-
         DOCUMENT_DELETE.forEach((key, value) ->
-                wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
-                        .withRequestBody(equalToJson(new Gson().toJson(new DocumentsDeletePostRequest(key))))
-                        .willReturn(buildResponseDefinition(200, new Gson().toJson(value)))));
+            wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
+               .withRequestBody(matchingJsonPath("$.caseRef", equalTo(key)))
+               .willReturn(buildResponseDefinition(200, new Gson().toJson(value)))
+               .atPriority(1)
+            )
+        );
+        wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
+            .withRequestBody(matchingJsonPath("$.caseRef"))
+            .willReturn(buildResponseDefinition(
+               200,
+                new Gson().toJson(new CaseDocumentsDeletionResults(8, 8))
+            )).atPriority(10));
     }
 
+
     private void setupDeleteRolesStub(final WireMockServer wireMockServer) {
-        String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
-        wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
-            .withRequestBody(equalToJson(body))
-            .willReturn(buildResponseDefinition(200)));
 
         ROLE_DELETE.forEach((key, value) ->
-               wireMockServer.stubFor(post(urlPathMatching(ROLES_DELETE_PATH))
-                      .withRequestBody(equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
-                      .willReturn(buildResponseDefinition(value))));
+            wireMockServer.stubFor(
+                post(urlPathMatching(ROLES_DELETE_PATH))
+                    .withRequestBody(
+                        matchingJsonPath("$.queryRequests[0].attributes.caseId[0]", equalTo(key))
+                    ).willReturn(buildResponseDefinition(value)).atPriority(1)
+            )
+        );
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(ROLES_DELETE_PATH))
+                .withRequestBody(
+                    matchingJsonPath("$.queryRequests[0].attributes.caseId[0]")
+                )
+                .willReturn(buildResponseDefinition(200))
+                .atPriority(10)
+        );
     }
 
     private void setupQueryRolesStub(final WireMockServer wireMockServer) {
-        String body = new Gson().toJson(new RoleAssignmentsPostRequest("${json-unit.any-string}"));
-        wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
-            .withRequestBody(equalToJson(body))
-            .willReturn(buildResponseDefinition(200)));
-
         ROLE_QUERY.forEach((key, value) ->
-                 wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
-                         .withRequestBody(equalToJson(new Gson().toJson(new RoleAssignmentsPostRequest(key))))
-                         .willReturn(buildResponseDefinition(value))));
+             wireMockServer.stubFor(post(urlPathMatching(ROLES_QUERY_PATH))
+                  .withRequestBody(
+                      matchingJsonPath("$.queryRequests[0].attributes.caseId[0]", equalTo(key))
+                  )
+                  .willReturn(buildResponseDefinition(value)).atPriority(1)
+             ));
+
+        wireMockServer.stubFor(
+            post(urlPathMatching(ROLES_QUERY_PATH))
+                .withRequestBody(
+                    matchingJsonPath("$.queryRequests[0].attributes.caseId[0]")
+                )
+                .willReturn(buildResponseDefinition(200)).atPriority(10)
+        );
     }
 
     private void setupHearingsStub(final WireMockServer wireMockServer) {
-        String body = "[\"${json-unit.any-string}\"]";
-        wireMockServer.stubFor(delete(urlPathMatching(HEARINGS_DELETE_PATH))
-            .withRequestBody(equalToJson(body))
-            .willReturn(buildResponseDefinition(204)));
-
         HEARINGS_DELETE.forEach((key, value) ->
-               wireMockServer.stubFor(delete(urlPathMatching(HEARINGS_DELETE_PATH))
-                          .withRequestBody(equalToJson("[\"" + key + "\"]"))
-                          .willReturn(buildResponseDefinition(value))));
+            wireMockServer.stubFor(
+                delete(urlPathMatching(HEARINGS_DELETE_PATH))
+                    .withRequestBody(
+                        matchingJsonPath("$[0]", equalTo(key))
+                    ).willReturn(buildResponseDefinition(value)).atPriority(1)
+            )
+        );
+
+        wireMockServer.stubFor(
+            delete(urlPathMatching(HEARINGS_DELETE_PATH))
+                .withRequestBody(
+                    matchingJsonPath("$[0]")   // match ANY array element at index 0
+                ).willReturn(buildResponseDefinition(204)).atPriority(10)
+        );
     }
+
 
     private ResponseDefinitionBuilder buildResponseDefinition(int status) {
         return buildResponseDefinition(status, null);

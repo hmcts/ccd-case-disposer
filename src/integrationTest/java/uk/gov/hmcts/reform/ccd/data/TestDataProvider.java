@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.ccd.data;
 
 import jakarta.inject.Inject;
-import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.ccd.config.WireMockStubs;
 import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchIntegrationTestUtils;
-import uk.gov.hmcts.reform.ccd.utils.RemoteDeletionVerifier;
 import uk.gov.hmcts.reform.ccd.utils.SimulationIntegrationTestUtils;
 
 import java.util.List;
@@ -28,9 +26,6 @@ public class TestDataProvider extends TestContainers {
 
     @Inject
     private DatabaseIntegrationTestUtils databaseIntegrationTestUtils;
-
-    @Autowired
-    private List<RemoteDeletionVerifier> remoteDeletionVerifiers;
 
     @Inject
     private WireMockStubs wireMockStubs;
@@ -66,11 +61,6 @@ public class TestDataProvider extends TestContainers {
 
     protected void verifyDatabaseDeletionSimulation(final List<Long> simulatedEndStateRowIds) {
         simulationIntegrationTestUtils.verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
-    }
-
-    protected void verifyRemoteDeletion(final List<Long> caseRefs) {
-        remoteDeletionVerifiers.forEach(remoteDeletionVerifier ->
-                remoteDeletionVerifier.verifyRemoteDeletion(caseRefs));
     }
 
     private void setSystemProperty(String propertyName, final String value) {

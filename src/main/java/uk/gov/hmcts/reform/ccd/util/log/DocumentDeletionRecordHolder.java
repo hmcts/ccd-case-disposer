@@ -4,31 +4,33 @@ import jakarta.inject.Named;
 import lombok.Getter;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Named
 @Getter
 public class DocumentDeletionRecordHolder {
-    private List<Map<String, CaseDocumentsDeletionResults>> documentDeleteRecordHolderList = new ArrayList<>();
 
-    public void setCaseDocumentsDeletionResults(final String caseRef,
-                                                final CaseDocumentsDeletionResults caseDocumentsDeletionResults) {
-        documentDeleteRecordHolderList.add(Map.of(caseRef, caseDocumentsDeletionResults));
+    private final ConcurrentMap<String, CaseDocumentsDeletionResults>
+        documentDeletionResults = new ConcurrentHashMap<>();
+
+    public void setCaseDocumentsDeletionResults(
+        final String caseRef,
+        final CaseDocumentsDeletionResults caseDocumentsDeletionResults) {
+        documentDeletionResults.put(caseRef, caseDocumentsDeletionResults);
     }
 
-    public CaseDocumentsDeletionResults getCaseDocumentsDeletionResults(final String caseRef) {
-        if (!documentDeleteRecordHolderList.isEmpty()) {
-            final Optional<Map<String, CaseDocumentsDeletionResults>> deletionResultsMap =
-                    documentDeleteRecordHolderList.stream()
-                    .filter(documentHolderEntry -> documentHolderEntry.containsKey(caseRef))
-                    .findFirst();
-            if (deletionResultsMap.isPresent()) {
-                return deletionResultsMap.get().get(caseRef);
-            }
-        }
-        return null;
+    public CaseDocumentsDeletionResults getCaseDocumentsDeletionResults(
+        final String caseRef) {
+        return documentDeletionResults.get(caseRef);
+    }
+
+    public Map<String, CaseDocumentsDeletionResults> snapshot() {
+        return Map.copyOf(documentDeletionResults);
+    }
+
+    public void clear() {
+        documentDeletionResults.clear();
     }
 }

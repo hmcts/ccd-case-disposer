@@ -13,6 +13,7 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.CaseDeletionAsyncService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
@@ -23,13 +24,15 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -49,6 +52,9 @@ class ApplicationExecutorTest {
 
     @Mock
     private CaseDeletionService caseDeletionService;
+
+    @Mock
+    private CaseDeletionAsyncService caseDeletionAsyncService;
 
     @Mock
     private ParameterResolver parameterResolver;
@@ -88,6 +94,9 @@ class ApplicationExecutorTest {
     void testShouldDeleteTheCasesFound() {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
 
+        when(caseDeletionAsyncService.deleteCaseAsync(any()))
+            .thenReturn(CompletableFuture.completedFuture(null));
+
         final List<CaseFamily> caseDataList = List.of(
             new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
             new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList())
@@ -101,8 +110,8 @@ class ApplicationExecutorTest {
         applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDeletionAsyncService, times(1)).deleteCaseAsync(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDeletionAsyncService, times(1)).deleteCaseAsync(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         verify(caseDeletionLoggingService, times(1)).logCases();
         verify(processedCasesRecordHolder, times(2)).addProcessedCase(any());
     }
@@ -111,6 +120,8 @@ class ApplicationExecutorTest {
     void shouldLimitCaseDeletionToRequestsLimit() {
         // Given
         when(parameterResolver.getRequestLimit()).thenReturn(1);
+        when(caseDeletionAsyncService.deleteCaseAsync(any()))
+            .thenReturn(CompletableFuture.completedFuture(null));
 
         final List<CaseFamily> caseDataList = List.of(
             new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
@@ -126,7 +137,7 @@ class ApplicationExecutorTest {
         applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDeletionAsyncService, times(1)).deleteCaseAsync(DELETABLE_CASE_DATA_WITH_PAST_TTL);
         verify(caseDeletionLoggingService, times(1)).logCases();
         verify(processedCasesRecordHolder, times(1)).addProcessedCase(any());
     }
@@ -138,6 +149,8 @@ class ApplicationExecutorTest {
     })
     void shouldNotRunAfterCutoffTime(String firstNow, String secondNow, int expectedDeleteCount) {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
+        when(caseDeletionAsyncService.deleteCaseAsync(any()))
+            .thenReturn(CompletableFuture.completedFuture(null));
         final List<CaseFamily> caseDataList = List.of(
             new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
             new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList()),
@@ -157,34 +170,36 @@ class ApplicationExecutorTest {
         applicationExecutor.execute(1);
 
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(expectedDeleteCount)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDeletionAsyncService, times(expectedDeleteCount)).deleteCaseAsync(DELETABLE_CASE_DATA_WITH_PAST_TTL);
     }
 
     @Test
     void shouldContinueDeletionsAfterLogAndAuditError(CapturedOutput output) {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
 
+        // Simulate async exception for the first case, success for the second
+        when(caseDeletionAsyncService.deleteCaseAsync(DELETABLE_CASE_DATA_WITH_PAST_TTL))
+            .thenReturn(CompletableFuture.failedFuture(new LogAndAuditException("Log and Audit error")));
+        when(caseDeletionAsyncService.deleteCaseAsync(DELETABLE_CASE_DATA4_WITH_PAST_TTL))
+            .thenReturn(CompletableFuture.completedFuture(null));
+
         final List<CaseFamily> caseDataList = List.of(
             new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
             new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList())
         );
 
-        doReturn(caseDataList)
-            .when(caseFindingService).findCasesDueDeletion();
-        doReturn(caseDataList)
-            .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
-        doThrow(new LogAndAuditException("Log and Audit error"))
-            .when(caseDeletionService)
-            .deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        doReturn(caseDataList).when(caseFindingService).findCasesDueDeletion();
+        doReturn(caseDataList).when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
 
         applicationExecutor.execute(1);
 
+        await().atMost(2, TimeUnit.SECONDS).untilAsserted(() ->
+            assertThat(output).asString().contains("LogAndAudit error deleting case")
+        );
         verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDeletionAsyncService, times(1)).deleteCaseAsync(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDeletionAsyncService, times(1)).deleteCaseAsync(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         verify(caseDeletionLoggingService, times(1)).logCases();
-        verify(processedCasesRecordHolder, times(2)).addProcessedCase(any());
-        assertThat(output).asString().contains("Error deleting case:");
-
+        verify(processedCasesRecordHolder, times(1)).addProcessedCase(any());
     }
 }

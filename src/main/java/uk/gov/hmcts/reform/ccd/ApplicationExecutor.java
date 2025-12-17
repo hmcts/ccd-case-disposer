@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
+import uk.gov.hmcts.reform.ccd.service.CaseDeletionAsyncService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
@@ -17,8 +18,11 @@ import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.getCaseData;
 
@@ -28,6 +32,7 @@ import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.getCaseData;
 public class ApplicationExecutor {
     private final CaseFinderService caseFindingService;
     private final CaseDeletionService caseDeletionService;
+    private final CaseDeletionAsyncService caseDeletionAsyncService;
     private final CaseFamiliesFilter caseFamiliesFilter;
     private final ParameterResolver parameterResolver;
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
@@ -63,7 +68,10 @@ public class ApplicationExecutor {
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
 
         log.info("Found deletable cases {}...", allDeletableCases.size());
-        processCases(allDeletableCases, requestLimit);
+        List<CompletableFuture<Void>> futures =
+            processCases(allDeletableCases, requestLimit);
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
         caseDeletionLoggingService.logCases();
 
@@ -78,24 +86,47 @@ public class ApplicationExecutor {
         log.info("Hearing Case Type: {}", parameterResolver.getHearingCaseType());
     }
 
-    private void processCases(final Set<CaseData> cases, int requestLimit) {
+    private List<CompletableFuture<Void>> processCases(final Set<CaseData> cases, int requestLimit) {
         LocalTime cutOffTime = parameterResolver.getCutOffTime();
         // check if we need to add one day to the cut off time
         int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
         cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
 
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        int scheduledCount = 0;
+
         for (CaseData caseData : cases) {
-            if (requestLimit == 0 || isCutOffTimeReached()) {
+            if (scheduledCount >= requestLimit || isCutOffTimeReached()) {
                 break;
             }
-            try {
-                caseDeletionService.deleteCaseData(caseData);
-            } catch (LogAndAuditException logAndAuditException) {
-                log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
-            }
-            requestLimit--;
-            processedCasesRecordHolder.addProcessedCase(caseData);
+
+            CompletableFuture<Void> future =
+                caseDeletionAsyncService.deleteCaseAsync(caseData)
+                    .handle((result, ex) -> {
+                        if (ex == null) {
+                            processedCasesRecordHolder.addProcessedCase(caseData);
+                            return null;
+                        }
+
+                        Throwable cause = ex instanceof CompletionException ? ex.getCause() : ex;
+                        if (cause instanceof LogAndAuditException) {
+                            log.error(
+                                "LogAndAudit error deleting case {}",
+                                caseData.getReference(), cause
+                            );
+                            processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+                            return null;
+                        }
+                        log.error("Unexpected async error deleting case {}",
+                            caseData.getReference(), cause
+                        );
+                        throw new CompletionException(cause);
+                    });
+
+            futures.add(future);
+            scheduledCount++;
         }
+        return futures;
     }
 
     private boolean isCutOffTimeReached() {

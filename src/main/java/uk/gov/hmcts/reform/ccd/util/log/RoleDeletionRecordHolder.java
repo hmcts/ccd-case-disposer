@@ -3,31 +3,31 @@ package uk.gov.hmcts.reform.ccd.util.log;
 import jakarta.inject.Named;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Named
 @Getter
 public class RoleDeletionRecordHolder {
-    private List<Map<String, Integer>> roleDeletionRecordHolderList = new ArrayList<>();
+
+    private final ConcurrentMap<String, Integer> roleDeletionResults =
+        new ConcurrentHashMap<>();
 
     public void setCaseRolesDeletionResults(final String caseRef,
-                                                final int caseRolesDeletionResults) {
-        roleDeletionRecordHolderList.add(Map.of(caseRef, caseRolesDeletionResults));
+                                            final int caseRolesDeletionResults) {
+        roleDeletionResults.put(caseRef, caseRolesDeletionResults);
     }
 
     public int getCaseRolesDeletionResults(final String caseRef) {
-        if (!roleDeletionRecordHolderList.isEmpty()) {
-            final Optional<Map<String, Integer>> deletionResultsMap =
-                roleDeletionRecordHolderList.stream()
-                    .filter(roleHolderEntry -> roleHolderEntry.containsKey(caseRef))
-                    .findFirst();
-            if (deletionResultsMap.isPresent()) {
-                return deletionResultsMap.get().get(caseRef);
-            }
-        }
-        return 0;
+        return roleDeletionResults.getOrDefault(caseRef, 0);
+    }
+
+    public Map<String, Integer> snapshot() {
+        return Map.copyOf(roleDeletionResults);
+    }
+
+    public void clear() {
+        roleDeletionResults.clear();
     }
 }

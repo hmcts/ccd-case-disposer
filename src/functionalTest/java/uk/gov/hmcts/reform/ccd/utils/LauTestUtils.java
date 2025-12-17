@@ -32,6 +32,6 @@ public class LauTestUtils {
                     toStringFunction()
                 )));
 
-        lauRecordHolder.getLauCaseRefList().clear();
+        lauRecordHolder.clear();
     }
 }

@@ -1,7 +1,9 @@
 package uk.gov.hmcts.reform.ccd.data;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkPrimaryKey;
@@ -23,4 +25,9 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
     List<CaseLinkEntity> findByCaseIdInOrLinkedCaseIdIn(final Collection<Long> caseIds);
 
     void delete(CaseLinkEntity caseLinkEntity);
+
+    @Modifying
+    @Query(value = "DELETE FROM case_link WHERE case_id = :caseId OR linked_case_id = :caseId",
+        nativeQuery = true)
+    int deleteCaseLinks(@Param("caseId") Long caseId);
 }

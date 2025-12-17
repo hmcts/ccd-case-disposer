@@ -5,19 +5,20 @@ import lombok.Getter;
 import lombok.Setter;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Named
 @Getter
 public class ProcessedCasesRecordHolder {
 
-    private final Set<Long> failedToDeleteCaseRefs = new HashSet<>();
-    private final Set<CaseData> processedCases = new HashSet<>();
+    private final Set<Long> failedToDeleteCaseRefs = ConcurrentHashMap.newKeySet();
+    private final Set<CaseData> processedCases = ConcurrentHashMap.newKeySet();
 
     @Setter
-    private Set<CaseData> simulatedCases = new HashSet<>();
+    private volatile Set<CaseData> simulatedCases = Collections.emptySet();
 
     public void addFailedToDeleteCaseRef(final CaseData caseData) {
         failedToDeleteCaseRefs.add(caseData.getReference());
@@ -45,6 +46,6 @@ public class ProcessedCasesRecordHolder {
     public void clearState() {
         failedToDeleteCaseRefs.clear();
         processedCases.clear();
-        simulatedCases.clear();
+        simulatedCases = Collections.emptySet();
     }
 }

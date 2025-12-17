@@ -36,7 +36,7 @@ public class HearingDocumentDeleteTestUtils {
             }
         });
 
-        hearingDeletionRecordHolder.getHearingDeletionRecordHolderList().clear();
+        hearingDeletionRecordHolder.clear();
     }
 }
 
