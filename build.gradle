@@ -257,7 +257,7 @@ def versions = [
     springBoot          : springBoot.class.package.implementationVersion,
     testcontainers      : '1.21.4',
     wiremock            : '3.0.1',
-    pactVersion         : '4.6.18',
+    pactVersion         : '4.6.19',
     serenity            : '3.1.20',
 ]
 
