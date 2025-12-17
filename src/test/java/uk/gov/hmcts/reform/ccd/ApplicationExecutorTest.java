@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
@@ -25,12 +26,14 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -202,4 +205,28 @@ class ApplicationExecutorTest {
         verify(caseDeletionLoggingService, times(1)).logCases();
         verify(processedCasesRecordHolder, times(1)).addProcessedCase(any());
     }
+
+    @Test
+    void shouldLogAndRethrowOnUnexpectedAsyncError() {
+        when(parameterResolver.getRequestLimit()).thenReturn(1);
+        CaseData caseData = DELETABLE_CASE_DATA_WITH_PAST_TTL;
+        List<CaseFamily> caseDataList = List.of(new CaseFamily(caseData, List.of()));
+
+        doReturn(caseDataList).when(caseFindingService).findCasesDueDeletion();
+        doReturn(caseDataList).when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
+
+        RuntimeException unexpected = new RuntimeException("Unexpected error");
+        when(caseDeletionAsyncService.deleteCaseAsync(caseData))
+            .thenReturn(CompletableFuture.failedFuture(unexpected));
+
+        assertThrows(
+            CompletionException.class,
+            () -> applicationExecutor.execute(1)
+        );
+
+        verify(caseDeletionAsyncService).deleteCaseAsync(caseData);
+        verify(processedCasesRecordHolder, times(0)).addProcessedCase(any());
+        verify(processedCasesRecordHolder, times(0)).addFailedToDeleteCaseRef(any());
+    }
+
 }

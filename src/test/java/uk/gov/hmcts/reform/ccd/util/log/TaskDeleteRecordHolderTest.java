@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -22,5 +25,29 @@ public class TaskDeleteRecordHolderTest {
         assertThat(tasksDeletionResults_1).isEqualTo(caseTasksDeletionResult_1);
         assertThat(tasksDeletionResults_2).isEqualTo(caseTasksDeletionResult_2);
 
+    }
+
+    @Test
+    void snapshotShouldReturnCurrentState() {
+        TasksDeletionRecordHolder holder = new TasksDeletionRecordHolder();
+        holder.setCaseTasksDeletionResults("case1", 10);
+        holder.setCaseTasksDeletionResults("case2", 20);
+
+        Map<String, Integer> snapshot = holder.snapshot();
+
+        Assertions.assertThat(snapshot).hasSize(2);
+        Assertions.assertThat(snapshot).containsEntry("case1", 10);
+        Assertions.assertThat(snapshot).containsEntry("case2", 20);
+    }
+
+    @Test
+    void clearShouldRemoveAllEntries() {
+        TasksDeletionRecordHolder holder = new TasksDeletionRecordHolder();
+        holder.setCaseTasksDeletionResults("case1", 10);
+        holder.setCaseTasksDeletionResults("case2", 20);
+
+        holder.clear();
+
+        Assertions.assertThat(holder.snapshot()).isEmpty();
     }
 }

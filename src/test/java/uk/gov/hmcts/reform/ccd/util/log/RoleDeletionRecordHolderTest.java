@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.ccd.util.log;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -29,5 +32,29 @@ class RoleDeletionRecordHolderTest {
 
         assertThat(caseRolesDeletionBeforeCaseRefMapping_2)
             .isEqualTo(caseRolesDeletionResults_2);
+    }
+
+    @Test
+    void snapshotShouldReturnCurrentState() {
+        RoleDeletionRecordHolder holder = new RoleDeletionRecordHolder();
+        holder.setCaseRolesDeletionResults("case1", 200);
+        holder.setCaseRolesDeletionResults("case2", 404);
+
+        Map<String, Integer> snapshot = holder.snapshot();
+
+        Assertions.assertThat(snapshot).hasSize(2);
+        Assertions.assertThat(snapshot).containsEntry("case1", 200);
+        Assertions.assertThat(snapshot).containsEntry("case2", 404);
+    }
+
+    @Test
+    void clearShouldRemoveAllEntries() {
+        RoleDeletionRecordHolder holder = new RoleDeletionRecordHolder();
+        holder.setCaseRolesDeletionResults("case1", 200);
+        holder.setCaseRolesDeletionResults("case2", 404);
+
+        holder.clear();
+
+        Assertions.assertThat(holder.snapshot()).isEmpty();
     }
 }
