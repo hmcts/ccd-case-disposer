@@ -47,9 +47,8 @@ class HearingDeletionRecordHolderTest {
 
         Map<String, Integer> snapshot = holder.snapshot();
 
-        Assertions.assertThat(snapshot).hasSize(2);
-        Assertions.assertThat(snapshot).containsEntry("case1", 200);
-        Assertions.assertThat(snapshot).containsEntry("case2", 404);
+        Assertions.assertThat(snapshot).hasSize(2)
+            .containsEntry("case1", 200).containsEntry("case2", 404);
     }
 
     @Test

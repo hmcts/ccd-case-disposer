@@ -22,7 +22,6 @@ import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,8 +86,6 @@ class CaseDeletionServiceTest {
 
     @Test
     void shouldDeleteCaseWithLinkedCases() {
-        final List<CaseLinkEntity> linkedCaseEntity = List.of(caseLinkEntity1, caseLinkEntity2);
-
         doReturn(0).when(caseEventSignificantItemsRepository).deleteByCaseDataId(anyLong());
         doReturn(0).when(caseEventRepository).deleteByCaseDataId(anyLong());
         doNothing().when(caseDataRepository).delete(any(CaseDataEntity.class));

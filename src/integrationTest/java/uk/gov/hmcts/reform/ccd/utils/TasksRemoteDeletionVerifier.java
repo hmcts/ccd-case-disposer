@@ -33,7 +33,7 @@ public class TasksRemoteDeletionVerifier implements RemoteDeletionVerifier<Map<S
         caseRefs.forEach(caseRef -> {
             String caseRefStr = caseRef.toString();
             int expected = TASKS_DELETE.getOrDefault(caseRefStr, 201);
-            assertThat(snapshot.get(caseRefStr)).isEqualTo(expected);
+            assertThat(expected).isEqualTo(snapshot.get(caseRefStr));
         });
     }
 }

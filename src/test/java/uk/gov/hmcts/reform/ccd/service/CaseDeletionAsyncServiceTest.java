@@ -19,7 +19,7 @@ class CaseDeletionAsyncServiceTest {
     private final CaseDeletionAsyncService asyncService = new CaseDeletionAsyncService(caseDeletionService);
 
     @Test
-    void shouldCompleteSuccessfullyWhenNoException() throws Exception {
+    void shouldCompleteSuccessfullyWhenNoException() {
         CaseData caseData = mock(CaseData.class);
 
         CompletableFuture<Void> future = asyncService.deleteCaseAsync(caseData);

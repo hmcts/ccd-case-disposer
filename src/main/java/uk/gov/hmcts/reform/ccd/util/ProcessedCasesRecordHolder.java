@@ -18,7 +18,7 @@ public class ProcessedCasesRecordHolder {
     private final Set<CaseData> processedCases = ConcurrentHashMap.newKeySet();
 
     @Setter
-    private volatile Set<CaseData> simulatedCases = Collections.emptySet();
+    private Set<CaseData> simulatedCases = ConcurrentHashMap.newKeySet();
 
     public void addFailedToDeleteCaseRef(final CaseData caseData) {
         failedToDeleteCaseRefs.add(caseData.getReference());

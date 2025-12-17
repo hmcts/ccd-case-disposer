@@ -49,8 +49,7 @@ class DocumentDeletionRecordHolderTest {
 
         Map<String, CaseDocumentsDeletionResults> snapshot = holder.snapshot();
 
-        Assertions.assertThat(snapshot).hasSize(2);
-        Assertions.assertThat(snapshot).containsKeys("case1", "case2");
+        Assertions.assertThat(snapshot).hasSize(2).containsKeys("case1", "case2");
         assertThat(snapshot.get("case1").getCaseDocumentsFound()).isEqualTo(1);
         assertThat(snapshot.get("case2").getMarkedForDeletion()).isEqualTo(4);
     }
