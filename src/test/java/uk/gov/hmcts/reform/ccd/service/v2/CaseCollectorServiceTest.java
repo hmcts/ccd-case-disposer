@@ -10,14 +10,18 @@ import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.exception.JobInterruptedException;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -135,6 +139,41 @@ class CaseCollectorServiceTest {
         result = service.getDeletableCases(List.of());
         assertThat(result).isEmpty();
         verify(caseDataRepository, times(0)).findExpiredCases(any());
+    }
+
+    @Test
+    void getDeletableCases_ThrowsJobInterruptedException_WhenThreadInterruptedAtStart() {
+        Thread.currentThread().interrupt();
+        given(caseDataRepository.findExpiredCases(anyList())).willReturn(List.of(entity(1)));
+
+        assertThatThrownBy(() -> service.getDeletableCases(List.of("TYPE")))
+            .isInstanceOf(JobInterruptedException.class);
+
+        // clear interruption for other tests
+        Thread.interrupted();
+    }
+
+    @Test
+    void getDeletableCases_ThrowsJobInterruptedException_DuringLinkTraversal() {
+        AtomicBoolean firstCalled = new AtomicBoolean(true);
+        // not interrupted at start, but will be during traversal
+        given(caseDataRepository.findExpiredCases(anyList())).willReturn(List.of(entity(1), entity(2)));
+
+        given(caseLinkRepository.findByCaseIdInOrLinkedCaseIdIn(anySet()))
+            .willAnswer(inv -> {
+                if (firstCalled.getAndSet(false)) {
+                    return List.of(link(1, 2), link(2, 3));
+                } else {
+                    Thread.currentThread().interrupt();
+                    return List.of(link(1, 2));
+                }
+            });
+
+        assertThatThrownBy(() -> service.getDeletableCases(List.of("TYPE")))
+            .isInstanceOf(JobInterruptedException.class);
+
+        // clear interrupt flag
+        Thread.interrupted();
     }
 
     private static CaseDataEntity entity(long id) {
