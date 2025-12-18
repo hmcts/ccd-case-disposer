@@ -9,12 +9,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.core.task.TaskExecutor;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
+import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 
@@ -58,13 +60,31 @@ class ApplicationExecutorTest {
     private CaseDeletionLoggingService caseDeletionLoggingService;
 
     @Mock
+    private CaseCollectorService caseCollectorService;
+
+    @Mock
     private Clock clock;
+
+    @Mock
+    TaskExecutor taskExecutor;
 
     @InjectMocks
     private ApplicationExecutor applicationExecutor;
 
     @BeforeEach
     void setUp() {
+        TaskExecutor synchronousExecutor = Runnable::run;
+        applicationExecutor = new ApplicationExecutor(
+            caseFindingService,
+            caseDeletionService,
+            caseFamiliesFilter,
+            parameterResolver,
+            processedCasesRecordHolder,
+            caseDeletionLoggingService,
+            caseCollectorService,
+            synchronousExecutor,
+            clock
+        );
         when(clock.instant()).thenReturn(Clock.systemUTC().instant());
         when(clock.getZone()).thenReturn(Clock.systemUTC().getZone());
         when(parameterResolver.getCutOffTime()).thenReturn(CUT_OFF_TIME);

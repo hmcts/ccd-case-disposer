@@ -41,9 +41,9 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         processedCasesRecordHolder.clearState();
 
         // WHEN
-        executor.execute(2);
+        executor.execute(1);
         // !TODO remove it. Not a solution, only to check that tests pass
-        Thread.currentThread().sleep(10000);
+        Thread.currentThread().sleep(5000);
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
         verifyRemoteDeletion(deletableCaseRefs);
@@ -70,7 +70,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         // WHEN
         executor.execute(2);
         // !TODO remove it. Not a solution, only to check that tests pass
-        Thread.currentThread().sleep(10000);
+        Thread.currentThread().sleep(5000);
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
