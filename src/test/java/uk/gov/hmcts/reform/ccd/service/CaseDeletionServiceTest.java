@@ -10,14 +10,12 @@ import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseEventSignificantItemsRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.DocumentDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.ElasticsearchOperationException;
 import uk.gov.hmcts.reform.ccd.exception.HearingDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.exception.RoleAssignmentDeletionException;
-import uk.gov.hmcts.reform.ccd.fixture.CaseLinkEntityBuilder;
 import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
@@ -62,9 +60,6 @@ class CaseDeletionServiceTest {
     private CaseDeletionService underTest;
 
     private final CaseData caseData = new CaseData(1L, 1L, DELETABLE_CASE_TYPE, JURISDICTION, YESTERDAY, 1L, null);
-
-    private final CaseLinkEntity caseLinkEntity1 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 10L).build();
-    private final CaseLinkEntity caseLinkEntity2 = new CaseLinkEntityBuilder(1L, DELETABLE_CASE_TYPE, 11L).build();
 
     @Test
     void shouldDeleteCase() {
