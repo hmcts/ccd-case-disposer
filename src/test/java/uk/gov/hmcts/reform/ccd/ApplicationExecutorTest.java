@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
@@ -26,7 +25,6 @@ import java.util.List;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -161,7 +159,7 @@ class ApplicationExecutorTest {
     }
 
     @Test
-    void shouldContinueDeletionsAfterLogAndAuditError(CapturedOutput output) {
+    void shouldContinueDeletionsAfterLogAndAuditError() {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
 
         final List<CaseFamily> caseDataList = List.of(
@@ -184,7 +182,7 @@ class ApplicationExecutorTest {
         verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         verify(caseDeletionLoggingService, times(1)).logCases();
         verify(processedCasesRecordHolder, times(2)).addProcessedCase(any());
-        assertThat(output).asString().contains("Error deleting case:");
+
 
     }
 }

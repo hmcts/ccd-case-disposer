@@ -18,8 +18,14 @@ import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.getCaseData;
 
@@ -86,17 +92,38 @@ public class ApplicationExecutor {
         int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
         cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
 
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        List<Future<?>> futures = new ArrayList<>();
+
         for (CaseData caseData : cases) {
             if (requestLimit == 0 || isCutOffTimeReached()) {
                 break;
             }
-            try {
-                caseDeletionService.deleteCaseData(caseData);
-            } catch (LogAndAuditException logAndAuditException) {
-                log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
-            }
+
+            futures.add(executor.submit(() -> {
+                try {
+                    caseDeletionService.deleteCaseData(caseData);
+                } catch (LogAndAuditException e) {
+                    log.error("Error deleting case {}", caseData.getReference(), e);
+                }
+                processedCasesRecordHolder.addProcessedCase(caseData);
+            }));
+
             requestLimit--;
-            processedCasesRecordHolder.addProcessedCase(caseData);
+        }
+
+        executor.shutdown();
+
+        try {
+            executor.awaitTermination(1, TimeUnit.HOURS);
+            for (Future<?> future : futures) {
+                future.get(); // propagate unexpected failures
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Job interrupted");
+        } catch (ExecutionException e) {
+            throw new RuntimeException("Worker task failed", e);
         }
     }
 
