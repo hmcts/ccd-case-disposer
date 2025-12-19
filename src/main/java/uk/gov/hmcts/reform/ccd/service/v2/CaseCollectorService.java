@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
+import uk.gov.hmcts.reform.ccd.exception.JobInterruptedException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ public class CaseCollectorService {
         Set<CaseData> deletableCases = new HashSet<>();
         Set<Long> expiredIds = expiredCases.stream().map(CaseData::getId).collect(Collectors.toUnmodifiableSet());
         for (CaseData caseData : expiredCases) {
+            checkIfInterrupted();
             if (areAllLinksDeletable(caseData.getId(), expiredIds)) {
                 deletableCases.add(caseData);
             }
@@ -50,6 +52,7 @@ public class CaseCollectorService {
             List<CaseLinkEntity> links = caseLinkRepository.findByCaseIdInOrLinkedCaseIdIn(queue);
             queue.clear();
             for (CaseLinkEntity caseLinkEntity : links) {
+                checkIfInterrupted();
                 Long leftCaseId = caseLinkEntity.getCaseId();
                 Long rightCaseId = caseLinkEntity.getLinkedCaseId();
 
@@ -99,4 +102,11 @@ public class CaseCollectorService {
         return cases;
     }
 
+    private void checkIfInterrupted() {
+        if (Thread.currentThread().isInterrupted()) {
+            log.warn("Interrupted during case collection");
+            Thread.currentThread().interrupt();
+            throw new JobInterruptedException();
+        }
+    }
 }

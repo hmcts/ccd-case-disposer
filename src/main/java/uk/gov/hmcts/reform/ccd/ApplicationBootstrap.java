@@ -12,7 +12,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import uk.gov.hmcts.reform.ccd.async.TimedJobExecutor;
+import uk.gov.hmcts.reform.ccd.exception.JobInterruptedException;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
+
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @SpringBootApplication
@@ -22,8 +27,16 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 public class ApplicationBootstrap implements ApplicationRunner {
 
+    public static final String MARKER = "CCD-Case-Disposer";
+
     @Inject
     private ApplicationExecutor applicationExecutor;
+
+    @Inject
+    private TimedJobExecutor timedJobExecutor;
+
+    @Value("${case-collector.max-run-duration-minutes:480}")
+    private Long timeoutInMinutes = 480L;
 
     @Autowired
     private TelemetryClient client;
@@ -39,13 +52,16 @@ public class ApplicationBootstrap implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        Duration timeout = Duration.ofMinutes(timeoutInMinutes);
         try {
-            log.info("Starting the Case-Disposer job.");
+            log.info("[{}] Starting the Case-Disposer job.", MARKER);
             securityUtil.generateTokens();
-            applicationExecutor.execute(caseCollectorVersion);
-            log.info("Completed the Case-Disposer job successfully.");
-        } catch (Exception e) {
-            log.error("Error executing Case-Disposer job.", e);
+            timedJobExecutor.runWithTimeout(() -> applicationExecutor.execute(caseCollectorVersion), timeout);
+            log.info("[{}] Completed the Case-Disposer job successfully.", MARKER);
+        } catch (TimeoutException | JobInterruptedException e) {
+            log.error("[{}] Timed out waiting for the job to complete.", MARKER);
+        } catch (RuntimeException e) {
+            log.error("[{}] Error executing Case-Disposer job.", MARKER, e);
         } finally {
             client.flush();
             waitTelemetryGracefulPeriod();
