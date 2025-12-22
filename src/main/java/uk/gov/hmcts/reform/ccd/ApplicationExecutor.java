@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.ccd;
 
-import com.google.common.base.Stopwatch;
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
+import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -39,10 +39,10 @@ public class ApplicationExecutor {
     private LocalDateTime applicationStartTime;
     private LocalDateTime cutOff;
 
+    @LogExecutionTime("Case-disposer")
     public void execute(int version) {
         logParameters();
         applicationStartTime = LocalDateTime.now(clock);
-        final Stopwatch timer = Stopwatch.createStarted();
         log.info("Case-Disposer started...");
         Set<CaseData> allDeletableCases;
         Set<CaseData> simulatedCases;
@@ -70,12 +70,6 @@ public class ApplicationExecutor {
         caseDeletionLoggingService.logCases();
 
         log.info("Case-Disposer finished.");
-
-        log.debug(
-            "Performance: Case disposer took {} to process {} cases",
-            timer.stop(),
-            Math.min(allDeletableCases.size(), requestLimit)
-        );
     }
 
     private void logParameters() {
@@ -92,21 +86,17 @@ public class ApplicationExecutor {
         int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
         cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
 
-        final Stopwatch timer = Stopwatch.createUnstarted();
         for (CaseData caseData : cases) {
             if (requestLimit == 0 || isCutOffTimeReached()) {
                 break;
             }
             try {
-                timer.start();
                 caseDeletionService.deleteCaseData(caseData);
             } catch (LogAndAuditException logAndAuditException) {
                 log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
             }
             requestLimit--;
             processedCasesRecordHolder.addProcessedCase(caseData);
-            log.debug("Performance: case {} took {} to delete", caseData.getReference(), timer.stop());
-            timer.reset();
         }
     }
 

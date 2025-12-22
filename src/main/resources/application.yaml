@@ -84,3 +84,8 @@ case-collector:
 logging:
   level:
     uk.gov.hmcts.reform.ccd: ${CCD_DISPOSER_LOG_LEVEL:info}
+    uk.gov.hmcts.reform.ccd.util.perf: ${CCD_DISPOSER_PERF_LOG_LEVEL:debug}
+
+performance:
+  logging:
+    enabled: ${CCD_DISPOSER_PERF_LOGGING_ENABLED:false}
