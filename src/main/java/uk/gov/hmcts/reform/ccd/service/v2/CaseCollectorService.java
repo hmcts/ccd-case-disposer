@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.JobInterruptedException;
+import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ public class CaseCollectorService {
     private final CaseDataRepository caseDataRepository;
     private final CaseLinkRepository caseLinkRepository;
 
+    @LogExecutionTime("Collect deletable cases")
     public Set<CaseData> getDeletableCases(List<String> caseTypes) {
         if (caseTypes == null || caseTypes.isEmpty()) {
             return new HashSet<>();
