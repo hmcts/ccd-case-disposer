@@ -56,9 +56,4 @@ public class DisposeTasksRemoteOperation implements DisposeRemoteOperation {
             tasksDeletePostRequest
         );
     }
-
-    @Override
-    public String toString() {
-        return "Task Disposer";
-    }
 }

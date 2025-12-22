@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import com.google.common.base.Stopwatch;
 import com.google.gson.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.LauClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
+import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.text.SimpleDateFormat;
 
@@ -33,10 +33,9 @@ public class LogAndAuditRemoteOperation {
 
     private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-
+    @LogExecutionTime("Log and Audit")
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
         try {
-            Stopwatch timer = Stopwatch.createStarted();
             final CaseActionPostRequestResponse caseActionPostRequestResponse =
                 buildCaseActionPostRequest(caseData);
             final ResponseEntity<CaseActionPostRequestResponse> logAndAuditPostResponse = lauClient.postLauAudit(
@@ -55,8 +54,6 @@ public class LogAndAuditRemoteOperation {
 
                 throw new LogAndAuditException(errorMessage);
             }
-            log.debug("Performance: {} post message took {}", this, timer.stop());
-
         } catch (final Exception exception) {
             final String errorMessage = String.format(
                 "Error posting to Log and Audit for case : %s",
@@ -99,10 +96,5 @@ public class LogAndAuditRemoteOperation {
 
     private String getTimestamp() {
         return new SimpleDateFormat(TIMESTAMP_PATTERN).format(valueOf(now()));
-    }
-
-    @Override
-    public String toString() {
-        return "Log And Audit";
     }
 }
