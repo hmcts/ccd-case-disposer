@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,8 +10,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.OutputCaptureExtension;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.JobInterruptedException;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
@@ -24,10 +27,18 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -66,14 +77,20 @@ class ApplicationExecutorTest {
     private Clock clock;
 
     @Mock
-    TaskExecutor taskExecutor;
+    ThreadPoolTaskExecutor taskExecutor;
 
     @InjectMocks
     private ApplicationExecutor applicationExecutor;
 
     @BeforeEach
     void setUp() {
-        TaskExecutor synchronousExecutor = Runnable::run;
+        ThreadPoolTaskExecutor testExecutor = new ThreadPoolTaskExecutor();
+        testExecutor.setCorePoolSize(1);
+        testExecutor.setMaxPoolSize(1);
+        testExecutor.setQueueCapacity(0);
+        testExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        testExecutor.setThreadNamePrefix("test-executor-");
+        testExecutor.initialize();
         applicationExecutor = new ApplicationExecutor(
             caseFindingService,
             caseDeletionService,
@@ -82,7 +99,7 @@ class ApplicationExecutorTest {
             processedCasesRecordHolder,
             caseDeletionLoggingService,
             caseCollectorService,
-            synchronousExecutor,
+            testExecutor,
             clock
         );
         when(clock.instant()).thenReturn(Clock.systemUTC().instant());
@@ -181,28 +198,91 @@ class ApplicationExecutorTest {
     @Test
     void shouldContinueDeletionsAfterLogAndAuditError() {
         when(parameterResolver.getRequestLimit()).thenReturn(10);
+        when(parameterResolver.getDeletableCaseTypes()).thenReturn(List.of("TEST"));
 
-        final List<CaseFamily> caseDataList = List.of(
-            new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL, emptyList()),
-            new CaseFamily(DELETABLE_CASE_DATA4_WITH_PAST_TTL, emptyList())
+        Set<CaseData> caseDataSet = Set.of(
+            DELETABLE_CASE_DATA_WITH_PAST_TTL,
+            DELETABLE_CASE_DATA4_WITH_PAST_TTL
         );
 
-        doReturn(caseDataList)
-            .when(caseFindingService).findCasesDueDeletion();
-        doReturn(caseDataList)
-            .when(caseFamiliesFilter).getDeletableCasesOnly(caseDataList);
+        doReturn(caseDataSet)
+            .when(caseCollectorService).getDeletableCases(List.of("TEST"));
         doThrow(new LogAndAuditException("Log and Audit error"))
             .when(caseDeletionService)
-            .deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
+            .deleteCaseData(any(CaseData.class));
 
-        applicationExecutor.execute(1);
+        applicationExecutor.execute(2);
 
-        verify(caseFindingService).findCasesDueDeletion();
-        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDeletionService, times(1)).deleteCaseData(DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseCollectorService).getDeletableCases(List.of("TEST"));
+        verify(caseDeletionService, times(2)).deleteCaseData(any());
         verify(caseDeletionLoggingService, times(1)).logCases();
         verify(processedCasesRecordHolder, times(2)).addProcessedCase(any());
+    }
 
+    @Test
+    void shouldWaitForAllTasksToComplete() throws Exception {
+        when(parameterResolver.getRequestLimit()).thenReturn(2);
 
+        Set<CaseData> cases = Set.of(
+            DELETABLE_CASE_DATA_WITH_PAST_TTL,
+            DELETABLE_CASE_DATA4_WITH_PAST_TTL
+        );
+
+        doReturn(cases)
+            .when(caseCollectorService)
+            .getDeletableCases(any());
+
+        CountDownLatch latch = new CountDownLatch(2);
+
+        doAnswer(invocation -> {
+            latch.countDown();
+            return null;
+        }).when(caseDeletionService).deleteCaseData(any());
+
+        long start = System.currentTimeMillis();
+
+        applicationExecutor.execute(2);
+
+        long duration = System.currentTimeMillis() - start;
+
+        assertThat(latch.await(0, TimeUnit.SECONDS)).isTrue();
+        assertThat(duration).isGreaterThanOrEqualTo(0);
+
+        verify(caseDeletionService, times(2)).deleteCaseData(any());
+    }
+
+    @Test
+    void shouldCancelRunningTasksOnInterruption() {
+        when(parameterResolver.getRequestLimit()).thenReturn(2);
+
+        Set<CaseData> cases = Set.of(
+            DELETABLE_CASE_DATA_WITH_PAST_TTL,
+            DELETABLE_CASE_DATA4_WITH_PAST_TTL
+        );
+
+        doReturn(cases)
+            .when(caseCollectorService)
+            .getDeletableCases(any());
+
+        doAnswer(invocation -> {
+            Thread.sleep(5_000); // long task
+            return null;
+        }).when(caseDeletionService).deleteCaseData(any());
+
+        Thread testThread = new Thread(() -> {
+            assertThatThrownBy(() -> applicationExecutor.execute(2))
+                .isInstanceOf(JobInterruptedException.class);
+        });
+
+        testThread.start();
+
+        // allow tasks to start
+        Awaitility.await()
+            .atMost(1, TimeUnit.SECONDS)
+            .untilAsserted(() ->
+                               verify(caseDeletionService, atLeastOnce()).deleteCaseData(any())
+            );
+
+        testThread.interrupt();
     }
 }
