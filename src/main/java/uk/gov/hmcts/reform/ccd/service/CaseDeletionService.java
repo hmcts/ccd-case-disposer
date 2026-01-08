@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
 import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
+import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.util.Optional;
 
@@ -33,6 +34,7 @@ public class CaseDeletionService {
     private final LogAndAuditRemoteOperation logAndAuditRemoteOperation;
 
     @Transactional
+    @LogExecutionTime("Delete case")
     public void deleteCaseData(@NonNull final CaseData caseData) {
         if (deleteCaseLinks(caseData)) {
             deleteCase(caseData);

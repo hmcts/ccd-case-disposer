@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
+import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -46,6 +47,7 @@ public class ApplicationExecutor {
     private LocalDateTime applicationStartTime;
     private LocalDateTime cutOff;
 
+    @LogExecutionTime("Case-disposer")
     public void execute(int version) {
         logParameters();
         applicationStartTime = LocalDateTime.now(clock);
