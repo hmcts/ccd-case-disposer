@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.data.CaseEventRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseEventSignificantItemsRepository;
 import uk.gov.hmcts.reform.ccd.data.CaseLinkRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
-import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.service.remote.LogAndAuditRemoteOperation;
@@ -19,7 +18,6 @@ import uk.gov.hmcts.reform.ccd.service.remote.RemoteDisposeService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
-import java.util.List;
 import java.util.Optional;
 
 @Named
@@ -52,14 +50,9 @@ public class CaseDeletionService {
      */
     boolean deleteCaseLinks(final CaseData caseData) {
         try {
-            final List<CaseLinkEntity> allLinkedCases = caseLinkRepository.findByCaseIdOrLinkedCaseId(caseData.getId());
-            if (allLinkedCases.isEmpty()) {
-                log.info("No linked cases found for case reference:: {}", caseData.getReference());
-            } else {
-                log.info("About to delete linked case reference:: {}", caseData.getReference());
-                caseLinkRepository.deleteAll(allLinkedCases);
-                log.info("Deleted linked case reference:: {}", caseData.getReference());
-            }
+            log.info("About to delete linked case reference:: {}", caseData.getReference());
+            caseLinkRepository.deleteByCaseIdOrLinkedCaseId(caseData.getId());
+            log.info("Deleted linked case reference:: {}", caseData.getReference());
             return true;
         } catch (final Exception exception) { // Catch all exceptions
             log.error("Could not delete linked case reference:: {}", caseData.getReference(), exception);
