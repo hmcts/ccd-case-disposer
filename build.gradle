@@ -306,7 +306,7 @@ dependencies {
     implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.6'
     implementation group: 'ch.qos.logback.access', name: 'common', version: '2.0.3'
 
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.8'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.9'
     implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
     implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: versions.elasticsearch
 
