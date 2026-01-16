@@ -5,6 +5,7 @@ import lombok.Getter;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,7 +13,8 @@ import java.util.Optional;
 @Named
 @Getter
 public class DocumentDeletionRecordHolder {
-    private List<Map<String, CaseDocumentsDeletionResults>> documentDeleteRecordHolderList = new ArrayList<>();
+    private List<Map<String, CaseDocumentsDeletionResults>> documentDeleteRecordHolderList =
+        Collections.synchronizedList(new ArrayList<>());
 
     public void setCaseDocumentsDeletionResults(final String caseRef,
                                                 final CaseDocumentsDeletionResults caseDocumentsDeletionResults) {
