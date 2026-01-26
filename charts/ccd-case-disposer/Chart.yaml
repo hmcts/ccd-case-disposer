@@ -11,11 +11,11 @@ dependencies:
     version: ~2.2.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
   - name: elasticsearch
-    version: 7.17.3
+    version: 9.2.4
     repository: 'https://helm.elastic.co'
     condition: elastic.enabled
   - name: logstash
-    version: 8.5.1
+    version: 9.2.4
     repository: 'https://helm.elastic.co'
     condition: elastic.enabled
   - name: ccd
