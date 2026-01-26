@@ -16,6 +16,7 @@ job:
     DATA_STORE_DB_OPTIONS: "?sslmode=allow"
     ELASTIC_SEARCH_ENABLED: true
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
+    ELASTIC_SEARCH_SCHEME: http
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
     DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
     TASKS_HOST: http://wa-task-management-api-aat.service.core-compute-aat.internal
@@ -30,20 +31,21 @@ elastic:
   enabled: true
 
 elasticsearch:
+  image: 'hmctsprod.azurecr.io/imported/elastic/elasticsearch'
+  imageTag: 9.3.4
   nameOverride: ${SERVICE_NAME}-es
   ingressHost: es-${SERVICE_FQDN}
   clusterName: "es"
+  createCert: false
+  protocol: http
   replicas: 1
   minimumMasterNodes: 1
   antiAffinity: "soft"
   esJavaOpts: "-Xmx512m -Xms512m"
-  extraEnvs:
-    - name: discovery.type
-      value: single-node
-    - name: cluster.initial_master_nodes
-      value: ""
-    - name: action.auto_create_index
-      value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
+  esConfig:
+    elasticsearch.yml: |
+      action.auto_create_index: .security*,.watches,.triggered_watches,.watcher-history-*,.ml*,ccd-logstash-dead-letter
+      xpack.security.enabled: false
   persistence:
     enabled: false
   ingress:
@@ -56,14 +58,14 @@ elasticsearch:
       - es-${SERVICE_FQDN}
 
 logstash:
-  image: "hmctsprod.azurecr.io/imported/logstash/logstash"
-  imageTag: "7.16.1"
+  image: "hmctsprod.azurecr.io/imported/elastic/logstash"
+  imageTag: "9.2.4"
   imagePullPolicy: "IfNotPresent"
   logstashJavaOpts: "-Xmx1g -Xms512M"
   extraInitContainers: |
     - name: download-postgres-jdbc
       image: hmctsprod.azurecr.io/curl:7.70.0
-      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
+      command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.9.jar', '-o', '/logstash-lib/postgresql.jar']
       volumeMounts:
       - name: logstash-lib
         mountPath: /logstash-lib
@@ -75,11 +77,12 @@ logstash:
       mountPath: /usr/share/logstash/ccd
   logstashConfig:
     logstash.yml: |
-      http.host: 0.0.0.0
+      api.http.host: 0.0.0.0
       xpack.monitoring.enabled: false
       xpack.monitoring.elasticsearch.hosts: ["http://${SERVICE_NAME}-es-master:9200"]
       queue.type: persisted
       dead_letter_queue.enable: true
+      pipeline.ecs_compatibility: disabled
     pipelines.yml: |
       - pipeline.id: main
         path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
