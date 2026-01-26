@@ -3,7 +3,7 @@ appVersion: "1.0"
 description: A Helm chart for ccd-case-disposer App
 name: ccd-case-disposer
 home: https://github.com/hmcts/ccd-case-disposer
-version:  0.2.33
+version:  0.2.34
 maintainers:
   - name: HMCTS CCD Team
 dependencies:
@@ -11,11 +11,11 @@ dependencies:
     version: ~2.2.0
     repository: 'oci://hmctspublic.azurecr.io/helm'
   - name: elasticsearch
-    version: 7.17.3
+    version: 9.2.4
     repository: 'https://helm.elastic.co'
     condition: elastic.enabled
   - name: logstash
-    version: 8.5.1
+    version: 9.2.4
     repository: 'https://helm.elastic.co'
     condition: elastic.enabled
   - name: ccd
