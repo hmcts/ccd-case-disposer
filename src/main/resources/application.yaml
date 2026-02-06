@@ -73,9 +73,9 @@ smoke.test.enabled: false
 app.insights.log.size: ${CASE_DISPOSER_SUMMARY_LOG_SIZE:250}
 
 thread:
-  max_pool_size: ${THREAD_MAX_POOL_SIZE:10}
+  max_pool_size: ${THREAD_MAX_POOL_SIZE:5}
   core_pool_size: ${THREAD_CORE_POOL_SIZE:5}
-  queue_capacity: ${THREAD_QUEUE_CAPACITY:200}
+  queue_capacity: ${THREAD_QUEUE_CAPACITY:100}
 
 case-collector:
   version: ${CASE_COLLECTOR_VERSION:1}
