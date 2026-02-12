@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.LauClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
+import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.text.SimpleDateFormat;
 
@@ -32,7 +33,7 @@ public class LogAndAuditRemoteOperation {
 
     private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
-
+    @LogExecutionTime("Log and Audit")
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
         try {
             final CaseActionPostRequestResponse caseActionPostRequestResponse =
@@ -53,8 +54,6 @@ public class LogAndAuditRemoteOperation {
 
                 throw new LogAndAuditException(errorMessage);
             }
-
-
         } catch (final Exception exception) {
             final String errorMessage = String.format(
                 "Error posting to Log and Audit for case : %s",
