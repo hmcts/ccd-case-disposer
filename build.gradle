@@ -232,7 +232,7 @@ def versions = [
     junitPlatform       : '1.13.4',
     lombok              : '1.18.42',
     springBoot          : springBoot.class.package.implementationVersion,
-    testcontainers      : '1.21.3',
+    testcontainers      : '1.21.4',
     pactVersion         : '4.6.18',
 ]
 
