@@ -233,7 +233,7 @@ def versions = [
     lombok              : '1.18.42',
     springBoot          : springBoot.class.package.implementationVersion,
     testcontainers      : '1.21.4',
-    pactVersion         : '4.6.18',
+    pactVersion         : '4.6.20',
 ]
 
 ext {
