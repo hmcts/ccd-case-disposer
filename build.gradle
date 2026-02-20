@@ -226,7 +226,7 @@ project.tasks['pitest'].group = "Verification"
 
 def versions = [
     springCloudVersion  : '2025.0.0',
-    elasticsearch       : '8.19.8',
+    elasticsearch       : '8.19.11',
     flyway              : '11.19.0',
     junit               : '5.13.4',
     junitPlatform       : '1.13.4',
