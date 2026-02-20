@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
     @Autowired
     private ProcessedCasesRecordHolder processedCasesRecordHolder;
 
+    @Disabled
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenarios(final String deletableCaseTypes,

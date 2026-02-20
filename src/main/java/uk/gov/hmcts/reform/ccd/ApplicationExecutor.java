@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.ccd;
 import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
+import uk.gov.hmcts.reform.ccd.exception.JobInterruptedException;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
@@ -18,8 +21,11 @@ import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.getCaseData;
 
@@ -34,6 +40,8 @@ public class ApplicationExecutor {
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseCollectorService caseCollectorService;
+    @Qualifier("caseDeletionExecutor")
+    private final ThreadPoolTaskExecutor taskExecutor;
     private final Clock clock;
 
     private LocalDateTime applicationStartTime;
@@ -86,18 +94,51 @@ public class ApplicationExecutor {
         int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
         cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
 
+        List<Future<?>> futures = new ArrayList<>();
+
         for (CaseData caseData : cases) {
             if (requestLimit == 0 || isCutOffTimeReached()) {
                 break;
             }
-            try {
-                caseDeletionService.deleteCaseData(caseData);
-            } catch (LogAndAuditException logAndAuditException) {
-                log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
-            }
+
+            Future<?> future = taskExecutor.submit(() -> {
+                try {
+                    if (Thread.currentThread().isInterrupted()) {
+                        throw new InterruptedException("Case deletion interrupted");
+                    }
+                    caseDeletionService.deleteCaseData(caseData);
+
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // VERY important
+                    log.warn("Case deletion interrupted for case {}", caseData.getReference());
+                } catch (LogAndAuditException e) {
+                    log.error("Error deleting case {}", caseData.getReference(), e);
+                }
+                processedCasesRecordHolder.addProcessedCase(caseData);
+            });
+
+            futures.add(future);
             requestLimit--;
-            processedCasesRecordHolder.addProcessedCase(caseData);
         }
+        waitForCompletion(futures);
+    }
+
+    private void waitForCompletion(List<Future<?>> futures) {
+        for (Future<?> future : futures) {
+            try {
+                future.get(); // blocks
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                cancelOutstanding(futures);
+                throw new JobInterruptedException();
+            } catch (ExecutionException e) {
+                log.error("Task failed", e.getCause());
+            }
+        }
+    }
+
+    private void cancelOutstanding(List<Future<?>> futures) {
+        futures.forEach(f -> f.cancel(true));
     }
 
     private boolean isCutOffTimeReached() {

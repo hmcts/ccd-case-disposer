@@ -4,6 +4,7 @@ import jakarta.inject.Named;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,7 +12,7 @@ import java.util.Optional;
 @Named
 @Getter
 public class TasksDeletionRecordHolder {
-    private List<Map<String, Integer>> tasksDeletionRecordHolderList = new ArrayList<>();
+    private List<Map<String, Integer>> tasksDeletionRecordHolderList = Collections.synchronizedList(new ArrayList<>());
 
     public void setCaseTasksDeletionResults(final String caseRef,
                                             final int caseTasksDeletionResults) {
