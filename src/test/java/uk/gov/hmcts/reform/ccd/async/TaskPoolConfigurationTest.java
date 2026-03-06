@@ -5,12 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
-import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -25,36 +23,32 @@ class TaskPoolConfigurationTest {
     private TaskPoolConfiguration taskPoolConfiguration;
 
     @Test
-    void shouldCreateInstanceOfAsyncConfigurer() {
-        assertThat(taskPoolConfiguration).isInstanceOf(AsyncConfigurer.class);
-    }
-
-    @Test
-    void shouldCreateExecutor() {
+    void shouldCreateThreadPoolTaskExecutorWithConfiguredValues() {
+        // given
         doReturn(5).when(parameterResolver).getThreadCorePoolSize();
         doReturn(10).when(parameterResolver).getThreadMaxPoolSize();
         doReturn(200).when(parameterResolver).getThreadQueueCapacity();
 
-        assertThat(taskPoolConfiguration.getAsyncExecutor()).isInstanceOf(Executor.class);
+        // when
+        ThreadPoolTaskExecutor executor = taskPoolConfiguration.caseDeletionExecutor();
+
+        // then
+        assertThat(executor).isNotNull();
+        assertThat(executor.getCorePoolSize()).isEqualTo(5);
+        assertThat(executor.getMaxPoolSize()).isEqualTo(10);
+        assertThat(executor.getThreadNamePrefix()).isEqualTo("case-deletion-");
     }
 
     @Test
-    void shouldCreateThreadPoolTaskExecutorExecutor() {
-        doReturn(5).when(parameterResolver).getThreadCorePoolSize();
-        doReturn(10).when(parameterResolver).getThreadMaxPoolSize();
-        doReturn(200).when(parameterResolver).getThreadQueueCapacity();
-        
-        final ThreadPoolTaskExecutor threadPoolTaskExecutor =
-                (ThreadPoolTaskExecutor) taskPoolConfiguration.getAsyncExecutor();
+    void shouldUseCallerRunsPolicy() {
+        doReturn(1).when(parameterResolver).getThreadCorePoolSize();
+        doReturn(1).when(parameterResolver).getThreadMaxPoolSize();
+        doReturn(0).when(parameterResolver).getThreadQueueCapacity();
 
-        assertThat(threadPoolTaskExecutor.getCorePoolSize()).isEqualTo(5);
-        assertThat(threadPoolTaskExecutor.getMaxPoolSize()).isEqualTo(10);
-        assertThat(threadPoolTaskExecutor.getThreadNamePrefix()).isEqualTo("Case-Deletion-thread-");
-    }
+        ThreadPoolTaskExecutor executor = taskPoolConfiguration.caseDeletionExecutor();
 
-    @Test
-    void shouldCreateAsyncUncaughtExceptionHandler() {
-        assertThat(taskPoolConfiguration.getAsyncUncaughtExceptionHandler())
-                .isInstanceOf(AsyncUncaughtExceptionHandler.class);
+        assertThat(executor.getThreadPoolExecutor()
+                       .getRejectedExecutionHandler())
+            .isInstanceOf(ThreadPoolExecutor.CallerRunsPolicy.class);
     }
 }
