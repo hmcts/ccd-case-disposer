@@ -13,7 +13,7 @@ spring:
   datasource:
     url: jdbc:postgresql://${DATA_STORE_DB_HOST:localhost}:${DATA_STORE_DB_PORT:5055}/${DATA_STORE_DB_NAME:ccd_data}${DATA_STORE_DB_OPTIONS:?stringtype=unspecified}
     username: ${DATA_STORE_DB_USERNAME:ccd}
-    password: ${DATA_STORE_DB_PASSWORD:ccd}
+    password: ${DATA_STORE_DB_PASSWORD}
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       connection-timeout: ${DATA_STORE_DB_CONNECTION_TIMEOUT:40000}
@@ -58,14 +58,14 @@ idam:
   api:
     url: ${IDAM_API_URL:http://localhost:5000}
     username: ${IDAM_CASE_DISPOSER_SYSTEM_USER_USERNAME:case.disposer.idam.system.user@gmail.com}
-    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD:Pa55word11}
+    password: ${IDAM_CASE_DISPOSER_SYSTEM_USER_PASSWORD}
   s2s-auth:
     name: ${IDAM_S2S_NAME:ccd_case_disposer}
     url: ${IDAM_S2S_URL:http://localhost:4502}
-    secret: ${IDAM_KEY_CCD_CASE_DISPOSER:AAAAAAAAAAAAAAAA}
+    secret: ${IDAM_KEY_CCD_CASE_DISPOSER}
   client:
     id: ${IDAM_CASE_DISPOSER_CLIENT_ID:ccd-case-disposer}
-    secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET:idam-case-disposer-client-secret}
+    secret: ${IDAM_CASE_DISPOSER_CLIENT_SECRET}
     redirect_uri: ${IDAM_CASE_DISPOSER_CLIENT_REDIRECT_URL:http://ccd-case-disposer/oauth2redirect}
 
 smoke.test.enabled: false

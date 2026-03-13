@@ -4,7 +4,7 @@ ccd:
   enabled: false
 
 job:
-  image: 'https://hmctspublic.azurecr.io/ccd/ccd-case-disposer:latest'
+  image: 'https://hmctsprod.azurecr.io/ccd/ccd-case-disposer:latest'
   kind: CronJob
   schedule: "0 22 * * *"
   startingDeadlineSeconds: 600
