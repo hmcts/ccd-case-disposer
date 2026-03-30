@@ -302,29 +302,6 @@ ccd:
         DB_HOST: "{{ .Release.Name }}-postgresql"
         DB_USER_NAME: "hmcts"
         DB_PASSWORD: "hmcts"
-      postgresql:
-        enabled: true
-        primary:
-          service:
-            ports:
-              postgresql: 5432
-            type: LoadBalancer
-            annotations:
-              external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
-              service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-          persistence:
-            enabled: false
-          initdb:
-            scripts:
-              init.sql: |
-                CREATE DATABASE "ccd_data_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "ccd_definition_store" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "user-profile" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-                CREATE DATABASE "role_assignment" WITH OWNER = hmcts ENCODING = 'UTF-8' CONNECTION LIMIT = -1;
-        auth:
-          username: "hmcts"
-          password: "hmcts"
-        postgresHostname: ${SERVICE_NAME}-postgresql
       keyVaults: [ ]
       secrets:
         USER_PROFILE_DB_PASSWORD:
