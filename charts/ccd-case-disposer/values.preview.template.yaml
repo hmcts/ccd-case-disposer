@@ -232,7 +232,7 @@ ccd:
     ras:
       enabled: false
 
-  ingressHost: ${SERVICE_FQDN}.preview.platform.hmcts.net
+  ingressHost: ${SERVICE_FQDN}
 
   global:
     ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
