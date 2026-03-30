@@ -167,18 +167,6 @@ withPipeline(type, product, component) {
     // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)
 
-    // If preview set DB LB IP Address
-    if("preview" == env.ENV){
-      withAksClient('nonprod', product) {
-        def subscription = env.SUBSCRIPTION_NAME
-        def namespace = new TeamConfig(this).getNameSpace(product)
-        def kubectl = new Kubectl(this, subscription, namespace)
-        kubectl.login()
-        String postgresInstanceName = "ccd-case-disposer-pr-${CHANGE_ID}-postgresql"
-        env.DATA_STORE_DB_HOST = kubectl.getServiceLoadbalancerIP(postgresInstanceName)
-      }
-    }
-
     // Execute functional tests
     echo "Verifying that functional test run correctly"
     try {

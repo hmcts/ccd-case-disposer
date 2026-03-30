@@ -5,7 +5,7 @@ name: ccd-case-disposer
 home: https://github.com/hmcts/ccd-case-disposer
 version:  0.2.34
 maintainers:
-  - name: HMCTS CCD Team
+  - name: HMCTS LAU Team
 dependencies:
   - name: job
     version: ~2.2.0
