@@ -4,32 +4,24 @@ import jakarta.inject.Named;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
-import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
-import uk.gov.hmcts.reform.ccd.service.CaseFinderService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
-import uk.gov.hmcts.reform.ccd.util.log.CaseFamiliesFilter;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.Set;
-
-import static uk.gov.hmcts.reform.ccd.util.CaseFamilyUtil.getCaseData;
 
 @Slf4j
 @Named
 @RequiredArgsConstructor
 public class ApplicationExecutor {
-    private final CaseFinderService caseFindingService;
     private final CaseDeletionService caseDeletionService;
-    private final CaseFamiliesFilter caseFamiliesFilter;
     private final ParameterResolver parameterResolver;
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
@@ -40,26 +32,14 @@ public class ApplicationExecutor {
     private LocalDateTime cutOff;
 
     @LogExecutionTime("Case-disposer")
-    public void execute(int version) {
+    public void execute() {
         logParameters();
         applicationStartTime = LocalDateTime.now(clock);
         log.info("Case-Disposer started...");
-        Set<CaseData> allDeletableCases;
-        Set<CaseData> simulatedCases;
-        if (version == 1) {
-            log.info("Running version 1...");
-            List<CaseFamily> caseFamiliesDueDeletion = caseFindingService.findCasesDueDeletion();
-            List<CaseFamily> deletableCasesOnly = caseFamiliesFilter.getDeletableCasesOnly(caseFamiliesDueDeletion);
-            List<CaseFamily> deletableLinkedFamiliesSimulation = caseFamiliesFilter.geSimulationCasesOnly(
-                caseFamiliesDueDeletion);
-            allDeletableCases = getCaseData(deletableCasesOnly);
-            simulatedCases = getCaseData(deletableLinkedFamiliesSimulation);
-        } else {
-            log.info("Running version 2...");
-            allDeletableCases = caseCollectorService.getDeletableCases(parameterResolver.getDeletableCaseTypes());
-            simulatedCases = caseCollectorService.getDeletableCases(
-                parameterResolver.getDeletableCaseTypesSimulation());
-        }
+        Set<CaseData> allDeletableCases = caseCollectorService.getDeletableCases(
+            parameterResolver.getDeletableCaseTypes());
+        Set<CaseData> simulatedCases = caseCollectorService.getDeletableCases(
+            parameterResolver.getDeletableCaseTypesSimulation());
 
         Integer requestLimit = parameterResolver.getRequestLimit();
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);

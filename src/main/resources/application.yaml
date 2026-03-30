@@ -78,7 +78,6 @@ thread:
   queue_capacity: ${THREAD_QUEUE_CAPACITY:200}
 
 case-collector:
-  version: ${CASE_COLLECTOR_VERSION:1}
   max-run-duration-minutes: ${CASE_COLLECTOR_RUN_DURATION_IN_MINUTES:480}
 
 logging:
