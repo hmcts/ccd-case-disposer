@@ -2,12 +2,9 @@ package uk.gov.hmcts.reform.ccd.fixture;
 
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
-import uk.gov.hmcts.reform.ccd.data.model.CaseFamily;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public interface TestData {
     String DELETABLE_CASE_TYPE = "deletable_case_type";
@@ -49,10 +46,6 @@ public interface TestData {
     CaseData DELETABLE_CASE_DATA4_WITH_PAST_TTL = new CaseData(4L, 4L, DELETABLE_CASE_TYPE,
             JURISDICTION,
             YESTERDAY, 4L, null);
-    CaseFamily DELETABLE_CASE_FAMILY = new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL,
-            asList(DELETABLE_CASE_DATA4_WITH_PAST_TTL,
-                    DELETABLE_CASE_DATA_WITH_PAST_TTL,
-                    DELETABLE_CASE_DATA_WITH_PAST_TTL));
     CaseData DELETABLE_CASE_DATA5_WITH_PAST_TTL = new CaseData(5L, 5L, DELETABLE_CASE_TYPE,
             JURISDICTION, YESTERDAY, 5L, null);
     CaseData DELETABLE_CASE_DATA03_WITH_PAST_TTL = new CaseData(6L, 6L, DELETABLE_CASE_TYPE, JURISDICTION,
@@ -76,9 +69,6 @@ public interface TestData {
                     YESTERDAY, 21L, null);
     CaseData NON_DELETABLE_CASE_DATA_WITH_MISSING_TTL =
         new CaseData(22L, 22L, NON_DELETABLE_CASE_TYPE, JURISDICTION, null, 22L, null);
-    CaseFamily NON_DELETABLE_CASE_FAMILY = new CaseFamily(NON_DELETABLE_CASE_DATA_WITH_PAST_TTL,
-            asList(NON_DELETABLE_CASE_DATA_WITH_PAST_TTL,
-                    NON_DELETABLE_CASE_DATA_WITH_PAST_TTL));
     CaseData DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1 = new CaseData(30L,
             30L,
             DELETABLE_CASE_TYPE_SIMULATION,
@@ -93,13 +83,6 @@ public interface TestData {
             YESTERDAY,
             31L,
             null);
-    CaseFamily DELETABLE_CASE_FAMILY_SIMULATION = new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
-            asList(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
-                    DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2));
-
-    CaseFamily FAILED_CASE_FAMILY = new CaseFamily(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
-            asList(DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1,
-                    DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2));
     CaseData LINKED_CASE_DATA_R10 = new CaseData(10L, 10L, DELETABLE_CASE_TYPE, JURISDICTION,
             YESTERDAY, 10L, null);
     CaseData LINKED_CASE_DATA_R11 = new CaseData(11L, 11L, DELETABLE_CASE_TYPE, JURISDICTION, YESTERDAY,

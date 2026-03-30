@@ -47,16 +47,13 @@ public class ApplicationBootstrap implements ApplicationRunner {
     @Value("${telemetry.wait.period:10000}")
     private int waitPeriod;
 
-    @Value("${case-collector.version:1}")
-    private int caseCollectorVersion;
-
     @Override
     public void run(ApplicationArguments args) throws Exception {
         Duration timeout = Duration.ofMinutes(timeoutInMinutes);
         try {
             log.info("[{}] Starting the Case-Disposer job.", MARKER);
             securityUtil.generateTokens();
-            timedJobExecutor.runWithTimeout(() -> applicationExecutor.execute(caseCollectorVersion), timeout);
+            timedJobExecutor.runWithTimeout(() -> applicationExecutor.execute(), timeout);
             log.info("[{}] Completed the Case-Disposer job successfully.", MARKER);
         } catch (TimeoutException | JobInterruptedException e) {
             log.error("[{}] Timed out waiting for the job to complete.", MARKER);

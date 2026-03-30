@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.async.TimedJobExecutor;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 
@@ -42,7 +41,6 @@ class ApplicationBootstrapTest {
 
     @Test
     void testShouldRunExecutor() throws Exception {
-        ReflectionTestUtils.setField(underTest, "caseCollectorVersion", 2);
         ArgumentCaptor<Runnable> runnableCaptor = ArgumentCaptor.forClass(Runnable.class);
         ArgumentCaptor<Duration> timeoutCaptor = ArgumentCaptor.forClass(Duration.class);
         doNothing().when(timedJobExecutor).runWithTimeout(runnableCaptor.capture(), timeoutCaptor.capture());
@@ -55,7 +53,7 @@ class ApplicationBootstrapTest {
 
         capturedJob.run();
 
-        verify(applicationExecutor).execute(2);
+        verify(applicationExecutor).execute();
         verify(securityUtil).generateTokens();
         verify(client).flush();
         verify(timedJobExecutor).runWithTimeout(any(), any());

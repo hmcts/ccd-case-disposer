@@ -26,32 +26,6 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
 
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
-    void testScenarios(final String deletableCaseTypes,
-                       final String deletableCaseTypesSimulation,
-                       final String scriptPath,
-                       final List<Long> initialStateRowIds,
-                       final Map<String, List<Long>> indexedData,
-                       final List<Long> deletableEndStateRowIds,
-                       final List<Long> simulatedEndStateRowIds,
-                       final List<Long> deletableCaseRefs,
-                       final Map<String, List<Long>> deletedFromIndexed,
-                       final Map<String, List<Long>> notDeletedFromIndexed) throws Exception {
-        // GIVEN
-        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, initialStateRowIds, indexedData);
-        processedCasesRecordHolder.clearState();
-
-        // WHEN
-        executor.execute(1);
-
-        // THEN
-        verifyDatabaseDeletion(deletableEndStateRowIds);
-        verifyRemoteDeletion(deletableCaseRefs);
-        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
-        verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
-    }
-
-    @ParameterizedTest
-    @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenariosNewVersion(final String deletableCaseTypes,
                        final String deletableCaseTypesSimulation,
                        final String scriptPath,
@@ -67,7 +41,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
         processedCasesRecordHolder.clearState();
 
         // WHEN
-        executor.execute(2);
+        executor.execute();
 
         // THEN
         verifyDatabaseDeletion(deletableEndStateRowIds);
