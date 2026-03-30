@@ -235,8 +235,8 @@ ccd:
   ingressHost: ${SERVICE_FQDN}
 
   global:
-    ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
-    ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
+    ccdDefinitionStoreUrl: http://${SERVICE_NAME}-ccd-definition-store
+    ccdDataStoreUrl: http://${SERVICE_NAME}-ccd-data-store-api
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-api.aat.platform.hmcts.net
@@ -254,7 +254,7 @@ ccd:
   ccd-definition-store-api:
     java:
       image: hmctsprod.azurecr.io/ccd/definition-store-api:latest
-      ingressHost: ccd-definition-store-${SERVICE_NAME}.preview.platform.hmcts.net
+      ingressHost: ccd-definition-store-${SERVICE_FQDN}
       imagePullPolicy: Always
       autoscaling:
         enabled: false
@@ -332,7 +332,7 @@ ccd:
   ccd-data-store-api:
     java:
       image: hmctsprod.azurecr.io/ccd/data-store-api:latest
-      ingressHost: ccd-data-store-api-${SERVICE_FQDN}.preview.platform.hmcts.net
+      ingressHost: ccd-data-store-api-${SERVICE_FQDN}
       imagePullPolicy: Always
       memoryRequests: '1524Mi'
       cpuRequests: '900m'
