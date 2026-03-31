@@ -109,6 +109,7 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_NAME = "ccd_data_store"
     env.DATA_STORE_DB_OPTIONS = '?sslmode=allow'
     env.DATA_STORE_DB_PORT = '5432'
+    env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://ccd-case-disposer-pr-${CHANGE_ID}-es-master:9200"
     env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TASKS_HOST= "http://wa-task-management-api-aat.service.core-compute-aat.internal"
@@ -166,6 +167,7 @@ withPipeline(type, product, component) {
 
     // Execute functional tests
     echo "Verifying that functional test run correctly"
+    echo "ELASTIC_SEARCH_DATA_NODES_HOSTS=${env.ELASTIC_SEARCH_DATA_NODES_HOSTS}"
     try {
       builder.gradle('functional')
     } finally {
