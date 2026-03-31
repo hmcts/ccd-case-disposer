@@ -90,6 +90,10 @@ task functional(type: Test) {
     group = "Verification"
     testClassesDirs = sourceSets.functionalTest.output.classesDirs
     classpath = sourceSets.functionalTest.runtimeClasspath
+    testLogging {
+        showStandardStreams = true
+        events "failed", "standardOut", "standardError"
+    }
 }
 
 task integration(type: Test) {
