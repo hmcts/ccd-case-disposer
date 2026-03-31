@@ -28,7 +28,6 @@ def secrets = [
           secret('definition-importer-username', 'DEFINITION_IMPORTER_USERNAME'),
           secret('definition-importer-password', 'DEFINITION_IMPORTER_PASSWORD'),
           secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
-          secret('ccd-ELASTIC-SEARCH-URL', 'ELASTIC_SEARCH_HOSTS'),
           secret('ccd-ELASTIC-SEARCH-DATA-NODES-URL', 'ELASTIC_SEARCH_DATA_NODES_HOSTS')
   ]
 ]

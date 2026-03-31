@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.parameter;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalTime;
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toUnmodifiableList;
 
 @SuppressWarnings("ALL")
+@Slf4j
 public class TestParameterResolver implements ParameterResolver {
     public static final String DELETABLE_CASE_TYPES_PROPERTY = "deletable.case.types";
     public static final String DELETABLE_CASE_TYPES_PROPERTY_SIMULATION = "simulated.case.types";
@@ -64,9 +66,11 @@ public class TestParameterResolver implements ParameterResolver {
 
     @Override
     public List<String> getElasticsearchHosts() {
-        return elasticsearchHosts.stream()
+        final List<String> resolvedHosts = elasticsearchHosts.stream()
                 .map(quotedHost -> quotedHost.replace("\"", "").strip())
                 .collect(toUnmodifiableList());
+        log.info("[ES-TEST-RESOLVER] Resolved elasticsearch.hosts from Spring property: {}", resolvedHosts);
+        return resolvedHosts;
     }
 
     @Override

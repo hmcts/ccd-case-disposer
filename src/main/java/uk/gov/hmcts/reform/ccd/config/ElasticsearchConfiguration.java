@@ -6,6 +6,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
+@Slf4j
 @Configuration
 public class ElasticsearchConfiguration {
 
@@ -26,6 +28,9 @@ public class ElasticsearchConfiguration {
 
     @PostConstruct
     public void init() {
+        log.info(
+            "[ES-CONFIG] Initialising Elasticsearch client with resolved hosts: {}",
+            parameterResolver.getElasticsearchHosts());
         final HttpHost[] httpHosts = parameterResolver.getElasticsearchHosts().stream()
             .map(HttpHost::create)
             .toArray(HttpHost[]::new);
