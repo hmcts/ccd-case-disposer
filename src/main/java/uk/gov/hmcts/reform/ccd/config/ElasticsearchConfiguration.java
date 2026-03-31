@@ -28,10 +28,11 @@ public class ElasticsearchConfiguration {
 
     @PostConstruct
     public void init() {
-        log.info(
-            "[ES-CONFIG] Initialising Elasticsearch client with resolved hosts: {}",
-            parameterResolver.getElasticsearchHosts());
-        final HttpHost[] httpHosts = parameterResolver.getElasticsearchHosts().stream()
+        final var resolvedHosts = parameterResolver.getElasticsearchHosts();
+        final String marker = "[ES-CONFIG] Initialising Elasticsearch client with resolved hosts: " + resolvedHosts;
+        log.info(marker);
+        System.err.println(marker);
+        final HttpHost[] httpHosts = resolvedHosts.stream()
             .map(HttpHost::create)
             .toArray(HttpHost[]::new);
 

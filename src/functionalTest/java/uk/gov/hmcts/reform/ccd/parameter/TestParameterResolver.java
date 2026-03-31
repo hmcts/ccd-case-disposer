@@ -69,7 +69,10 @@ public class TestParameterResolver implements ParameterResolver {
         final List<String> resolvedHosts = elasticsearchHosts.stream()
                 .map(quotedHost -> quotedHost.replace("\"", "").strip())
                 .collect(toUnmodifiableList());
-        log.info("[ES-TEST-RESOLVER] Resolved elasticsearch.hosts from Spring property: {}", resolvedHosts);
+        final String marker = "[ES-TEST-RESOLVER] Resolved elasticsearch.hosts from Spring property: "
+            + resolvedHosts;
+        log.info(marker);
+        System.err.println(marker);
         return resolvedHosts;
     }
 
