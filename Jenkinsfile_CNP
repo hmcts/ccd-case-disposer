@@ -165,6 +165,18 @@ withPipeline(type, product, component) {
     // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)
 
+    if (env.ENV == 'preview') {
+      env.DATA_STORE_DB_HOST = '127.0.0.1'
+      env.DATA_STORE_DB_PORT = '15432'
+
+      sh """
+        kubectl port-forward service/ccd-case-disposer-pr-${CHANGE_ID}-postgresql 15432:5432 \
+          > port-forward-postgres.log 2>&1 &
+        echo \$! > port-forward-postgres.pid
+        sleep 10
+      """
+    }
+
     // Execute functional tests
     echo "Verifying that functional test run correctly"
     echo "ELASTIC_SEARCH_DATA_NODES_HOSTS=${env.ELASTIC_SEARCH_DATA_NODES_HOSTS}"
@@ -172,6 +184,14 @@ withPipeline(type, product, component) {
     try {
       builder.gradle('functional')
     } finally {
+      if (env.ENV == 'preview') {
+        sh """
+          if [ -f port-forward-postgres.pid ]; then
+            kill \$(cat port-forward-postgres.pid) || true
+            rm -f port-forward-postgres.pid
+          fi
+        """
+      }
       junit '**/test-results/**/*.xml'
     }
   }
