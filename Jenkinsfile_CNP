@@ -168,6 +168,7 @@ withPipeline(type, product, component) {
     // Execute functional tests
     echo "Verifying that functional test run correctly"
     echo "ELASTIC_SEARCH_DATA_NODES_HOSTS=${env.ELASTIC_SEARCH_DATA_NODES_HOSTS}"
+    echo "DATA_STORE_DB_HOST=${env.DATA_STORE_DB_HOST}"
     try {
       builder.gradle('functional')
     } finally {
