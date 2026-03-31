@@ -312,6 +312,8 @@ ccd:
             annotations:
               external-dns.alpha.kubernetes.io/hostname: "${SERVICE_NAME}-postgresql"
               service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+              service.beta.kubernetes.io/azure-load-balancer-health-probe-interval: "120"
+              service.beta.kubernetes.io/port_5432_no_probe_rule: "true"
           persistence:
             enabled: false
           initdb:
