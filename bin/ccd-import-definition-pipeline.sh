@@ -11,7 +11,6 @@ echo filepath =$filepath
 userToken=$(${dir}/idam-lease-user-token.sh ${DEFINITION_IMPORTER_USERNAME:-ccd.docker.default@hmcts.net} ${DEFINITION_IMPORTER_PASSWORD:-Password12})
 serviceToken=$(${dir}/idam-lease-service-token.sh)
 
-echo ELASTIC_SEARCH_DATA_NODES_HOSTS = $ELASTIC_SEARCH_DATA_NODES_HOSTS
 echo DEFINITION_STORE_HOST = $DEFINITION_STORE_HOST
 uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
   ${DEFINITION_STORE_HOST:-http://localhost:4451}/import \
