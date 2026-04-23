@@ -27,55 +27,46 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
 
     @Override
     public void delete(final CaseData caseData) {
-        if (!caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
-            try {
-                final DocumentsDeletePostRequest documentsDeleteRequest =
-                    new DocumentsDeletePostRequest(caseData.getReference().toString());
+        // HRS cases don't have any documents
+        if (caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
+            return;
+        }
 
-                final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse =
-                    postDocument(documentsDeleteRequest);
+        final String caseRef = caseData.getReference().toString();
+        final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
+        final ResponseEntity<CaseDocumentsDeletionResults> documentsDeleteResponse;
 
-                logDocumentsDisposal(documentsDeleteRequest, documentsDeleteResponse.getBody());
+        try {
+            documentsDeleteResponse = postDocument(documentsDeleteRequest);
+        } catch (final Exception ex) {
+            log.error("Error deleting documents for case : {}", caseRef, ex);
+            throw new DocumentDeletionException(caseRef, ex);
+        }
 
-                if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
-                    final String errorMessage = String
-                        .format("Unexpected response code %d while deleting documents for case: %s",
-                                documentsDeleteResponse.getStatusCode().value(), caseData.getReference());
+        logDocumentsDisposal(caseRef, documentsDeleteResponse.getBody());
 
-                    throw new DocumentDeletionException(errorMessage);
-                }
-
-            } catch (final Exception ex) {
-                final String errorMessage = String.format(
-                    "Error deleting documents for case : %s", caseData.getReference().toString());
-                log.error(errorMessage, ex);
-                throw new DocumentDeletionException(errorMessage, ex);
-            }
+        if (!documentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
+            throw new DocumentDeletionException(documentsDeleteResponse.getStatusCode().value(), caseRef);
         }
     }
 
-
-    private void logDocumentsDisposal(final DocumentsDeletePostRequest documentsDeleteRequest,
-                                      final CaseDocumentsDeletionResults documentsDeletionResults) {
+    private void logDocumentsDisposal(final String caseRef, final CaseDocumentsDeletionResults deletionResults) {
         try {
-            documentDeletionRecordHolder.setCaseDocumentsDeletionResults(
-                documentsDeleteRequest.getCaseRef(),
-                documentsDeletionResults
-            );
+            documentDeletionRecordHolder.setCaseDocumentsDeletionResults(caseRef, deletionResults);
 
-            final String message = getLogMessage(documentsDeletionResults);
+            final String message = getLogMessage(deletionResults);
 
             log.info(
                 "{}Case Ref = {} - Documents found = {} - Documents marked for deletion = {}",
                 message,
-                documentsDeleteRequest.getCaseRef(),
-                documentsDeletionResults.getCaseDocumentsFound(),
-                documentsDeletionResults.getMarkedForDeletion()
+                caseRef,
+                deletionResults.getCaseDocumentsFound(),
+                deletionResults.getMarkedForDeletion()
             );
 
         } catch (final JsonParseException jsonParseException) {
             final String errorMessage = "Unable to map json to object document deletion endpoint response due"
-                + " to following endpoint response: ".concat(documentsDeletionResults.toString());
+                + " to following endpoint response: ".concat(deletionResults.toString());
             log.error(errorMessage);
             throw new DocumentDeletionException(errorMessage);
         }
@@ -89,9 +80,9 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
         return "Case Documents Deletion CONFIRMATION: ";
     }
 
-
-    private ResponseEntity<CaseDocumentsDeletionResults> postDocument(final DocumentsDeletePostRequest
-                                                                          documentsDeletePostRequest) {
+    private ResponseEntity<CaseDocumentsDeletionResults> postDocument(
+        final DocumentsDeletePostRequest documentsDeletePostRequest
+    ) {
         return documentClient
             .deleteDocument(securityUtil.getServiceAuthorization(), documentsDeletePostRequest);
     }

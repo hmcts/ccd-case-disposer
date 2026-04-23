@@ -28,23 +28,21 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
     @Override
     public void delete(final CaseData caseData) {
         if (caseData.getCaseType().equals(parameterResolver.getHearingCaseType())) {
-            final List<String> caseRef = List.of(String.valueOf(caseData.getReference()));
+            final String caseRef = caseData.getReference().toString();
+            final ResponseEntity<Void> deleteHearingsResponse;
             try {
-                final ResponseEntity<Void> deleteHearingsResponse = deleteHearings(caseRef);
+                deleteHearingsResponse = deleteHearings(List.of(caseRef));
+            } catch (Exception ex) {
+                log.error("Error deleting hearing for case : {}", caseRef, ex);
+                throw new HearingDeletionException(caseRef, ex);
+            }
 
-                logHearingDisposal(caseRef.getFirst(), deleteHearingsResponse.getStatusCode().value());
+            final int statusCode = deleteHearingsResponse.getStatusCode().value();
 
-                if (deleteHearingsResponse.getStatusCode().value() != NO_CONTENT.value()) {
-                    final String errorMessage = String
-                            .format("Unexpected response code %d while deleting hearing for case: %s",
-                            deleteHearingsResponse.getStatusCode().value(), caseRef);
+            logHearingDisposal(caseRef, statusCode);
 
-                    throw new HearingDeletionException(errorMessage);
-                }
-            } catch (final Exception ex) {
-                final String errorMessage = String.format("Error deleting hearing for case : %s", caseRef);
-                log.error(errorMessage, ex);
-                throw new HearingDeletionException(errorMessage, ex);
+            if (statusCode != NO_CONTENT.value()) {
+                throw new HearingDeletionException(statusCode, caseRef);
             }
         }
     }
@@ -52,7 +50,6 @@ public class DisposeHearingsRemoteOperation implements DisposeRemoteOperation {
     private void logHearingDisposal(final String caseRef, final int status) {
         hearingDeletionRecordHolder.setHearingDeletionResults(caseRef, status);
     }
-
 
     private ResponseEntity<Void> deleteHearings(final List<String> caseRefs) {
         return hearingClient.deleteHearing(securityUtil.getIdamClientToken(),

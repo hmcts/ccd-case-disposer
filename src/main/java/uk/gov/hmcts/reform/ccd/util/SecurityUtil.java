@@ -49,10 +49,7 @@ public class SecurityUtil {
         try {
             userDetails = idamClient.getUserDetails(idamClientToken);
         } catch (final Exception exception) {
-            log.error("Case disposer is unable to generate UserDetails due to error - {}",
-                    exception.getMessage(),
-                    exception
-            );
+            log.error("Case disposer is unable to generate UserDetails due to error", exception);
             throw new UserDetailsGenerationException(String.format("Case disposer is unable to generate UserDetails "
                     + "due to error - %s", exception.getMessage()), exception);
         }
@@ -63,10 +60,7 @@ public class SecurityUtil {
         try {
             serviceAuthorization = authTokenGenerator.generate();
         } catch (final Exception exception) {
-            log.error("Case disposer is unable to generate service auth token due to error - {}",
-                    exception.getMessage(),
-                    exception
-            );
+            log.error("Case disposer is unable to generate service auth token due to error", exception);
             throw new ServiceAuthTokenGenerationException(String.format("Case disposer is unable to generate service "
                     + "auth token due to error - %s", exception.getMessage()), exception);
         }
@@ -78,10 +72,7 @@ public class SecurityUtil {
             idamClientToken = idamClient.getAccessToken(parameterResolver.getIdamUsername(),
                     parameterResolver.getIdamPassword());
         } catch (final Exception exception) {
-            log.error("Case disposer is unable to generate IDAM token due to error - {}",
-                    exception.getMessage(),
-                    exception
-            );
+            log.error("Case disposer is unable to generate IDAM token due to error", exception);
             throw new IdamAuthTokenGenerationException(String.format("Case disposer is unable to generate IDAM "
                     + "token due to error - %s", exception.getMessage()), exception);
         }

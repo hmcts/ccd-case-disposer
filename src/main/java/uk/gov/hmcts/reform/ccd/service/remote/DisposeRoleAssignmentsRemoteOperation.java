@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.am.RoleAssignmentsPostRequest;
@@ -25,30 +26,23 @@ public class DisposeRoleAssignmentsRemoteOperation implements DisposeRemoteOpera
     @Override
     public void delete(final CaseData caseData) {
         final String caseRef = caseData.getReference().toString();
+        final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest = new RoleAssignmentsPostRequest(caseRef);
+        final ResponseEntity<RoleAssignmentsPostResponse> roleAssignmentsDeleteResponse;
+
         try {
-            final RoleAssignmentsPostRequest roleAssignmentsDeleteRequest =
-                new RoleAssignmentsPostRequest(caseRef);
-
-            final ResponseEntity<RoleAssignmentsPostResponse> roleAssignmentsDeleteResponse =
-                deleteRoleAssignment(roleAssignmentsDeleteRequest);
-
-            roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef,
-                                                                 roleAssignmentsDeleteResponse.getStatusCode().value());
-
-            if (!roleAssignmentsDeleteResponse.getStatusCode().is2xxSuccessful()) {
-                final String errorMessage = String
-                    .format("Unexpected response code %d while deleting role assignments for case: %s",
-                            roleAssignmentsDeleteResponse.getStatusCode().value(), caseData.getReference()
-                    );
-
-                throw new RoleAssignmentDeletionException(errorMessage);
-            }
-
-        } catch (final Exception ex) {
-            final String errorMessage = String.format("Error deleting role assignments for case : %s", caseRef);
-            log.error(errorMessage, ex);
-            throw new RoleAssignmentDeletionException(errorMessage, ex);
+            roleAssignmentsDeleteResponse = deleteRoleAssignment(roleAssignmentsDeleteRequest);
+        } catch (Exception ex) {
+            log.error("Error deleting role assignments for case: {}", caseRef, ex);
+            throw new RoleAssignmentDeletionException(caseRef, ex);
         }
+
+        HttpStatusCode statusCode = roleAssignmentsDeleteResponse.getStatusCode();
+        roleDeletionRecordHolder.setCaseRolesDeletionResults(caseRef, statusCode.value());
+
+        if (!statusCode.is2xxSuccessful()) {
+            throw new RoleAssignmentDeletionException(statusCode.value(), caseRef);
+        }
+
     }
 
 

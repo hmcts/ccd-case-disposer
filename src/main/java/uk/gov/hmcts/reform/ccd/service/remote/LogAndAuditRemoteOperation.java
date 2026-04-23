@@ -35,32 +35,32 @@ public class LogAndAuditRemoteOperation {
 
     @LogExecutionTime("Log and Audit")
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
+        final CaseActionPostRequestResponse caseActionPostRequestResponse =
+            buildCaseActionPostRequest(caseData);
+
+        final String caseRef = caseData.getReference().toString();
+        final ResponseEntity<CaseActionPostRequestResponse> logAndAuditPostResponse;
         try {
-            final CaseActionPostRequestResponse caseActionPostRequestResponse =
-                buildCaseActionPostRequest(caseData);
-            final ResponseEntity<CaseActionPostRequestResponse> logAndAuditPostResponse = lauClient.postLauAudit(
+            logAndAuditPostResponse = lauClient.postLauAudit(
                 securityUtil.getServiceAuthorization(),
                 caseActionPostRequestResponse
             );
+        } catch (final Exception ex) {
+            log.error("Error posting to Log and Audit for case : {}", caseRef, ex);
+            throw new LogAndAuditException(caseRef, ex);
+        }
 
-            logResponse(logAndAuditPostResponse.getBody());
+        logResponse(logAndAuditPostResponse.getBody());
 
-            if (!logAndAuditPostResponse.getStatusCode().is2xxSuccessful()) {
-                final String errorMessage = String
-                    .format("Unexpected response code %d while sending data to Log and Audit for case: %s",
-                            logAndAuditPostResponse.getStatusCode().value(), caseData.getReference());
-
-                log.error(errorMessage);
-
-                throw new LogAndAuditException(errorMessage);
-            }
-        } catch (final Exception exception) {
-            final String errorMessage = String.format(
-                "Error posting to Log and Audit for case : %s",
-                caseData.getReference()
+        if (!logAndAuditPostResponse.getStatusCode().is2xxSuccessful()) {
+            int statusCode = logAndAuditPostResponse.getStatusCode().value();
+            log.error(
+                "Unexpected response code {} while sending data to Log and Audit for case: {}",
+                statusCode,
+                caseRef
             );
-            log.error(errorMessage, exception);
-            throw new LogAndAuditException(errorMessage, exception);
+
+            throw new LogAndAuditException(statusCode, caseRef);
         }
     }
 

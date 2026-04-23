@@ -70,6 +70,6 @@ class DisposeTaskRemoteOperationTest {
         when(tasksClient.deleteTasks(any(), any(), any(DeleteTasksRequest.class))).thenReturn(response);
         assertThatExceptionOfType(TasksDeletionException.class)
             .isThrownBy(() -> disposeTasksRemoteOperation.delete(caseData))
-            .withMessage("Error deleting tasks for case : 1234567890123456");
+            .withMessage("Unexpected response code 400 while deleting tasks for case: 1234567890123456");
     }
 }
