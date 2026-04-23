@@ -16,14 +16,12 @@ import uk.gov.hmcts.reform.ccd.util.log.HearingDeletionRecordHolder;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_HEARINGS_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE_TYPE;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,28 +71,34 @@ class DisposerHearingsRemoteOperationTest {
     @Test
     void shouldThrowHearingDeletionExceptionWhenErrorOccurs() {
         final List<String> caseRefs = List.of("1234567890123456");
-
+        final RuntimeException exception = new RuntimeException("Delete request failed");
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
-        doThrow(new RuntimeException("Delete request failed"))
-            .when(hearingClient).deleteHearing(any(), eq(DELETE_HEARINGS_PATH), eq(caseRefs));
+        when(securityUtil.getIdamClientToken()).thenReturn("123");
+        when(securityUtil.getServiceAuthorization()).thenReturn("456");
 
-        assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));
+        doThrow(exception)
+            .when(hearingClient)
+            .deleteHearing("123", "456", caseRefs);
+
+        assertThatExceptionOfType(HearingDeletionException.class)
+            .isThrownBy(() -> disposeHearingsRemoteOperation.delete(caseData))
+            .withMessage("Error deleting hearing for case : 1234567890123456")
+            .withCause(exception);
     }
 
 
     @Test
-    void shouldNotDeleteHearings() {
+    void shouldNotInvokeHearingDeletionIfCaseTypeIsNotHearing() {
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
-        final CaseData caseData = CaseData.builder()
+        final CaseData nonHrsCaseData = CaseData.builder()
             .reference(1234567890123456L)
             .caseType("someRandomCaseType").build();
 
-        disposeHearingsRemoteOperation.delete(caseData);
+        disposeHearingsRemoteOperation.delete(nonHrsCaseData);
 
         verifyNoInteractions(hearingDeletionRecordHolder);
         verifyNoInteractions(hearingClient);
         verifyNoInteractions(securityUtil);
-
     }
 
     @Test
@@ -107,7 +111,7 @@ class DisposerHearingsRemoteOperationTest {
                                          "456",
                                          List.of(caseData.getReference().toString())))
             .thenReturn(mockResponse);
-
         assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));
+        verify(hearingDeletionRecordHolder).setHearingDeletionResults(caseData.getReference().toString(), 500);
     }
 }

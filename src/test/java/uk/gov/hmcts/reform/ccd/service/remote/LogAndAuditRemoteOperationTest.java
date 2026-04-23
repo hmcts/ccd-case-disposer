@@ -18,8 +18,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -74,18 +73,14 @@ class LogAndAuditRemoteOperationTest {
 
     @Test
     void shouldThrowExceptionWhenRequestInvalid() {
-        try {
-            doThrow(new LogAndAuditException("Hmmmmm something is wrong here"))
-                .when(lauClient)
-                .postLauAudit(anyString(), any(CaseActionPostRequestResponse.class));
+        doThrow(new LogAndAuditException("Hmmmmm something is wrong here"))
+            .when(lauClient)
+            .postLauAudit(anyString(), any(CaseActionPostRequestResponse.class));
 
-            logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(DELETABLE_CASE_DATA_WITH_PAST_TTL);
-
-            fail("The method should have thrown LogAndAuditException when request is invalid");
-        } catch (final LogAndAuditException logAndAuditException) {
-            assertThat(logAndAuditException.getMessage())
-                .isEqualTo("Error posting to Log and Audit for case : 1");
-        }
+        assertThatExceptionOfType(LogAndAuditException.class)
+            .isThrownBy(() -> logAndAuditRemoteOperation
+                .postCaseDeletionToLogAndAudit(DELETABLE_CASE_DATA_WITH_PAST_TTL))
+            .withMessage("Error posting to Log and Audit for case: 1");
     }
 
     @Test
@@ -96,12 +91,9 @@ class LogAndAuditRemoteOperationTest {
         when(lauClient.postLauAudit(anyString(), any(CaseActionPostRequestResponse.class)))
             .thenReturn(ResponseEntity.status(500).body(caseActionResponse));
 
-        try {
-            logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(DELETABLE_CASE_DATA_WITH_PAST_TTL);
-            fail("The method should have thrown LogAndAuditException when response status is not 2xx");
-        } catch (final LogAndAuditException logAndAuditException) {
-            assertThat(logAndAuditException.getMessage())
-                .isEqualTo("Error posting to Log and Audit for case : 1");
-        }
+        assertThatExceptionOfType(LogAndAuditException.class)
+            .isThrownBy(() -> logAndAuditRemoteOperation
+                .postCaseDeletionToLogAndAudit(DELETABLE_CASE_DATA_WITH_PAST_TTL))
+            .withMessage("Unexpected response code 500 while sending data to Log and Audit for case: 1");
     }
 }

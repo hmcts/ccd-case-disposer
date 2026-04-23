@@ -19,8 +19,7 @@ import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -79,58 +78,59 @@ class DisposeDocumentsRemoteOperationTest {
 
     @Test
     void shouldThrowExceptionWhenRequestInvalid() {
-        try {
-            when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-            doThrow(new DocumentDeletionException("1234567890123456"))
-                .when(documentClient)
-                .deleteDocument(anyString(), any(DocumentsDeletePostRequest.class));
+        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        doThrow(new DocumentDeletionException("1234567890123456"))
+            .when(documentClient)
+            .deleteDocument(anyString(), any(DocumentsDeletePostRequest.class));
 
-            disposeDocumentsRemoteOperation.delete(caseData);
+        assertThatExceptionOfType(DocumentDeletionException.class)
+            .isThrownBy(() -> disposeDocumentsRemoteOperation.delete(caseData))
+            .withMessage("Error deleting documents for case: 1234567890123456");
 
-            fail("The method should have thrown DocumentDeletionException when request is invalid");
-        } catch (final DocumentDeletionException documentDeletionException) {
-            assertThat(documentDeletionException.getMessage())
-                .isEqualTo("Error deleting documents for case : 1234567890123456");
-        }
     }
 
     @Test
     void shouldThrowExceptionWhenResponseIsUnableToMapToObject() {
-        try {
-            final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(1, 1);
+        final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(1, 1);
 
-            when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-            when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
-                .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
+        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
+            .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
 
-            doThrow(new JsonSyntaxException("Unable to map document post response to object"))
-                .when(documentDeletionRecordHolder)
-                .setCaseDocumentsDeletionResults(
-                    eq("1234567890123456"),
-                    any(CaseDocumentsDeletionResults.class)
-                );
+        doThrow(new JsonSyntaxException("Unable to map document post response to object"))
+            .when(documentDeletionRecordHolder)
+            .setCaseDocumentsDeletionResults(
+                eq("1234567890123456"),
+                any(CaseDocumentsDeletionResults.class)
+            );
 
-            disposeDocumentsRemoteOperation.delete(caseData);
-
-            fail("The method should have thrown JsonParseException when request is invalid");
-        } catch (final DocumentDeletionException documentDeletionException) {
-            assertThat(documentDeletionException.getCause().getMessage())
-                .contains("Unable to map json to object document deletion endpoint response due to following "
-                              + "endpoint response:");
-        }
+        assertThatExceptionOfType(DocumentDeletionException.class)
+            .isThrownBy(() -> disposeDocumentsRemoteOperation.delete(caseData))
+            .withMessageStartingWith("Unable to map json to object document deletion endpoint response");
     }
 
     @Test
     void shouldNotDeleteHearings() {
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
-        final CaseData caseData = CaseData.builder()
+        final CaseData hrsCaseData = CaseData.builder()
             .reference(1234567890123456L)
             .caseType(HEARING_RECORDINGS_CASE_TYPE).build();
 
-        disposeDocumentsRemoteOperation.delete(caseData);
+        disposeDocumentsRemoteOperation.delete(hrsCaseData);
 
         verifyNoInteractions(documentDeletionRecordHolder);
         verifyNoInteractions(documentClient);
+    }
 
+    @Test
+    void shouldThrowDocumentDeletionExceptionWhenResponseStatusIsNot2xx() {
+        final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(0, 0);
+        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(documentClient.deleteDocument(any(), any(DocumentsDeletePostRequest.class)))
+            .thenReturn(ResponseEntity.badRequest().body(caseActionResponse));
+
+        assertThatExceptionOfType(DocumentDeletionException.class)
+            .isThrownBy(() -> disposeDocumentsRemoteOperation.delete(caseData))
+            .withMessage("Unexpected response code 400 while deleting documents for case: 1234567890123456");
     }
 }
