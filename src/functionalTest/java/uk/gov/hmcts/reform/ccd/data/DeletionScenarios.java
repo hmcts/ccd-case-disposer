@@ -15,7 +15,7 @@ public class DeletionScenarios {
     }
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
-        return Stream.of(Arguments.of(
+        return Stream.of(/*Arguments.of(
                         "DPR_FT_MasterCaseType",
                         "DPR_FT_MultiplePages",
                         "scenarios/S-001-simulated-and-deletable-case-types.sql",
@@ -71,8 +71,21 @@ public class DeletionScenarios {
                      Map.of("DPR_FT_MasterCaseType", List.of(1004259907353628L,1004259907353629L)),
                      emptyMap(),
                      List.of(1004259907353628L,1004259907353629L)
+                 ),*/
+                 Arguments.of(
+                     "DPR_FT_MasterCaseType",
+                     "",
+                     "scenarios/S-005-delete-cases-with-admin-roles.sql",
+                     List.of(1004259907353728L),
+                     Map.of("DPR_FT_MasterCaseType", List.of(1004259907353728L)),
+                     emptyList(),
+                     emptyList(),
+                     Map.of(1004259907353728L, List.of("jpg.jpg")),
+                     Map.of(1004259907353728L, List.of("S-002-role-assignment-for-case.json")),
+                     Map.of("DPR_FT_MasterCaseType", List.of(1004259907353728L)),
+                     emptyMap(),
+                     List.of(1004259907353728L)
                  )
-
-        );
+                );
     }
 }

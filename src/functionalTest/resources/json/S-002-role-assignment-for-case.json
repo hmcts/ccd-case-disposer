@@ -1,0 +1,24 @@
+{
+  "roleRequest" : {
+    "assignerId" : "787f8cea-955e-4458-b8ac-e8680827b29b",
+    "process" : "CCD",
+    "reference" : "1004259907353728/dfd14404-4607-4887-898d-752dc32bd318",
+    "replaceExisting" : true
+  },
+  "requestedRoles" : [ {
+    "roleType" : "ORGANISATION",
+    "grantType" : "STANDARD",
+    "classification" : "PUBLIC",
+    "attributes": {
+      "caseId": "1004259907353728",
+      "jurisdiction": "IA",
+      "caseType": "Asylum"
+    },
+    "roleName" : "hearing-manager",
+    "roleCategory" : "ADMIN",
+    "actorIdType" : "IDAM",
+    "actorId" : "dfd14404-4607-4887-898d-752dc32bd318",
+    "authorisations": ["QA"]
+  }
+  ]
+}
