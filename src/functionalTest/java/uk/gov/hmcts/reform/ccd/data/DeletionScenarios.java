@@ -15,7 +15,7 @@ public class DeletionScenarios {
     }
 
     protected static Stream<Arguments> provideCaseDeletionScenarios() {
-        return Stream.of(/*Arguments.of(
+        return Stream.of(Arguments.of(
                         "DPR_FT_MasterCaseType",
                         "DPR_FT_MultiplePages",
                         "scenarios/S-001-simulated-and-deletable-case-types.sql",
@@ -71,7 +71,7 @@ public class DeletionScenarios {
                      Map.of("DPR_FT_MasterCaseType", List.of(1004259907353628L,1004259907353629L)),
                      emptyMap(),
                      List.of(1004259907353628L,1004259907353629L)
-                 ),*/
+                 ),
                  Arguments.of(
                      "DPR_FT_MasterCaseType",
                      "",
