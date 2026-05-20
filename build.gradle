@@ -247,7 +247,7 @@ def versions = [
     elasticsearch       : '9.4.0',
     flyway              : '12.6.1',
     gradlePitest        : '1.15.0',
-    idamClient          : '3.0.5',
+    idamClient          : '4.0.0',
     junit               : '5.14.4',
     lombok              : '1.18.46',
     reformLogging       : '8.0.0',
