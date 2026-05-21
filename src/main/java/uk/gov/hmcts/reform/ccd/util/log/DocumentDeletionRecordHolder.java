@@ -4,31 +4,19 @@ import jakarta.inject.Named;
 import lombok.Getter;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Named
 @Getter
 public class DocumentDeletionRecordHolder {
-    private List<Map<String, CaseDocumentsDeletionResults>> documentDeleteRecordHolderList = new ArrayList<>();
+    private ConcurrentMap<String, CaseDocumentsDeletionResults> documentsDeletionByCaseRef = new ConcurrentHashMap<>();
 
-    public void setCaseDocumentsDeletionResults(final String caseRef,
-                                                final CaseDocumentsDeletionResults caseDocumentsDeletionResults) {
-        documentDeleteRecordHolderList.add(Map.of(caseRef, caseDocumentsDeletionResults));
+    public void setCaseDocumentsDeletionResults(String caseRef, CaseDocumentsDeletionResults deletionResult) {
+        documentsDeletionByCaseRef.put(caseRef, deletionResult);
     }
 
     public CaseDocumentsDeletionResults getCaseDocumentsDeletionResults(final String caseRef) {
-        if (!documentDeleteRecordHolderList.isEmpty()) {
-            final Optional<Map<String, CaseDocumentsDeletionResults>> deletionResultsMap =
-                    documentDeleteRecordHolderList.stream()
-                    .filter(documentHolderEntry -> documentHolderEntry.containsKey(caseRef))
-                    .findFirst();
-            if (deletionResultsMap.isPresent()) {
-                return deletionResultsMap.get().get(caseRef);
-            }
-        }
-        return null;
+        return documentsDeletionByCaseRef.getOrDefault(caseRef, null);
     }
 }
