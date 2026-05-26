@@ -200,6 +200,10 @@ dependencyManagement {
           entry 'logback-core'
           entry 'logback-classic'
         }
+
+        dependencySet(group: 'org.apache.logging.log4j', version: '2.26.0') {
+          entry 'log4j-api'
+        }
     }
 }
 
@@ -261,7 +265,6 @@ def versions = [
     serenity            : '3.1.20',
 ]
 
-ext['jackson.version'] = '2.16.0'
 project.ext.pacticipantVersion = getCheckedOutGitCommitHash()
 
 rootProject.tasks.named("processTestResources") {
@@ -278,6 +281,8 @@ rootProject.tasks.named("processIntegrationTestResources") {
 rootProject.tasks.named("processContractTestResources") {
   duplicatesStrategy = 'include'
 }
+
+ext['commons-lang3.version'] = '3.18.0'
 
 dependencies {
 

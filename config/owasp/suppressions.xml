@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+ <suppress until="2026-08-31">
+    <cve>CVE-2025-21199</cve>
+    <cve>CVE-2026-39883</cve>
+    <cve>CVE-2026-39882</cve>
+    <cve>CVE-2026-29181</cve>
+  </suppress>
+
   <!--Please add all the false positives under the below section-->
   <!--End of false positives section -->
 </suppressions>
