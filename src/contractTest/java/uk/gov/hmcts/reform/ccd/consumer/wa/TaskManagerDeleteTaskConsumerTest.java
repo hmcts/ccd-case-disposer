@@ -39,7 +39,7 @@ public class TaskManagerDeleteTaskConsumerTest extends SpringBootContractBaseTes
 
         RestAssured
             .given()
-            .headers(getHttpHeaders())
+            .headers(getHttpHeaders().toSingleValueMap())
             .contentType(ContentType.JSON)
             .body(deleteTaskWithRequest())
             .post(mockServer.getUrl() + WA_DELETE_TASK)
