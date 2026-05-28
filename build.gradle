@@ -5,12 +5,12 @@ plugins {
   id 'idea'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.5.14'
+  id 'org.springframework.boot' version '4.0.6'
   id 'org.owasp.dependencycheck' version '12.2.1'
   id 'com.github.ben-manes.versions' version '0.54.0'
   id 'org.sonarqube' version '7.3.0.8198'
   id 'uk.gov.hmcts.java' version '0.12.70'
-  id 'io.freefair.lombok' version '8.14.4'
+  id 'io.freefair.lombok' version '9.5.0'
   id 'org.flywaydb.flyway' version '12.6.2'
   id "info.solidsoft.pitest" version '1.19.0'
   id "au.com.dius.pact" version '4.7.1'
@@ -186,24 +186,8 @@ dependencyCheck {
 }
 
 dependencyManagement {
-    dependencies {
-        dependency group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.84'
-        dependencySet(group: 'org.springframework.cloud', version: '4.3.2') {
-            entry 'spring-cloud-starter-openfeign'
-            entry 'spring-cloud-openfeign-core'
-        }
-        dependencySet(group: 'org.yaml', version: '2.6') {
-            entry 'snakeyaml'
-        }
-
-        dependencySet(group: 'ch.qos.logback', version: '1.5.32') {
-          entry 'logback-core'
-          entry 'logback-classic'
-        }
-
-        dependencySet(group: 'org.apache.logging.log4j', version: '2.26.0') {
-          entry 'log4j-api'
-        }
+    imports {
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.1'
     }
 }
 
@@ -251,12 +235,11 @@ def versions = [
     elasticsearch       : '9.4.1',
     flyway              : '12.6.2',
     gradlePitest        : '1.15.0',
-    idamClient          : '3.0.5',
-    junit               : '5.14.4',
+    idamClient          : '4.0.0',
     lombok              : '1.18.46',
     reformLogging       : '8.0.0',
-    restAssured         : '5.5.7',
-    s2sClient           : '5.3.3',
+    restAssured         : '6.0.0',
+    s2sClient           : '6.0.0',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
     testcontainers      : '1.21.4',
@@ -281,8 +264,6 @@ rootProject.tasks.named("processIntegrationTestResources") {
 rootProject.tasks.named("processContractTestResources") {
   duplicatesStrategy = 'include'
 }
-
-ext['commons-lang3.version'] = '3.18.0'
 
 dependencies {
 
@@ -320,6 +301,8 @@ dependencies {
     testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa-test'
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-flyway-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
     testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
     testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
@@ -345,8 +328,6 @@ dependencies {
     //pact contract testing
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit', version: versions.pactVersion
-    contractTestRuntimeOnly(group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: versions.junit)
-    contractTestImplementation(group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: versions.junit)
 
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
