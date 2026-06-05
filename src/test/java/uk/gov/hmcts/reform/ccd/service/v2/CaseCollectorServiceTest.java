@@ -26,6 +26,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@SuppressWarnings("java:S5778")
 @ExtendWith(MockitoExtension.class)
 class CaseCollectorServiceTest {
 
@@ -176,6 +177,7 @@ class CaseCollectorServiceTest {
         Thread.interrupted();
     }
 
+    @SuppressWarnings("java:S8692")
     private static CaseDataEntity entity(long id) {
         CaseDataEntity e = new CaseDataEntity();
         e.setId(id);

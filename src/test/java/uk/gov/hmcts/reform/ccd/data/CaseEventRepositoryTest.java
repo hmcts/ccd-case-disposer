@@ -19,13 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
-public class CaseEventRepositoryTest extends BaseRepositoryTest {
+class CaseEventRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
     private CaseEventRepository caseEventRepository;
 
     @BeforeEach
-    public void setUp() throws SQLException {
+    void setUp() throws SQLException {
         insertDataIntoDatabase("testData/case_event.sql");
     }
 

@@ -36,6 +36,7 @@ class SecurityUtilTest {
     private SecurityUtil securityUtil;
 
     @Test
+    @SuppressWarnings("java:S1874")
     void shouldGetServiceAuthorization() {
 
         setField(securityUtil, "parameterResolver", parameterResolver);
@@ -91,6 +92,7 @@ class SecurityUtilTest {
     }
 
     @Test
+    @SuppressWarnings("java:S1874")
     void shouldThrowUserDetailsGenerationException() {
         try {
             setField(securityUtil, "parameterResolver", parameterResolver);

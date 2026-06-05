@@ -24,7 +24,6 @@ public class FileUtils {
 
     public String getJsonFromFile(final String fileName) throws IOException {
         final File file = ResourceUtils.getFile(this.getClass().getResource(JSON_FOLDER + fileName));
-        final String fileContent = Files.readString(file.toPath(), StandardCharsets.UTF_8);
-        return fileContent;
+        return Files.readString(file.toPath(), StandardCharsets.UTF_8);
     }
 }

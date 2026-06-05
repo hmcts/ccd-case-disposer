@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.ccd.service.remote;
 import com.google.gson.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.lau.ActionLog;
@@ -15,14 +14,12 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
-import java.text.SimpleDateFormat;
-
-import static java.sql.Timestamp.valueOf;
-import static java.time.LocalDateTime.now;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @Slf4j
-@Qualifier("LogAndAuditRemoteOperation")
 @RequiredArgsConstructor
 public class LogAndAuditRemoteOperation {
 
@@ -30,8 +27,9 @@ public class LogAndAuditRemoteOperation {
     private final SecurityUtil securityUtil;
     private final LauRecordHolder lauRecordHolder;
 
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-    private static final String TIMESTAMP_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     @LogExecutionTime("Log and Audit")
     public void postCaseDeletionToLogAndAudit(final CaseData caseData) {
@@ -95,6 +93,6 @@ public class LogAndAuditRemoteOperation {
 
 
     private String getTimestamp() {
-        return new SimpleDateFormat(TIMESTAMP_PATTERN).format(valueOf(now()));
+        return OffsetDateTime.now(ZoneOffset.UTC).format(TIMESTAMP_FORMATTER);
     }
 }

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.ccd.async;
 
-import jakarta.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +17,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 @EnableAsync
 @Slf4j
+@RequiredArgsConstructor
 public class TaskPoolConfiguration implements AsyncConfigurer {
 
-    @Inject
-    private ParameterResolver parameterResolver;
+    private final ParameterResolver parameterResolver;
 
     @Bean
     @Override

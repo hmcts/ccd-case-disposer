@@ -37,7 +37,7 @@ class DefaultParameterResolverTest {
     protected DefaultParameterResolver defaultParameterResolver = new DefaultParameterResolver();
 
     @BeforeEach
-    public void initMock() {
+    void initMock() {
 
         ReflectionTestUtils.setField(defaultParameterResolver,
                                      ELASTIC_SEARCH_DATA_NODES_HOSTS, Arrays.asList("http://localhost:9200"));

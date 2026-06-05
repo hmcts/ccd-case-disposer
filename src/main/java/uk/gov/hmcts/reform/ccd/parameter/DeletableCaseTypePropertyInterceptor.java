@@ -7,8 +7,6 @@ import uk.gov.hmcts.reform.ccd.exception.DuplicateCaseTypeException;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @Slf4j
 @Configuration
 public class DeletableCaseTypePropertyInterceptor {
@@ -25,9 +23,9 @@ public class DeletableCaseTypePropertyInterceptor {
         final List<String> deletableCaseTypesSimulation = parameterResolver.getDeletableCaseTypesSimulation();
 
         final List<String> duplicateCaseTypes = deletableCaseTypes.stream()
-                .filter(deletableCaseType -> deletableCaseTypesSimulation.contains(deletableCaseType))
+                .filter(deletableCaseTypesSimulation::contains)
                 .filter(caseTypes -> !caseTypes.isEmpty())
-                .collect(toList());
+                .toList();
 
         if (!duplicateCaseTypes.isEmpty()) {
             log.error("Found duplicate deletable case type in "

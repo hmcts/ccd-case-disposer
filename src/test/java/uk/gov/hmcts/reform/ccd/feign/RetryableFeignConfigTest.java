@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-public class RetryableFeignConfigTest {
+class RetryableFeignConfigTest {
 
     @Test
     void testFeignRetryer() {

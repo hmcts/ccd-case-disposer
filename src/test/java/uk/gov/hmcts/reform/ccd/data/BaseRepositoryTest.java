@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 
+@SuppressWarnings("java:S2187")
 public class BaseRepositoryTest {
 
     @Inject

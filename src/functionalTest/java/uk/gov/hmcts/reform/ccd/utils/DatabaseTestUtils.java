@@ -45,8 +45,7 @@ public class DatabaseTestUtils {
                         }
                     });
 
-                    assertThat(databaseEndStateRowIds.size())
-                            .isEqualTo(endStateRows.size());
+                    assertThat(databaseEndStateRowIds).hasSameSizeAs(endStateRows);
                     assertThat(databaseEndStateRowIds).containsExactlyInAnyOrderElementsOf(endStateRows);
                 });
     }

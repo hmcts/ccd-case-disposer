@@ -3,8 +3,9 @@ package uk.gov.hmcts.reform.ccd.util;
 import jakarta.inject.Named;
 import uk.gov.hmcts.reform.ccd.data.model.CaseDataView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,6 +25,9 @@ import static uk.gov.hmcts.reform.ccd.util.LogConstants.TOTAL_STRING;
 
 @Named
 public class SummaryStringLogBuilder {
+
+    private static final DateTimeFormatter DATE_FORMATTER =
+        DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy, HH:mm", Locale.UK);
 
     public String buildSummaryString(final List<CaseDataView> caseDataViews) {
         final int deletedCases = countCaseFamilies(caseDataViews, DELETED_STATE);
@@ -49,8 +53,7 @@ public class SummaryStringLogBuilder {
                                      final Map<String, Long> caseTypeAndStateCount) {
 
         final StringBuilder stringBuilder = new StringBuilder(SUMMARY_HEADING_STRING);
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMMM yyyy, HH:mm", Locale.UK);
-        stringBuilder.append(dateFormat.format(new Date()))
+        stringBuilder.append(LocalDateTime.now(ZoneOffset.UTC).format(DATE_FORMATTER))
             .append(CR_STRING)
             .append(TOTAL_CASES_STRING).append(total)
             .append(DELETED_CASES_STRING).append(deleted)

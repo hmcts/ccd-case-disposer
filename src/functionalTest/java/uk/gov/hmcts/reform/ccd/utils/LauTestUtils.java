@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Functions.toStringFunction;
 import static com.google.common.collect.Lists.newArrayList;
@@ -23,7 +22,7 @@ public class LauTestUtils {
 
         final List<Long> caseRefs = deletableEndStateRowIds.stream()
             .flatMap(List::stream)
-            .collect(Collectors.toList());
+            .toList();
 
         with().await()
             .untilAsserted(() -> assertThat(lauRecordHolder.getLauCaseRefList())

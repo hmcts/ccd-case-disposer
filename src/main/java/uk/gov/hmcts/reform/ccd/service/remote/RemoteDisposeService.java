@@ -1,16 +1,16 @@
 package uk.gov.hmcts.reform.ccd.service.remote;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RemoteDisposeService {
 
-    @Autowired
-    private List<DisposeRemoteOperation> disposeRemoteOperations;
+    private final List<DisposeRemoteOperation> disposeRemoteOperations;
 
     /**
      * Each class that implements DisposeRemoteOperation is responsible for handling the deletion logic.
