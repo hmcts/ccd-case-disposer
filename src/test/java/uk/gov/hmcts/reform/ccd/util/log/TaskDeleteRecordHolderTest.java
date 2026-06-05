@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class TaskDeleteRecordHolderTest {
+class TaskDeleteRecordHolderTest {
 
     @Test
     void shouldHoldTasksDeletionResults() {

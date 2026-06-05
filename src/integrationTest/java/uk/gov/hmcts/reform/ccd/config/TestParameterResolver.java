@@ -89,7 +89,7 @@ public class TestParameterResolver implements ParameterResolver {
 
         return Arrays.stream(result)
                 .map(quotedItem -> quotedItem.replace("\"", "").strip())
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Override
@@ -101,13 +101,13 @@ public class TestParameterResolver implements ParameterResolver {
 
         return Arrays.stream(result)
                 .map(quotedItem -> quotedItem.replace("\"", "").strip())
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Override
     public List<String> getAllDeletableCaseTypes() {
         return Stream.concat(getDeletableCaseTypes().stream(), getDeletableCaseTypesSimulation().stream())
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Override

@@ -70,6 +70,7 @@ class ApplicationExecutorTest {
     private ApplicationExecutor applicationExecutor;
 
     @BeforeEach
+    @SuppressWarnings("java:S8692")
     void setUp() {
         when(clock.instant()).thenReturn(Clock.systemUTC().instant());
         when(clock.getZone()).thenReturn(Clock.systemUTC().getZone());

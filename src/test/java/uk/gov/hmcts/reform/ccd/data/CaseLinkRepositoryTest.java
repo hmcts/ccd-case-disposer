@@ -19,13 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
-public class CaseLinkRepositoryTest extends BaseRepositoryTest {
+class CaseLinkRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
     private CaseLinkRepository caseLinkRepository;
 
     @BeforeEach
-    public void setUp() throws SQLException {
+    void setUp() throws SQLException {
         insertDataIntoDatabase("testData/case_link.sql");
     }
 
@@ -55,6 +55,6 @@ public class CaseLinkRepositoryTest extends BaseRepositoryTest {
         assertThat(caseLinkEntities).hasSize(1);
         caseLinkRepository.delete(caseLinkEntities.getFirst());
         caseLinkEntities = caseLinkRepository.findByCaseIdOrLinkedCaseId(7L);
-        assertThat(caseLinkEntities).hasSize(0);
+        assertThat(caseLinkEntities).isEmpty();
     }
 }

@@ -5,7 +5,6 @@ import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pivovarit.function.ThrowingConsumer;
 import jakarta.inject.Inject;
 import org.springframework.stereotype.Component;
@@ -15,9 +14,8 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.with;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -29,8 +27,6 @@ public class ElasticSearchIndexCreator {
 
     @Inject
     private ParameterResolver parameterResolver;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public void insertDataIntoElasticsearch(final String indexName, final List<Long> caseRefs) throws IOException {
         final String caseIndex = getIndexName(indexName);
@@ -61,7 +57,7 @@ public class ElasticSearchIndexCreator {
                         .withReference(ref)
                         .withCaseType(caseType)
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private void refreshIndex(final String caseIndex) throws IOException {
@@ -70,8 +66,7 @@ public class ElasticSearchIndexCreator {
 
         with()
             .await()
-            .untilAsserted(() -> assertThat(refreshResponse.shards().failures().size())
-                .isEqualTo(0));
+            .untilAsserted(() -> assertThat(refreshResponse.shards().failures()).isEmpty());
     }
 
     public String getIndexName(String caseType) {

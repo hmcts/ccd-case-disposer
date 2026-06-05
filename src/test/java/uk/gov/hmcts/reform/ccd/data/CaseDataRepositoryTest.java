@@ -21,13 +21,13 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_TYPE;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 @ImportAutoConfiguration({FeignAutoConfiguration.class})
-public class CaseDataRepositoryTest extends BaseRepositoryTest {
+class CaseDataRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
     private CaseDataRepository caseDataRepository;
 
     @BeforeEach
-    public void setUp() throws SQLException {
+    void setUp() throws SQLException {
         insertDataIntoDatabase("testData/case_data.sql");
     }
 

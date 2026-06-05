@@ -10,6 +10,6 @@ class LauRecordHolderTest {
     void shouldAddCaseRef() {
         final LauRecordHolder lauRecordHolder = new LauRecordHolder();
         lauRecordHolder.addLauCaseRef("123");
-        assertThat(lauRecordHolder.getLauCaseRefList().size()).isEqualTo(1);
+        assertThat(lauRecordHolder.getLauCaseRefList()).hasSize(1);
     }
 }

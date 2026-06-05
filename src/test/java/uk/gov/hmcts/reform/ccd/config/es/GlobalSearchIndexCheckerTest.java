@@ -44,7 +44,7 @@ class GlobalSearchIndexCheckerTest {
         when(elasticsearchClient.indices()).thenReturn(indicesClient);
         when(elasticsearchClient.indices().exists(any(Function.class))).thenReturn(booleanResponse);
 
-        assertThat(globalSearchIndexChecker.isGlobalSearchExist()).isEqualTo(true);
+        assertThat(globalSearchIndexChecker.isGlobalSearchExist()).isTrue();
     }
 
     @Test
@@ -58,7 +58,7 @@ class GlobalSearchIndexCheckerTest {
         when(elasticsearchClient.indices()).thenReturn(indicesClient);
         when(elasticsearchClient.indices().exists(any(Function.class))).thenReturn(booleanResponse);
 
-        assertThat(globalSearchIndexChecker.isGlobalSearchExist()).isEqualTo(false);
+        assertThat(globalSearchIndexChecker.isGlobalSearchExist()).isFalse();
     }
 
 

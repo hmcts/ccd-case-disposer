@@ -161,8 +161,7 @@ public class ElasticSearchTestUtils {
 
         with()
             .await()
-            .untilAsserted(() -> assertThat(refreshResponse.shards().failures().size())
-                .isEqualTo(0));
+            .untilAsserted(() -> assertThat(refreshResponse.shards().failures()).isEmpty());
     }
 
     private <T> void throwError(final String message, final List<T> list) {

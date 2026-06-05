@@ -140,7 +140,6 @@ public class ElasticSearchIntegrationTestUtils {
 
     public void createElasticSearchIndex(final Map<String, List<Long>> indexedData) {
         indexedData.entrySet()
-                .stream()
                 .forEach(ThrowingConsumer.unchecked(entry -> {
                     elasticSearchIndexCreator.insertDataIntoElasticsearch(entry.getKey(), entry.getValue());
                 }));
@@ -152,8 +151,7 @@ public class ElasticSearchIntegrationTestUtils {
 
         with()
             .await()
-            .untilAsserted(() -> assertThat(refreshResponse.shards().failures().size())
-                .isEqualTo(0));
+            .untilAsserted(() -> assertThat(refreshResponse.shards().failures()).isEmpty());
     }
 
 

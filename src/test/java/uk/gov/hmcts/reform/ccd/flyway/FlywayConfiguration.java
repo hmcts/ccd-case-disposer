@@ -43,7 +43,7 @@ public class FlywayConfiguration implements FlywayConfigurationCustomizer {
     @Override
     public void customize(FluentConfiguration configuration) {
         PostgreSQLConfigurationExtension configurationExtension =
-            configuration.getPluginRegister().getPlugin(PostgreSQLConfigurationExtension.class);
+            configuration.getPluginRegister().getExact(PostgreSQLConfigurationExtension.class);
         configurationExtension.setTransactionalLock(false);
         configuration.locations("filesystem:src/integrationTest/resources/db/migration");
     }
