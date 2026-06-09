@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.ccd.util;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -25,18 +24,20 @@ public class SecurityUtil {
 
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamClient idamClient;
+    private final ParameterResolver parameterResolver;
 
     private String serviceAuthorization;
     private String idamClientToken;
     private UserDetails userDetails = new UserDetails();
 
-    @Autowired
-    private ParameterResolver parameterResolver;
-
-    @Autowired
-    public SecurityUtil(final AuthTokenGenerator authTokenGenerator, IdamClient idamClient) {
+    public SecurityUtil(
+        final AuthTokenGenerator authTokenGenerator,
+        final IdamClient idamClient,
+        final ParameterResolver parameterResolver
+    ) {
         this.authTokenGenerator = authTokenGenerator;
         this.idamClient = idamClient;
+        this.parameterResolver = parameterResolver;
     }
 
     public void generateTokens() {
@@ -45,6 +46,7 @@ public class SecurityUtil {
         generateUserDetails();
     }
 
+    @SuppressWarnings("java:S1874") // idamClient.getUserDetails is deprecated
     private void generateUserDetails() {
         try {
             userDetails = idamClient.getUserDetails(idamClientToken);

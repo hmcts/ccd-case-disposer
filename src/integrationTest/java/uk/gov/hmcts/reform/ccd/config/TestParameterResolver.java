@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toUnmodifiableList;
-
 @SuppressWarnings("ALL")
 public class TestParameterResolver implements ParameterResolver {
     public static final String DELETABLE_CASE_TYPES_PROPERTY = "deletable.case.types";
@@ -78,7 +76,7 @@ public class TestParameterResolver implements ParameterResolver {
     public List<String> getElasticsearchHosts() {
         return elasticsearchHosts.stream()
                 .map(quotedHost -> quotedHost.replace("\"", "").strip())
-                .collect(toUnmodifiableList());
+                .toList();
     }
 
     @Override
