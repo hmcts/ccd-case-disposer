@@ -23,7 +23,7 @@ job:
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
     HEARING_RECORDING_HOST: http://em-hrs-api-aat.service.core-compute-aat.internal
     IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-    IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
+    IDAM_API_URL: https://idam-web-public.aat.platform.hmcts.net
 global:
   jobKind: CronJob
 
@@ -241,7 +241,7 @@ ccd:
     ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
     ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
-    idamApiUrl: https://idam-api.aat.platform.hmcts.net
+    idamApiUrl: https://idam-web-public.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
     s2sUrl: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
     ccdApiGatewayIngress: gateway-${SERVICE_FQDN}.preview.platform.hmcts.net
@@ -361,7 +361,7 @@ ccd:
         DATA_STORE_IDAM_KEY: ${CCD_DATA_STORE_S2S_SECRET}
         DATA_STORE_S2S_AUTHORISED_SERVICES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
         IDAM_USER_URL: https://idam-web-public.aat.platform.hmcts.net
-        IDAM_API_BASE_URL: https://idam-api.aat.platform.hmcts.net
+        IDAM_API_BASE_URL: https://idam-web-public.aat.platform.hmcts.net
         IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
         IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
         CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES: ccd_gw,ccd_gateway,fpl_case_service,ccd_data,ccd_ps,ccd_case_disposer
