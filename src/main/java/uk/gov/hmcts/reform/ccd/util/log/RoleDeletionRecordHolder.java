@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentMap;
 @Named
 @Getter
 public class RoleDeletionRecordHolder {
-    private ConcurrentMap<String, Integer> roleDeletionByCaseRef = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Integer> roleDeletionByCaseRef = new ConcurrentHashMap<>();
 
     public void setCaseRolesDeletionResults(final String caseRef, final int rolesDeletionResult) {
         roleDeletionByCaseRef.put(caseRef, rolesDeletionResult);

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Named
 @Getter
 public class LauRecordHolder {
-    private Set<String> lauCaseRefList = ConcurrentHashMap.newKeySet();
+    private final Set<String> lauCaseRefList = ConcurrentHashMap.newKeySet();
 
     public void addLauCaseRef(final String caseRef) {
         lauCaseRefList.add(caseRef);

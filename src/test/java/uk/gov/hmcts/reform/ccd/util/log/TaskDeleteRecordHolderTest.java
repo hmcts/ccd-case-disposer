@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@SuppressWarnings({"PMD.AvoidInstantiatingObjectsInLoops", "PMD.CloseResource"})
 class TaskDeleteRecordHolderTest {
 
     @Test
@@ -32,6 +33,7 @@ class TaskDeleteRecordHolderTest {
 
     }
 
+    @SuppressWarnings("PMD.CognitiveComplexity")
     @Test
     void shouldHandleConcurrentReadsAndWritesUnderLoad() throws Exception {
         final int writerThreads = 8;

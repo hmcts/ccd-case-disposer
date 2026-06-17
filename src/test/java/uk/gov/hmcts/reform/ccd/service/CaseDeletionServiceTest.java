@@ -123,13 +123,13 @@ class CaseDeletionServiceTest {
     @Test
     void shouldLogErrorWhenDeleteCaseLinksFails() {
         // GIVEN
-        Mockito.doThrow(IllegalArgumentException.class).when(caseLinkRepository).findByCaseIdOrLinkedCaseId(1L);
+        Mockito.doThrow(IllegalArgumentException.class).when(caseLinkRepository).deleteByCaseIdOrLinkedCaseId(1L);
 
         // WHEN
         catchThrowable(() -> underTest.deleteCaseLinks(caseData));
 
         // THEN
-        verify(caseLinkRepository, times(1)).findByCaseIdOrLinkedCaseId(1L);
+        verify(caseLinkRepository, times(1)).deleteByCaseIdOrLinkedCaseId(1L);
         verify(processedCasesRecordHolder, times(1)).addFailedToDeleteCaseRef(caseData);
         Mockito.verifyNoMoreInteractions(caseLinkRepository);
     }
@@ -139,7 +139,8 @@ class CaseDeletionServiceTest {
         // GIVEN
         doReturn(Optional.of(TestData.DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
-        Mockito.doThrow(DocumentDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+        Mockito.doThrow(DocumentDeletionException.class)
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         // WHEN
         underTest.deleteCaseData(caseData);
@@ -158,7 +159,8 @@ class CaseDeletionServiceTest {
         // GIVEN
         doReturn(Optional.of(TestData.DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
-        Mockito.doThrow(ElasticsearchOperationException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+        Mockito.doThrow(ElasticsearchOperationException.class)
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         // WHEN
         underTest.deleteCaseData(caseData);
@@ -177,7 +179,8 @@ class CaseDeletionServiceTest {
         // GIVEN
         doReturn(Optional.of(TestData.DELETABLE_CASE_ENTITY_WITH_PAST_TTL)).when(caseDataRepository).findById(1L);
 
-        Mockito.doThrow(RoleAssignmentDeletionException.class).when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
+        Mockito.doThrow(RoleAssignmentDeletionException.class)
+            .when(remoteDisposeService).remoteDeleteAll(any(CaseData.class));
 
         // WHEN
         underTest.deleteCaseData(caseData);

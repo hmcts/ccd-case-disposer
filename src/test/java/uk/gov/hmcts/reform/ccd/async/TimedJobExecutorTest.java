@@ -10,7 +10,7 @@ import java.util.concurrent.locks.LockSupport;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-@SuppressWarnings({"java:S2925", "PMD.DoNotUseThreads"})
+@SuppressWarnings({"java:S2925"})
 class TimedJobExecutorTest {
 
     @Test

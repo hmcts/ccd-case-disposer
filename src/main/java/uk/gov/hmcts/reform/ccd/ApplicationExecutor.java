@@ -81,6 +81,7 @@ public class ApplicationExecutor {
         log.info("Hearing Case Type: {}", parameterResolver.getHearingCaseType());
     }
 
+    @SuppressWarnings("PMD.ExceptionAsFlowControl")
     private void processCases(final Set<CaseData> cases, int requestLimit) {
         int remainingRequests = requestLimit;
         LocalTime cutOffTime = parameterResolver.getCutOffTime();
@@ -117,6 +118,7 @@ public class ApplicationExecutor {
         waitForCompletion(futures);
     }
 
+    @SuppressWarnings("PMD.PreserveStackTrace")
     private void waitForCompletion(List<Future<?>> futures) {
         for (Future<?> future : futures) {
             try {
@@ -126,7 +128,7 @@ public class ApplicationExecutor {
                 cancelOutstanding(futures);
                 throw new JobInterruptedException();
             } catch (ExecutionException e) {
-                log.error("Task failed", e.getCause());
+                log.error("Task failed {}", e.getCause(), e);
             }
         }
     }

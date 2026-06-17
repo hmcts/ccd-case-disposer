@@ -33,7 +33,5 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
 
     @Modifying
     @Query("DELETE FROM CaseLinkEntity c WHERE c.caseId = :caseId OR c.linkedCaseId = :caseId")
-    int deleteByCaseIdOrLinkedCaseId(final Long caseId);
-
-    void delete(CaseLinkEntity caseLinkEntity);
+    int deleteByCaseIdOrLinkedCaseId(Long caseId);
 }

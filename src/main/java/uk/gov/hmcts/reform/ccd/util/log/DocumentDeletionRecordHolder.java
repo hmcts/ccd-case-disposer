@@ -10,7 +10,8 @@ import java.util.concurrent.ConcurrentMap;
 @Named
 @Getter
 public class DocumentDeletionRecordHolder {
-    private ConcurrentMap<String, CaseDocumentsDeletionResults> documentsDeletionByCaseRef = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, CaseDocumentsDeletionResults> documentsDeletionByCaseRef =
+        new ConcurrentHashMap<>();
 
     public void setCaseDocumentsDeletionResults(String caseRef, CaseDocumentsDeletionResults deletionResult) {
         documentsDeletionByCaseRef.put(caseRef, deletionResult);
