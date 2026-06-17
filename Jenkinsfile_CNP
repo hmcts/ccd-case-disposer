@@ -152,7 +152,7 @@ withPipeline(type, product, component) {
     // Set required environment variables to run functional tests apart from one in vaults.
     env.ELASTIC_SEARCH_ENABLED = true
     env.IDAM_S2S_URL = 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal'
-    env.IDAM_API_URL = 'https://idam-api.aat.platform.hmcts.net'
+    env.IDAM_API_URL = 'https://idam-web-public.aat.platform.hmcts.net'
     env.ROLE_ASSIGNMENT_HOST = 'http://am-role-assignment-service-aat.service.core-compute-aat.internal'
     env.DOCUMENT_STORE_HOST = 'http://dm-store-aat.service.core-compute-aat.internal'
     env.TASKS_HOST = 'http://wa-task-management-api-aat.service.core-compute-aat.internal'
