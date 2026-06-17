@@ -13,7 +13,11 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_HEARINGS_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
-@FeignClient(name = "hearingClient", url = "${remote.hearing.host}")
+@FeignClient(
+    name = "hearingClient",
+    url = "${remote.hearing.host}",
+    configuration = CcdJsonFeignConfiguration.class
+)
 public interface HearingClient {
 
     @DeleteMapping(
