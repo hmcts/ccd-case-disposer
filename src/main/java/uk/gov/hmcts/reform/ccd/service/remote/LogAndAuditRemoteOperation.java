@@ -82,7 +82,7 @@ public class LogAndAuditRemoteOperation {
 
     private CaseActionPostRequestResponse buildCaseActionPostRequest(final CaseData caseData) {
         return new CaseActionPostRequestResponse(ActionLog.builder()
-                                                     .userId(securityUtil.getUserDetails().getId())
+                                                     .userId(securityUtil.getUserInfo().getUid())
                                                      .caseAction("DELETE")
                                                      .caseTypeId(caseData.getCaseType())
                                                      .caseRef(caseData.getReference().toString())

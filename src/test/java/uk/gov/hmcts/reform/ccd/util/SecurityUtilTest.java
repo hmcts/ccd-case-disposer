@@ -11,14 +11,13 @@ import uk.gov.hmcts.reform.ccd.exception.ServiceAuthTokenGenerationException;
 import uk.gov.hmcts.reform.ccd.exception.UserDetailsGenerationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
 class SecurityUtilTest {
@@ -38,74 +37,57 @@ class SecurityUtilTest {
     @Test
     @SuppressWarnings("java:S1874")
     void shouldGetServiceAuthorization() {
-
-        setField(securityUtil, "parameterResolver", parameterResolver);
-        final UserDetails userDetails = mock(UserDetails.class);
+        final UserInfo userInfo = mock(UserInfo.class);
 
         when(serviceTokenGenerator.generate()).thenReturn("7gf364fg367f67");
         when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
         when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
         when(idamClient.getAccessToken("JohnTerry", "Chelsea123")).thenReturn("Bearer 123");
-        when(idamClient.getUserDetails("Bearer 123")).thenReturn(userDetails);
+        when(idamClient.getUserInfo("Bearer 123")).thenReturn(userInfo);
 
-
-        invokeMethod(securityUtil, "generateTokens");
+        securityUtil.generateTokens();
 
         assertThat(securityUtil.getServiceAuthorization()).isEqualTo("7gf364fg367f67");
         assertThat(securityUtil.getIdamClientToken()).isEqualTo("Bearer 123");
-        assertThat(securityUtil.getUserDetails()).isEqualTo(userDetails);
+        assertThat(securityUtil.getUserInfo()).isEqualTo(userInfo);
     }
 
 
     @Test
     void shouldThrowServiceAuthTokenGenerationException() {
-        try {
-            setField(securityUtil, "parameterResolver", parameterResolver);
-            doThrow(new ServiceAuthTokenGenerationException("1234567890123456"))
-                    .when(serviceTokenGenerator).generate();
-
-            invokeMethod(securityUtil, "generateTokens");
-
-        } catch (final ServiceAuthTokenGenerationException serviceAuthTokenGenerationException) {
-            assertThat(serviceAuthTokenGenerationException.getMessage())
-                    .contains("Case disposer is unable to generate service auth token due to error -");
-        }
+        doThrow(new ServiceAuthTokenGenerationException("1234567890123456"))
+                .when(serviceTokenGenerator).generate();
+        assertThatThrownBy(() -> securityUtil.generateTokens())
+            .isInstanceOf(ServiceAuthTokenGenerationException.class)
+            .hasMessageContaining("Case disposer is unable to generate service auth token due to error -");
     }
 
     @Test
     void shouldThrowIdamAuthTokenGenerationException() {
-        try {
-            setField(securityUtil, "parameterResolver", parameterResolver);
+        when(serviceTokenGenerator.generate()).thenReturn("service-token");
+        when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
+        when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
 
-            when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
-            when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
+        doThrow(new IdamAuthTokenGenerationException("1234567890123456"))
+            .when(idamClient).getAccessToken("JohnTerry", "Chelsea123");
 
-            doThrow(new IdamAuthTokenGenerationException("1234567890123456"))
-                    .when(idamClient).getAccessToken("JohnTerry", "Chelsea123");
-
-            invokeMethod(securityUtil, "generateTokens");
-
-        } catch (final IdamAuthTokenGenerationException idamAuthTokenGenerationException) {
-            assertThat(idamAuthTokenGenerationException.getMessage())
-                    .contains("Case disposer is unable to generate IDAM token due to error -");
-        }
+        assertThatThrownBy(() -> securityUtil.generateTokens())
+            .isInstanceOf(IdamAuthTokenGenerationException.class)
+            .hasMessageContaining("Case disposer is unable to generate IDAM token due to error -");
     }
 
     @Test
-    @SuppressWarnings("java:S1874")
     void shouldThrowUserDetailsGenerationException() {
-        try {
-            setField(securityUtil, "parameterResolver", parameterResolver);
-            setField(securityUtil, "idamClientToken", "Bearer 123");
+        when(serviceTokenGenerator.generate()).thenReturn("service-token");
+        when(parameterResolver.getIdamUsername()).thenReturn("JohnSmith");
+        when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
+        when(idamClient.getAccessToken("JohnSmith", "Chelsea123")).thenReturn("Bearer 123");
 
-            doThrow(new UserDetailsGenerationException("1234567890123456"))
-                    .when(idamClient).getUserDetails("Bearer 123");
+        doThrow(new UserDetailsGenerationException("1234567890123456"))
+            .when(idamClient).getUserInfo("Bearer 123");
 
-            invokeMethod(securityUtil, "generateUserDetails");
-
-        } catch (final UserDetailsGenerationException userDetailsGenerationException) {
-            assertThat(userDetailsGenerationException.getMessage())
-                    .contains("Case disposer is unable to generate UserDetails due to error -");
-        }
+        assertThatThrownBy(() -> securityUtil.generateTokens())
+            .isInstanceOf(UserDetailsGenerationException.class)
+            .hasMessageContaining("Case disposer is unable to get UserInfo due to error -");
     }
 }
