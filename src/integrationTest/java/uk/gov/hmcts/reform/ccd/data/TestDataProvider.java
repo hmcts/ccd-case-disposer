@@ -4,16 +4,19 @@ import jakarta.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.ccd.config.WireMockStubs;
 import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
+import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.ElasticSearchIntegrationTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.RemoteDeletionVerifier;
 import uk.gov.hmcts.reform.ccd.utils.SimulationIntegrationTestUtils;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.List;
 import java.util.Map;
 
 import static java.lang.System.clearProperty;
 import static java.lang.System.setProperty;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
@@ -32,6 +35,9 @@ public class TestDataProvider extends TestContainers {
     @Autowired
     private List<RemoteDeletionVerifier> remoteDeletionVerifiers;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     @Inject
     private WireMockStubs wireMockStubs;
 
@@ -41,6 +47,8 @@ public class TestDataProvider extends TestContainers {
                              final List<Long> rowIds,
                              final Map<String, List<Long>> indexedData) throws Exception {
 
+        UserInfo userInfo = new UserInfo("sub", "uid", "john-terry", "John", "Terry", List.of());
+        setField(securityUtil, "userInfo", userInfo);
         setSystemProperty(DELETABLE_CASE_TYPES_PROPERTY, deletableCaseTypes);
         setSystemProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION, deletableCaseTypesSimulation);
 
