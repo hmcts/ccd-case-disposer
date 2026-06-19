@@ -79,9 +79,9 @@ class SecurityUtilTest {
     @Test
     void shouldThrowUserDetailsGenerationException() {
         when(serviceTokenGenerator.generate()).thenReturn("service-token");
-        when(parameterResolver.getIdamUsername()).thenReturn("JohnSmith");
+        when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
         when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
-        when(idamClient.getAccessToken("JohnSmith", "Chelsea123")).thenReturn("Bearer 123");
+        when(idamClient.getAccessToken("JohnTerry", "Chelsea123")).thenReturn("Bearer 123");
 
         doThrow(new UserDetailsGenerationException("1234567890123456"))
             .when(idamClient).getUserInfo("Bearer 123");
