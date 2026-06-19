@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.ccd.exception.ServiceAuthTokenGenerationException;
 import uk.gov.hmcts.reform.ccd.exception.UserDetailsGenerationException;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -28,7 +28,7 @@ public class SecurityUtil {
 
     private String serviceAuthorization;
     private String idamClientToken;
-    private UserDetails userDetails = new UserDetails();
+    private UserInfo userInfo;
 
     public SecurityUtil(
         final AuthTokenGenerator authTokenGenerator,
@@ -43,16 +43,15 @@ public class SecurityUtil {
     public void generateTokens() {
         generateServiceToken();
         generateIdamToken();
-        generateUserDetails();
+        generateUserInfo();
     }
 
-    @SuppressWarnings("java:S1874") // idamClient.getUserDetails is deprecated
-    private void generateUserDetails() {
+    private void generateUserInfo() {
         try {
-            userDetails = idamClient.getUserDetails(idamClientToken);
+            userInfo = idamClient.getUserInfo(idamClientToken);
         } catch (final Exception exception) {
-            log.error("Case disposer is unable to generate UserDetails due to error", exception);
-            throw new UserDetailsGenerationException(String.format("Case disposer is unable to generate UserDetails "
+            log.error("Case disposer is unable to get UserInfo due to error", exception);
+            throw new UserDetailsGenerationException(String.format("Case disposer is unable to get UserInfo "
                     + "due to error - %s", exception.getMessage()), exception);
         }
     }

@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.service.remote.clients.LauClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.util.log.LauRecordHolder;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.util.Optional;
 
@@ -46,9 +46,9 @@ class LogAndAuditRemoteOperationTest {
 
     @BeforeEach
     void setUp() {
-        final UserDetails userDetails = mock(UserDetails.class);
-        when(securityUtil.getUserDetails()).thenReturn(userDetails);
-        when(userDetails.getId()).thenReturn("123");
+        final UserInfo userInfo = mock(UserInfo.class);
+        when(securityUtil.getUserInfo()).thenReturn(userInfo);
+        when(userInfo.getUid()).thenReturn("123");
         when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
     }
 
