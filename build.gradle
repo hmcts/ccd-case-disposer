@@ -187,7 +187,7 @@ dependencyCheck {
 
 dependencyManagement {
     imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.1'
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.2'
     }
 }
 
@@ -273,48 +273,49 @@ dependencies {
       }
     }
 
-    implementation group: 'commons-io', name: 'commons-io', version: versions.commonsIo
-    implementation group: 'io.rest-assured', name: 'rest-assured', version: versions.restAssured
-    implementation group: 'jakarta.ws.rs', name: 'jakarta.ws.rs-api', version: '4.0.0'
-    implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '3.0.0'
-    implementation group: 'jakarta.inject', name: 'jakarta.inject-api', version: '2.0.1'
-    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: versions.idamClient
-    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: versions.s2sClient
-    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: versions.reformLogging
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.14.0'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre'
-    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
-    implementation group: 'commons-net', name: 'commons-net', version: '3.13.0'
+    implementation "commons-io:commons-io:${versions.commonsIo}"
+    implementation "io.rest-assured:rest-assured:${versions.restAssured}"
+    implementation "jakarta.ws.rs:jakarta.ws.rs-api:4.0.0"
+    implementation "jakarta.annotation:jakarta.annotation-api:3.0.0"
+    implementation "jakarta.inject:jakarta.inject-api:2.0.1"
+    implementation "com.github.hmcts:idam-java-client:${versions.idamClient}"
+    implementation "com.github.hmcts:service-auth-provider-java-client:${versions.s2sClient}"
+    implementation "com.github.hmcts.java-logging:logging:${versions.reformLogging}"
+    implementation "com.google.code.gson:gson:2.14.0"
+    implementation "com.google.guava:guava:33.6.0-jre"
+    implementation "commons-fileupload:commons-fileupload:1.6.0"
+    implementation "commons-net:commons-net:3.13.0"
 
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
-    implementation group: 'com.microsoft.azure', name: 'applicationinsights-web', version: '3.7.9'
-    implementation group: 'ch.qos.logback.access', name: 'common', version: '2.0.3'
+    implementation "org.springframework.boot:spring-boot-http-converter"
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "com.microsoft.azure:applicationinsights-web:3.7.9"
+    implementation "ch.qos.logback.access:common:2.0.3"
 
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
-    implementation group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    implementation group: 'co.elastic.clients', name: 'elasticsearch-java', version: versions.elasticsearch
-    implementation group: 'co.elastic.clients', name: 'elasticsearch-rest5-client', version: versions.elasticsearch
+    implementation "org.postgresql:postgresql:42.7.11"
+    implementation "org.projectlombok:lombok:${versions.lombok}"
+    implementation "co.elastic.clients:elasticsearch-java:${versions.elasticsearch}"
+    implementation "co.elastic.clients:elasticsearch-rest5-client:${versions.elasticsearch}"
 
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: versions.lombok
+    annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+    testAnnotationProcessor "org.projectlombok:lombok:${versions.lombok}"
 
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa-test'
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-flyway-test'
-    testImplementation group: 'org.testcontainers', name: 'postgresql', version: versions.testcontainers
-    testImplementation group: 'org.testcontainers', name: 'junit-jupiter', version: versions.testcontainers
-    testImplementation group: 'org.testcontainers', name: 'elasticsearch', version: versions.testcontainers
-    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.3.0'
-    testImplementation group: 'com.github.tomakehurst', name: 'wiremock-jre8-standalone', version: versions.wiremock
-    testImplementation group: 'org.flywaydb', name: 'flyway-core', version: versions.flyway
-    testImplementation group: 'com.pivovarit', name: 'throwing-function', version: '1.6.1'
-    testImplementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: versions.gradlePitest
-    testImplementation 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
-    testImplementation 'com.github.hmcts:fortify-client:1.4.10:all'
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.springframework.boot:spring-boot-starter-data-jpa-test"
+    testImplementation "org.springframework.boot:spring-boot-starter-flyway-test"
+    testImplementation "org.testcontainers:postgresql:${versions.testcontainers}"
+    testImplementation "org.testcontainers:junit-jupiter:${versions.testcontainers}"
+    testImplementation "org.testcontainers:elasticsearch:${versions.testcontainers}"
+    testImplementation "org.awaitility:awaitility:4.3.0"
+    testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:${versions.wiremock}"
+    testImplementation "org.flywaydb:flyway-core:${versions.flyway}"
+    testImplementation "com.pivovarit:throwing-function:1.6.1"
+    testImplementation "info.solidsoft.gradle.pitest:gradle-pitest-plugin:${versions.gradlePitest}"
+    testImplementation "org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5"
+    testImplementation "com.github.hmcts:fortify-client:1.4.10:all"
 
-    testImplementation group: 'org.flywaydb', name: 'flyway-database-postgresql', version: versions.flyway
+    testImplementation "org.flywaydb:flyway-database-postgresql:${versions.flyway}"
 
     integrationTestImplementation sourceSets.main.runtimeClasspath
     integrationTestImplementation sourceSets.test.runtimeClasspath
@@ -322,12 +323,12 @@ dependencies {
     functionalTestImplementation sourceSets.main.runtimeClasspath
     functionalTestImplementation sourceSets.test.runtimeClasspath
 
-    functionalTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api', version: versions.apiGuardian
-    integrationTestCompileOnly group: 'org.apiguardian', name: 'apiguardian-api', version: versions.apiGuardian
+    functionalTestCompileOnly "org.apiguardian:apiguardian-api:${versions.apiGuardian}"
+    integrationTestCompileOnly "org.apiguardian:apiguardian-api:${versions.apiGuardian}"
 
     //pact contract testing
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: versions.pactVersion
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit', version: versions.pactVersion
+    contractTestImplementation "au.com.dius.pact.consumer:junit5:${versions.pactVersion}"
+    contractTestImplementation "au.com.dius.pact.consumer:junit:${versions.pactVersion}"
 
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
