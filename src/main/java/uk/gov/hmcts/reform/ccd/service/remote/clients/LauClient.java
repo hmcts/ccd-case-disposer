@@ -11,7 +11,11 @@ import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.LAU_SAVE_PATH;
 
-@FeignClient(name = "lauClient", url = "${remote.log.and.audit.host}")
+@FeignClient(
+    name = "lauClient",
+    url = "${remote.log.and.audit.host}",
+    configuration = CcdJsonFeignConfiguration.class
+)
 public interface LauClient {
 
     @PostMapping(
