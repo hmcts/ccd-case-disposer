@@ -34,7 +34,7 @@ public class CaseCollectorService {
         List<CaseData> expiredCases = getExpiredCases(caseTypes);
         Set<Long> expiredIds = expiredCases.stream().map(CaseData::getId).collect(Collectors.toUnmodifiableSet());
 
-        List<CaseLinkEntity> links = caseLinkRepository.findByCaseIdInOrLinkedCaseIdIn(expiredIds);
+        List<CaseLinkEntity> links = caseLinkRepository.findByCaseIdInOrLinkedCaseIdIn(caseTypes);
 
         UnionFind groups = new UnionFind(expiredIds);
         mergeExpiredLinks(groups, links, expiredIds);
