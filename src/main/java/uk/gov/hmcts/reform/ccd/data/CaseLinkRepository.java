@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.ccd.data;
 
+import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -19,8 +20,14 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
 
     List<CaseLinkEntity> findByLinkedCaseId(final Long linkedCaseId);
 
-    @Query("SELECT c FROM CaseLinkEntity c WHERE c.caseId in (:caseIds) OR c.linkedCaseId in (:caseIds)")
-    List<CaseLinkEntity> findByCaseIdInOrLinkedCaseIdIn(final Collection<Long> caseIds);
+    @NativeQuery("""
+        WITH expired_ids AS (
+                SELECT id FROM case_data WHERE resolved_ttl < CURRENT_DATE AND case_type_id IN :queryCaseTypes)
+        SELECT cl.* FROM case_link cl
+        JOIN expired_ids expired
+        ON cl.case_id = expired.id OR cl.linked_case_id = expired.id
+        """)
+    List<CaseLinkEntity> findByCaseIdInOrLinkedCaseIdIn(final Collection<String> queryCaseTypes);
 
     void delete(CaseLinkEntity caseLinkEntity);
 }
