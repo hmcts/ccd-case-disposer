@@ -23,11 +23,11 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
     @NativeQuery("""
         WITH expired_ids AS (
                 SELECT id FROM case_data WHERE resolved_ttl < CURRENT_DATE AND case_type_id IN :queryCaseTypes)
-        SELECT cl.* FROM case_link cl
+        SELECT DISTINCT cl.* FROM case_link cl
         JOIN expired_ids expired
         ON cl.case_id = expired.id OR cl.linked_case_id = expired.id
         """)
-    List<CaseLinkEntity> findByCaseIdInOrLinkedCaseIdIn(final Collection<String> queryCaseTypes);
+    List<CaseLinkEntity> findExpiredCaseLinksByCaseTypes(final Collection<String> queryCaseTypes);
 
     void delete(CaseLinkEntity caseLinkEntity);
 }
