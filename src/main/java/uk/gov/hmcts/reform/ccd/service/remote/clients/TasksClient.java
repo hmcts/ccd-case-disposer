@@ -11,7 +11,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_TASKS_PATH;
 
-@FeignClient(name = "tasksClient", url = "${remote.tasks.host}")
+@FeignClient(
+    name = "tasksClient",
+    url = "${remote.tasks.host}",
+    configuration = CcdJsonFeignConfiguration.class
+)
 public interface TasksClient {
 
     @PostMapping(
