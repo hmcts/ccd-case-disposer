@@ -3,17 +3,6 @@
  <suppress until="2026-08-31">
     <cve>CVE-2025-7962</cve>
     <cve>CVE-2025-21199</cve>
-    <cve>CVE-2026-24051</cve>
-    <cve>CVE-2026-39883</cve>
-    <cve>CVE-2026-39882</cve>
-    <cve>CVE-2026-29181</cve>
-    <cve>CVE-2026-41178</cve>
-    <cve>CVE-2026-41840</cve>
-    <cve>CVE-2026-41841</cve>
-    <cve>CVE-2026-41842</cve>
-    <cve>CVE-2026-41843</cve>
-    <cve>CVE-2026-41850</cve>
-    <cve>CVE-2026-41851</cve>
     <cve>CVE-2026-54515</cve>
   </suppress>
 
