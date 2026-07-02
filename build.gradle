@@ -232,7 +232,7 @@ project.tasks['pitest'].group = "Verification"
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.22.0',
-    elasticsearch       : '9.4.2',
+    elasticsearch       : '9.4.3',
     flyway              : '12.10.0',
     gradlePitest        : '1.15.0',
     idamClient          : '4.0.0',
