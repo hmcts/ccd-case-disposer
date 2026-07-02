@@ -189,6 +189,9 @@ dependencyManagement {
     imports {
         mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.2'
     }
+    dependencies {
+        dependency 'com.fasterxml.jackson.core:jackson-databind:2.22.1'
+    }
 }
 
 repositories {
@@ -266,7 +269,6 @@ rootProject.tasks.named("processContractTestResources") {
 }
 
 dependencies {
-
     modules {
       module("com.google.collections:google-collections") {
         replacedBy("com.google.guava:guava", "google-collections is part of guava")
