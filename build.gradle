@@ -11,7 +11,7 @@ plugins {
   id 'org.sonarqube' version '7.3.1.8318'
   id 'uk.gov.hmcts.java' version '0.12.70'
   id 'io.freefair.lombok' version '9.5.0'
-  id 'org.flywaydb.flyway' version '12.9.0'
+  id 'org.flywaydb.flyway' version '12.10.0'
   id "info.solidsoft.pitest" version '1.19.0'
   id "au.com.dius.pact" version '4.7.3'
 }
@@ -233,7 +233,7 @@ def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.22.0',
     elasticsearch       : '9.4.2',
-    flyway              : '12.9.0',
+    flyway              : '12.10.0',
     gradlePitest        : '1.15.0',
     idamClient          : '4.0.0',
     lombok              : '1.18.46',
