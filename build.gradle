@@ -293,7 +293,7 @@ dependencies {
     implementation "com.microsoft.azure:applicationinsights-web:3.7.9"
     implementation "ch.qos.logback.access:common:2.0.3"
 
-    implementation "org.postgresql:postgresql:42.7.12"
+    implementation "org.postgresql:postgresql:42.7.13"
     implementation "org.projectlombok:lombok:${versions.lombok}"
     implementation "co.elastic.clients:elasticsearch-java:${versions.elasticsearch}"
     implementation "co.elastic.clients:elasticsearch-rest5-client:${versions.elasticsearch}"
