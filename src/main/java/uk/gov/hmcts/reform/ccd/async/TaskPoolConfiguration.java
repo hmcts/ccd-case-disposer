@@ -28,7 +28,7 @@ public class TaskPoolConfiguration implements AsyncConfigurer {
         return getThreadPoolTaskExecutor();
     }
 
-
+    @SuppressWarnings("PMD.DoNotUseThreads")
     public Executor getThreadPoolTaskExecutor() {
         log.info("Creating Async Task Executor");
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

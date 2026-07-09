@@ -7,7 +7,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("PMD.TooManyFields")
 public class DefaultParameterResolver implements ParameterResolver {
 
     @Value("#{'${elasticsearch.hosts}'.split(',')}")

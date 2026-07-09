@@ -13,12 +13,12 @@ import java.util.List;
 @Repository
 public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseLinkPrimaryKey> {
 
-    List<CaseLinkEntity> findByCaseId(final Long caseId);
+    List<CaseLinkEntity> findByCaseId(Long caseId);
 
     @Query("SELECT c FROM CaseLinkEntity c WHERE c.caseId = :caseId OR c.linkedCaseId = :caseId")
-    List<CaseLinkEntity> findByCaseIdOrLinkedCaseId(final Long caseId);
+    List<CaseLinkEntity> findByCaseIdOrLinkedCaseId(Long caseId);
 
-    List<CaseLinkEntity> findByLinkedCaseId(final Long linkedCaseId);
+    List<CaseLinkEntity> findByLinkedCaseId(Long linkedCaseId);
 
     @NativeQuery("""
         WITH expired_ids AS (
@@ -27,7 +27,6 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
         JOIN expired_ids expired
         ON cl.case_id = expired.id OR cl.linked_case_id = expired.id
         """)
-    List<CaseLinkEntity> findExpiredCaseLinksByCaseTypes(final Collection<String> queryCaseTypes);
+    List<CaseLinkEntity> findExpiredCaseLinksByCaseTypes(Collection<String> queryCaseTypes);
 
-    void delete(CaseLinkEntity caseLinkEntity);
 }

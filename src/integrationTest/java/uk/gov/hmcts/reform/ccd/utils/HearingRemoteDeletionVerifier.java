@@ -16,6 +16,7 @@ public class HearingRemoteDeletionVerifier implements RemoteDeletionVerifier {
     @Inject
     private HearingDeletionRecordHolder hearingDeletionRecordHolder;
 
+    @Override
     public void verifyRemoteDeletion(final List<Long> caseRefDeletedHearings) {
         caseRefDeletedHearings.forEach(caseRef -> {
             final Integer caseHearingsDeletionMocks = HEARINGS_DELETE.get(Long.toString(caseRef));

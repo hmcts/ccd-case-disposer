@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 
-@SuppressWarnings("java:S2187")
+@SuppressWarnings({"java:S2187", "PMD.TestClassWithoutTestCases"})
 public class BaseRepositoryTest {
 
     @Inject

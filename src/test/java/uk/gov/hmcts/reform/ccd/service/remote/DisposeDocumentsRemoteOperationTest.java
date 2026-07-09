@@ -34,6 +34,8 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE
 @ExtendWith(MockitoExtension.class)
 class DisposeDocumentsRemoteOperationTest {
 
+    private static final String SERVICE_AUTH = "some_cool_service_auth";
+
     @Mock
     private DocumentClient documentClient;
 
@@ -58,7 +60,7 @@ class DisposeDocumentsRemoteOperationTest {
     void shouldPostDocumentsDeleteRemoteDisposeRequestWithoutAnomaly() {
 
         final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(1, 1);
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
 
         when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
             .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
@@ -71,14 +73,14 @@ class DisposeDocumentsRemoteOperationTest {
         );
 
         verify(documentClient, times(1)).deleteDocument(
-            eq("some_cool_service_auth"),
+            eq(SERVICE_AUTH),
             any()
         );
     }
 
     @Test
     void shouldThrowExceptionWhenRequestInvalid() {
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
         doThrow(new DocumentDeletionException("1234567890123456"))
             .when(documentClient)
             .deleteDocument(anyString(), any(DocumentsDeletePostRequest.class));
@@ -93,7 +95,7 @@ class DisposeDocumentsRemoteOperationTest {
     void shouldThrowExceptionWhenResponseIsUnableToMapToObject() {
         final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(1, 1);
 
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
         when(documentClient.deleteDocument(anyString(), any(DocumentsDeletePostRequest.class)))
             .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
 
@@ -106,7 +108,8 @@ class DisposeDocumentsRemoteOperationTest {
 
         assertThatExceptionOfType(DocumentDeletionException.class)
             .isThrownBy(() -> disposeDocumentsRemoteOperation.delete(caseData))
-            .withMessageStartingWith("Unable to map json to object document deletion endpoint response");
+            .withMessageStartingWith(
+                "Error deleting documents for case: Unable to map json to object document deletion endpoint response");
     }
 
     @Test
@@ -125,7 +128,7 @@ class DisposeDocumentsRemoteOperationTest {
     @Test
     void shouldThrowDocumentDeletionExceptionWhenResponseStatusIsNot2xx() {
         final CaseDocumentsDeletionResults caseActionResponse = new CaseDocumentsDeletionResults(0, 0);
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
         when(documentClient.deleteDocument(any(), any(DocumentsDeletePostRequest.class)))
             .thenReturn(ResponseEntity.badRequest().body(caseActionResponse));
 

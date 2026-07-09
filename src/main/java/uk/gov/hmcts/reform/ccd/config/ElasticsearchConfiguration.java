@@ -5,8 +5,6 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
 import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
-import jakarta.annotation.PostConstruct;
-import jakarta.inject.Inject;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.util.Timeout;
 import org.springframework.context.annotation.Bean;
@@ -18,16 +16,8 @@ import java.net.URISyntaxException;
 @Configuration
 public class ElasticsearchConfiguration {
 
-    private final ParameterResolver parameterResolver;
-    private ElasticsearchClient elasticsearchClient;
-
-    @Inject
-    public ElasticsearchConfiguration(final ParameterResolver parameterResolver) {
-        this.parameterResolver = parameterResolver;
-    }
-
-    @PostConstruct
-    public void init() {
+    @Bean(destroyMethod = "close")
+    public Rest5Client restClient(ParameterResolver parameterResolver) {
         final HttpHost[] httpHosts = parameterResolver.getElasticsearchHosts().stream()
             .map(host -> {
                 try {
@@ -38,17 +28,20 @@ public class ElasticsearchConfiguration {
             })
             .toArray(HttpHost[]::new);
 
-        Rest5Client restClient = Rest5Client.builder(httpHosts)
+        return Rest5Client.builder(httpHosts)
             .setConnectionConfigCallback(configBuilder -> configBuilder
                 .setConnectTimeout(Timeout.ofMilliseconds(parameterResolver.getElasticsearchRequestTimeout()))
             ).build();
-        ElasticsearchTransport transport = new Rest5ClientTransport(restClient, new JacksonJsonpMapper());
-        elasticsearchClient = new ElasticsearchClient(transport);
     }
 
     @Bean(destroyMethod = "close")
-    public ElasticsearchClient provideElasticsearchClient() {
-        return elasticsearchClient;
+    public ElasticsearchTransport elasticsearchTransport(Rest5Client restClient) {
+        return new Rest5ClientTransport(restClient, new JacksonJsonpMapper());
+    }
+
+    @Bean
+    public ElasticsearchClient elasticsearchClient(ElasticsearchTransport transport) {
+        return new ElasticsearchClient(transport);
     }
 
 }

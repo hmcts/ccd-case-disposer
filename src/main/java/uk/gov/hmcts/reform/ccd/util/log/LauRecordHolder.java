@@ -10,7 +10,7 @@ import java.util.List;
 @Named
 @Getter
 public class LauRecordHolder {
-    private List<String> lauCaseRefList = new ArrayList<>();
+    private final List<String> lauCaseRefList = new ArrayList<>();
 
     public void addLauCaseRef(final String caseRef) {
         lauCaseRefList.add(caseRef);

@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.ccd;
 
 import com.microsoft.applicationinsights.TelemetryClient;
-import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -21,31 +19,39 @@ import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @SpringBootApplication
-// Spring needs a constructor, it's not a utility class
-@SuppressWarnings({"HideUtilityClassConstructor", "java:S6813"})
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.ccd", "uk.gov.hmcts.reform.idam"})
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 public class ApplicationBootstrap implements ApplicationRunner {
 
     public static final String MARKER = "CCD-Case-Disposer";
 
-    @Inject
-    private ApplicationExecutor applicationExecutor;
+    private final ApplicationExecutor applicationExecutor;
 
-    @Inject
-    private TimedJobExecutor timedJobExecutor;
+    private final TimedJobExecutor timedJobExecutor;
 
-    @Value("${case-collector.max-run-duration-minutes:480}")
-    private Long timeoutInMinutes = 480L;
+    private final Long timeoutInMinutes;
 
-    @Autowired
-    private TelemetryClient client;
+    private final TelemetryClient client;
 
-    @Inject
-    private SecurityUtil securityUtil;
+    private final SecurityUtil securityUtil;
 
-    @Value("${telemetry.wait.period:10000}")
-    private int waitPeriod;
+    private final int waitPeriod;
+
+    public ApplicationBootstrap(
+        ApplicationExecutor applicationExecutor,
+        TimedJobExecutor timedJobExecutor,
+        TelemetryClient client,
+        SecurityUtil securityUtil,
+        @Value("${case-collector.max-run-duration-minutes:480}") Long timeoutInMinutes,
+        @Value("${telemetry.wait.period:10000}") int waitPeriod
+    ) {
+        this.applicationExecutor = applicationExecutor;
+        this.timedJobExecutor = timedJobExecutor;
+        this.client = client;
+        this.securityUtil = securityUtil;
+        this.timeoutInMinutes = timeoutInMinutes;
+        this.waitPeriod = waitPeriod;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -53,7 +59,7 @@ public class ApplicationBootstrap implements ApplicationRunner {
         try {
             log.info("[{}] Starting the Case-Disposer job.", MARKER);
             securityUtil.generateTokens();
-            timedJobExecutor.runWithTimeout(() -> applicationExecutor.execute(), timeout);
+            timedJobExecutor.runWithTimeout(applicationExecutor::execute, timeout);
             log.info("[{}] Completed the Case-Disposer job successfully.", MARKER);
         } catch (TimeoutException | JobInterruptedException e) {
             log.error("[{}] Timed out waiting for the job to complete.", MARKER);
@@ -65,6 +71,7 @@ public class ApplicationBootstrap implements ApplicationRunner {
         }
     }
 
+    @SuppressWarnings("PMD.DoNotUseThreads")
     private void waitTelemetryGracefulPeriod() throws InterruptedException {
         Thread.sleep(waitPeriod);
     }

@@ -18,6 +18,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestDataProvider {
 
     @Inject
@@ -51,6 +52,7 @@ public class TestDataProvider {
     private SecurityUtil securityUtil;
 
 
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     protected void setupData(final String deletableCaseTypes,
                              final String deletableCaseTypesSimulation,
                              final String scriptPath,

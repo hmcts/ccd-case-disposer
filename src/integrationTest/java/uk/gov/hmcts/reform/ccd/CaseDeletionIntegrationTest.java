@@ -24,6 +24,7 @@ class CaseDeletionIntegrationTest extends TestDataProvider {
     @Autowired
     private ProcessedCasesRecordHolder processedCasesRecordHolder;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenariosNewVersion(final String deletableCaseTypes,

@@ -45,9 +45,7 @@ public class ElasticSearchIndexCreator {
         }));
 
         final BulkResponse bulkResponse = elasticsearchClient.bulk(bulkRequestBuilder.build());
-
-        assertFalse(bulkResponse.errors());
-
+        assertFalse(bulkResponse.errors(), "Bulk response contains errors.");
         refreshIndex(caseIndex);
     }
 
@@ -69,6 +67,7 @@ public class ElasticSearchIndexCreator {
             .untilAsserted(() -> assertThat(refreshResponse.shards().failures()).isEmpty());
     }
 
+    @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
     public String getIndexName(String caseType) {
         if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {
             return String.format("%s_cases", caseType.toLowerCase());

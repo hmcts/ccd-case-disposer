@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import java.time.LocalDate;
 import java.util.List;
 
-@SuppressWarnings("java:S8692")
+@SuppressWarnings({"java:S8692", "PMD.ConstantsInInterface"})
 public interface TestData {
     String DELETABLE_CASE_TYPE = "deletable_case_type";
     String JURISDICTION = "deletable_jurisdiction";
