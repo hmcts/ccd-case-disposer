@@ -22,6 +22,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SecurityUtilTest {
 
+    private static final String USERNAME = "JohnTerry";
+    private static final String PASSWORD = "Chelsea123";
+    private static final String BEARER_TOKEN = "Bearer 123";
+
     @Mock
     private AuthTokenGenerator serviceTokenGenerator;
 
@@ -40,15 +44,15 @@ class SecurityUtilTest {
         final UserInfo userInfo = mock(UserInfo.class);
 
         when(serviceTokenGenerator.generate()).thenReturn("7gf364fg367f67");
-        when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
-        when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
-        when(idamClient.getAccessToken("JohnTerry", "Chelsea123")).thenReturn("Bearer 123");
-        when(idamClient.getUserInfo("Bearer 123")).thenReturn(userInfo);
+        when(parameterResolver.getIdamUsername()).thenReturn(USERNAME);
+        when(parameterResolver.getIdamPassword()).thenReturn(PASSWORD);
+        when(idamClient.getAccessToken(USERNAME, PASSWORD)).thenReturn(BEARER_TOKEN);
+        when(idamClient.getUserInfo(BEARER_TOKEN)).thenReturn(userInfo);
 
         securityUtil.generateTokens();
 
         assertThat(securityUtil.getServiceAuthorization()).isEqualTo("7gf364fg367f67");
-        assertThat(securityUtil.getIdamClientToken()).isEqualTo("Bearer 123");
+        assertThat(securityUtil.getIdamClientToken()).isEqualTo(BEARER_TOKEN);
         assertThat(securityUtil.getUserInfo()).isEqualTo(userInfo);
     }
 
@@ -57,7 +61,7 @@ class SecurityUtilTest {
     void shouldThrowServiceAuthTokenGenerationException() {
         doThrow(new ServiceAuthTokenGenerationException("1234567890123456"))
                 .when(serviceTokenGenerator).generate();
-        assertThatThrownBy(() -> securityUtil.generateTokens())
+        assertThatThrownBy(securityUtil::generateTokens)
             .isInstanceOf(ServiceAuthTokenGenerationException.class)
             .hasMessageContaining("Case disposer is unable to generate service auth token due to error -");
     }
@@ -65,13 +69,13 @@ class SecurityUtilTest {
     @Test
     void shouldThrowIdamAuthTokenGenerationException() {
         when(serviceTokenGenerator.generate()).thenReturn("service-token");
-        when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
-        when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
+        when(parameterResolver.getIdamUsername()).thenReturn(USERNAME);
+        when(parameterResolver.getIdamPassword()).thenReturn(PASSWORD);
 
         doThrow(new IdamAuthTokenGenerationException("1234567890123456"))
-            .when(idamClient).getAccessToken("JohnTerry", "Chelsea123");
+            .when(idamClient).getAccessToken(USERNAME, PASSWORD);
 
-        assertThatThrownBy(() -> securityUtil.generateTokens())
+        assertThatThrownBy(securityUtil::generateTokens)
             .isInstanceOf(IdamAuthTokenGenerationException.class)
             .hasMessageContaining("Case disposer is unable to generate IDAM token due to error -");
     }
@@ -79,14 +83,14 @@ class SecurityUtilTest {
     @Test
     void shouldThrowUserDetailsGenerationException() {
         when(serviceTokenGenerator.generate()).thenReturn("service-token");
-        when(parameterResolver.getIdamUsername()).thenReturn("JohnTerry");
-        when(parameterResolver.getIdamPassword()).thenReturn("Chelsea123");
-        when(idamClient.getAccessToken("JohnTerry", "Chelsea123")).thenReturn("Bearer 123");
+        when(parameterResolver.getIdamUsername()).thenReturn(USERNAME);
+        when(parameterResolver.getIdamPassword()).thenReturn(PASSWORD);
+        when(idamClient.getAccessToken(USERNAME, PASSWORD)).thenReturn(BEARER_TOKEN);
 
         doThrow(new UserDetailsGenerationException("1234567890123456"))
-            .when(idamClient).getUserInfo("Bearer 123");
+            .when(idamClient).getUserInfo(BEARER_TOKEN);
 
-        assertThatThrownBy(() -> securityUtil.generateTokens())
+        assertThatThrownBy(securityUtil::generateTokens)
             .isInstanceOf(UserDetailsGenerationException.class)
             .hasMessageContaining("Case disposer is unable to get UserInfo due to error -");
     }

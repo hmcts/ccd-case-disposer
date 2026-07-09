@@ -20,11 +20,11 @@ public class CaseData {
     CaseData parentCase;
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
+    public boolean equals(Object other) {
+        if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        CaseData caseData = (CaseData) o;
+        CaseData caseData = (CaseData) other;
         return Objects.equals(id, caseData.id);
     }
 

@@ -21,6 +21,4 @@ public interface CaseDataRepository extends JpaRepository<CaseDataEntity, Long> 
     @Query("SELECT c FROM CaseDataEntity c WHERE c.reference = :queryCaseReference")
     Optional<CaseDataEntity> findByReference(@Param("queryCaseReference") Long queryCaseReference);
 
-
-    void delete(final CaseDataEntity caseDataEntity);
 }

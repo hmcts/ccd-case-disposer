@@ -15,6 +15,7 @@ public class RoleRemoteDeletionVerifier implements RemoteDeletionVerifier {
     @Inject
     private RoleDeletionRecordHolder roleDeletionRecordHolder;
 
+    @Override
     public void verifyRemoteDeletion(final List<Long> caseRefDeletedRoles) {
         caseRefDeletedRoles.forEach(caseRef -> {
             String caseRefStr = Long.toString(caseRef);

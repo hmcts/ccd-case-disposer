@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 
 
 @Configuration
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestApplicationConfiguration {
 
     @Bean

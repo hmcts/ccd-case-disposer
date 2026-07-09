@@ -21,7 +21,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SuppressWarnings({"unchecked"})
+@SuppressWarnings({"unchecked", "PMD.CloseResource"})
 @ExtendWith(MockitoExtension.class)
 class GlobalSearchIndexCheckerTest {
 
@@ -71,6 +71,6 @@ class GlobalSearchIndexCheckerTest {
         when(elasticsearchClient.indices().exists(any(Function.class))).thenThrow(new IOException());
 
         assertThatExceptionOfType(ElasticsearchOperationException.class)
-            .isThrownBy(() -> globalSearchIndexChecker.isGlobalSearchExist());
+            .isThrownBy(globalSearchIndexChecker::isGlobalSearchExist);
     }
 }

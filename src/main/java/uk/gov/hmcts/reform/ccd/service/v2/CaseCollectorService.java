@@ -10,12 +10,12 @@ import uk.gov.hmcts.reform.ccd.data.entity.CaseLinkEntity;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -98,7 +98,7 @@ public class CaseCollectorService {
     }
 
     private static final class UnionFind {
-        private final Map<Long, Long> rootByCaseId = new HashMap<>();
+        private final Map<Long, Long> rootByCaseId = new ConcurrentHashMap<>();
 
         UnionFind(Set<Long> caseIds) {
             for (Long caseId : caseIds) {

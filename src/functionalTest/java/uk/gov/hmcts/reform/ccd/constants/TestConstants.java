@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.constants;
 
-public class TestConstants {
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
+public final class TestConstants {
 
     public static final String GLOBAL_SEARCH_PATH = "/elastic-support/global-search/index";
     public static final String DOCUMENT_PATH = "/documents";

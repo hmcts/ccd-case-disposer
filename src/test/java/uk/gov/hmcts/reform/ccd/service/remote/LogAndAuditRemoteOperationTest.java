@@ -32,6 +32,8 @@ import static uk.gov.hmcts.reform.ccd.fixture.TestData.DELETABLE_CASE_DATA_WITH_
 @ExtendWith(MockitoExtension.class)
 class LogAndAuditRemoteOperationTest {
 
+    private static final String UID = "123";
+
     @Mock
     private LauClient lauClient;
 
@@ -48,14 +50,14 @@ class LogAndAuditRemoteOperationTest {
     void setUp() {
         final UserInfo userInfo = mock(UserInfo.class);
         when(securityUtil.getUserInfo()).thenReturn(userInfo);
-        when(userInfo.getUid()).thenReturn("123");
+        when(userInfo.getUid()).thenReturn(UID);
         when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
     }
 
     @Test
     void shouldPostToLogAndAudit() {
         final CaseActionPostRequestResponse caseActionResponse =
-            new CaseActionPostRequestResponse(ActionLog.builder().caseRef("123").build());
+            new CaseActionPostRequestResponse(ActionLog.builder().caseRef(UID).build());
 
         when(lauClient.postLauAudit(anyString(), any(CaseActionPostRequestResponse.class)))
             .thenReturn(ResponseEntity.of(Optional.of(caseActionResponse)));
@@ -63,7 +65,7 @@ class LogAndAuditRemoteOperationTest {
 
         logAndAuditRemoteOperation.postCaseDeletionToLogAndAudit(DELETABLE_CASE_DATA_WITH_PAST_TTL);
 
-        verify(lauRecordHolder, times(1)).addLauCaseRef("123");
+        verify(lauRecordHolder, times(1)).addLauCaseRef(UID);
         verify(lauClient, times(1)).postLauAudit(
             eq("some_cool_service_auth"),
             any()
@@ -86,7 +88,7 @@ class LogAndAuditRemoteOperationTest {
     @Test
     void shouldThrowExceptionWhenResponseStatusIsNot2xx() {
         final CaseActionPostRequestResponse caseActionResponse =
-            new CaseActionPostRequestResponse(ActionLog.builder().caseRef("123").build());
+            new CaseActionPostRequestResponse(ActionLog.builder().caseRef(UID).build());
 
         when(lauClient.postLauAudit(anyString(), any(CaseActionPostRequestResponse.class)))
             .thenReturn(ResponseEntity.status(500).body(caseActionResponse));

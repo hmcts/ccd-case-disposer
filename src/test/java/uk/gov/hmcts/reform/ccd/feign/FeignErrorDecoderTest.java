@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings("PMD.CloseResource")
 class FeignErrorDecoderTest {
 
     private ErrorDecoder errorDecoder;

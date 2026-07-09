@@ -22,9 +22,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SuppressWarnings("java:S5778")
+@SuppressWarnings({"java:S5778", "PMD.TooManyMethods"})
 @ExtendWith(MockitoExtension.class)
 class CaseCollectorServiceTest {
+    private static final String CASE_TYPE = "TYPE";
 
     @Mock
     private CaseDataRepository caseDataRepository;
@@ -58,10 +59,10 @@ class CaseCollectorServiceTest {
     void getDeletableCases_ExcludesCasesLinkedToNonExpired() {
         List<CaseDataEntity> expired = List.of(entity(1), entity(2));
         given(caseDataRepository.findExpiredCases(anyList())).willReturn(expired);
-        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of("TYPE"))).willReturn(List.of(link(1, 99)));
+        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of(CASE_TYPE))).willReturn(List.of(link(1, 99)));
 
         // when
-        Set<CaseData> result = service.getDeletableCases(List.of("TYPE"));
+        Set<CaseData> result = service.getDeletableCases(List.of(CASE_TYPE));
 
         // then
         assertThat(result.stream().map(CaseData::getId)).containsExactly(2L);
@@ -71,7 +72,7 @@ class CaseCollectorServiceTest {
     void getDeletableCases_TraversesTransitively() {
         List<CaseDataEntity> expired = List.of(entity(1), entity(2), entity(3), entity(4));
         given(caseDataRepository.findExpiredCases(anyList())).willReturn(expired);
-        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of("TYPE")))
+        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of(CASE_TYPE)))
             .willReturn(List.of(
                 link(1, 2),
                 link(2, 99),
@@ -80,7 +81,7 @@ class CaseCollectorServiceTest {
             ));
 
         // when
-        Set<CaseData> result = service.getDeletableCases(List.of("TYPE"));
+        Set<CaseData> result = service.getDeletableCases(List.of(CASE_TYPE));
 
         // then
         assertThat(result.stream().map(CaseData::getId)).containsExactlyInAnyOrder(3L, 4L);
@@ -89,48 +90,48 @@ class CaseCollectorServiceTest {
     @Test
     void getDeletableCases_HandlesSelfLinks() {
         given(caseDataRepository.findExpiredCases(anyList())).willReturn(List.of(entity(1), entity(2)));
-        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of("TYPE"))).willReturn(List.of(link(1, 1)));
-        Set<CaseData> result = service.getDeletableCases(List.of("TYPE"));
+        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of(CASE_TYPE))).willReturn(List.of(link(1, 1)));
+        Set<CaseData> result = service.getDeletableCases(List.of(CASE_TYPE));
         assertThat(result.stream().map(CaseData::getId)).containsExactlyInAnyOrder(1L, 2L);
     }
 
     @Test
     void getDeletableCases_HandlesCyclicalLinks() {
         given(caseDataRepository.findExpiredCases(anyList())).willReturn(List.of(entity(1), entity(2), entity(3)));
-        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of("TYPE")))
+        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of(CASE_TYPE)))
             .willReturn(List.of(
                 link(1, 2),
                 link(2, 3),
                 link(3, 1)
             ));
-        Set<CaseData> result = service.getDeletableCases(List.of("TYPE"));
+        Set<CaseData> result = service.getDeletableCases(List.of(CASE_TYPE));
         assertThat(result.stream().map(CaseData::getId)).containsExactlyInAnyOrder(1L, 2L, 3L);
     }
 
     @Test
     void getDeletableCases_HandlesCyclicalLinkWithNonExpired() {
         given(caseDataRepository.findExpiredCases(anyList())).willReturn(List.of(entity(1), entity(2), entity(3)));
-        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of("TYPE")))
+        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of(CASE_TYPE)))
             .willReturn(List.of(
                 link(1, 2),
                 link(2, 3),
                 link(3, 1),
                 link(99, 3)
             ));
-        Set<CaseData> result = service.getDeletableCases(List.of("TYPE"));
+        Set<CaseData> result = service.getDeletableCases(List.of(CASE_TYPE));
         assertThat(result).isEmpty();
     }
 
     @Test
     void getDeletableCases_HandlesManyLinks() {
         given(caseDataRepository.findExpiredCases(anyList())).willReturn(List.of(entity(1), entity(2), entity(3)));
-        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of("TYPE"))).willReturn(List.of(
+        given(caseLinkRepository.findExpiredCaseLinksByCaseTypes(List.of(CASE_TYPE))).willReturn(List.of(
             link(1, 2),
             link(1, 3),
             link(1, 4),
             link(1, 5)
         ));
-        Set<CaseData> result = service.getDeletableCases(List.of("TYPE"));
+        Set<CaseData> result = service.getDeletableCases(List.of(CASE_TYPE));
         assertThat(result).isEmpty();
     }
 
@@ -147,20 +148,20 @@ class CaseCollectorServiceTest {
 
     @SuppressWarnings("java:S8692")
     private static CaseDataEntity entity(long id) {
-        CaseDataEntity e = new CaseDataEntity();
-        e.setId(id);
-        e.setReference(id);
-        e.setCaseType("TYPE");
-        e.setJurisdiction("JUR");
-        e.setResolvedTtl(LocalDate.now().minusDays(1));
-        return e;
+        CaseDataEntity entity = new CaseDataEntity();
+        entity.setId(id);
+        entity.setReference(id);
+        entity.setCaseType(CASE_TYPE);
+        entity.setJurisdiction("JUR");
+        entity.setResolvedTtl(LocalDate.now().minusDays(1));
+        return entity;
     }
 
     private static CaseLinkEntity link(long left, long right) {
-        CaseLinkEntity l = new CaseLinkEntity();
-        l.setCaseId(left);
-        l.setLinkedCaseId(right);
-        return l;
+        CaseLinkEntity linkEntity = new CaseLinkEntity();
+        linkEntity.setCaseId(left);
+        linkEntity.setLinkedCaseId(right);
+        return linkEntity;
     }
 
 }

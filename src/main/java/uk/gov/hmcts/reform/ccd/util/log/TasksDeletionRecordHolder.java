@@ -11,7 +11,7 @@ import java.util.Optional;
 @Named
 @Getter
 public class TasksDeletionRecordHolder {
-    private List<Map<String, Integer>> tasksDeletionRecordHolderList = new ArrayList<>();
+    private final List<Map<String, Integer>> tasksDeletionRecordHolderList = new ArrayList<>();
 
     public void setCaseTasksDeletionResults(final String caseRef,
                                             final int caseTasksDeletionResults) {

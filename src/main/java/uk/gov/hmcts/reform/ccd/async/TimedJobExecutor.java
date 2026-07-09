@@ -15,19 +15,19 @@ import java.util.concurrent.TimeoutException;
 @Component
 public class TimedJobExecutor {
 
+    @SuppressWarnings("PMD.DoNotUseThreads")
     public void runWithTimeout(Runnable task, Duration timeout)
         throws TimeoutException, ExecutionException, InterruptedException {
 
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-        Future<?> future = executor.submit(task);
-        try {
-            future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
-        } catch (TimeoutException te) {
-            log.error("Timed out waiting for task to complete. Stopping...");
-            future.cancel(true);
-            throw te;
-        } finally {
-            executor.shutdown();
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            Future<?> future = executor.submit(task);
+            try {
+                future.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            } catch (TimeoutException te) {
+                log.error("Timed out waiting for task to complete. Stopping...");
+                future.cancel(true);
+                throw te;
+            }
         }
     }
 }

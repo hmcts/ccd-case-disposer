@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-@SuppressWarnings("java:S2925")
+@SuppressWarnings({"java:S2925", "PMD.DoNotUseThreads"})
 class TimedJobExecutorTest {
 
     @Test

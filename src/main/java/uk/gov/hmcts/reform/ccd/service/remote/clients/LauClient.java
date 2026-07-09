@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.data.lau.CaseActionPostRequestResponse;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.LAU_SAVE_PATH;
 
 @FeignClient(name = "lauClient", url = "${remote.log.and.audit.host}")
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface LauClient {
 
     @PostMapping(
@@ -20,7 +21,7 @@ public interface LauClient {
         consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<CaseActionPostRequestResponse> postLauAudit(
         @RequestHeader("ServiceAuthorization") String serviceAuthHeader,
-        @RequestBody final CaseActionPostRequestResponse caseActionPostRequestResponse
+        @RequestBody CaseActionPostRequestResponse caseActionPostRequestResponse
     );
 
 }

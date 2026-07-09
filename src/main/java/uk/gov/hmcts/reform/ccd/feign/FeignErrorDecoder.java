@@ -5,6 +5,7 @@ import feign.Response;
 import feign.RetryableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatusCode;
 
 @Configuration
 @Slf4j
@@ -15,7 +16,7 @@ public class FeignErrorDecoder implements feign.codec.ErrorDecoder {
         int status = response.status();
         FeignException exception = FeignException.errorStatus(methodKey, response);
         log.info("Feign response status: {}, message - {}", status, exception.getMessage());
-        if (response.status() >= 400) {
+        if (HttpStatusCode.valueOf(status).isError()) {
             return new RetryableException(
                 status,
                 exception.getMessage(),

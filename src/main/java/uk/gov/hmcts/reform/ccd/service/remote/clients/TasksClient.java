@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_TASKS_PATH;
 
 @FeignClient(name = "tasksClient", url = "${remote.tasks.host}")
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface TasksClient {
 
     @PostMapping(
@@ -21,7 +22,7 @@ public interface TasksClient {
     ResponseEntity<Void> deleteTasks(
         @RequestHeader("ServiceAuthorization") String serviceAuthHeader,
         @RequestHeader(AUTHORISATION_HEADER) String authHeader,
-        @RequestBody final DeleteTasksRequest tasksDeletePostRequest
+        @RequestBody DeleteTasksRequest tasksDeletePostRequest
     );
 
 }

@@ -61,13 +61,14 @@ public class ApplicationExecutor {
     }
 
     private void processCases(final Set<CaseData> cases, int requestLimit) {
+        int remainingRequests = requestLimit;
         LocalTime cutOffTime = parameterResolver.getCutOffTime();
         // check if we need to add one day to the cut off time
         int dayOffset = applicationStartTime.toLocalTime().isAfter(cutOffTime) ? 1 : 0;
         cutOff = LocalDateTime.of(applicationStartTime.plusDays(dayOffset).toLocalDate(), cutOffTime);
 
         for (CaseData caseData : cases) {
-            if (requestLimit == 0 || isCutOffTimeReached()) {
+            if (remainingRequests <= 0 || isCutOffTimeReached()) {
                 break;
             }
             try {
@@ -75,7 +76,7 @@ public class ApplicationExecutor {
             } catch (LogAndAuditException logAndAuditException) {
                 log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
             }
-            requestLimit--;
+            remainingRequests--;
             processedCasesRecordHolder.addProcessedCase(caseData);
         }
     }

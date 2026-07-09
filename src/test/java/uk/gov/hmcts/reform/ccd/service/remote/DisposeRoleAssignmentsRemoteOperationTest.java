@@ -36,6 +36,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DisposeRoleAssignmentsRemoteOperationTest {
 
+    private static final String SERVICE_AUTH = "some_cool_service_auth";
+    private static final String IDAM_TOKEN = "some_cool_idam_token";
+    private static final String CASE_REF_STRING = "1234567890123456";
+
     @Mock
     private RoleAssignmentClient roleAssignmentClient;
 
@@ -58,8 +62,8 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         final ArgumentCaptor<RoleAssignmentsPostRequest> requestCaptor =
             ArgumentCaptor.forClass(RoleAssignmentsPostRequest.class);
 
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-        when(securityUtil.getIdamClientToken()).thenReturn("some_cool_idam_token");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
+        when(securityUtil.getIdamClientToken()).thenReturn(IDAM_TOKEN);
 
         when(roleAssignmentClient.deleteRoleAssignment(
             anyString(),
@@ -71,19 +75,19 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults(
-            "1234567890123456",
+            CASE_REF_STRING,
             200
         );
         verify(roleAssignmentClient, times(1)).deleteRoleAssignment(
-            eq("some_cool_service_auth"),
-            eq("some_cool_idam_token"),
+            eq(SERVICE_AUTH),
+            eq(IDAM_TOKEN),
             requestCaptor.capture()
         );
 
         final RoleAssignmentsPostRequest request = requestCaptor.getValue();
         assertThat(request.getQueryRequests()).hasSize(1);
         final QueryRequest queryRequest = request.getQueryRequests().get(0);
-        assertThat(queryRequest.getAttributes()).containsEntry("caseId", List.of("1234567890123456"));
+        assertThat(queryRequest.getAttributes()).containsEntry("caseId", List.of(CASE_REF_STRING));
     }
 
     @Test
@@ -91,8 +95,8 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         final RoleAssignmentsPostResponse roleAssignmentsPostResponse = new RoleAssignmentsPostResponse();
         roleAssignmentsPostResponse.setRoleAssignmentResponse(List.of(mock(QueryResponse.class)));
 
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-        when(securityUtil.getIdamClientToken()).thenReturn("some_cool_idam_token");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
+        when(securityUtil.getIdamClientToken()).thenReturn(IDAM_TOKEN);
 
         when(roleAssignmentClient.deleteRoleAssignment(
             anyString(),
@@ -105,7 +109,7 @@ class DisposeRoleAssignmentsRemoteOperationTest {
             .withMessage("Unexpected response code 500 while deleting role assignments for case: 1234567890123456");
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults(
-            "1234567890123456",
+            CASE_REF_STRING,
             500
         );
     }
@@ -114,14 +118,14 @@ class DisposeRoleAssignmentsRemoteOperationTest {
     void shouldThrowExceptionWhenDeleteRequestInvalid() {
         final RuntimeException cause = new RuntimeException("role assignment service unavailable");
 
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-        when(securityUtil.getIdamClientToken()).thenReturn("some_cool_idam_token");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
+        when(securityUtil.getIdamClientToken()).thenReturn(IDAM_TOKEN);
 
         doThrow(cause)
             .when(roleAssignmentClient)
             .deleteRoleAssignment(
-                eq("some_cool_service_auth"),
-                eq("some_cool_idam_token"),
+                eq(SERVICE_AUTH),
+                eq(IDAM_TOKEN),
                 any(RoleAssignmentsPostRequest.class)
             );
 
@@ -138,15 +142,15 @@ class DisposeRoleAssignmentsRemoteOperationTest {
         final RoleAssignmentsPostResponse roleAssignmentsPostResponse = new RoleAssignmentsPostResponse();
         roleAssignmentsPostResponse.setRoleAssignmentResponse(List.of(mock(QueryResponse.class)));
 
-        when(securityUtil.getServiceAuthorization()).thenReturn("some_cool_service_auth");
-        when(securityUtil.getIdamClientToken()).thenReturn("some_cool_idam_token");
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH);
+        when(securityUtil.getIdamClientToken()).thenReturn(IDAM_TOKEN);
         when(roleAssignmentClient.deleteRoleAssignment(anyString(), anyString(), any(RoleAssignmentsPostRequest.class)))
             .thenReturn(ResponseEntity.status(204).body(roleAssignmentsPostResponse));
 
         disposeRoleAssignmentsRemoteOperation.delete(caseData);
 
         verify(roleDeletionRecordHolder, times(1)).setCaseRolesDeletionResults(
-            "1234567890123456",
+            CASE_REF_STRING,
             204
         );
     }
