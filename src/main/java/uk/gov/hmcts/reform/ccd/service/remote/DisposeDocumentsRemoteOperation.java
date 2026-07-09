@@ -68,7 +68,7 @@ public class DisposeDocumentsRemoteOperation implements DisposeRemoteOperation {
             final String errorMessage = "Unable to map json to object document deletion endpoint response due"
                 + " to following endpoint response: ".concat(deletionResults.toString());
             log.error(errorMessage);
-            throw new DocumentDeletionException(errorMessage);
+            throw new DocumentDeletionException(errorMessage, jsonParseException);
         }
     }
 

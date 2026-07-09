@@ -52,8 +52,10 @@ public class SummaryStringLogBuilder {
                                      final int total,
                                      final Map<String, Long> caseTypeAndStateCount) {
 
-        final StringBuilder stringBuilder = new StringBuilder(SUMMARY_HEADING_STRING);
-        stringBuilder.append(LocalDateTime.now(ZoneOffset.UTC).format(DATE_FORMATTER))
+        final StringBuilder stringBuilder = new StringBuilder(1024);
+        stringBuilder
+            .append(SUMMARY_HEADING_STRING)
+            .append(LocalDateTime.now(ZoneOffset.UTC).format(DATE_FORMATTER))
             .append(CR_STRING)
             .append(TOTAL_CASES_STRING).append(total)
             .append(DELETED_CASES_STRING).append(deleted)

@@ -79,6 +79,7 @@ public class DisposeElasticsearchRemoteOperation implements DisposeRemoteOperati
         throw new ElasticsearchOperationException(message);
     }
 
+    @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
     private String getIndex(final String caseType) {
         return String.format(parameterResolver.getCasesIndexNamePattern(), caseType).toLowerCase();
     }

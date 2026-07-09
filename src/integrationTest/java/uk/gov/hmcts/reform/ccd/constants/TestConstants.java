@@ -5,9 +5,8 @@ import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 
 import java.util.Map;
 
-public class TestConstants {
-    private TestConstants() {
-    }
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
+public final class TestConstants {
 
     // Put special cases here only.
     public static final Map<String, CaseDocumentsDeletionResults> DOCUMENT_DELETE = Map.ofEntries(
@@ -38,5 +37,8 @@ public class TestConstants {
     public static final Map<String, Integer> LAU_SAVE = Map.ofEntries(
         Map.entry("1504259907033002", HttpStatus.GATEWAY_TIMEOUT.value())
     );
+
+    private TestConstants() {
+    }
 
 }

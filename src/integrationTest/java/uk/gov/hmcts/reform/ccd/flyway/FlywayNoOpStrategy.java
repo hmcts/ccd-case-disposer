@@ -6,7 +6,6 @@ import uk.gov.hmcts.reform.ccd.exception.MigrationScriptException;
 
 import java.util.stream.Stream;
 
-@SuppressWarnings({"PMD.DataflowAnomalyAnalysis"})
 public class FlywayNoOpStrategy implements FlywayMigrationStrategy {
 
     @Override

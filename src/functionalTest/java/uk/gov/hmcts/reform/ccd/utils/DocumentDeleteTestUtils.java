@@ -72,7 +72,7 @@ public class DocumentDeleteTestUtils {
                                 assertThat(response.getStatusCode()).isEqualTo(200);
 
                             } catch (final UnsupportedEncodingException e) {
-                                e.printStackTrace();
+                                log.error("Error while uploading document {}", filename, e);
                             }
                         }));
     }

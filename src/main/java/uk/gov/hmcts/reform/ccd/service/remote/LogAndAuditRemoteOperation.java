@@ -75,7 +75,7 @@ public class LogAndAuditRemoteOperation {
             final String errorMessage = "Unable to map json to object Log and Audit endpoint response due"
                 + " to following endpoint response: ".concat(logAndAuditPostResponse.toString());
             log.error(errorMessage);
-            throw new LogAndAuditException(errorMessage);
+            throw new LogAndAuditException(errorMessage, jsonParseException);
         }
 
     }

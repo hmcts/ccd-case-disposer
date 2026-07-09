@@ -9,12 +9,13 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
-public class DeletionScenarios {
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
+public final class DeletionScenarios {
 
     private DeletionScenarios() {
     }
 
-    protected static Stream<Arguments> provideCaseDeletionScenarios() {
+    static Stream<Arguments> provideCaseDeletionScenarios() {
         return Stream.of(Arguments.of(
                         "DPR_FT_MasterCaseType",
                         "DPR_FT_MultiplePages",

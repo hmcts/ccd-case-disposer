@@ -11,7 +11,7 @@ import java.util.Optional;
 @Named
 @Getter
 public class RoleDeletionRecordHolder {
-    private List<Map<String, Integer>> roleDeletionRecordHolderList = new ArrayList<>();
+    private final List<Map<String, Integer>> roleDeletionRecordHolderList = new ArrayList<>();
 
     public void setCaseRolesDeletionResults(final String caseRef,
                                                 final int caseRolesDeletionResults) {

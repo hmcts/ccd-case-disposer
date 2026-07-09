@@ -30,7 +30,7 @@ public class GlobalSearchIndexCreator {
     private SecurityUtils securityUtils;
 
     public void createGlobalSearchIndex() {
-        if (createGlobalSearch.equals("true") && isPreview()) {
+        if ("true".equals(createGlobalSearch) && isPreview()) {
             final Response response = RestAssured
                     .given()
                     .relaxedHTTPSValidation()
@@ -48,9 +48,6 @@ public class GlobalSearchIndexCreator {
 
     private boolean isPreview() {
         final Optional<String> env = Optional.ofNullable(System.getenv("ENV"));
-        if (env.isPresent() && env.get().equals("preview")) {
-            return true;
-        }
-        return false;
+        return env.isPresent() && "preview".equals(env.get());
     }
 }

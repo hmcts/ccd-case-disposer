@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.MEDIA_TYPE_POST_DELETE_
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @FeignClient(name = "roleAssignmentClient", url = "${remote.role.assignment.host}")
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface RoleAssignmentClient {
 
     @PostMapping(
@@ -24,7 +25,7 @@ public interface RoleAssignmentClient {
     ResponseEntity<RoleAssignmentsPostResponse> deleteRoleAssignment(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORISATION_HEADER) String authHeader,
-        @RequestBody final RoleAssignmentsPostRequest roleAssignmentsPostRequest
+        @RequestBody RoleAssignmentsPostRequest roleAssignmentsPostRequest
     );
 
 }

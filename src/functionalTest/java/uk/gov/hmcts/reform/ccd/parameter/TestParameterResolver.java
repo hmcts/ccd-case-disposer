@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestParameterResolver implements ParameterResolver {
     public static final String DELETABLE_CASE_TYPES_PROPERTY = "deletable.case.types";
     public static final String DELETABLE_CASE_TYPES_PROPERTY_SIMULATION = "simulated.case.types";
@@ -87,6 +87,7 @@ public class TestParameterResolver implements ParameterResolver {
         return casesIndexType;
     }
 
+    @Override
     public String getCaseDefinitionHost() {
         return caseDefinitionHost;
     }

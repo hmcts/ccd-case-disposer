@@ -12,6 +12,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+@SuppressWarnings("PMD.TooManyMethods")
 class DefaultParameterResolverTest {
 
     private static final String ELASTIC_SEARCH_DATA_NODES_HOSTS = "elasticsearchHosts";
@@ -74,92 +75,118 @@ class DefaultParameterResolverTest {
     @Test
     @DisplayName("should get correct value for getElasticsearchHosts")
     void shouldGetCorrectValueForGetElasticsearchHosts() {
-        assertThat(defaultParameterResolver.getElasticsearchHosts(),
+        assertThat("Incorrect value for ES hosts",
+                   defaultParameterResolver.getElasticsearchHosts(),
                    is(equalTo(Arrays.asList("http://localhost:9200"))));
     }
 
     @Test
     @DisplayName("should get correct value for getElasticsearchRequestTimeout")
     void shouldGetCorrectValueForGetElasticsearchRequestTimeout() {
-        assertThat(defaultParameterResolver.getElasticsearchRequestTimeout(),
-                   is(equalTo(6000)));
+        assertThat(
+            "Incorrect value for ES request timeout",
+            defaultParameterResolver.getElasticsearchRequestTimeout(),
+            is(equalTo(6000)));
     }
 
     @Test
     @DisplayName("should get correct value for getCasesIndexNamePattern")
     void shouldGetCorrectValueForGetCasesIndexNamePattern() {
-        assertThat(defaultParameterResolver.getCasesIndexNamePattern(),
-                   is(equalTo("%s_cases")));
+        assertThat(
+            "Incorrect value for cases index name pattern",
+            defaultParameterResolver.getCasesIndexNamePattern(),
+            is(equalTo("%s_cases")));
     }
 
     @Test
     @DisplayName("should get correct value for getCasesIndexType")
     void shouldGetCorrectValueForGetCasesIndexType() {
-        assertThat(defaultParameterResolver.getCasesIndexType(),
-                   is(equalTo("_doc")));
+        assertThat(
+            "Incorrect value for cases index type",
+            defaultParameterResolver.getCasesIndexType(),
+            is(equalTo("_doc")));
     }
 
     @Test
     @DisplayName("should get correct value for getGlobalSearchIndexName")
     void shouldGetCorrectValueForGetGlobalSearchIndexName() {
-        assertThat(defaultParameterResolver.getGlobalSearchIndexName(),
-                   is(equalTo("global_index_name")));
+        assertThat(
+            "Incorrect value for global search index name",
+            defaultParameterResolver.getGlobalSearchIndexName(),
+            is(equalTo("global_index_name")));
     }
 
     @Test
     @DisplayName("should get correct value for getIdamUsername")
     void shouldGetCorrectValueForGetIdamUsername() {
-        assertThat(defaultParameterResolver.getIdamUsername(),
-                   is(equalTo("user@email.com")));
+        assertThat(
+            "Incorrect value for idam username",
+            defaultParameterResolver.getIdamUsername(),
+            is(equalTo("user@email.com")));
     }
 
     @Test
     @DisplayName("should get correct value for getIdamPassword")
     void shouldGetCorrectValueForGetIdamPassword() {
-        assertThat(defaultParameterResolver.getIdamPassword(),
-                   is(equalTo("Pa55w0rd")));
+        assertThat(
+            "Incorrect value for idam password",
+            defaultParameterResolver.getIdamPassword(),
+            is(equalTo("Pa55w0rd")));
     }
 
     @Test
     @DisplayName("should get correct value for getDeletableCaseTypes")
     void shouldGetCorrectValueForGetDeletableCaseTypes() {
-        assertThat(defaultParameterResolver.getDeletableCaseTypes(),
-                   is(equalTo(Arrays.asList("Case_Type_01"))));
+        assertThat(
+            "Incorrect value for deletable case types",
+            defaultParameterResolver.getDeletableCaseTypes(),
+            is(equalTo(Arrays.asList("Case_Type_01"))));
     }
 
     @Test
     @DisplayName("should get correct value for getDeletableCaseTypesSimulation")
     void shouldGetCorrectValueForGetDeletableCaseTypesSimulation() {
-        assertThat(defaultParameterResolver.getDeletableCaseTypesSimulation(),
-                   is(equalTo(Arrays.asList("Case_Type_02"))));
+        assertThat(
+            "Incorrect value for deletable case types simulation",
+            defaultParameterResolver.getDeletableCaseTypesSimulation(),
+            is(equalTo(Arrays.asList("Case_Type_02"))));
     }
 
 
     @Test
     @DisplayName("should get correct value for threadQueueCapacity")
     void shouldGetCorrectValueForGetThreadQueueCapacity() {
-        assertThat(defaultParameterResolver.getThreadQueueCapacity(),
-                is(equalTo(200)));
+        assertThat(
+            "Incorrect value for thread queue capacity",
+            defaultParameterResolver.getThreadQueueCapacity(),
+            is(equalTo(200)));
     }
 
     @Test
     @DisplayName("should get correct value for threadCorePoolSize")
     void shouldGetCorrectValueForGetThreadCorePoolSize() {
-        assertThat(defaultParameterResolver.getThreadCorePoolSize(),
-                is(equalTo(5)));
+        assertThat(
+            "Incorrect value for thread core pool size",
+            defaultParameterResolver.getThreadCorePoolSize(),
+            is(equalTo(5)));
     }
 
     @Test
     @DisplayName("should get correct value for threadMaxPoolSize")
     void shouldGetCorrectValueForGetThreadMaxPoolSize() {
-        assertThat(defaultParameterResolver.getThreadMaxPoolSize(),
-                is(equalTo(10)));
+        assertThat(
+            "Incorrect value for thread max pool size",
+            defaultParameterResolver.getThreadMaxPoolSize(),
+            is(equalTo(10)));
     }
 
     @Test
     @DisplayName("should get correct value for getCutOffTime")
     void shouldGetCorrectValueForGetCutOffTime() {
-        assertThat(defaultParameterResolver.getCutOffTime(), is(equalTo(LocalTime.parse("06:00"))));
+        assertThat(
+            "Incorrect value for cut off time",
+            defaultParameterResolver.getCutOffTime(),
+            is(equalTo(LocalTime.parse("06:00"))));
     }
 
 }

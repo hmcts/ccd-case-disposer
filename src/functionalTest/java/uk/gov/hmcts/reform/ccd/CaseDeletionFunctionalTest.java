@@ -32,6 +32,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         Awaitility.setDefaultTimeout(70, TimeUnit.SECONDS);
     }
 
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     @ParameterizedTest
     @MethodSource("uk.gov.hmcts.reform.ccd.data.DeletionScenarios#provideCaseDeletionScenarios")
     void testScenariosNewVersion(final String deletableCaseTypes,

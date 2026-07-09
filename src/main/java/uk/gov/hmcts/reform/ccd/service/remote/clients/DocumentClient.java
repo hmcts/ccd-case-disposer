@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_DOCUMENT_PATH;
 
 @FeignClient(name = "documentClient", url = "${remote.document.store.host}")
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface DocumentClient {
 
     @PostMapping(
@@ -20,7 +21,7 @@ public interface DocumentClient {
         consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<CaseDocumentsDeletionResults> deleteDocument(
         @RequestHeader("ServiceAuthorization") String serviceAuthHeader,
-        @RequestBody final DocumentsDeletePostRequest documentsDeletePostRequest
+        @RequestBody DocumentsDeletePostRequest documentsDeletePostRequest
     );
 
 }

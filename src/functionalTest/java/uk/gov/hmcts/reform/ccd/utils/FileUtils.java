@@ -16,9 +16,10 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.JSON_FOLDER;
 @Component
 public class FileUtils {
 
+    @SuppressWarnings("PMD.UseProperClassLoader")
     public File getResourceFile(final String fileName) throws UnsupportedEncodingException {
         final String file = getClass().getClassLoader().getResource(FILES_FOLDER + fileName).getFile();
-        final String result = decode(file, "UTF-8");
+        final String result = decode(file, StandardCharsets.UTF_8);
         return new File(result);
     }
 

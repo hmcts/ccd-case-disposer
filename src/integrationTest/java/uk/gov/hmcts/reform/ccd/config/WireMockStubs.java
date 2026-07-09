@@ -32,6 +32,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.TASKS_DELETE;
 @Configuration
 public class WireMockStubs {
 
+    private static final String ANY_JSON_STRING = "${json-unit.any-string}";
     private static final String JSON_RESPONSE = "application/json;charset=UTF-8";
 
     private static final String DOCUMENTS_DELETE_PATH = "/documents/delete";
@@ -42,7 +43,7 @@ public class WireMockStubs {
     private static final String HEARINGS_DELETE_PATH = "/delete";
 
 
-    private RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
+    private final RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
 
     public void setUpStubs(final WireMockServer wireMockServer) {
         roleAssignmentsResponse.setRoleAssignmentResponse(Collections.singletonList(new QueryResponse()));
@@ -55,7 +56,7 @@ public class WireMockStubs {
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
-        String body = new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction("${json-unit.any-string}")));
+        String body = new Gson().toJson(new DeleteTasksRequest(new DeleteCaseTasksAction(ANY_JSON_STRING)));
         wireMockServer.stubFor(post(urlPathMatching(TASKS_DELETE_PATH))
             .withRequestBody(equalToJson(body))
             .willReturn(buildResponseDefinition(201)));
@@ -71,7 +72,7 @@ public class WireMockStubs {
     private void setupLauStub(final WireMockServer wireMockServer) {
         ActionLog actionLogExample = ActionLog.builder()
             .caseAction("DELETE")
-            .caseRef("${json-unit.any-string}")
+            .caseRef(ANY_JSON_STRING)
             .caseJurisdictionId("BEFTA_MASTER")
             .build();
         String body = new Gson().toJson(new CaseActionPostRequestResponse(actionLogExample));
@@ -97,7 +98,7 @@ public class WireMockStubs {
     }
 
     private void setupDeleteDocumentsStub(final WireMockServer wireMockServer) {
-        String body = new Gson().toJson(new DocumentsDeletePostRequest("${json-unit.any-string}"));
+        String body = new Gson().toJson(new DocumentsDeletePostRequest(ANY_JSON_STRING));
         wireMockServer.stubFor(post(urlPathMatching(DOCUMENTS_DELETE_PATH))
             .withRequestBody(equalToJson(body))
             .willReturn(buildResponseDefinition(

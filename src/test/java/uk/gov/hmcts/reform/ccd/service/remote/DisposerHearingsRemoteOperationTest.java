@@ -27,6 +27,9 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.HEARING_RECORDINGS_CASE
 @ExtendWith(MockitoExtension.class)
 class DisposerHearingsRemoteOperationTest {
 
+    private static final String AUTH_HEADER = "Bearer 123";
+    private static final String SERVICE_AUTH_HEADER = "Bearer 456";
+
     @Mock
     private HearingClient hearingClient;
 
@@ -51,17 +54,17 @@ class DisposerHearingsRemoteOperationTest {
         ResponseEntity<Void> mockResponse = new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
-        when(securityUtil.getIdamClientToken()).thenReturn("123");
-        when(securityUtil.getServiceAuthorization()).thenReturn("456");
-        when(hearingClient.deleteHearing("123",
-                                         "456",
+        when(securityUtil.getIdamClientToken()).thenReturn(AUTH_HEADER);
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH_HEADER);
+        when(hearingClient.deleteHearing(AUTH_HEADER,
+                                         SERVICE_AUTH_HEADER,
                                          List.of(caseData.getReference().toString())))
             .thenReturn(mockResponse);
 
         disposeHearingsRemoteOperation.delete(caseData);
 
-        verify(hearingClient).deleteHearing("123",
-                                            "456",
+        verify(hearingClient).deleteHearing(AUTH_HEADER,
+                                            SERVICE_AUTH_HEADER,
                                             List.of(String.valueOf(caseData.getReference())));
         verify(hearingDeletionRecordHolder)
             .setHearingDeletionResults(List.of(String.valueOf(caseData.getReference())).getFirst(),
@@ -73,12 +76,12 @@ class DisposerHearingsRemoteOperationTest {
         final List<String> caseRefs = List.of("1234567890123456");
         final RuntimeException exception = new RuntimeException("Delete request failed");
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
-        when(securityUtil.getIdamClientToken()).thenReturn("123");
-        when(securityUtil.getServiceAuthorization()).thenReturn("456");
+        when(securityUtil.getIdamClientToken()).thenReturn(AUTH_HEADER);
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH_HEADER);
 
         doThrow(exception)
             .when(hearingClient)
-            .deleteHearing("123", "456", caseRefs);
+            .deleteHearing(AUTH_HEADER, SERVICE_AUTH_HEADER, caseRefs);
 
         assertThatExceptionOfType(HearingDeletionException.class)
             .isThrownBy(() -> disposeHearingsRemoteOperation.delete(caseData))
@@ -105,10 +108,10 @@ class DisposerHearingsRemoteOperationTest {
     void shouldThrowExceptionWhenResponseCodeNot204() {
         ResponseEntity<Void> mockResponse = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         when(parameterResolver.getHearingCaseType()).thenReturn(HEARING_RECORDINGS_CASE_TYPE);
-        when(securityUtil.getIdamClientToken()).thenReturn("123");
-        when(securityUtil.getServiceAuthorization()).thenReturn("456");
-        when(hearingClient.deleteHearing("123",
-                                         "456",
+        when(securityUtil.getIdamClientToken()).thenReturn(AUTH_HEADER);
+        when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_AUTH_HEADER);
+        when(hearingClient.deleteHearing(AUTH_HEADER,
+                                         SERVICE_AUTH_HEADER,
                                          List.of(caseData.getReference().toString())))
             .thenReturn(mockResponse);
         assertThrows(HearingDeletionException.class, () -> disposeHearingsRemoteOperation.delete(caseData));

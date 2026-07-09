@@ -48,6 +48,9 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.LAU_SAVE_PATH;
     "remote.hearing.host=http://localhost:8080",
 })
 class TestClientRetry {
+
+    private static final String CASE_REF = "12345";
+    private static final String SERVICE_AUTH_HEADER = "serviceAuthHeader";
     protected static final WireMockServer WIREMOCK_SERVER = new WireMockServer(8080);
 
     static {
@@ -99,9 +102,9 @@ class TestClientRetry {
 
     @Test
     void testFeignDocumentClientRetry() {
-        DocumentsDeletePostRequest request = new DocumentsDeletePostRequest("12345");
+        DocumentsDeletePostRequest request = new DocumentsDeletePostRequest(CASE_REF);
 
-        Throwable thrown = catchThrowable(() -> documentClient.deleteDocument("serviceAuthHeader", request));
+        Throwable thrown = catchThrowable(() -> documentClient.deleteDocument(SERVICE_AUTH_HEADER, request));
 
         assertThat(thrown)
             .isInstanceOf(FeignException.class)
@@ -112,10 +115,10 @@ class TestClientRetry {
 
     @Test
     void testFeignRoleAssignmentDeleteRetry() {
-        RoleAssignmentsPostRequest request = new RoleAssignmentsPostRequest("12345");
+        RoleAssignmentsPostRequest request = new RoleAssignmentsPostRequest(CASE_REF);
 
         Throwable thrown = catchThrowable(
-            () -> roleAssignmentClient.deleteRoleAssignment("serviceAuthHeader","authHeader", request));
+            () -> roleAssignmentClient.deleteRoleAssignment(SERVICE_AUTH_HEADER,"authHeader", request));
 
         assertThat(thrown)
             .isInstanceOf(FeignException.class)
@@ -131,11 +134,11 @@ class TestClientRetry {
                 .userId("1")
                 .caseAction("DELETE")
                 .caseTypeId("FT_MasterCaseType")
-                .caseRef("12345")
+                .caseRef(CASE_REF)
                 .caseJurisdictionId("BEFTA_MASTER")
                 .timestamp("2021-08-23T22:20:05.023Z")
                 .build());
-        Throwable thrown = catchThrowable(() -> lauClient.postLauAudit("serviceAuthHeader", request));
+        Throwable thrown = catchThrowable(() -> lauClient.postLauAudit(SERVICE_AUTH_HEADER, request));
         assertThat(thrown)
             .isInstanceOf(FeignException.class)
             .hasMessageStartingWith("[503 Service Unavailable] during [POST]");
@@ -145,9 +148,9 @@ class TestClientRetry {
 
     @Test
     void testFeignTaskDeleteRetry() {
-        DeleteTasksRequest request = new DeleteTasksRequest(new DeleteCaseTasksAction("12345"));
+        DeleteTasksRequest request = new DeleteTasksRequest(new DeleteCaseTasksAction(CASE_REF));
         Throwable thrown = catchThrowable(
-            () -> tasksClient.deleteTasks("serviceAuthHeader","authHeader",  request));
+            () -> tasksClient.deleteTasks(SERVICE_AUTH_HEADER,"authHeader",  request));
 
         assertThat(thrown)
             .isInstanceOf(FeignException.class)
@@ -162,7 +165,7 @@ class TestClientRetry {
         request.add("3456");
 
         Throwable thrown = catchThrowable(
-            () -> hearingClient.deleteHearing("serviceAuthHeader", "authHeader", request));
+            () -> hearingClient.deleteHearing(SERVICE_AUTH_HEADER, "authHeader", request));
 
         assertThat(thrown)
             .isInstanceOf(FeignException.class)
