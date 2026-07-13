@@ -241,7 +241,7 @@ def versions = [
     idamClient          : '4.0.0',
     lombok              : '1.18.46',
     reformLogging       : '8.0.0',
-    restAssured         : '6.0.0',
+    restAssured         : '6.0.1',
     s2sClient           : '6.0.0',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
