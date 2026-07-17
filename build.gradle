@@ -119,7 +119,7 @@ check.dependsOn integration
 
 checkstyle {
   maxWarnings = 0
-  toolVersion = '13.7.0'
+  toolVersion = '13.8.0'
   getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
 }
 
@@ -231,6 +231,8 @@ pitest {
 }
 
 project.tasks['pitest'].group = "Verification"
+
+ext['log4j2.version'] = '2.25.5'
 
 def versions = [
     apiGuardian         : '1.1.2',
