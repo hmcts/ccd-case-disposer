@@ -232,6 +232,8 @@ pitest {
 
 project.tasks['pitest'].group = "Verification"
 
+ext['log4j2.version'] = '2.25.5'
+
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.22.0',
