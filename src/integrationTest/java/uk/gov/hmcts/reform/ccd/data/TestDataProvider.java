@@ -21,6 +21,7 @@ import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CAS
 import static uk.gov.hmcts.reform.ccd.config.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
 
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestDataProvider extends TestContainers {
 
     @Inject
@@ -41,6 +42,7 @@ public class TestDataProvider extends TestContainers {
     @Inject
     private WireMockStubs wireMockStubs;
 
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     protected void setupData(final String deletableCaseTypes,
                              final String deletableCaseTypesSimulation,
                              final String ccdScriptPath,

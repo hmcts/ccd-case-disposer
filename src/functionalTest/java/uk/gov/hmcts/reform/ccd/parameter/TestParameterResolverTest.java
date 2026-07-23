@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_
 
 @ActiveProfiles("functional")
 @SpringBootTest(classes = {TestParameterResolver.class})
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 class TestParameterResolverTest {
 
     @Inject

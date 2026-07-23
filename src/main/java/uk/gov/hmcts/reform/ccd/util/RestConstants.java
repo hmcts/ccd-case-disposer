@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.ccd.util;
 
 @SuppressWarnings({"java:S1075"})
-public class RestConstants {
-    private RestConstants() {
-    }
+public final class RestConstants {
 
     // Paths
     public static final String DELETE_DOCUMENT_PATH = "/documents/delete";
@@ -22,4 +20,8 @@ public class RestConstants {
 
 
     public static final String HEARING_RECORDINGS_CASE_TYPE = "HearingRecordings";
+
+    private RestConstants() {
+    }
+
 }

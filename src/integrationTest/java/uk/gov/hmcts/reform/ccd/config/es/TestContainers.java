@@ -18,7 +18,8 @@ import java.time.Duration;
 
 @Testcontainers
 @ContextConfiguration(initializers = {TestContainers.ElasticsearchInitializer.class})
-public abstract class TestContainers {
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
+public class TestContainers {
 
     protected static final WireMockServer WIREMOCK_SERVER = new WireMockServer(4603);
     private static final Logger LOGGER = LoggerFactory.getLogger(TestContainers.class);
@@ -37,6 +38,10 @@ public abstract class TestContainers {
         if (!WIREMOCK_SERVER.isRunning()) {
             WIREMOCK_SERVER.start();
         }
+    }
+
+    protected TestContainers() {
+        // utility class
     }
 
     public static class ElasticsearchInitializer

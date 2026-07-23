@@ -16,6 +16,7 @@ public class LauRemoteDeletionVerifier implements RemoteDeletionVerifier {
     @Inject
     private LauRecordHolder lauRecordHolder;
 
+    @Override
     public void verifyRemoteDeletion(final List<Long> caseRefs) {
         assertThat(lauRecordHolder.getLauCaseRefList())
             .containsExactlyInAnyOrderElementsOf(Lists.transform(caseRefs, Functions.toStringFunction()));

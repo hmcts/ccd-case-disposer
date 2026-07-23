@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver;
 @EnableJpaRepositories(basePackages = {"uk.gov.hmcts.reform.ccd.data"})
 @EntityScan(basePackages = {"uk.gov.hmcts.reform.ccd.data"})
 @EnableAutoConfiguration
+@SuppressWarnings("PMD.TestClassWithoutTestCases")
 public class TestApplicationConfiguration {
 
     @Bean

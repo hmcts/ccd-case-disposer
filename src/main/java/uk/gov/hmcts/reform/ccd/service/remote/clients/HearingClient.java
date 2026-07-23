@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_HEARINGS_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @FeignClient(name = "hearingClient", url = "${remote.hearing.host}")
+@SuppressWarnings("PMD.ImplicitFunctionalInterface")
 public interface HearingClient {
 
     @DeleteMapping(
@@ -23,7 +24,7 @@ public interface HearingClient {
     ResponseEntity<Void> deleteHearing(
         @RequestHeader(AUTHORISATION_HEADER) String authHeader,
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
-        @RequestBody final List<String> ccdCaseIds
+        @RequestBody List<String> ccdCaseIds
     );
 
 }

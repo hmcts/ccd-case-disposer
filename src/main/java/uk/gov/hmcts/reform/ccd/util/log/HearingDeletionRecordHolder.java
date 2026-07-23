@@ -11,7 +11,7 @@ import java.util.Optional;
 @Named
 @Getter
 public class HearingDeletionRecordHolder {
-    private List<Map<String, Integer>> hearingDeletionRecordHolderList = new ArrayList<>();
+    private final List<Map<String, Integer>> hearingDeletionRecordHolderList = new ArrayList<>();
 
     public void setHearingDeletionResults(final String caseRef,
                                           final int hearingDeletionStatus) {

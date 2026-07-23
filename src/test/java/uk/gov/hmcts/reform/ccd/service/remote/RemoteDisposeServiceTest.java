@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.verify;
 class RemoteDisposeServiceTest {
 
     @Spy
-    private ArrayList<DisposeRemoteOperation> disposeRemoteOperations;
+    private final List<DisposeRemoteOperation> disposeRemoteOperations = new ArrayList<>();
 
     @InjectMocks
     private RemoteDisposeService remoteDisposeService;

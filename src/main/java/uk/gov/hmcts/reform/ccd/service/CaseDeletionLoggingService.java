@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.DELETED_STATE;
 import static uk.gov.hmcts.reform.ccd.util.LogConstants.FAILED_STATE;
@@ -38,13 +39,11 @@ public class CaseDeletionLoggingService {
 
         final List<CaseDataView> caseDataViews = buildCaseDataViews();
 
-        if (!caseDataViews.isEmpty()) {
-
-            final String summaryString = summaryStringLogBuilder.buildSummaryString(caseDataViews);
-
-            log.info(summaryString);
-        } else {
+        if (caseDataViews.isEmpty()) {
             logDataIfNoDeletableOrSimulatedCasesFound();
+        } else {
+            final String summaryString = summaryStringLogBuilder.buildSummaryString(caseDataViews);
+            log.info(summaryString);
         }
     }
 
@@ -55,13 +54,15 @@ public class CaseDeletionLoggingService {
                                                           parameterResolver.getAppInsightsLogSize());
 
         for (List<CaseData> partition : partitions) {
-            StringBuilder batchLog = new StringBuilder();
-            partition.forEach(caseData ->
-                batchLog.append(String.format("Simulated case type: %s, Case ref: %s%n",
-                                              caseData.getCaseType(), caseData.getReference()))
-            );
+            String batchLog = partition.stream()
+                .map(caseData -> String.format(
+                    "Simulated case type: %s, Case ref: %s",
+                    caseData.getCaseType(),
+                    caseData.getReference()
+                ))
+                .collect(Collectors.joining(System.lineSeparator()));
 
-            log.info(batchLog.toString());
+            log.info(batchLog);
         }
     }
 

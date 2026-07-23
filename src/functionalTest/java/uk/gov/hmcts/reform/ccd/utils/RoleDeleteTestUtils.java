@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.utils;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.ROLE_ASSIGNMENT_PA
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @Component
+@Slf4j
 public class RoleDeleteTestUtils {
 
     @Inject
@@ -73,7 +75,7 @@ public class RoleDeleteTestUtils {
                                 assertThat(response.getStatusCode()).isEqualTo(201);
 
                             } catch (final IOException e) {
-                                e.printStackTrace();
+                                log.error("Error creating role assignment", e);
                             }
                         }));
     }

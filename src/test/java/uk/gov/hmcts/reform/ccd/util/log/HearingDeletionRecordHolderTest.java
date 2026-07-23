@@ -12,28 +12,28 @@ class HearingDeletionRecordHolderTest {
     void shouldHoldCaseHearingDeletionResults() {
         final HearingDeletionRecordHolder hearingDeletionRecordHolder = new HearingDeletionRecordHolder();
 
-        final int caseRolesDeletionBeforeCaseRefMapping_1 = HttpStatus.OK.value();
-        final int caseRolesDeletionBeforeCaseRefMapping_2 = HttpStatus.OK.value();
+        final int caseRolesDeletionBeforeCaseRefMapping1 = HttpStatus.OK.value();
+        final int caseRolesDeletionBeforeCaseRefMapping2 = HttpStatus.OK.value();
 
         hearingDeletionRecordHolder.setHearingDeletionResults(
             "123",
-            caseRolesDeletionBeforeCaseRefMapping_1
+            caseRolesDeletionBeforeCaseRefMapping1
         );
         hearingDeletionRecordHolder.setHearingDeletionResults(
             "456",
-            caseRolesDeletionBeforeCaseRefMapping_2
+            caseRolesDeletionBeforeCaseRefMapping2
         );
 
-        final int caseRolesDeletionResults_1 =
+        final int caseRolesDeletionResults1 =
             hearingDeletionRecordHolder.getHearingDeletionResults("123");
-        final int caseRolesDeletionResults_2 =
+        final int caseRolesDeletionResults2 =
             hearingDeletionRecordHolder.getHearingDeletionResults("456");
 
-        assertThat(caseRolesDeletionBeforeCaseRefMapping_1)
-            .isEqualTo(caseRolesDeletionResults_1);
+        assertThat(caseRolesDeletionBeforeCaseRefMapping1)
+            .isEqualTo(caseRolesDeletionResults1);
 
-        assertThat(caseRolesDeletionBeforeCaseRefMapping_2)
-            .isEqualTo(caseRolesDeletionResults_2);
+        assertThat(caseRolesDeletionBeforeCaseRefMapping2)
+            .isEqualTo(caseRolesDeletionResults2);
     }
 
 }

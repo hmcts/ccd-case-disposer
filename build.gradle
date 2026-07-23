@@ -85,31 +85,31 @@ test {
     failFast = true
 }
 
-task functional(type: Test) {
-    description = "Runs functional tests"
-    group = "Verification"
-    testClassesDirs = sourceSets.functionalTest.output.classesDirs
-    classpath = sourceSets.functionalTest.runtimeClasspath
+tasks.register('functional', Test) {
+  description = "Runs functional tests"
+  group = "Verification"
+  testClassesDirs = sourceSets.functionalTest.output.classesDirs
+  classpath = sourceSets.functionalTest.runtimeClasspath
 }
 
-task integration(type: Test) {
-    description = "Runs integration tests"
-    group = "Verification"
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    failFast = true
-    mustRunAfter test
+tasks.register('integration', Test) {
+  description = "Runs integration tests"
+  group = "Verification"
+  testClassesDirs = sourceSets.integrationTest.output.classesDirs
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  failFast = true
+  mustRunAfter test
 }
 
-task fortifyScan(type: JavaExec)  {
+tasks.register('fortifyScan', JavaExec) {
   mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
-task checkoutDataStoreMigrationScripts (type: Exec){
-   executable "src/integrationTest/resources/scripts/checkout-datastore-db-scripts.sh"
-   outputs.upToDateWhen { false }
+tasks.register('checkoutDataStoreMigrationScripts', Exec) {
+  executable "src/integrationTest/resources/scripts/checkout-datastore-db-scripts.sh"
+  outputs.upToDateWhen { false }
 }
 
 //**** Uncomment this line to checkout latest data-store-api migration scripts *****
@@ -124,12 +124,12 @@ checkstyle {
 }
 
 pmd {
-    //sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
-    sourceSets = []
-    reportsDir = file("$project.buildDir/reports/pmd")
-    // https://github.com/pmd/pmd/issues/876
-    ruleSets = []
-    ruleSetFiles = files("config/pmd/ruleset.xml")
+  toolVersion = "7.26.0"
+  sourceSets = [sourceSets.main, sourceSets.test, sourceSets.functionalTest, sourceSets.integrationTest]
+  reportsDir = file("$project.buildDir/reports/pmd")
+  // https://github.com/pmd/pmd/issues/876
+  ruleSets = []
+  ruleSetFiles = files("config/pmd/ruleset.xml")
 }
 
 static def getCheckedOutGitCommitHash() {
@@ -354,7 +354,7 @@ pact {
   }
 }
 
-task runAndPublishConsumerPactTests(type: Test){
+tasks.register('runAndPublishConsumerPactTests', Test) {
   logger.lifecycle("Runs pact Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath
@@ -368,7 +368,7 @@ task contract(type: Test, description: 'Runs the pact contract tests.', group: '
   classpath = sourceSets.contractTest.runtimeClasspath
 }
 
-task runProviderPactVerification(type: Test) {
+tasks.register('runProviderPactVerification', Test) {
   logger.lifecycle("Runs provider pact Tests")
   testClassesDirs = sourceSets.contractTest.output.classesDirs
   classpath = sourceSets.contractTest.runtimeClasspath

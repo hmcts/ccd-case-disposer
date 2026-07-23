@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.ccd;
 
 import com.microsoft.applicationinsights.TelemetryClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.ApplicationArguments;
@@ -36,8 +36,19 @@ class ApplicationBootstrapTest {
     @Mock
     private TelemetryClient client;
 
-    @InjectMocks
     private ApplicationBootstrap underTest;
+
+    @BeforeEach
+    void setUp() {
+        underTest = new ApplicationBootstrap(
+            applicationExecutor,
+            timedJobExecutor,
+            client,
+            securityUtil,
+            480L,
+            10_000
+        );
+    }
 
     @Test
     void testShouldRunExecutor() throws Exception {

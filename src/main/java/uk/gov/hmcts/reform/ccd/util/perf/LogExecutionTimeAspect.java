@@ -15,6 +15,8 @@ import java.time.Duration;
 @Component
 @ConditionalOnBooleanProperty(prefix = "performance.logging", name = "enabled")
 public class LogExecutionTimeAspect {
+
+    private static final long SECOND_IN_MILLIS = 1000;
     private static final Logger LOG =
         LoggerFactory.getLogger(LogExecutionTimeAspect.class.getPackageName());
 
@@ -23,7 +25,7 @@ public class LogExecutionTimeAspect {
         return proceed(joinPoint, joinPoint.getSignature().toShortString());
     }
 
-    @Around(value = "@annotation(annotation)")
+    @Around("@annotation(annotation)")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint, LogExecutionTime annotation) throws Throwable {
         String givenValue = annotation.value();
         String metricName = givenValue.isBlank() ? joinPoint.getSignature().toShortString() : givenValue;
@@ -43,7 +45,7 @@ public class LogExecutionTimeAspect {
 
     private String format(Duration duration) {
         long ms = duration.toMillis();
-        if (ms < 1000) {
+        if (ms < SECOND_IN_MILLIS) {
             return ms + "ms";
         }
         return String.format("%.2fs", ms / 1000.0);

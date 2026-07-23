@@ -17,6 +17,7 @@ public class DocumentRemoteDeletionVerifier implements RemoteDeletionVerifier {
     @Inject
     private DocumentDeletionRecordHolder documentDeletionRecordHolder;
 
+    @Override
     public void verifyRemoteDeletion(final List<Long> caseRefDeletedDocuments) {
         caseRefDeletedDocuments.forEach(caseRef -> {
             final CaseDocumentsDeletionResults caseDocumentsDeletionMocks = DOCUMENT_DELETE.get(Long.toString(caseRef));

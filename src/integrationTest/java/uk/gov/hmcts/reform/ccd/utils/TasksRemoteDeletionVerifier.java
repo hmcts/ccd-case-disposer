@@ -15,6 +15,7 @@ public class TasksRemoteDeletionVerifier implements RemoteDeletionVerifier {
     @Inject
     private TasksDeletionRecordHolder tasksDeletionRecordHolder;
 
+    @Override
     public void verifyRemoteDeletion(final List<Long> caseRefs) {
         caseRefs.forEach(caseRef -> {
             String caseRefStr = Long.toString(caseRef);

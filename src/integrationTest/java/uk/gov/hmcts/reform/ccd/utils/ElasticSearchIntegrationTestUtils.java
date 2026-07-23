@@ -64,6 +64,7 @@ public class ElasticSearchIntegrationTestUtils {
         });
     }
 
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public void resetIndices(final Set<String> indexes) throws Exception {
         for (String index : indexes) {
             final String indexName = getIndexName(index);
@@ -155,6 +156,7 @@ public class ElasticSearchIntegrationTestUtils {
     }
 
 
+    @SuppressWarnings("PMD.UseLocaleWithCaseConversions")
     public String getIndexName(String caseType) {
         if (!parameterResolver.getGlobalSearchIndexName().equals(caseType)) {
             return String.format("%s_cases", caseType.toLowerCase());

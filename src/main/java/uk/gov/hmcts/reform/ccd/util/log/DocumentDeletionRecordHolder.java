@@ -12,7 +12,7 @@ import java.util.Optional;
 @Named
 @Getter
 public class DocumentDeletionRecordHolder {
-    private List<Map<String, CaseDocumentsDeletionResults>> documentDeleteRecordHolderList = new ArrayList<>();
+    private final List<Map<String, CaseDocumentsDeletionResults>> documentDeleteRecordHolderList = new ArrayList<>();
 
     public void setCaseDocumentsDeletionResults(final String caseRef,
                                                 final CaseDocumentsDeletionResults caseDocumentsDeletionResults) {
