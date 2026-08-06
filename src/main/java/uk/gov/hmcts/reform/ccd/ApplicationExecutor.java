@@ -45,9 +45,15 @@ public class ApplicationExecutor {
         Set<CaseData> simulatedCases = caseCollectorService.getDeletableCases(
             parameterResolver.getDeletableCaseTypesSimulation());
 
+        //At the moment calling here it might change in future
         Map<String, ShellMappingResponse> responseMap = shellMappingService
             .getShellMappings(parameterResolver.getDeletableCaseTypesSimulation());
-        log.info("Shell mapping Size{}...", responseMap.size());
+        responseMap.forEach((caseType, mapping) -> {
+            log.info("caseType={}, shellCaseTypeId={}, mappingCount={}",
+                     caseType,
+                     mapping.getShellCaseTypeID(),
+                     mapping.getShellCaseMappings().size());
+        });
 
 
         Integer requestLimit = parameterResolver.getRequestLimit();
