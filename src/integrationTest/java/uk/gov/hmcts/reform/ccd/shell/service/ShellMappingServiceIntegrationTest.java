@@ -52,13 +52,14 @@ class ShellMappingServiceIntegrationTest extends TestContainers {
 
         ShellMappingResponse response = shellMappingService.loadMappings(caseTypeId);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getShellCaseTypeID()).isEqualTo("FT_ShellCaseType");
-        assertThat(response.getShellCaseMappings()).hasSize(1);
-        assertThat(response.getShellCaseMappings().getFirst().getOriginatingCaseFieldName())
-            .isEqualTo("applicantName");
-        assertThat(response.getShellCaseMappings().getFirst().getShellCaseFieldName())
-            .isEqualTo("shellApplicantName");
+        assertThat(response)
+            .isNotNull()
+            .extracting(
+                ShellMappingResponse::getShellCaseTypeID,
+                r -> r.getShellCaseMappings().size(),
+                r -> r.getShellCaseMappings().getFirst().getOriginatingCaseFieldName(),
+                r -> r.getShellCaseMappings().getFirst().getShellCaseFieldName())
+            .containsExactly("FT_ShellCaseType", 1, "applicantName", "shellApplicantName");
 
         WIREMOCK_SERVER.verify(1, getRequestedFor(urlPathEqualTo(SHELL_MAPPING_PATH + caseTypeId)));
     }
@@ -83,10 +84,13 @@ class ShellMappingServiceIntegrationTest extends TestContainers {
         Map<String, ShellMappingResponse> result = shellMappingService
             .getShellMappings(List.of(firstCaseType, secondCaseType));
 
-        assertThat(result).hasSize(2);
-        assertThat(result).containsKeys(firstCaseType, secondCaseType);
-        assertThat(result.get(firstCaseType).getShellCaseTypeID()).isEqualTo("FT_Shell_Master");
-        assertThat(result.get(secondCaseType).getShellCaseTypeID()).isEqualTo("FT_Shell_Other");
+        assertThat(result)
+            .hasSize(2)
+            .containsKeys(firstCaseType, secondCaseType)
+            .extracting(
+                m -> m.get(firstCaseType).getShellCaseTypeID(),
+                m -> m.get(secondCaseType).getShellCaseTypeID())
+            .containsExactly("FT_Shell_Master", "FT_Shell_Other");
 
         WIREMOCK_SERVER.verify(1, getRequestedFor(urlPathEqualTo(SHELL_MAPPING_PATH + firstCaseType)));
         WIREMOCK_SERVER.verify(1, getRequestedFor(urlPathEqualTo(SHELL_MAPPING_PATH + secondCaseType)));

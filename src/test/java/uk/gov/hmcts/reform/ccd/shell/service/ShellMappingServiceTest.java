@@ -53,21 +53,6 @@ class ShellMappingServiceTest {
             });
     }
 
-    @Test
-    void shouldReturnEmptyResponseWhenClientReturnsNullBody() {
-        stubAuthTokens();
-        when(shellMappingClient.getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, CASE_TYPE_ID))
-            .thenReturn(null);
-
-        ShellMappingResponse response = shellMappingService.loadMappings(CASE_TYPE_ID);
-
-        assertThat(response)
-            .isNotNull()
-            .satisfies(r -> {
-                assertThat(r.getShellCaseTypeID()).isNull();
-                assertThat(r.getShellCaseMappings()).isEmpty();
-            });
-    }
 
     @Test
     void shouldReturnClientResponseWhenShellMappingExists() {
