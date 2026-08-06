@@ -48,12 +48,12 @@ public class ApplicationExecutor {
         //At the moment calling here it might change in future
         Map<String, ShellMappingResponse> responseMap = shellMappingService
             .getShellMappings(parameterResolver.getDeletableCaseTypesSimulation());
-        responseMap.forEach((caseType, mapping) -> {
+        responseMap.forEach((caseType, mapping) ->
             log.info("caseType={}, shellCaseTypeId={}, mappingCount={}",
                      caseType,
                      mapping.getShellCaseTypeID(),
-                     mapping.getShellCaseMappings().size());
-        });
+                     mapping.getShellCaseMappings().size())
+        );
 
 
         Integer requestLimit = parameterResolver.getRequestLimit();
