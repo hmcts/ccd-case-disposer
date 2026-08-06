@@ -14,6 +14,8 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -80,6 +82,32 @@ class ShellMappingServiceTest {
 
         assertThat(responseMap).isEmpty();
         verifyNoInteractions(shellMappingClient);
+    }
+
+    @Test
+    void shouldReturnMappingsForEachCaseTypeWhenCaseTypesProvided() {
+        stubAuthTokens();
+        String firstCaseTypeId = "case-type-id-1";
+        String secondCaseTypeId = "case-type-id-2";
+
+        ShellMappingResponse firstResponse = new ShellMappingResponse("shell-case-type-1");
+        ShellMappingResponse secondResponse = new ShellMappingResponse("shell-case-type-2");
+
+        when(shellMappingClient.getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, firstCaseTypeId))
+            .thenReturn(firstResponse);
+        when(shellMappingClient.getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, secondCaseTypeId))
+            .thenReturn(secondResponse);
+
+        Map<String, ShellMappingResponse> responseMap =
+            shellMappingService.getShellMappings(List.of(firstCaseTypeId, secondCaseTypeId));
+
+        assertThat(responseMap)
+            .hasSize(2)
+            .containsEntry(firstCaseTypeId, firstResponse)
+            .containsEntry(secondCaseTypeId, secondResponse);
+
+        verify(shellMappingClient, times(1)).getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, firstCaseTypeId);
+        verify(shellMappingClient, times(1)).getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, secondCaseTypeId);
     }
 
     @Test

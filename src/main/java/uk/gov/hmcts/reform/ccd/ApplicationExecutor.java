@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
-import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -46,15 +44,7 @@ public class ApplicationExecutor {
             parameterResolver.getDeletableCaseTypesSimulation());
 
         //At the moment calling here it might change in future
-        Map<String, ShellMappingResponse> responseMap = shellMappingService
-            .getShellMappings(parameterResolver.getDeletableCaseTypesSimulation());
-        responseMap.forEach((caseType, mapping) ->
-            log.info("caseType={}, shellCaseTypeId={}, mappingCount={}",
-                     caseType,
-                     mapping.getShellCaseTypeID(),
-                     mapping.getShellCaseMappings().size())
-        );
-
+        shellMappingService.getShellMappings(parameterResolver.getDeletableCaseTypesSimulation());
 
         Integer requestLimit = parameterResolver.getRequestLimit();
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
