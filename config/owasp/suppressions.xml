@@ -7,6 +7,10 @@
     <cve>CVE-2026-54428</cve>
     <cve>CVE-2026-54515</cve>
   </suppress>
+  <suppress>
+    <notes>httpclient5</notes>
+    <cve>CVE-2026-64607</cve>
+  </suppress>
 
   <!--Please add all the false positives under the below section-->
   <!--End of false positives section -->
