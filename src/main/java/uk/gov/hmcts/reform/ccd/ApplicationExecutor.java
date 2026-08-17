@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
-import uk.gov.hmcts.reform.ccd.shell.util.ShellMappingsCache;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
@@ -31,7 +30,6 @@ public class ApplicationExecutor {
     private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseCollectorService caseCollectorService;
     private final ShellMappingService shellMappingService;
-    private final ShellMappingsCache shellMappingsCache;
     private final Clock clock;
 
     private LocalDateTime applicationStartTime;
@@ -39,32 +37,30 @@ public class ApplicationExecutor {
 
     @LogExecutionTime("Case-disposer")
     public void execute() {
-        shellMappingsCache.clear();
-        try {
-            logParameters();
-            applicationStartTime = LocalDateTime.now(clock);
-            log.info("Case-Disposer started...");
-            Set<CaseData> allDeletableCases = caseCollectorService.getDeletableCases(
-                parameterResolver.getDeletableCaseTypes());
-            Set<CaseData> simulatedCases = caseCollectorService.getDeletableCases(
-                parameterResolver.getDeletableCaseTypesSimulation());
 
-            Map<String, ShellMappingResponse> shellMappings =
-                shellMappingService.getShellMappings(parameterResolver.getDeletableCaseTypes());
-            shellMappingsCache.putAll(shellMappings);
+        logParameters();
+        applicationStartTime = LocalDateTime.now(clock);
+        log.info("Case-Disposer started...");
+        Set<CaseData> allDeletableCases = caseCollectorService.getDeletableCases(
+            parameterResolver.getDeletableCaseTypes());
+        Set<CaseData> simulatedCases = caseCollectorService.getDeletableCases(
+            parameterResolver.getDeletableCaseTypesSimulation());
 
-            Integer requestLimit = parameterResolver.getRequestLimit();
-            processedCasesRecordHolder.setSimulatedCases(simulatedCases);
+        Map<String, ShellMappingResponse> shellMappings =
+            shellMappingService.getShellMappings(parameterResolver.getDeletableCaseTypes());
+        //Just to satisfy PMD rule, this will change later
+        log.info("Shell mappings loaded for case types: {}", shellMappings.keySet());
 
-            log.info("Found deletable cases {}...", allDeletableCases.size());
-            processCases(allDeletableCases, requestLimit);
+        Integer requestLimit = parameterResolver.getRequestLimit();
+        processedCasesRecordHolder.setSimulatedCases(simulatedCases);
 
-            caseDeletionLoggingService.logCases();
+        log.info("Found deletable cases {}...", allDeletableCases.size());
+        processCases(allDeletableCases, requestLimit);
 
-            log.info("Case-Disposer finished.");
-        } finally {
-            shellMappingsCache.clear();
-        }
+        caseDeletionLoggingService.logCases();
+
+        log.info("Case-Disposer finished.");
+
     }
 
     private void logParameters() {

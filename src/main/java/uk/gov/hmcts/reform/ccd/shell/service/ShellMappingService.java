@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,13 +20,24 @@ public class ShellMappingService {
     private final ShellMappingClient shellMappingClient;
     private final SecurityUtil securityUtil;
 
+    private final Map<String, ShellMappingResponse> cache =
+        new ConcurrentHashMap<>();
+
     public ShellMappingResponse loadMappings(String caseTypeId) {
+        return cache.computeIfAbsent(caseTypeId, this::retrieveMappings);
+    }
+
+    private ShellMappingResponse retrieveMappings(String caseTypeId) {
         ShellMappingResponse response = shellMappingClient.getShellMappings(
-            securityUtil.getServiceAuthorization(), securityUtil.getIdamClientToken(), caseTypeId);
+            securityUtil.getServiceAuthorization(),
+            securityUtil.getIdamClientToken(),
+            caseTypeId
+        );
 
         if (response == null) {
             log.info("Shell mapping response was empty for caseTypeId={}, continuing without shell mappings",
-                     caseTypeId);
+                caseTypeId
+            );
             return emptyResponse();
         }
 
@@ -46,5 +58,9 @@ public class ShellMappingService {
                 Function.identity(),
                 this::loadMappings
             ));
+    }
+
+    public void clearCache() {
+        cache.clear();
     }
 }

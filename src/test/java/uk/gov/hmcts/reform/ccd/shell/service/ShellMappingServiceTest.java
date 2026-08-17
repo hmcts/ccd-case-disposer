@@ -121,6 +121,89 @@ class ShellMappingServiceTest {
             .isSameAs(serviceUnavailable);
     }
 
+    @Test
+    void shouldReturnCachedResponseAndNotCallClientAgainForSameCaseType() {
+        stubAuthTokens();
+
+        ShellMappingResponse expectedResponse =
+            new ShellMappingResponse("shell-case-type-id");
+
+        when(shellMappingClient.getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, CASE_TYPE_ID))
+            .thenReturn(expectedResponse);
+
+        ShellMappingResponse firstResponse =
+            shellMappingService.loadMappings(CASE_TYPE_ID);
+
+        ShellMappingResponse secondResponse =
+            shellMappingService.loadMappings(CASE_TYPE_ID);
+
+        assertThat(firstResponse).isSameAs(expectedResponse);
+        assertThat(secondResponse).isSameAs(expectedResponse);
+
+        verify(shellMappingClient, times(1))
+            .getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, CASE_TYPE_ID);
+    }
+
+    @Test
+    void shouldCallClientAgainForDifferentCaseType() {
+        stubAuthTokens();
+
+        String firstCaseTypeId = "case-type-id-1";
+        String secondCaseTypeId = "case-type-id-2";
+
+        ShellMappingResponse firstResponse =
+            new ShellMappingResponse("shell-case-type-1");
+        ShellMappingResponse secondResponse =
+            new ShellMappingResponse("shell-case-type-2");
+
+        when(shellMappingClient.getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, firstCaseTypeId))
+            .thenReturn(firstResponse);
+
+        when(shellMappingClient.getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, secondCaseTypeId))
+            .thenReturn(secondResponse);
+
+        ShellMappingResponse result1 =
+            shellMappingService.loadMappings(firstCaseTypeId);
+
+        ShellMappingResponse result2 =
+            shellMappingService.loadMappings(secondCaseTypeId);
+
+        assertThat(result1).isSameAs(firstResponse);
+        assertThat(result2).isSameAs(secondResponse);
+
+        verify(shellMappingClient, times(1))
+            .getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, firstCaseTypeId);
+
+        verify(shellMappingClient, times(1))
+            .getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, secondCaseTypeId);
+    }
+
+    @Test
+    void shouldCacheEmptyResponseWhenShellMappingDoesNotExist() {
+        stubAuthTokens();
+
+        when(shellMappingClient.getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, CASE_TYPE_ID))
+            .thenReturn(null);
+
+        ShellMappingResponse firstResponse =
+            shellMappingService.loadMappings(CASE_TYPE_ID);
+
+        ShellMappingResponse secondResponse =
+            shellMappingService.loadMappings(CASE_TYPE_ID);
+
+        assertThat(firstResponse)
+            .isNotNull()
+            .satisfies(r -> {
+                assertThat(r.getShellCaseTypeID()).isNull();
+                assertThat(r.getShellCaseMappings()).isEmpty();
+            });
+
+        assertThat(secondResponse).isSameAs(firstResponse);
+
+        verify(shellMappingClient, times(1))
+            .getShellMappings(SERVICE_TOKEN, IDAM_TOKEN, CASE_TYPE_ID);
+    }
+
     private void stubAuthTokens() {
         when(securityUtil.getServiceAuthorization()).thenReturn(SERVICE_TOKEN);
         when(securityUtil.getIdamClientToken()).thenReturn(IDAM_TOKEN);
