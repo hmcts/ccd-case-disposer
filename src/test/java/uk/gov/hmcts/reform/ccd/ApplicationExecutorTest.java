@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
-import uk.gov.hmcts.reform.ccd.shell.util.ShellMappingsHolder;
+import uk.gov.hmcts.reform.ccd.shell.util.ShellMappingsCache;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.time.Clock;
@@ -66,7 +66,7 @@ class ApplicationExecutorTest {
     private ShellMappingService shellMappingService;
 
     @Mock
-    private ShellMappingsHolder shellMappingsHolder;
+    private ShellMappingsCache shellMappingsCache;
 
     @Mock
     private Clock clock;
@@ -165,7 +165,7 @@ class ApplicationExecutorTest {
         applicationExecutor.execute();
 
         verify(processedCasesRecordHolder).setSimulatedCases(simulatedCases);
-        verify(shellMappingsHolder).putAll(Map.of());
+        verify(shellMappingsCache).putAll(Map.of());
         verify(caseDeletionService, never()).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1);
         verify(caseDeletionService, never()).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2);
 
@@ -174,6 +174,6 @@ class ApplicationExecutorTest {
         inOrder.verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
         inOrder.verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         inOrder.verify(caseDeletionLoggingService).logCases();
-        verify(shellMappingsHolder, times(2)).clear();
+        verify(shellMappingsCache, times(2)).clear();
     }
 }

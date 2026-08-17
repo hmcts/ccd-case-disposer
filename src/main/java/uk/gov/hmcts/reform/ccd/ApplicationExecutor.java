@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
-import uk.gov.hmcts.reform.ccd.shell.util.ShellMappingsHolder;
+import uk.gov.hmcts.reform.ccd.shell.util.ShellMappingsCache;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
@@ -31,7 +31,7 @@ public class ApplicationExecutor {
     private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseCollectorService caseCollectorService;
     private final ShellMappingService shellMappingService;
-    private final ShellMappingsHolder shellMappingsHolder;
+    private final ShellMappingsCache shellMappingsCache;
     private final Clock clock;
 
     private LocalDateTime applicationStartTime;
@@ -39,7 +39,7 @@ public class ApplicationExecutor {
 
     @LogExecutionTime("Case-disposer")
     public void execute() {
-        shellMappingsHolder.clear();
+        shellMappingsCache.clear();
         try {
             logParameters();
             applicationStartTime = LocalDateTime.now(clock);
@@ -51,7 +51,7 @@ public class ApplicationExecutor {
 
             Map<String, ShellMappingResponse> shellMappings =
                 shellMappingService.getShellMappings(parameterResolver.getDeletableCaseTypes());
-            shellMappingsHolder.putAll(shellMappings);
+            shellMappingsCache.putAll(shellMappings);
 
             Integer requestLimit = parameterResolver.getRequestLimit();
             processedCasesRecordHolder.setSimulatedCases(simulatedCases);
@@ -63,7 +63,7 @@ public class ApplicationExecutor {
 
             log.info("Case-Disposer finished.");
         } finally {
-            shellMappingsHolder.clear();
+            shellMappingsCache.clear();
         }
     }
 

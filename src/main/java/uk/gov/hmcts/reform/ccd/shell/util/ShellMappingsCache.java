@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Named
-public class ShellMappingsHolder {
+public class ShellMappingsCache {
 
     private final Map<String, ShellMappingResponse> shellMappingsByCaseType = new ConcurrentHashMap<>();
 
