@@ -190,7 +190,7 @@ dependencyManagement {
         mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.2'
     }
     dependencies {
-        dependency 'com.fasterxml.jackson.core:jackson-databind:2.22.1'
+        dependency 'com.fasterxml.jackson.core:jackson-databind:2.22.2'
     }
 }
 
