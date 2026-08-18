@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.time.Clock;
@@ -26,10 +27,12 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
@@ -37,6 +40,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ApplicationExecutorTest {
 
@@ -56,6 +60,9 @@ class ApplicationExecutorTest {
 
     @Mock
     private CaseCollectorService caseCollectorService;
+
+    @Mock
+    private ShellMappingService shellMappingService;
 
     @Mock
     private Clock clock;
@@ -78,6 +85,7 @@ class ApplicationExecutorTest {
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(Set.of());
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE_SIMULATION)))
             .thenReturn(Set.of());
+        when(shellMappingService.getShellMappings(anyList())).thenReturn(Map.of());
     }
 
     @Test

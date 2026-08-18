@@ -9,12 +9,15 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -26,6 +29,7 @@ public class ApplicationExecutor {
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseCollectorService caseCollectorService;
+    private final ShellMappingService shellMappingService;
     private final Clock clock;
 
     private LocalDateTime applicationStartTime;
@@ -33,6 +37,7 @@ public class ApplicationExecutor {
 
     @LogExecutionTime("Case-disposer")
     public void execute() {
+
         logParameters();
         applicationStartTime = LocalDateTime.now(clock);
         log.info("Case-Disposer started...");
@@ -40,6 +45,11 @@ public class ApplicationExecutor {
             parameterResolver.getDeletableCaseTypes());
         Set<CaseData> simulatedCases = caseCollectorService.getDeletableCases(
             parameterResolver.getDeletableCaseTypesSimulation());
+
+        Map<String, ShellMappingResponse> shellMappings =
+            shellMappingService.getShellMappings(parameterResolver.getDeletableCaseTypes());
+        //Just to satisfy PMD rule, this will change later
+        log.info("Shell mappings loaded for case types: {}", shellMappings.keySet());
 
         Integer requestLimit = parameterResolver.getRequestLimit();
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
@@ -50,6 +60,7 @@ public class ApplicationExecutor {
         caseDeletionLoggingService.logCases();
 
         log.info("Case-Disposer finished.");
+
     }
 
     private void logParameters() {

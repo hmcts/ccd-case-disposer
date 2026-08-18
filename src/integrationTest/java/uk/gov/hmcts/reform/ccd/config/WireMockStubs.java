@@ -19,6 +19,7 @@ import java.util.Collections;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalToJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static feign.form.ContentProcessor.CONTENT_TYPE_HEADER;
@@ -41,6 +42,7 @@ public class WireMockStubs {
     private static final String LAU_SAVE_PATH = "/audit/caseAction";
     private static final String TASKS_DELETE_PATH = "/task/delete";
     private static final String HEARINGS_DELETE_PATH = "/delete";
+    private static final String SHELL_MAPPING_PATH = "/api/retrieve-shell-mappings/.*";
 
 
     private final RoleAssignmentsPostResponse roleAssignmentsResponse = new RoleAssignmentsPostResponse();
@@ -53,6 +55,7 @@ public class WireMockStubs {
         setupLauStub(wireMockServer);
         setupTasksStub(wireMockServer);
         setupHearingsStub(wireMockServer);
+        setupShellRetrieveStub(wireMockServer);
     }
 
     private void setupTasksStub(final WireMockServer wireMockServer) {
@@ -156,6 +159,12 @@ public class WireMockStubs {
             .withHeader(CONTENT_TYPE_HEADER, JSON_RESPONSE)
             .withBody(body)
             .withStatus(status);
+    }
+
+    private void setupShellRetrieveStub(final WireMockServer wireMockServer) {
+        String emptyMappingResponse = "{\"shellCaseTypeID\": null, \"shellCaseMappings\": []}";
+        wireMockServer.stubFor(get(urlPathMatching(SHELL_MAPPING_PATH))
+                                   .willReturn(buildResponseDefinition(200, emptyMappingResponse)));
     }
 
 

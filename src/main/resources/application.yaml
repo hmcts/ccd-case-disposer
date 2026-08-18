@@ -88,3 +88,7 @@ logging:
 performance:
   logging:
     enabled: ${CCD_DISPOSER_PERF_LOGGING_ENABLED:false}
+
+shell:
+  mapping:
+    url: ${DEFINITION_STORE_HOST:http://localhost:4506}
