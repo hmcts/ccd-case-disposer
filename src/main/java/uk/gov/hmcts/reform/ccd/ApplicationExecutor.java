@@ -9,7 +9,6 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
-import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Map;
 import java.util.Set;
 
 @Slf4j
@@ -46,10 +44,12 @@ public class ApplicationExecutor {
         Set<CaseData> simulatedCases = caseCollectorService.getDeletableCases(
             parameterResolver.getDeletableCaseTypesSimulation());
 
-        Map<String, ShellMappingResponse> shellMappings =
+        //Commenting this whole section now as need to merge ccd_defention_store PR to
+        // allow ccd_case_disposer to retrieve mapping
+        /*Map<String, ShellMappingResponse> shellMappings =
             shellMappingService.getShellMappings(parameterResolver.getDeletableCaseTypes());
         //Just to satisfy PMD rule, this will change later
-        log.info("Shell mappings loaded for case types: {}", shellMappings.keySet());
+        log.info("Shell mappings loaded for case types: {}", shellMappings.keySet());*/
 
         Integer requestLimit = parameterResolver.getRequestLimit();
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
