@@ -53,6 +53,10 @@ remote:
   hearing:
     host: ${HEARING_RECORDING_HOST:http://localhost:4000}
     case.type: HearingRecordings
+  ccd-data-store:
+    host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
+  ccd-definition-store:
+    host: ${CCD_DEFINITION_STORE_HOST:http://localhost:4451}
 
 idam:
   api:
@@ -89,6 +93,6 @@ performance:
   logging:
     enabled: ${CCD_DISPOSER_PERF_LOGGING_ENABLED:false}
 
-shell:
-  mapping:
-    url: ${DEFINITION_STORE_HOST:http://localhost:4506}
+features:
+  shell-case:
+    enabled: ${CCD_DISPOSER_SHELL_CASE_ENABLED:false}
