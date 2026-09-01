@@ -17,9 +17,8 @@ import uk.gov.hmcts.reform.ccd.exception.LogAndAuditException;
 import uk.gov.hmcts.reform.ccd.fixture.TestData;
 import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
-import uk.gov.hmcts.reform.ccd.service.CaseDeletionService;
+import uk.gov.hmcts.reform.ccd.service.CaseDisposalWorkflow;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
-import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 
 import java.time.Clock;
@@ -45,14 +44,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
+
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class ApplicationExecutorTest {
 
     private static final LocalTime CUT_OFF_TIME = LocalTime.parse("06:00");
-
-    @Mock
-    private CaseDeletionService caseDeletionService;
 
     @Mock
     private ParameterResolver parameterResolver;
@@ -67,7 +64,7 @@ class ApplicationExecutorTest {
     private CaseCollectorService caseCollectorService;
 
     @Mock
-    private ShellMappingService shellMappingService;
+    private CaseDisposalWorkflow caseDisposalWorkflow;
 
     @Mock
     private Clock clock;
@@ -93,7 +90,6 @@ class ApplicationExecutorTest {
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(Set.of());
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE_SIMULATION)))
             .thenReturn(Set.of());
-        //when(shellMappingService.getShellMappings(anyList())).thenReturn(Map.of());
     }
 
     @AfterEach
@@ -115,9 +111,9 @@ class ApplicationExecutorTest {
 
         applicationExecutor.execute();
 
-        verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
-        verify(caseDeletionService, never()).deleteCaseData(TestData.DELETABLE_CASE_DATA5_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow, never()).dispose(TestData.DELETABLE_CASE_DATA5_WITH_PAST_TTL);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         verify(processedCasesRecordHolder, never()).addProcessedCase(TestData.DELETABLE_CASE_DATA5_WITH_PAST_TTL);
@@ -139,7 +135,7 @@ class ApplicationExecutorTest {
 
         applicationExecutor.execute();
 
-        verify(caseDeletionService, times(expectedDeleteCount)).deleteCaseData(any());
+        verify(caseDisposalWorkflow, times(expectedDeleteCount)).dispose(any());
         verify(processedCasesRecordHolder, times(expectedDeleteCount)).addProcessedCase(any());
     }
 
@@ -157,12 +153,12 @@ class ApplicationExecutorTest {
                 throw new LogAndAuditException("log and audit failed");
             }
             return null;
-        }).when(caseDeletionService).deleteCaseData(any());
+        }).when(caseDisposalWorkflow).dispose(any());
 
         applicationExecutor.execute();
 
-        verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         assertThat(output).contains("Error deleting case 1");
@@ -181,14 +177,15 @@ class ApplicationExecutorTest {
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE_SIMULATION)))
             .thenReturn(simulatedCases);
+        when(caseDisposalWorkflow.dispose(any())).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
 
         applicationExecutor.execute();
 
         verify(processedCasesRecordHolder).setSimulatedCases(simulatedCases);
-        verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDeletionService).deleteCaseData(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
-        verify(caseDeletionService, never()).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1);
-        verify(caseDeletionService, never()).deleteCaseData(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow, never()).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1);
+        verify(caseDisposalWorkflow, never()).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2);
         verify(caseDeletionLoggingService).logCases();
     }
 
@@ -400,5 +397,11 @@ class ApplicationExecutorTest {
     private void givenNoSimulatedCases() {
         when(caseCollectorService.getDeletableCases(
             List.of(TestData.DELETABLE_CASE_TYPE_SIMULATION))).thenReturn(Set.of());
+
+        InOrder inOrder = inOrder(processedCasesRecordHolder, caseDisposalWorkflow, caseDeletionLoggingService);
+        inOrder.verify(processedCasesRecordHolder).setSimulatedCases(simulatedCases);
+        inOrder.verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        inOrder.verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        inOrder.verify(caseDeletionLoggingService).logCases();
     }
 }

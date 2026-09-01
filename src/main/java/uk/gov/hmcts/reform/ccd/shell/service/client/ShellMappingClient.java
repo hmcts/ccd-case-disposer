@@ -13,7 +13,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_H
 @FeignClient(
     name = "shell-mapping-service",
     // Missing shell mappings are expected for some case types; treat 404 as empty so processing continues.
-    url = "${shell.mapping.url}",
+    url = "${remote.ccd-definition-store.host}",
     dismiss404 = true
 )
 @SuppressWarnings("PMD.ImplicitFunctionalInterface")
