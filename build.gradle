@@ -187,7 +187,7 @@ dependencyCheck {
 
 dependencyManagement {
     imports {
-        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.2'
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2025.1.3'
     }
     dependencies {
         dependency 'com.fasterxml.jackson.core:jackson-databind:2.22.2'
