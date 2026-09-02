@@ -146,6 +146,7 @@ jacocoTestReport {
 }
 
 project.tasks['sonarqube'].dependsOn jacocoTestReport
+tasks.sonarResolver.dependsOn(processResources)
 
 sonarqube {
   properties {
