@@ -3,31 +3,19 @@ package uk.gov.hmcts.reform.ccd.util.log;
 import jakarta.inject.Named;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Named
 @Getter
 public class TasksDeletionRecordHolder {
-    private final List<Map<String, Integer>> tasksDeletionRecordHolderList = new ArrayList<>();
+    private final ConcurrentMap<String, Integer> tasksDeletionByCaseRef = new ConcurrentHashMap<>();
 
-    public void setCaseTasksDeletionResults(final String caseRef,
-                                            final int caseTasksDeletionResults) {
-        tasksDeletionRecordHolderList.add(Map.of(caseRef, caseTasksDeletionResults));
+    public void setCaseTasksDeletionResults(final String caseRef, final int deletionResult) {
+        tasksDeletionByCaseRef.put(caseRef, deletionResult);
     }
 
     public int getTasksDeletionResults(final String caseRef) {
-        if (!tasksDeletionRecordHolderList.isEmpty()) {
-            final Optional<Map<String, Integer>> deletionResultsMap =
-                tasksDeletionRecordHolderList.stream()
-                    .filter(taskHolderEntry -> taskHolderEntry.containsKey(caseRef))
-                    .findFirst();
-            if (deletionResultsMap.isPresent()) {
-                return deletionResultsMap.get().get(caseRef);
-            }
-        }
-        return 0;
+        return tasksDeletionByCaseRef.getOrDefault(caseRef, 0);
     }
 }
