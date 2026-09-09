@@ -50,13 +50,10 @@ public class ShellCaseDataMapper {
         for (String segment: splitPath(path)) {
             if (!current.isObject()) {
                 throw new ShellCaseException(
-                    "Cannot read shell mapping source path '%s': '%s' is not an object"
-                        .formatted(path, segment)
-                );
+                    "Cannot read shell mapping source path '%s': '%s' is not an object".formatted(path, segment));
             }
 
             current = current.get(segment);
-
             if (current == null) {
                 return null;
             }
@@ -81,8 +78,7 @@ public class ShellCaseDataMapper {
                 current = (ObjectNode) existing;
             } else {
                 throw new ShellCaseException(
-                    "Cannot write shell mapping target path '%s': "
-                        + "'%s' is already a non-object value"
+                    "Cannot write shell mapping target path '%s': '%s' is already a non-object value"
                         .formatted(path, segment)
                 );
             }
@@ -120,9 +116,7 @@ public class ShellCaseDataMapper {
                 || existing.startsWith(targetPath + ".")
                 || targetPath.startsWith(existing + ".")) {
                 throw new ShellCaseException(
-                    "Conflicting shell case target mappings: '%s' and '%s'"
-                        .formatted(existing, targetPath)
-                );
+                    "Conflicting shell case target mappings: '%s' and '%s'".formatted(existing, targetPath));
             }
         }
 
