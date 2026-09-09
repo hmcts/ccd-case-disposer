@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
@@ -10,16 +11,19 @@ import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.OriginalCaseDataLoader;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class CaseDisposalWorkflow {
+
     private final ShellMappingService shellMappingService;
     private final CaseDeletionService caseDeletionService;
     private final OriginalCaseDataLoader originalCaseDataLoader;
     private final ShellCaseProperties shellCaseProperties;
+    private final ShellCaseDataMapper shellCaseDataMapper;
 
     public DisposalOutcome dispose(CaseData caseData) {
         try {
@@ -39,10 +43,12 @@ public class CaseDisposalWorkflow {
     }
 
     private void shellCaseFlow(CaseData caseData) {
-        ShellMappingResponse definition = shellMappingService.loadMappings(caseData.getCaseType());
-        if (definition.getShellCaseTypeID() != null) {
+        ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
+        if (shellMapping.getShellCaseTypeID() != null) {
             CcdCaseResponse originalCaseData = originalCaseDataLoader.load(caseData.getReference());
-            log.info("ORIGINAL CASE - {}", originalCaseData.toString());
+            ObjectNode mappedData = shellCaseDataMapper.map(
+                originalCaseData.data(), shellMapping.getShellCaseMappings());
+            log.info("Mapped data - {}", mappedData);
         }
     }
 
