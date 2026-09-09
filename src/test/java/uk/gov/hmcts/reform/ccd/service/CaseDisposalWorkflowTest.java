@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.OriginalCaseDataLoader;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,6 +34,8 @@ class CaseDisposalWorkflowTest {
     private CaseDeletionService caseDeletionService;
     @Mock
     private OriginalCaseDataLoader originalCaseDataLoader;
+    @Mock
+    private ShellCaseDataMapper shellCaseDataMapper;
 
     private ShellCaseProperties shellCaseProperties;
     private CaseDisposalWorkflow underTest;
@@ -50,7 +53,8 @@ class CaseDisposalWorkflowTest {
             shellMappingService,
             caseDeletionService,
             originalCaseDataLoader,
-            shellCaseProperties
+            shellCaseProperties,
+            shellCaseDataMapper
         );
     }
 
