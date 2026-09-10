@@ -9,10 +9,18 @@ import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellDocument;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
+import uk.gov.hmcts.reform.ccd.shell.service.CaseDocumentResolver;
+import uk.gov.hmcts.reform.ccd.shell.service.DocumentHashService;
 import uk.gov.hmcts.reform.ccd.shell.service.OriginalCaseDataLoader;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentHashAppender;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +32,9 @@ public class CaseDisposalWorkflow {
     private final OriginalCaseDataLoader originalCaseDataLoader;
     private final ShellCaseProperties shellCaseProperties;
     private final ShellCaseDataMapper shellCaseDataMapper;
+    private final CaseDocumentResolver caseDocumentResolver;
+    private final DocumentHashService documentHashService;
+    private final ShellDocumentHashAppender shellDocumentHashAppender;
 
     public DisposalOutcome dispose(CaseData caseData) {
         try {
@@ -48,6 +59,9 @@ public class CaseDisposalWorkflow {
             CcdCaseResponse originalCaseData = originalCaseDataLoader.load(caseData.getReference());
             ObjectNode mappedData = shellCaseDataMapper.map(
                 originalCaseData.data(), shellMapping.getShellCaseMappings());
+            List<ShellDocument> documents = caseDocumentResolver.resolveDocuments(mappedData);
+            Map<UUID, String> hashes = documentHashService.fetchHashes(documents);
+            shellDocumentHashAppender.appendHash(documents, hashes);
             log.info("Mapped data - {}", mappedData);
         }
     }

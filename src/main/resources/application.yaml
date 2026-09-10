@@ -57,6 +57,8 @@ remote:
     host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
   ccd-definition-store:
     host: ${CCD_DEFINITION_STORE_HOST:http://localhost:4451}
+  ccd-document-am:
+    host: ${CCD_DOCUMENT_AM_HOST:http://localhost:4455}
 
 idam:
   api:
