@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.ccd.shell.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
@@ -19,8 +19,12 @@ class ShellDocumentHashAppenderTest {
     private static final UUID DOCUMENT_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     private static final String HASH_TOKEN = "hash-token";
 
-    @InjectMocks
     private ShellDocumentHashAppender underTest;
+
+    @BeforeEach
+    void setUp() {
+        underTest = new ShellDocumentHashAppender();
+    }
 
     @Test
     void shouldAppendHashToDocumentNode() {
