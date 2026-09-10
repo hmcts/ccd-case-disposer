@@ -5,15 +5,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellDocument;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
+import uk.gov.hmcts.reform.ccd.shell.service.CaseDocumentResolver;
+import uk.gov.hmcts.reform.ccd.shell.service.DocumentHashService;
 import uk.gov.hmcts.reform.ccd.shell.service.OriginalCaseDataLoader;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentHashAppender;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -36,6 +46,12 @@ class CaseDisposalWorkflowTest {
     private OriginalCaseDataLoader originalCaseDataLoader;
     @Mock
     private ShellCaseDataMapper shellCaseDataMapper;
+    @Mock
+    private CaseDocumentResolver caseDocumentResolver;
+    @Mock
+    private DocumentHashService documentHashService;
+    @Mock
+    private ShellDocumentHashAppender shellDocumentHashAppender;
 
     private ShellCaseProperties shellCaseProperties;
     private CaseDisposalWorkflow underTest;
@@ -54,7 +70,10 @@ class CaseDisposalWorkflowTest {
             caseDeletionService,
             originalCaseDataLoader,
             shellCaseProperties,
-            shellCaseDataMapper
+            shellCaseDataMapper,
+            caseDocumentResolver,
+            documentHashService,
+            shellDocumentHashAppender
         );
     }
 
@@ -66,7 +85,8 @@ class CaseDisposalWorkflowTest {
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
-        verifyNoInteractions(shellMappingService, originalCaseDataLoader);
+        verifyNoInteractions(shellMappingService, originalCaseDataLoader, shellCaseDataMapper,
+            caseDocumentResolver, documentHashService, shellDocumentHashAppender);
     }
 
     @Test
@@ -78,24 +98,58 @@ class CaseDisposalWorkflowTest {
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
-        verifyNoInteractions(originalCaseDataLoader);
+        verifyNoInteractions(originalCaseDataLoader, shellCaseDataMapper,
+            caseDocumentResolver, documentHashService, shellDocumentHashAppender);
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
     }
 
     @Test
-    void shouldLoadOriginalCaseAndReturnDeletedWhenShellMappingExists() {
+    void shouldRetrieveAndAppendDocumentHashesWhenShellMappingExists() {
         shellCaseProperties.setEnabled(true);
         ShellMappingResponse mapping = new ShellMappingResponse("ShellCaseType");
-        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, null);
+        ObjectNode originalData = JsonNodeFactory.instance.objectNode();
+        ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
+        UUID documentId = UUID.randomUUID();
+        ShellDocument document = new ShellDocument(documentId, mappedData.putObject("document"));
+        List<ShellDocument> documents = List.of(document);
+        Map<UUID, String> hashes = Map.of(documentId, "hash-token");
+        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
         when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
         when(originalCaseDataLoader.load(CASE_REFERENCE)).thenReturn(originalCase);
+        when(shellCaseDataMapper.map(originalData, mapping.getShellCaseMappings())).thenReturn(mappedData);
+        when(caseDocumentResolver.resolveDocuments(mappedData)).thenReturn(documents);
+        when(documentHashService.fetchHashes(documents)).thenReturn(hashes);
 
         CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
         verify(originalCaseDataLoader).load(CASE_REFERENCE);
+        verify(shellCaseDataMapper).map(originalData, mapping.getShellCaseMappings());
+        verify(caseDocumentResolver).resolveDocuments(mappedData);
+        verify(documentHashService).fetchHashes(documents);
+        verify(shellDocumentHashAppender).appendHash(documents, hashes);
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
+    }
+
+    @Test
+    void shouldNotDeleteCaseWhenDocumentHashRetrievalFails() {
+        shellCaseProperties.setEnabled(true);
+        ShellMappingResponse mapping = new ShellMappingResponse("ShellCaseType");
+        ObjectNode originalData = JsonNodeFactory.instance.objectNode();
+        ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
+        List<ShellDocument> documents = List.of();
+        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
+        when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
+        when(originalCaseDataLoader.load(CASE_REFERENCE)).thenReturn(originalCase);
+        when(shellCaseDataMapper.map(originalData, mapping.getShellCaseMappings())).thenReturn(mappedData);
+        when(caseDocumentResolver.resolveDocuments(mappedData)).thenReturn(documents);
+        when(documentHashService.fetchHashes(documents)).thenThrow(new ShellCaseException());
+
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+
+        assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
+        verifyNoInteractions(shellDocumentHashAppender, caseDeletionService);
     }
 
     @Test
@@ -107,7 +161,8 @@ class CaseDisposalWorkflowTest {
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
-        verifyNoInteractions(originalCaseDataLoader, caseDeletionService);
+        verifyNoInteractions(originalCaseDataLoader, shellCaseDataMapper, caseDocumentResolver,
+            documentHashService, shellDocumentHashAppender, caseDeletionService);
     }
 
     @Test
@@ -122,7 +177,8 @@ class CaseDisposalWorkflowTest {
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
         verify(originalCaseDataLoader).load(CASE_REFERENCE);
-        verifyNoInteractions(caseDeletionService);
+        verifyNoInteractions(shellCaseDataMapper, caseDocumentResolver, documentHashService,
+            shellDocumentHashAppender, caseDeletionService);
     }
 
     @Test
@@ -134,6 +190,7 @@ class CaseDisposalWorkflowTest {
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETION_FAILED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
-        verifyNoInteractions(originalCaseDataLoader, caseDeletionService);
+        verifyNoInteractions(originalCaseDataLoader, shellCaseDataMapper, caseDocumentResolver,
+            documentHashService, shellDocumentHashAppender, caseDeletionService);
     }
 }
