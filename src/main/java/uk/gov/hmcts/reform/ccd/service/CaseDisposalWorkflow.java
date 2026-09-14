@@ -9,11 +9,13 @@ import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellCasePayload;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellDocument;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.CaseDocumentResolver;
 import uk.gov.hmcts.reform.ccd.shell.service.DocumentHashService;
 import uk.gov.hmcts.reform.ccd.shell.service.OriginalCaseDataLoader;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseCreator;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentHashAppender;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
@@ -35,6 +37,7 @@ public class CaseDisposalWorkflow {
     private final CaseDocumentResolver caseDocumentResolver;
     private final DocumentHashService documentHashService;
     private final ShellDocumentHashAppender shellDocumentHashAppender;
+    private final ShellCaseCreator shellCaseCreator;
 
     public DisposalOutcome dispose(CaseData caseData) {
         try {
@@ -55,15 +58,23 @@ public class CaseDisposalWorkflow {
 
     private void shellCaseFlow(CaseData caseData) {
         ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
-        if (shellMapping.getShellCaseTypeID() != null) {
-            CcdCaseResponse originalCaseData = originalCaseDataLoader.load(caseData.getReference());
-            ObjectNode mappedData = shellCaseDataMapper.map(
-                originalCaseData.data(), shellMapping.getShellCaseMappings());
-            List<ShellDocument> documents = caseDocumentResolver.resolveDocuments(mappedData);
-            Map<UUID, String> hashes = documentHashService.fetchHashes(documents);
-            shellDocumentHashAppender.appendHash(documents, hashes);
-            log.info("Mapped data - {}", mappedData);
+        if (shellMapping.getShellCaseTypeID() == null) {
+            log.info("No shell case mapping found for case type: {}", caseData.getCaseType());
+            return;
         }
+
+        CcdCaseResponse originalCaseData = originalCaseDataLoader.load(caseData.getReference());
+        ObjectNode mappedData = shellCaseDataMapper.map(
+            originalCaseData.data(), shellMapping.getShellCaseMappings());
+        List<ShellDocument> documents = caseDocumentResolver.resolveDocuments(mappedData);
+        Map<UUID, String> hashes = documentHashService.fetchHashes(documents);
+        shellDocumentHashAppender.appendHash(documents, hashes);
+
+        ShellCasePayload shellCase = shellCaseCreator.build(caseData, mappedData, shellMapping.getShellCaseTypeID());
+        shellCaseCreator.create(shellCase, shellMapping.getShellCaseTypeID());
+
+        log.info("shell case - {}", shellCase);
+
     }
 
     public enum DisposalOutcome {
