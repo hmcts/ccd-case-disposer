@@ -12,11 +12,13 @@ import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellCasePayload;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellDocument;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.CaseDocumentResolver;
 import uk.gov.hmcts.reform.ccd.shell.service.DocumentHashService;
 import uk.gov.hmcts.reform.ccd.shell.service.OriginalCaseDataLoader;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseCreator;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentHashAppender;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
@@ -52,6 +54,8 @@ class CaseDisposalWorkflowTest {
     private DocumentHashService documentHashService;
     @Mock
     private ShellDocumentHashAppender shellDocumentHashAppender;
+    @Mock
+    private ShellCaseCreator shellCaseCreator;
 
     private ShellCaseProperties shellCaseProperties;
     private CaseDisposalWorkflow underTest;
@@ -73,7 +77,8 @@ class CaseDisposalWorkflowTest {
             shellCaseDataMapper,
             caseDocumentResolver,
             documentHashService,
-            shellDocumentHashAppender
+            shellDocumentHashAppender,
+            shellCaseCreator
         );
     }
 
@@ -86,7 +91,7 @@ class CaseDisposalWorkflowTest {
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
         verifyNoInteractions(shellMappingService, originalCaseDataLoader, shellCaseDataMapper,
-            caseDocumentResolver, documentHashService, shellDocumentHashAppender);
+            caseDocumentResolver, documentHashService, shellDocumentHashAppender, shellCaseCreator);
     }
 
     @Test
@@ -99,7 +104,7 @@ class CaseDisposalWorkflowTest {
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
         verifyNoInteractions(originalCaseDataLoader, shellCaseDataMapper,
-            caseDocumentResolver, documentHashService, shellDocumentHashAppender);
+            caseDocumentResolver, documentHashService, shellDocumentHashAppender, shellCaseCreator);
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
     }
 
@@ -113,12 +118,15 @@ class CaseDisposalWorkflowTest {
         ShellDocument document = new ShellDocument(documentId, mappedData.putObject("document"));
         List<ShellDocument> documents = List.of(document);
         Map<UUID, String> hashes = Map.of(documentId, "hash-token");
+        ShellCasePayload shellCasePayload = new ShellCasePayload(mappedData, "event-token");
         CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
         when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
         when(originalCaseDataLoader.load(CASE_REFERENCE)).thenReturn(originalCase);
         when(shellCaseDataMapper.map(originalData, mapping.getShellCaseMappings())).thenReturn(mappedData);
         when(caseDocumentResolver.resolveDocuments(mappedData)).thenReturn(documents);
         when(documentHashService.fetchHashes(documents)).thenReturn(hashes);
+        when(shellCaseCreator.build(caseData, mappedData, mapping.getShellCaseTypeID()))
+            .thenReturn(shellCasePayload);
 
         CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
 
@@ -129,6 +137,8 @@ class CaseDisposalWorkflowTest {
         verify(caseDocumentResolver).resolveDocuments(mappedData);
         verify(documentHashService).fetchHashes(documents);
         verify(shellDocumentHashAppender).appendHash(documents, hashes);
+        verify(shellCaseCreator).build(caseData, mappedData, mapping.getShellCaseTypeID());
+        verify(shellCaseCreator).create(shellCasePayload, mapping.getShellCaseTypeID());
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
     }
 
@@ -149,7 +159,7 @@ class CaseDisposalWorkflowTest {
         CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
-        verifyNoInteractions(shellDocumentHashAppender, caseDeletionService);
+        verifyNoInteractions(shellDocumentHashAppender, shellCaseCreator, caseDeletionService);
     }
 
     @Test
@@ -162,7 +172,7 @@ class CaseDisposalWorkflowTest {
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
         verifyNoInteractions(originalCaseDataLoader, shellCaseDataMapper, caseDocumentResolver,
-            documentHashService, shellDocumentHashAppender, caseDeletionService);
+            documentHashService, shellDocumentHashAppender, shellCaseCreator, caseDeletionService);
     }
 
     @Test
@@ -178,7 +188,7 @@ class CaseDisposalWorkflowTest {
         verify(shellMappingService).loadMappings(CASE_TYPE);
         verify(originalCaseDataLoader).load(CASE_REFERENCE);
         verifyNoInteractions(shellCaseDataMapper, caseDocumentResolver, documentHashService,
-            shellDocumentHashAppender, caseDeletionService);
+            shellDocumentHashAppender, shellCaseCreator, caseDeletionService);
     }
 
     @Test
@@ -191,6 +201,6 @@ class CaseDisposalWorkflowTest {
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETION_FAILED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
         verifyNoInteractions(originalCaseDataLoader, shellCaseDataMapper, caseDocumentResolver,
-            documentHashService, shellDocumentHashAppender, caseDeletionService);
+            documentHashService, shellDocumentHashAppender, shellCaseCreator, caseDeletionService);
     }
 }
