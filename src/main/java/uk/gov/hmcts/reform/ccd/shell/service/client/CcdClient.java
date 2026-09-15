@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import tools.jackson.databind.JsonNode;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseSearchResponse;
 import uk.gov.hmcts.reform.ccd.shell.data.CcdCreateCaseEventResponse;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellCasePayload;
 
@@ -21,6 +24,14 @@ public interface CcdClient {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORISATION_HEADER) String authHeader,
         @PathVariable("caseReference") long caseReference
+    );
+
+    @PostMapping("/searchCases")
+    CcdCaseSearchResponse searchCase(
+        @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+        @RequestHeader(AUTHORISATION_HEADER) String authHeader,
+        @RequestParam("ctid") String caseType,
+        @RequestBody JsonNode searchRequest
     );
 
     @GetMapping(value = "/case-types/{caseType}/event-triggers/{triggerId}", headers = "Experimental=true")
