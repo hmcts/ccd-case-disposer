@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 @RequiredArgsConstructor
 public class ShellCaseCreator {
 
-    private static final String ORIGINAL_CASE_REFERENCE = "original_case_reference";
+    public static final String ORIGINAL_CASE_REFERENCE = "original_case_reference";
     private static final String ORIGINAL_CASE_TYPE = "original_case_type";
     private static final String TRIGGER_ID = "CREATE";
 
