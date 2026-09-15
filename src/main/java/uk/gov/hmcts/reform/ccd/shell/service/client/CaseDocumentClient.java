@@ -4,7 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import uk.gov.hmcts.reform.ccd.shell.data.CaseDocumentHashResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.CaseDocumentHashResponse;
 
 import java.util.UUID;
 
