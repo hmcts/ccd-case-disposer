@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.ccd.exception;
+package uk.gov.hmcts.reform.ccd.shell.exception;
 
 public class ShellCaseException extends RuntimeException {
 
