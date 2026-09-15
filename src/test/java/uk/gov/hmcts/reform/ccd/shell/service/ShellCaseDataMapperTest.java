@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.JsonNodeFactory;
 import tools.jackson.databind.node.ObjectNode;
-import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
+import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellCaseFieldMapping;
 
 import java.util.List;

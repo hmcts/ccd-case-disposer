@@ -21,7 +21,7 @@ class ShellCasePayloadTest {
 
         assertThat(json.get("data")).isEqualTo(data);
         assertThat(json.get("event_token").asString()).isEqualTo("event-token");
-        assertThat(json.get("event").get("id").asString()).isEqualTo("CREATE");
+        assertThat(json.get("event").get("id").asString()).isEqualTo("createCase");
         assertThat(json.get("event").get("summary").asString()).isEqualTo("Create case");
         assertThat(json.get("event").get("description").asString()).isEqualTo("Initial case creation");
         assertThat(json.get("ignore_warning").asBoolean()).isFalse();

@@ -8,7 +8,7 @@ public record ShellCasePayload(
     @JsonProperty("event_token") String eventToken
 ) {
 
-    private static final Event EVENT = new Event("CREATE", "Create case", "Initial case creation");
+    private static final Event EVENT = new Event("createCase", "Create case", "Initial case creation");
 
     @JsonProperty("event")
     public Event event() {

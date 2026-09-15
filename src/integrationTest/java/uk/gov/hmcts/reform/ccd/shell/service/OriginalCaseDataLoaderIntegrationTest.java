@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.es.TestContainers;
-import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseResponse;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -31,7 +31,7 @@ class OriginalCaseDataLoaderIntegrationTest extends TestContainers {
     private static final String IDAM_TOKEN = "idam-token";
 
     @Inject
-    private OriginalCaseDataLoader originalCaseDataLoader;
+    private CcdCaseService ccdCaseService;
 
     @Inject
     private SecurityUtil securityUtil;
@@ -62,7 +62,7 @@ class OriginalCaseDataLoaderIntegrationTest extends TestContainers {
                 .withStatus(200)
                 .withBody(responseBody)));
 
-        CcdCaseResponse response = originalCaseDataLoader.load(CASE_REFERENCE);
+        CcdCaseResponse response = ccdCaseService.loadCase(CASE_REFERENCE);
 
         assertThat(response.id()).isEqualTo(CASE_REFERENCE);
         assertThat(response.caseType()).isEqualTo("FT_MasterCaseType");

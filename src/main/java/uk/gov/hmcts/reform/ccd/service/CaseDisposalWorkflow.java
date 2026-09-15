@@ -6,26 +6,17 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
-import uk.gov.hmcts.reform.ccd.exception.ShellAlreadyExistsException;
-import uk.gov.hmcts.reform.ccd.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
-import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
-import uk.gov.hmcts.reform.ccd.shell.model.ShellCasePayload;
-import uk.gov.hmcts.reform.ccd.shell.model.ShellDocument;
+import uk.gov.hmcts.reform.ccd.shell.exception.ShellAlreadyExistsException;
+import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
+import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseResponse;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
-import uk.gov.hmcts.reform.ccd.shell.service.CaseDocumentResolver;
-import uk.gov.hmcts.reform.ccd.shell.service.DocumentHashService;
-import uk.gov.hmcts.reform.ccd.shell.service.OriginalCaseDataLoader;
-import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseCreator;
+import uk.gov.hmcts.reform.ccd.shell.service.CcdCaseService;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
-import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseFinder;
-import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentHashAppender;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentService;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -34,14 +25,11 @@ public class CaseDisposalWorkflow {
 
     private final ShellMappingService shellMappingService;
     private final CaseDeletionService caseDeletionService;
-    private final OriginalCaseDataLoader originalCaseDataLoader;
-    private final ShellCaseFinder shellCaseFinder;
+    private final CcdCaseService ccdCaseService;
     private final ShellCaseProperties shellCaseProperties;
     private final ShellCaseDataMapper shellCaseDataMapper;
-    private final CaseDocumentResolver caseDocumentResolver;
-    private final DocumentHashService documentHashService;
-    private final ShellDocumentHashAppender shellDocumentHashAppender;
-    private final ShellCaseCreator shellCaseCreator;
+    private final ShellDocumentService shellDocumentService;
+
 
     public DisposalOutcome dispose(CaseData caseData) {
         try {
@@ -76,25 +64,21 @@ public class CaseDisposalWorkflow {
             return;
         }
 
-        CcdCaseResponse originalCaseData = originalCaseDataLoader.load(caseData.getReference());
-
-        Optional<Long> foundShellCases = shellCaseFinder.findShellCase(shellCaseType, caseData.getReference());
+        Optional<Long> foundShellCases = ccdCaseService.findShellCase(shellCaseType, caseData.getReference());
         if (foundShellCases.isPresent()) {
             log.error("Found shell case for case type: {}", caseData.getCaseType());
             throw new ShellAlreadyExistsException(caseData.getReference(), foundShellCases.get());
         }
 
+        CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
+
         ObjectNode mappedData = shellCaseDataMapper.map(
             originalCaseData.data(), shellMapping.getShellCaseMappings());
-        List<ShellDocument> documents = caseDocumentResolver.resolveDocuments(mappedData);
-        Map<UUID, String> hashes = documentHashService.fetchHashes(documents);
-        shellDocumentHashAppender.appendHash(documents, hashes);
 
-        ShellCasePayload shellCase = shellCaseCreator.build(caseData, mappedData, shellCaseType);
-        shellCaseCreator.create(shellCase, shellCaseType);
+        shellDocumentService.appendDocumentHashes(mappedData);
+        ccdCaseService.createShellCase(caseData, mappedData, shellCaseType);
 
         log.info("Created shell case for original case reference: {}", caseData.getReference());
-
     }
 
     public enum DisposalOutcome {

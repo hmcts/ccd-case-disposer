@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import tools.jackson.databind.JsonNode;
-import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseResponse;
-import uk.gov.hmcts.reform.ccd.shell.data.CcdCaseSearchResponse;
-import uk.gov.hmcts.reform.ccd.shell.data.CcdCreateCaseEventResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseSearchResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.CcdCreateCaseEventResponse;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellCasePayload;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
