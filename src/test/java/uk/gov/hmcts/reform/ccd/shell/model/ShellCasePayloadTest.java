@@ -15,7 +15,7 @@ class ShellCasePayloadTest {
         ObjectNode data = JsonNodeFactory.instance.objectNode()
             .put("original_case_reference", "1234567890123456")
             .put("mapped_field", "mapped value");
-        ShellCasePayload payload = new ShellCasePayload(data, "event-token");
+        ShellCasePayload payload = ShellCasePayload.withEvent(data, "event-token", "createCase");
 
         JsonNode json = JsonMapper.builder().build().valueToTree(payload);
 

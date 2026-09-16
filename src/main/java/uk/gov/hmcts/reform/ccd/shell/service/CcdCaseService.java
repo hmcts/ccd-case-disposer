@@ -10,11 +10,11 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseResponse;
 import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseSearchResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.CcdCreateCaseEventResponse;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellCasePayload;
 import uk.gov.hmcts.reform.ccd.shell.service.client.CcdClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,18 +26,21 @@ public class CcdCaseService {
     private static final String ORIGINAL_CASE_TYPE = "original_case_type";
     private static final String TRIGGER_ID = "createCase";
     private static final int NUMBER_OF_RESULTS = 5;
-    private static final int SINGLE_RESULT = 1;
 
     private final CcdClient ccdClient;
     private final SecurityUtil securityUtil;
 
     public CcdCaseResponse loadCase(Long caseReference) {
         try {
-            return ccdClient.getOriginalCaseData(
+            CcdCaseResponse response = ccdClient.getOriginalCaseData(
                 securityUtil.getServiceAuthorization(),
                 securityUtil.getIdamClientToken(),
                 caseReference
             );
+            if (response == null || response.data() == null) {
+                throw new ShellCaseException("CCD returned invalid case data - " + caseReference);
+            }
+            return response;
         } catch (FeignException exc) {
             throw new ShellCaseException("Failed to load original case: " + caseReference, exc);
         }
@@ -52,33 +55,31 @@ public class CcdCaseService {
                 shellCaseType,
                 request
             );
-            if (response == null || response.cases() == null) {
-                throw new ShellCaseException(
-                    "CCD returned invalid shell case search response while searching for " + originalCaseReference);
-            }
-            if (response.total() != null && response.total() > SINGLE_RESULT) {
-                log.warn("Found multiple shell cases for original case reference {}", originalCaseReference);
-            }
+            validateSearchResponse(response, originalCaseReference);
+
             return response.cases().stream()
                 .map(CcdCaseSearchResponse.EsCase::reference)
-                .filter(Objects::nonNull)
                 .findFirst();
         } catch (FeignException exc) {
-            throw new ShellCaseException("failed to search for case" + originalCaseReference, exc);
+            throw new ShellCaseException("failed to search for case: " + originalCaseReference, exc);
         }
     }
 
     public void createShellCase(CaseData originalCaseData, ObjectNode shellCaseData, String shellCaseType) {
         try {
-            String eventToken = ccdClient.getCreateCaseToken(
+            CcdCreateCaseEventResponse response = ccdClient.getCreateCaseToken(
                 securityUtil.getServiceAuthorization(),
                 securityUtil.getIdamClientToken(),
                 TRIGGER_ID,
                 shellCaseType
-            ).token();
+            );
+            if (response == null || response.token() == null || response.token().isBlank()) {
+                throw new ShellCaseException(
+                    "Invalid create case token returned from CCD for case " + originalCaseData.getReference());
+            }
             shellCaseData.put(ORIGINAL_CASE_REFERENCE, originalCaseData.getReference().toString());
             shellCaseData.put(ORIGINAL_CASE_TYPE, originalCaseData.getCaseType());
-            ShellCasePayload payload = new ShellCasePayload(shellCaseData, eventToken);
+            ShellCasePayload payload = ShellCasePayload.withEvent(shellCaseData, response.token(), TRIGGER_ID);
             ccdClient.createCase(
                 securityUtil.getServiceAuthorization(),
                 securityUtil.getIdamClientToken(),
@@ -87,6 +88,19 @@ public class CcdCaseService {
             );
         } catch (FeignException exc) {
             throw new ShellCaseException("Failed to create shell case " + originalCaseData.getReference(), exc);
+        }
+    }
+
+    private void validateSearchResponse(CcdCaseSearchResponse response, long originalCaseReference) {
+        if (response == null || response.cases() == null) {
+            throw new ShellCaseException(
+                "CCD returned invalid shell case search response while searching for " + originalCaseReference);
+        }
+
+        if (response.total() != null && response.total() > 0 && response.cases().isEmpty()) {
+            throw new ShellCaseException(
+                "ES reported found results (total=" + response.total()
+                    + ") but returned empty list for case: " +  originalCaseReference);
         }
     }
 

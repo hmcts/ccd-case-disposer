@@ -14,3 +14,6 @@ spring:
 flyway:
   noop:
     strategy: "false"
+
+remote:
+  delayOnError: 0

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
+import uk.gov.hmcts.reform.ccd.shell.model.CaseDocumentHashResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.client.CaseDocumentClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 
@@ -35,21 +36,25 @@ public class ShellDocumentService {
     private Map<UUID, String> fetchHashes(List<ShellDocument> documents) {
         Map<UUID, String> hashes = new ConcurrentHashMap<>();
         for (ShellDocument document : documents) {
-            try {
-                hashes.computeIfAbsent(
-                    document.documentId(),
-                    documentId -> documentClient.getDocumentHash(
-                        securityUtil.getServiceAuthorization(),
-                        securityUtil.getIdamClientToken(),
-                        documentId
-                    ).hashToken()
-                );
-            } catch (FeignException exc) {
-                throw new ShellCaseException("Failed to fetch document hash for " + document.documentId(), exc);
-            }
+            hashes.computeIfAbsent(document.documentId(), this::fetchDocumentHash);
         }
-
         return Map.copyOf(hashes);
+    }
+
+    private String fetchDocumentHash(UUID documentId) {
+        try {
+            CaseDocumentHashResponse response = documentClient.getDocumentHash(
+                securityUtil.getServiceAuthorization(),
+                securityUtil.getIdamClientToken(),
+                documentId);
+
+            if (response == null || response.hashToken() == null || response.hashToken().isBlank()) {
+                throw new ShellCaseException("CCD Document AM returned an invalid hash for " + documentId);
+            }
+            return  response.hashToken();
+        } catch (FeignException exc) {
+            throw new ShellCaseException("Failed to fetch document hash for " + documentId, exc);
+        }
     }
 
     private void appendHash(List<ShellDocument> documents, Map<UUID, String> hashes) {
@@ -70,7 +75,11 @@ public class ShellDocumentService {
 
     private void findDocuments(JsonNode node, List<ShellDocument> documents) {
         if (node.isObject()) {
-            resolveDocument((ObjectNode) node).ifPresent(documents::add);
+            Optional<ShellDocument> document = resolveDocument((ObjectNode) node);
+            if (document.isPresent()) {
+                documents.add(document.get());
+                return;
+            }
         }
 
         if (node.isContainer()) {

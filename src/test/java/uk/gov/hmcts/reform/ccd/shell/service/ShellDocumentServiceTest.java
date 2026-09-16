@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("PMD.TooManyMethods")
 class ShellDocumentServiceTest {
 
     private static final String SERVICE_TOKEN = "service-token";
@@ -106,7 +107,7 @@ class ShellDocumentServiceTest {
     }
 
     @Test
-    void shouldFailWhenDocumentHashIsMissing() {
+    void shouldFailWhenDocumentHashIsNull() {
         ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
         mappedData.set(DOCUMENT_FIELD, documentNode(FIRST_DOCUMENT_ID));
         mockTokens();
@@ -115,7 +116,33 @@ class ShellDocumentServiceTest {
 
         assertThatThrownBy(() -> underTest.appendDocumentHashes(mappedData))
             .isInstanceOf(ShellCaseException.class)
-            .hasMessage("No hash resolved for document " + FIRST_DOCUMENT_ID);
+            .hasMessage("CCD Document AM returned an invalid hash for " + FIRST_DOCUMENT_ID);
+    }
+
+    @Test
+    void shouldFailWhenDocumentHashResponseIsNull() {
+        ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
+        mappedData.set(DOCUMENT_FIELD, documentNode(FIRST_DOCUMENT_ID));
+        mockTokens();
+        when(documentClient.getDocumentHash(SERVICE_TOKEN, USER_TOKEN, FIRST_DOCUMENT_ID))
+            .thenReturn(null);
+
+        assertThatThrownBy(() -> underTest.appendDocumentHashes(mappedData))
+            .isInstanceOf(ShellCaseException.class)
+            .hasMessage("CCD Document AM returned an invalid hash for " + FIRST_DOCUMENT_ID);
+    }
+
+    @Test
+    void shouldFailWhenDocumentHashIsBlank() {
+        ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
+        mappedData.set(DOCUMENT_FIELD, documentNode(FIRST_DOCUMENT_ID));
+        mockTokens();
+        when(documentClient.getDocumentHash(SERVICE_TOKEN, USER_TOKEN, FIRST_DOCUMENT_ID))
+            .thenReturn(new CaseDocumentHashResponse(" "));
+
+        assertThatThrownBy(() -> underTest.appendDocumentHashes(mappedData))
+            .isInstanceOf(ShellCaseException.class)
+            .hasMessage("CCD Document AM returned an invalid hash for " + FIRST_DOCUMENT_ID);
     }
 
     @Test
