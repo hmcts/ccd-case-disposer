@@ -5,14 +5,15 @@ import tools.jackson.databind.node.ObjectNode;
 
 public record ShellCasePayload(
     ObjectNode data,
-    @JsonProperty("event_token") String eventToken
+    @JsonProperty("event_token") String eventToken,
+    Event event
 ) {
 
-    private static final Event EVENT = new Event("createCase", "Create case", "Initial case creation");
-
-    @JsonProperty("event")
-    public Event event() {
-        return EVENT;
+    public static ShellCasePayload withEvent(ObjectNode data, String eventToken, String eventId) {
+        return new ShellCasePayload(
+            data,
+            eventToken,
+            new Event(eventId, "Create case", "Initial case creation"));
     }
 
     @JsonProperty("ignore_warning")
@@ -20,6 +21,7 @@ public record ShellCasePayload(
         return false;
     }
 
-    private record Event(String id, String summary, String description) {
+    public record Event(String id, String summary, String description) {
+
     }
 }
