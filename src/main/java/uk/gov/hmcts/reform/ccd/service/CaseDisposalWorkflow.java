@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.node.ObjectNode;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
-import uk.gov.hmcts.reform.ccd.exception.CaseDeletionException;
 import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellAlreadyExistsException;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
@@ -50,15 +49,12 @@ public class CaseDisposalWorkflow {
         } catch (ShellCaseException exc) {
             log.error("Shell case creation failed for case: {}", caseData.getReference(), exc);
             return DisposalOutcome.SHELL_FAILED;
-        } catch (CaseDeletionException exc) {
-            log.error("Case deletion failed for case: {}", caseData.getReference(), exc);
-            return DisposalOutcome.DELETION_FAILED;
         }
     }
 
     private void shellCaseFlow(CaseData caseData) {
         ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
-        String shellCaseType = shellMapping.getShellCaseTypeID();
+        String shellCaseType = shellMapping.shellCaseTypeID();
         if (shellCaseType == null) {
             log.info("No shell case mapping found for case type: {}", caseData.getCaseType());
             return;
@@ -73,7 +69,7 @@ public class CaseDisposalWorkflow {
         CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
 
         ObjectNode mappedData = shellCaseDataMapper.map(
-            originalCaseData.data(), shellMapping.getShellCaseMappings());
+            originalCaseData.data(), shellMapping.shellCaseMappings());
 
         shellDocumentService.appendDocumentHashes(mappedData);
         ccdCaseService.createShellCase(caseData, mappedData, shellCaseType);
@@ -84,8 +80,7 @@ public class CaseDisposalWorkflow {
     public enum DisposalOutcome {
         DELETED,
         SHELL_ALREADY_EXISTS,
-        SHELL_FAILED,
-        DELETION_FAILED
+        SHELL_FAILED
     }
 
 }
