@@ -74,7 +74,10 @@ public class ApplicationExecutor {
                 break;
             }
             try {
-                caseDisposalWorkflow.dispose(caseData);
+                CaseDisposalWorkflow.DisposalOutcome outcome = caseDisposalWorkflow.dispose(caseData);
+                if (outcome != CaseDisposalWorkflow.DisposalOutcome.DELETED) {
+                    processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+                }
             } catch (LogAndAuditException logAndAuditException) {
                 log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
             }

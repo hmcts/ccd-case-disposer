@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,7 +31,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -89,6 +89,7 @@ class ApplicationExecutorTest {
         ));
         when(parameterResolver.getRequestLimit()).thenReturn(2);
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
+        when(caseDisposalWorkflow.dispose(any())).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
 
         applicationExecutor.execute();
 
@@ -124,8 +125,10 @@ class ApplicationExecutorTest {
             TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL
         ));
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
-        doThrow(new LogAndAuditException("log and audit failed"))
-            .when(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        when(caseDisposalWorkflow.dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL))
+            .thenThrow(new LogAndAuditException("log and audit failed"));
+        when(caseDisposalWorkflow.dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL))
+            .thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
 
         applicationExecutor.execute();
 
@@ -134,6 +137,36 @@ class ApplicationExecutorTest {
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         assertThat(output).contains("Error deleting case: 1 due to log and audit exception");
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = CaseDisposalWorkflow.DisposalOutcome.class,
+        names = {"SHELL_ALREADY_EXISTS", "SHELL_FAILED"}
+    )
+    void shouldRecordNonDeletedWorkflowOutcomeAsFailure(CaseDisposalWorkflow.DisposalOutcome outcome) {
+        CaseData caseData = TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
+        when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE)))
+            .thenReturn(Set.of(caseData));
+        when(caseDisposalWorkflow.dispose(caseData)).thenReturn(outcome);
+
+        applicationExecutor.execute();
+
+        verify(processedCasesRecordHolder).addFailedToDeleteCaseRef(caseData);
+        verify(processedCasesRecordHolder).addProcessedCase(caseData);
+    }
+
+    @Test
+    void shouldNotRecordDeletedWorkflowOutcomeAsFailure() {
+        CaseData caseData = TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
+        when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE)))
+            .thenReturn(Set.of(caseData));
+        when(caseDisposalWorkflow.dispose(caseData)).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+
+        applicationExecutor.execute();
+
+        verify(processedCasesRecordHolder, never()).addFailedToDeleteCaseRef(caseData);
+        verify(processedCasesRecordHolder).addProcessedCase(caseData);
     }
 
     @Test
@@ -149,6 +182,7 @@ class ApplicationExecutorTest {
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE_SIMULATION)))
             .thenReturn(simulatedCases);
+        when(caseDisposalWorkflow.dispose(any())).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
 
         applicationExecutor.execute();
 
