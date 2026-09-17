@@ -45,7 +45,7 @@ public class ShellMappingService {
             throw new ShellCaseException("Shell mapping response was null for case type " + caseTypeId);
         }
 
-        if (response.shellCaseTypeID() != null && response.shellCaseMappings() == null) {
+        if (response.shellCaseTypeId() != null && response.shellCaseMappings() == null) {
             throw new ShellCaseException("Shell mapping response was invalid for case type " + caseTypeId);
         }
 

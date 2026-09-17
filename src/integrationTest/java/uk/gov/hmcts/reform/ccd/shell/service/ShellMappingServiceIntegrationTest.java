@@ -58,7 +58,7 @@ class ShellMappingServiceIntegrationTest extends TestContainers {
         assertThat(response)
             .isNotNull()
             .extracting(
-                ShellMappingResponse::shellCaseTypeID,
+                ShellMappingResponse::shellCaseTypeId,
                 r -> r.shellCaseMappings().size(),
                 r -> r.shellCaseMappings().getFirst().getOriginatingCaseFieldName(),
                 r -> r.shellCaseMappings().getFirst().getShellCaseFieldName())
@@ -91,8 +91,8 @@ class ShellMappingServiceIntegrationTest extends TestContainers {
             .hasSize(2)
             .containsKeys(firstCaseType, secondCaseType)
             .extracting(
-                m -> m.get(firstCaseType).shellCaseTypeID(),
-                m -> m.get(secondCaseType).shellCaseTypeID())
+                m -> m.get(firstCaseType).shellCaseTypeId(),
+                m -> m.get(secondCaseType).shellCaseTypeId())
             .containsExactly("FT_Shell_Master", "FT_Shell_Other");
 
         WIREMOCK_SERVER.verify(1, getRequestedFor(urlPathEqualTo(SHELL_MAPPING_PATH + firstCaseType)));
