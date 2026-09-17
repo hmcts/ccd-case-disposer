@@ -14,8 +14,12 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.DELETE_ROLE_PATH;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.MEDIA_TYPE_POST_DELETE_ASSIGNMENTS;
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_HEADER;
 
-@FeignClient(name = "roleAssignmentClient", url = "${remote.role.assignment.host}")
 @SuppressWarnings("PMD.ImplicitFunctionalInterface")
+@FeignClient(
+    name = "roleAssignmentClient",
+    url = "${remote.role.assignment.host}",
+    configuration = CcdJsonFeignConfiguration.class
+)
 public interface RoleAssignmentClient {
 
     @PostMapping(
