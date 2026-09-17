@@ -49,21 +49,24 @@ public class CaseDisposalWorkflow {
         } catch (ShellCaseException exc) {
             log.error("Shell case creation failed for case: {}", caseData.getReference(), exc);
             return DisposalOutcome.SHELL_FAILED;
+        } catch (RuntimeException exc) {
+            log.error("Unexpected error occurred while disposing case: {}", caseData.getReference(), exc);
+            return DisposalOutcome.SHELL_FAILED;
         }
     }
 
     private void shellCaseFlow(CaseData caseData) {
         ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
-        String shellCaseType = shellMapping.shellCaseTypeID();
+        String shellCaseType = shellMapping.shellCaseTypeId();
         if (shellCaseType == null) {
             log.info("No shell case mapping found for case type: {}", caseData.getCaseType());
             return;
         }
 
-        Optional<Long> foundShellCases = ccdCaseService.findShellCase(shellCaseType, caseData.getReference());
-        if (foundShellCases.isPresent()) {
+        Optional<Long> existingShellCases = ccdCaseService.findShellCase(shellCaseType, caseData.getReference());
+        if (existingShellCases.isPresent()) {
             log.error("Found shell case for case type: {}", caseData.getCaseType());
-            throw new ShellAlreadyExistsException(caseData.getReference(), foundShellCases.get());
+            throw new ShellAlreadyExistsException(caseData.getReference(), existingShellCases.get());
         }
 
         CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
