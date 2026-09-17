@@ -26,6 +26,7 @@ public class CcdCaseService {
     private static final String ORIGINAL_CASE_TYPE = "original_case_type";
     private static final String TRIGGER_ID = "createCase";
     private static final int NUMBER_OF_RESULTS = 5;
+    private static final int SINGLE_RESULT = 1;
 
     private final CcdClient ccdClient;
     private final SecurityUtil securityUtil;
@@ -56,6 +57,10 @@ public class CcdCaseService {
                 request
             );
             validateSearchResponse(response, originalCaseReference);
+
+            if (response.total() > SINGLE_RESULT) {
+                log.warn("More than a single result returned from case search - total {}", response.total());
+            }
 
             return response.cases().stream()
                 .map(CcdCaseSearchResponse.EsCase::reference)
