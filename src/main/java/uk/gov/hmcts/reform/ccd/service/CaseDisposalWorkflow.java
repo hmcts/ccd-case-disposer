@@ -63,10 +63,10 @@ public class CaseDisposalWorkflow {
             return;
         }
 
-        Optional<Long> existingShellCases = ccdCaseService.findShellCase(shellCaseType, caseData.getReference());
-        if (existingShellCases.isPresent()) {
+        Optional<Long> existingShellCase = ccdCaseService.findShellCase(shellCaseType, caseData.getReference());
+        if (existingShellCase.isPresent()) {
             log.error("Found shell case for case type: {}", caseData.getCaseType());
-            throw new ShellAlreadyExistsException(caseData.getReference(), existingShellCases.get());
+            throw new ShellAlreadyExistsException(caseData.getReference(), existingShellCase.get());
         }
 
         CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
