@@ -67,13 +67,13 @@ class ShellCaseDeletionIntegrationTest extends TestDataProvider {
         executor.execute();
 
         if (scenario.deletionExpected()) {
-            verifySuccessfulShellCreationAndDeletion();
+            verifySuccessfulDeletion(scenario.shellCreationExpected());
         } else {
             verifyShellFailurePreventedDeletion();
         }
     }
 
-    private void verifySuccessfulShellCreationAndDeletion() {
+    private void verifySuccessfulDeletion(boolean shellCreationExpected) {
         verifyDatabaseDeletion(List.of());
         verifyElasticsearchDeletion(
             Map.of(ORIGINAL_CASE_TYPE, List.of(ORIGINAL_CASE_REFERENCE)),
@@ -82,8 +82,12 @@ class ShellCaseDeletionIntegrationTest extends TestDataProvider {
         verifyRemoteDeletion(List.of(ORIGINAL_CASE_REFERENCE));
         assertThat(processedCasesRecordHolder.getFailedToDeleteCaseRefs()).isEmpty();
 
-        WIREMOCK_SERVER.verify(1, postRequestedFor(urlPathEqualTo(shellCaseStubs.createCasePath()))
-            .withRequestBody(equalToJson(expectedShellCasePayload(), true, true)));
+        if (shellCreationExpected) {
+            WIREMOCK_SERVER.verify(1, postRequestedFor(urlPathEqualTo(shellCaseStubs.createCasePath()))
+                .withRequestBody(equalToJson(expectedShellCasePayload(), true, true)));
+        } else {
+            WIREMOCK_SERVER.verify(0, postRequestedFor(urlPathEqualTo(shellCaseStubs.createCasePath())));
+        }
     }
 
     private void verifyShellFailurePreventedDeletion() {

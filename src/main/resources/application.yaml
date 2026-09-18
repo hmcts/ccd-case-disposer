@@ -98,3 +98,5 @@ performance:
 features:
   shell-case:
     enabled: ${CCD_DISPOSER_SHELL_CASE_ENABLED:false}
+    draft-state-category: SHELL_DISABLED
+    trigger-id: CREATE
