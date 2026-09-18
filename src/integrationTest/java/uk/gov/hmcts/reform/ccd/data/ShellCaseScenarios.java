@@ -18,7 +18,8 @@ public final class ShellCaseScenarios {
             scenario("definition store failure prevents deletion", ShellCaseResult.MAPPING_FAILURE, false, false),
             scenario("shell case search failure prevents deletion", ShellCaseResult.SEARCH_FAILURE, false, false),
             scenario("existing shell case prevents deletion", ShellCaseResult.SHELL_ALREADY_EXISTS, false, false),
-            scenario("original case load failure prevents deletion", ShellCaseResult.ORIGINAL_CASE_FAILURE, false, false),
+            scenario("original case load failure prevents deletion",
+                     ShellCaseResult.ORIGINAL_CASE_FAILURE, false, false),
             scenario("document hash failure prevents deletion", ShellCaseResult.DOCUMENT_HASH_FAILURE, false, false),
             scenario("invalid create event token prevents deletion", ShellCaseResult.EVENT_TOKEN_FAILURE, false, false),
             scenario("shell case creation failure prevents deletion", ShellCaseResult.CREATE_FAILURE, false, false)
