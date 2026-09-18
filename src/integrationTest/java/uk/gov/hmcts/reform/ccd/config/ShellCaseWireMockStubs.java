@@ -29,7 +29,7 @@ public class ShellCaseWireMockStubs {
 
     public void setUp(WireMockServer wireMockServer, ShellCaseResult result) {
         wireMockServer.stubFor(get(urlPathEqualTo(MAPPING_PATH))
-            .willReturn(response(result == ShellCaseResult.MAPPING_FAILURE ? 500 : 200, mappingResponse())));
+            .willReturn(response(result == ShellCaseResult.MAPPING_FAILURE ? 500 : 200, mappingResponse(result))));
 
         wireMockServer.stubFor(post(urlPathEqualTo(SEARCH_PATH))
             .willReturn(response(result == ShellCaseResult.SEARCH_FAILURE ? 500 : 200, searchResponse(result))));
@@ -63,10 +63,12 @@ public class ShellCaseWireMockStubs {
             .withBody(body);
     }
 
-    private String mappingResponse() {
+    private String mappingResponse(ShellCaseResult result) {
+        String mappedState = result == ShellCaseResult.CASE_STATE_EXCLUDED ? "ExcludedState" : "CaseCreated";
         return """
             {
               "shellCaseTypeID": "FT_ShellCaseType",
+              "caseStates": [{"name": "%s", "stateCategory": "category"}],
               "shellCaseMappings": [
                 {
                   "OriginatingCaseFieldName": "applicant.name",
@@ -78,7 +80,7 @@ public class ShellCaseWireMockStubs {
                 }
               ]
             }
-            """;
+            """.formatted(mappedState);
     }
 
     private String searchResponse(ShellCaseResult result) {

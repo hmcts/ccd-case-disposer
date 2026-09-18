@@ -57,12 +57,12 @@ public class CaseDisposalWorkflow {
 
     private void shellCaseFlow(CaseData caseData) {
         ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
-        String shellCaseType = shellMapping.shellCaseTypeId();
-        if (shellCaseType == null) {
-            log.info("No shell case mapping found for case type: {}", caseData.getCaseType());
+
+        if (!mappingRequireShell(shellMapping, caseData)) {
             return;
         }
 
+        String shellCaseType = shellMapping.shellCaseTypeId();
         Optional<Long> existingShellCase = ccdCaseService.findShellCase(shellCaseType, caseData.getReference());
         if (existingShellCase.isPresent()) {
             log.error("Found shell case for case type: {}", caseData.getCaseType());
@@ -80,10 +80,25 @@ public class CaseDisposalWorkflow {
         log.info("Created shell case for original case reference: {}", caseData.getReference());
     }
 
+    private boolean mappingRequireShell(ShellMappingResponse shellMapping, CaseData caseData) {
+
+        String shellCaseType = shellMapping.shellCaseTypeId();
+        if (shellCaseType == null) {
+            log.info("No shell case mapping found for case type: {}", caseData.getCaseType());
+            return false;
+        }
+
+        boolean stateMapped = shellMapping.caseStates().stream()
+            .anyMatch(caseState -> caseState.name().equals(caseData.getState()));
+        if (!stateMapped) {
+            log.info("Case state {} is explicitly set to be excluded from shell creation", caseData.getState());
+        }
+        return stateMapped;
+    }
+
     public enum DisposalOutcome {
         DELETED,
         SHELL_ALREADY_EXISTS,
         SHELL_FAILED
     }
-
 }
