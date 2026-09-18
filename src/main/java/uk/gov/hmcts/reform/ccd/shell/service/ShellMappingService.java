@@ -4,6 +4,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.client.ShellMappingClient;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 public class ShellMappingService {
     private final ShellMappingClient shellMappingClient;
     private final SecurityUtil securityUtil;
+    private final ShellCaseProperties shellCaseProperties;
 
     private final Map<String, ShellMappingResponse> cache = new ConcurrentHashMap<>();
 
@@ -34,6 +36,7 @@ public class ShellMappingService {
             response = shellMappingClient.getShellMappings(
                 securityUtil.getServiceAuthorization(),
                 securityUtil.getIdamClientToken(),
+                shellCaseProperties.getDraftStateCategory(),
                 caseTypeId
             );
         }  catch (FeignException exc) {

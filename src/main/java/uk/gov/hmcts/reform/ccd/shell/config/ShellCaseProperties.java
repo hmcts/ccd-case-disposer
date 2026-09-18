@@ -11,4 +11,6 @@ import org.springframework.stereotype.Component;
 @Setter
 public class ShellCaseProperties {
     private boolean enabled;
+    private String draftStateCategory;
+    private String triggerId;
 }

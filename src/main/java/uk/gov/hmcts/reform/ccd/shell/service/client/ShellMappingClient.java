@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
@@ -26,6 +27,7 @@ public interface ShellMappingClient {
     ShellMappingResponse getShellMappings(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORISATION_HEADER) String authHeader,
+        @RequestParam("stateCategoriesToExclude") String stateCategoriesToExclude,
         @PathVariable("originalCaseTypeId") String originalCaseTypeId
     );
 }
