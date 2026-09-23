@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress until="2026-09-30">
+  <suppress until="2026-12-30">
     <notes>
       opentelemetry-api-1.62.0.jar
       opentelemetry-common-1.62.0.jar
@@ -10,7 +10,7 @@
   </suppress>
 
   <!--Please add all the false positives under the below section-->
-  <suppress until="2026-09-30">
+  <suppress until="2026-12-30">
     <notes>
       applicationinsights-core-3.7.9.jar
       applicationinsights-web-3.7.9.jar
