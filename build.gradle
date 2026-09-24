@@ -238,14 +238,14 @@ ext['log4j2.version'] = '2.25.5'
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.22.0',
-    elasticsearch       : '9.5.3',
+    elasticsearch       : '9.5.4',
     flyway              : '13.5.0',
     gradlePitest        : '1.15.0',
     idamClient          : '4.0.0',
     lombok              : '1.18.48',
     reformLogging       : '8.0.0',
     restAssured         : '6.0.1',
-    s2sClient           : '6.0.1',
+    s2sClient           : '6.1.2',
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
     testcontainers      : '1.21.4',
@@ -296,7 +296,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
     implementation "org.springframework.boot:spring-boot-starter-json"
-    implementation "com.microsoft.azure:applicationinsights-web:3.7.9"
+    implementation "com.microsoft.azure:applicationinsights-web:3.7.10"
     implementation "ch.qos.logback.access:common:2.0.3"
 
     implementation "org.postgresql:postgresql:42.7.13"
