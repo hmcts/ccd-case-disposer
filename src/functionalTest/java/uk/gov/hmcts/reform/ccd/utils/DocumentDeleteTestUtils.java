@@ -51,6 +51,15 @@ public class DocumentDeleteTestUtils {
                 }));
     }
 
+    public void verifyDocumentStoreNotDeleted(final Map<Long, List<String>> deletableDocuments) {
+        with().await()
+            .untilAsserted(() -> deletableDocuments.entrySet().forEach(entry -> {
+                final CaseDocumentsDeletionResults caseDocumentsDeletionResults = documentDeletionRecordHolder
+                    .getCaseDocumentsDeletionResults(Long.toString(entry.getKey()));
+                assertThat(caseDocumentsDeletionResults).isNull();
+            }));
+    }
+
     public void uploadDocument(final Map<Long, List<String>> deletableDocuments) {
         deletableDocuments.entrySet()
                 .forEach(entry -> entry.getValue()

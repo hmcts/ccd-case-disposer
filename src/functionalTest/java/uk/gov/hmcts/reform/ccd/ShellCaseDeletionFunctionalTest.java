@@ -47,7 +47,7 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
                                  final List<Long> deletableRowIds,
                                 final String shellCaseType) throws Exception {
         // GIVEN
-        setupData(deletableCaseTypes, null, scriptPath, deletableDocuments, deletableRoles,
+        setupData(deletableCaseTypes, "", scriptPath, deletableDocuments, deletableRoles,
                   initialStateRowIds, indexedData);
 
         // WHEN
@@ -56,7 +56,7 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
         // THEN
         verifyShellCaseCreation(shellCaseType,deletableEndStateRowIds);
         verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
-        verifyDocumentDeletion(deletableDocuments);
+        verifyDocumentNotDeleted(deletableDocuments);
         verifyHearingDocumentDeletion(deletedFromIndexed);
         verifyRoleDeletion(deletableRoles);
         verifyTaskDeletion(deletableRowIds);

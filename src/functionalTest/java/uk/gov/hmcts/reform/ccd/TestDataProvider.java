@@ -104,6 +104,10 @@ public class TestDataProvider {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
     }
 
+    protected void verifyDocumentNotDeleted(final Map<Long, List<String>> deletableDocuments) {
+        documentDeleteTestUtils.verifyDocumentStoreNotDeleted(deletableDocuments);
+    }
+
     protected void verifyHearingDocumentDeletion(final Map<String, List<Long>> deletedFromIndexed) {
         hearingDocumentDeleteTestUtils.verifyHearingDocumentStoreDeletion(deletedFromIndexed);
     }
