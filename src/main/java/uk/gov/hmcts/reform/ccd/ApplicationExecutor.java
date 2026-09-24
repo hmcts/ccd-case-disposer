@@ -33,7 +33,6 @@ public class ApplicationExecutor {
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseCollectorService caseCollectorService;
-    private final ShellMappingService shellMappingService;
     @Qualifier("caseDeletionExecutor")
     private final ThreadPoolTaskExecutor taskExecutor;
 
@@ -87,21 +86,17 @@ public class ApplicationExecutor {
             if (remainingRequests <= 0 || isCutOffTimeReached()) {
                 break;
             }
-            try {
-                CaseDisposalWorkflow.DisposalOutcome outcome = caseDisposalWorkflow.dispose(caseData);
-                if (outcome != CaseDisposalWorkflow.DisposalOutcome.DELETED) {
-                    processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
-                }
-            } catch (LogAndAuditException logAndAuditException) {
-                log.error("Error deleting case: {} due to log and audit exception", caseData.getReference());
-            }
 
             Future<?> future = taskExecutor.submit(() -> {
                 try {
                     if (Thread.currentThread().isInterrupted()) {
                         throw new InterruptedException("Case deletion interrupted");
                     }
-                    caseDeletionService.deleteCaseData(caseData);
+
+                    CaseDisposalWorkflow.DisposalOutcome outcome = caseDisposalWorkflow.dispose(caseData);
+                    if (outcome != CaseDisposalWorkflow.DisposalOutcome.DELETED) {
+                        processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
+                    }
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // VERY important
                     log.warn("Case deletion interrupted for case {}", caseData.getReference());
