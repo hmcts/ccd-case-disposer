@@ -18,7 +18,7 @@ import java.util.Map;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY;
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
-@SuppressWarnings("PMD.TestClassWithoutTestCases")
+@SuppressWarnings({"PMD.TestClassWithoutTestCases","PMD.TooManyMethods"})
 public class TestDataProvider {
 
     @Inject
@@ -85,6 +85,10 @@ public class TestDataProvider {
     protected void verifyDatabaseDeletion(final List<Long> initialRowIds,
                                           final List<Long> endStateRowIds) {
         databaseTestUtils.verifyDatabaseDeletion(initialRowIds, endStateRowIds);
+    }
+
+    protected void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRowIds) {
+        databaseTestUtils.verifyShellCaseCreation(shellCaseType, endStateRowIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
