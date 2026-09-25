@@ -56,8 +56,8 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
         // THEN
         verifyShellCaseCreation(shellCaseType,deletableEndStateRowIds);
         verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
+        //As there is mapping for Document field it should not be deleted it should move to new case
         verifyDocumentNotDeleted(deletableDocuments);
-        verifyHearingDocumentDeletion(deletedFromIndexed);
         verifyRoleDeletion(deletableRoles);
         verifyTaskDeletion(deletableRowIds);
         verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));

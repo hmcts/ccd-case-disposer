@@ -17,14 +17,14 @@ public final class ShellCaseScenarios {
         return Stream.of(Arguments.of(
             "DPR_FT_MasterCaseType",
             "scenarios/shell/S-001-case-deleted-and-shell-case-created.sql",
-            List.of(1004259907353629L),
-            Map.of("DPR_FT_MasterCaseType", List.of(1004259907353629L)),
-            List.of(1004259907353629L),
-            Map.of(1004259907353629L, List.of("jpg.jpg")),
-            Map.of(1004259907353629L, List.of("S-002-role-assignment-for-shell-case.json")),
-            Map.of("DPR_FT_MasterCaseType", List.of(1004259907353629L)),
+            List.of(1004259907353829L),
+            Map.of("DPR_FT_MasterCaseType", List.of(1004259907353829L)),
+            List.of(1004259907353829L),
+            Map.of(1004259907353829L, List.of("jpg.jpg")),
+            Map.of(1004259907353829L, List.of("S-002-role-assignment-for-shell-case.json")),
+            Map.of("DPR_FT_MasterCaseType", List.of(1004259907353829L)),
             emptyMap(),
-            List.of(1004259907353629L),
+            List.of(1004259907353829L),
             "DPR_FT_Shell_MasterCaseType"
             )
         );

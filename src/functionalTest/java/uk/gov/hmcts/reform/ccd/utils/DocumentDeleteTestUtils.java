@@ -51,7 +51,7 @@ public class DocumentDeleteTestUtils {
                 }));
     }
 
-    public void verifyDocumentStoreNotDeleted(final Map<Long, List<String>> deletableDocuments) {
+    public void verifyDocumentNotDeleted(final Map<Long, List<String>> deletableDocuments) {
         with().await()
             .untilAsserted(() -> deletableDocuments.entrySet().forEach(entry -> {
                 final CaseDocumentsDeletionResults caseDocumentsDeletionResults = documentDeletionRecordHolder
