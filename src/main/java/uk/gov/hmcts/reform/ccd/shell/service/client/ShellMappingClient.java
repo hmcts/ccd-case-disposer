@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 
 import static uk.gov.hmcts.reform.ccd.util.RestConstants.AUTHORISATION_HEADER;
@@ -13,7 +14,7 @@ import static uk.gov.hmcts.reform.ccd.util.RestConstants.SERVICE_AUTHORISATION_H
 @FeignClient(
     name = "shell-mapping-service",
     // Missing shell mappings are expected for some case types; treat 404 as empty so processing continues.
-    url = "${shell.mapping.url}",
+    url = "${remote.ccd-definition-store.host}",
     dismiss404 = true
 )
 @SuppressWarnings("PMD.ImplicitFunctionalInterface")
@@ -26,6 +27,7 @@ public interface ShellMappingClient {
     ShellMappingResponse getShellMappings(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORISATION_HEADER) String authHeader,
+        @RequestParam("stateCategoriesToExclude") String stateCategoriesToExclude,
         @PathVariable("originalCaseTypeId") String originalCaseTypeId
     );
 }
