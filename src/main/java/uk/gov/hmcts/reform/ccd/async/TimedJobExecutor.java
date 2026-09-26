@@ -15,7 +15,6 @@ import java.util.concurrent.TimeoutException;
 @Component
 public class TimedJobExecutor {
 
-    @SuppressWarnings("PMD.DoNotUseThreads")
     public void runWithTimeout(Runnable task, Duration timeout)
         throws TimeoutException, ExecutionException, InterruptedException {
 
