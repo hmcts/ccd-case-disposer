@@ -249,7 +249,7 @@ def versions = [
     sonarPitest         : '0.5',
     springBoot          : springBoot.class.package.implementationVersion,
     testcontainers      : '1.21.4',
-    wiremock            : '3.0.1',
+    wiremock            : '3.13.2',
     pactVersion         : '4.7.5',
     serenity            : '3.1.20',
 ]
@@ -314,7 +314,7 @@ dependencies {
     testImplementation "org.testcontainers:junit-jupiter:${versions.testcontainers}"
     testImplementation "org.testcontainers:elasticsearch:${versions.testcontainers}"
     testImplementation "org.awaitility:awaitility:4.3.0"
-    testImplementation "com.github.tomakehurst:wiremock-jre8-standalone:${versions.wiremock}"
+    testImplementation "org.wiremock:wiremock-standalone:${versions.wiremock}"
     testImplementation "org.flywaydb:flyway-core:${versions.flyway}"
     testImplementation "com.pivovarit:throwing-function:1.6.1"
     testImplementation "info.solidsoft.gradle.pitest:gradle-pitest-plugin:${versions.gradlePitest}"

@@ -62,6 +62,7 @@ class CaseDeletionServiceTest {
         1L,
         TestData.DELETABLE_CASE_TYPE,
         TestData.JURISDICTION,
+        TestData.STATE,
         TestData.YESTERDAY,
         1L,
         null);
