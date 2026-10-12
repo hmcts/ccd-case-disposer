@@ -1,7 +1,8 @@
 # renovate: datasource=github-releases depName=microsoft/ApplicationInsights-Java
 ARG APP_INSIGHTS_AGENT_VERSION=3.7.10
 
-FROM hmctsprod.azurecr.io/base/java:25-distroless
+ARG PLATFORM=""
+FROM hmctsprod.azurecr.io/base/java${PLATFORM}:25-distroless
 
 COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/ccd-case-disposer.jar /opt/app/
