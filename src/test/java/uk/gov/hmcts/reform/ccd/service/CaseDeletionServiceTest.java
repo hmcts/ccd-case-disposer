@@ -109,7 +109,7 @@ class CaseDeletionServiceTest {
         doReturn(Optional.of(Mockito.mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
 
         // WHEN
-        catchThrowable(() -> underTest.deleteCase(caseData));
+        underTest.deleteCase(caseData);
 
         // THEN
         verify(processedCasesRecordHolder).addFailedToDeleteCaseRef(caseData);
@@ -126,7 +126,7 @@ class CaseDeletionServiceTest {
         Mockito.doThrow(IllegalArgumentException.class).when(caseLinkRepository).deleteByCaseIdOrLinkedCaseId(1L);
 
         // WHEN
-        catchThrowable(() -> underTest.deleteCaseLinks(caseData));
+        underTest.deleteCaseLinks(caseData);
 
         // THEN
         verify(caseLinkRepository, times(1)).deleteByCaseIdOrLinkedCaseId(1L);
@@ -263,7 +263,7 @@ class CaseDeletionServiceTest {
         doReturn(Optional.of(Mockito.mock(CaseDataEntity.class))).when(caseDataRepository).findById(anyLong());
 
         // WHEN
-        catchThrowable(() -> underTest.deleteCase(caseData));
+        underTest.deleteCase(caseData);
 
         // THEN
         verify(processedCasesRecordHolder).addFailedToDeleteCaseRef(caseData);
