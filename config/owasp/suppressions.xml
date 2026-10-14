@@ -17,5 +17,12 @@
   </suppress>
 
   <!--Please add all the false positives under the below section-->
+  <suppress until="2026-12-30">
+    <notes>
+      applicationinsights-core-3.7.9.jar
+      applicationinsights-web-3.7.9.jar
+    </notes>
+    <cve>CVE-2025-21199</cve>
+  </suppress>
   <!--End of false positives section -->
 </suppressions>
