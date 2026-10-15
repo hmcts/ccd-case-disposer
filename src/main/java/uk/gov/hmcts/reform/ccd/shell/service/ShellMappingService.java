@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.ccd.shell.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
+import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.client.ShellMappingClient;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
@@ -19,33 +22,38 @@ import java.util.stream.Collectors;
 public class ShellMappingService {
     private final ShellMappingClient shellMappingClient;
     private final SecurityUtil securityUtil;
+    private final ShellCaseProperties shellCaseProperties;
 
-    private final Map<String, ShellMappingResponse> cache =
-        new ConcurrentHashMap<>();
+    private final Map<String, ShellMappingResponse> cache = new ConcurrentHashMap<>();
 
     public ShellMappingResponse loadMappings(String caseTypeId) {
         return cache.computeIfAbsent(caseTypeId, this::retrieveMappings);
     }
 
     private ShellMappingResponse retrieveMappings(String caseTypeId) {
-        ShellMappingResponse response = shellMappingClient.getShellMappings(
-            securityUtil.getServiceAuthorization(),
-            securityUtil.getIdamClientToken(),
-            caseTypeId
-        );
-
-        if (response == null) {
-            log.info("Shell mapping response was empty for caseTypeId={}, continuing without shell mappings",
+        ShellMappingResponse response;
+        try {
+            response = shellMappingClient.getShellMappings(
+                securityUtil.getServiceAuthorization(),
+                securityUtil.getIdamClientToken(),
+                shellCaseProperties.getDraftStateCategory(),
                 caseTypeId
             );
-            return emptyResponse();
+        }  catch (FeignException exc) {
+            log.warn("Failed to retrieve mappings for case type {}", caseTypeId);
+            throw new ShellCaseException("Failed to retrieve mappings for case type " + caseTypeId, exc);
         }
 
-        return response;
-    }
+        if (response == null) {
+            throw new ShellCaseException("Shell mapping response was null for case type " + caseTypeId);
+        }
 
-    private ShellMappingResponse emptyResponse() {
-        return new ShellMappingResponse(null);
+        if (response.shellCaseTypeId() != null && response.shellCaseMappings() == null) {
+            throw new ShellCaseException("Shell mapping response was invalid for case type " + caseTypeId);
+        }
+
+        log.info("Shell mapping for case type {} returned {}", caseTypeId, response);
+        return response;
     }
 
     public Map<String, ShellMappingResponse> getShellMappings(List<String> caseTypes) {
