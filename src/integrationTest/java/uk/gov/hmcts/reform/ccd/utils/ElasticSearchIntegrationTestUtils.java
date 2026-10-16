@@ -11,6 +11,7 @@ import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
 import co.elastic.clients.elasticsearch.indices.RefreshResponse;
+import com.pivovarit.function.ThrowingBiConsumer;
 import com.pivovarit.function.ThrowingConsumer;
 import com.pivovarit.function.ThrowingFunction;
 import jakarta.inject.Inject;
@@ -53,15 +54,16 @@ public class ElasticSearchIntegrationTestUtils {
     }
 
     private void verifyCaseDataAreDeletedInElasticsearch(final Map<String, List<Long>> deletedFromIndexed) {
-        deletedFromIndexed.forEach((key, value) -> {
-            final String indexName = getIndexName(key);
-
-            value.forEach(ThrowingConsumer.unchecked(caseReference -> {
+        deletedFromIndexed.forEach(ThrowingBiConsumer.unchecked((key, value) -> {
+            if (!value.isEmpty()) {
+                final String indexName = getIndexName(key);
                 refreshIndex(indexName);
-                final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
-                assertThat(actualCaseReference).isNotPresent();
-            }));
-        });
+                value.forEach(ThrowingConsumer.unchecked(caseReference -> {
+                    final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
+                    assertThat(actualCaseReference).isNotPresent();
+                }));
+            }
+        }));
     }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
@@ -93,18 +95,19 @@ public class ElasticSearchIntegrationTestUtils {
     }
 
     public void verifyCaseDataAreInElasticsearch(final Map<String, List<Long>> indexedData) {
-        indexedData.forEach((key, value) -> {
-            final String indexName = getIndexName(key);
-
-            value.forEach(ThrowingConsumer.unchecked(caseReference -> {
+        indexedData.forEach(ThrowingBiConsumer.unchecked((key, value) -> {
+            if (!value.isEmpty()) {
+                final String indexName = getIndexName(key);
                 refreshIndex(indexName);
-                final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
+                value.forEach(ThrowingConsumer.unchecked(caseReference -> {
+                    final Optional<Long> actualCaseReference = findCaseByReference(indexName, caseReference);
 
-                assertThat(actualCaseReference)
-                        .isPresent()
-                        .hasValue(caseReference);
-            }));
-        });
+                    assertThat(actualCaseReference)
+                            .isPresent()
+                            .hasValue(caseReference);
+                }));
+            }
+        }));
     }
 
     private Optional<Long> findCaseByReference(final String caseIndex, final Long caseReference) throws IOException {
