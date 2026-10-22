@@ -84,14 +84,16 @@ public class CaseCollectorService {
                 .caseType(entity.getCaseType())
                 .jurisdiction(entity.getJurisdiction())
                 .resolvedTtl(entity.getResolvedTtl())
+                .state(entity.getState())
                 .build()).toList();
 
         log.debug("Cases with expired TTL: {}", cases.size());
         cases.forEach(cs -> log.debug(
-            "Case id: {} ref: {} type: {}, ttl: {}",
+            "Case id: {} ref: {} type: {}, state: {}, ttl: {}",
             cs.getId(),
             cs.getReference(),
             cs.getCaseType(),
+            cs.getState(),
             cs.getResolvedTtl()));
 
         return cases;
