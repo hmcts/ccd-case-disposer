@@ -13,7 +13,7 @@ plugins {
   id 'io.freefair.lombok' version '9.8.2'
   id 'org.flywaydb.flyway' version '13.11.1'
   id "info.solidsoft.pitest" version '1.19.0'
-  id "au.com.dius.pact" version '4.7.5'
+  id "au.com.dius.pact" version '4.7.6'
 }
 
 group = 'uk.gov.hmcts.reform'
