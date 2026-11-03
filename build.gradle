@@ -239,7 +239,7 @@ ext['log4j2.version'] = '2.25.5'
 def versions = [
     apiGuardian         : '1.1.2',
     commonsIo           : '2.22.0',
-    elasticsearch       : '9.5.5',
+    elasticsearch       : '9.5.6',
     flyway              : '13.11.1',
     gradlePitest        : '1.15.0',
     idamClient          : '4.0.0',
