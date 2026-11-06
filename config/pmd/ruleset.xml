@@ -18,6 +18,7 @@
     <exclude name="OnlyOneReturn"/>
     <exclude name="TooManyStaticImports"/>
     <exclude name="CommentDefaultAccessModifier"/>
+    <exclude name="LocalVariableDeclarationShouldBeAtStartOfBlock"/>
   </rule>
   <rule ref="category/java/codestyle.xml/ClassNamingConventions">
     <properties>
