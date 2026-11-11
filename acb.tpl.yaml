@@ -1,7 +1,7 @@
 version: 1.0-preview-1
 steps:
   - id: pull-base-image-amd64
-    cmd: docker pull --platform linux/amd64 hmctsprod.azurecr.io/base/java:21-distroless && docker tag hmctsprod.azurecr.io/base/java:21-distroless hmctsprod.azurecr.io/base/java/linux/amd64:21-distroless
+    cmd: docker pull --platform linux/amd64 hmctsprod.azurecr.io/base/java:25-distroless && docker tag hmctsprod.azurecr.io/base/java:25-distroless hmctsprod.azurecr.io/base/java/linux/amd64:25-distroless
     when: ["-"]
     retries: 10
     retryDelay: 5
@@ -18,7 +18,7 @@ steps:
     retryDelay: 5
 
   - id: pull-base-image-arm64
-    cmd: docker pull --platform linux/arm64 hmctsprod.azurecr.io/base/java:21-distroless && docker tag hmctsprod.azurecr.io/base/java:21-distroless hmctsprod.azurecr.io/base/java/linux/arm64:21-distroless
+    cmd: docker pull --platform linux/arm64 hmctsprod.azurecr.io/base/java:25-distroless && docker tag hmctsprod.azurecr.io/base/java:25-distroless hmctsprod.azurecr.io/base/java/linux/arm64:25-distroless
     when:
       - pull-base-image-amd64
     retries: 10
@@ -46,11 +46,14 @@ steps:
     retryDelay: 5
 
   - id: manifest-create
-    cmd: docker manifest create {{.Run.Registry}}/{{CI_IMAGE_TAG}} {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64 {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64
+    cmd: |
+      docker manifest rm {{.Run.Registry}}/{{CI_IMAGE_TAG}} {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64 {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64 || true
+      docker manifest create {{.Run.Registry}}/{{CI_IMAGE_TAG}} {{.Run.Registry}}/{{CI_IMAGE_TAG}}-amd64 {{.Run.Registry}}/{{CI_IMAGE_TAG}}-arm64
     when:
       - push-images
     retries: 10
     retryDelay: 5
+    keep: true
 
   - id: manifest-push
     cmd: docker manifest push --purge {{.Run.Registry}}/{{CI_IMAGE_TAG}}
@@ -58,3 +61,4 @@ steps:
       - manifest-create
     retries: 10
     retryDelay: 5
+    keep: true

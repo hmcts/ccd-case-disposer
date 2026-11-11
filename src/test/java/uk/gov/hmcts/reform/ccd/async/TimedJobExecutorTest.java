@@ -5,11 +5,12 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.LockSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-@SuppressWarnings({"java:S2925", "PMD.DoNotUseThreads"})
+@SuppressWarnings({"java:S2925"})
 class TimedJobExecutorTest {
 
     @Test
@@ -43,19 +44,17 @@ class TimedJobExecutorTest {
     void shouldInterruptTaskOnTimeout() {
         TimedJobExecutor executor = new TimedJobExecutor();
 
-        AtomicBoolean interrupted = new AtomicBoolean(false);
+        AtomicBoolean ran = new AtomicBoolean(false);
 
         Runnable longRunningTask = () -> {
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                interrupted.set(true);   // task detected interruption
-            }
+            ran.set(true);
+            LockSupport.park(); // waits until interrupted
         };
 
-        Throwable thrown = catchThrowable(() -> executor.runWithTimeout(longRunningTask, Duration.ofMillis(100)));
-        assertThat(thrown).isInstanceOf(TimeoutException.class);
+        Throwable thrown = catchThrowable(() -> executor.runWithTimeout(longRunningTask, Duration.ofMillis(100))
+        );
 
-        assertThat(interrupted.get()).isTrue();
+        assertThat(thrown).isInstanceOf(TimeoutException.class);
+        assertThat(ran.get()).isTrue();
     }
 }

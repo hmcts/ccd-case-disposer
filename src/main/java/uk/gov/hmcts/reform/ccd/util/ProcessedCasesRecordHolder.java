@@ -2,22 +2,27 @@ package uk.gov.hmcts.reform.ccd.util;
 
 import jakarta.inject.Named;
 import lombok.Getter;
-import lombok.Setter;
 import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Named
 @Getter
 public class ProcessedCasesRecordHolder {
 
-    private final Set<Long> failedToDeleteCaseRefs = new HashSet<>();
-    private final Set<CaseData> processedCases = new HashSet<>();
+    private final Set<Long> failedToDeleteCaseRefs = ConcurrentHashMap.newKeySet();
+    private final Set<CaseData> processedCases = ConcurrentHashMap.newKeySet();
 
-    @Setter
-    private Set<CaseData> simulatedCases = new HashSet<>();
+    private Set<CaseData> simulatedCases = ConcurrentHashMap.newKeySet();
+
+    // Make sure setter does not set simulatedCases to thread-unsafe instance
+    public void setSimulatedCases(Set<CaseData> cases) {
+        Set<CaseData> copy = ConcurrentHashMap.newKeySet();
+        copy.addAll(cases);
+        this.simulatedCases = copy;
+    }
 
     public void addFailedToDeleteCaseRef(final CaseData caseData) {
         failedToDeleteCaseRefs.add(caseData.getReference());

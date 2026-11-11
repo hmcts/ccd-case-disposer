@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.ccd.data;
 
+
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -29,4 +31,7 @@ public interface CaseLinkRepository extends CrudRepository<CaseLinkEntity, CaseL
         """)
     List<CaseLinkEntity> findExpiredCaseLinksByCaseTypes(Collection<String> queryCaseTypes);
 
+    @Modifying
+    @Query("DELETE FROM CaseLinkEntity c WHERE c.caseId = :caseId OR c.linkedCaseId = :caseId")
+    int deleteByCaseIdOrLinkedCaseId(Long caseId);
 }
