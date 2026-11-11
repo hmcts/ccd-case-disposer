@@ -1,0 +1,66 @@
+package uk.gov.hmcts.reform.ccd;
+
+import org.awaitility.Awaitility;
+import org.awaitility.Durations;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
+import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+@ActiveProfiles("functional")
+@SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
+@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd"})
+class ShellCaseDeletionFunctionalTest extends TestDataProvider {
+
+    @Autowired
+    private ApplicationExecutor executor;
+
+    @BeforeAll
+    static void setup() {
+        Awaitility.setDefaultPollInterval(0, TimeUnit.MILLISECONDS);
+        Awaitility.setDefaultPollDelay(Durations.FIVE_SECONDS);
+        Awaitility.setDefaultTimeout(70, TimeUnit.SECONDS);
+    }
+
+    @SuppressWarnings("PMD.ExcessiveParameterList")
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("uk.gov.hmcts.reform.ccd.data.ShellCaseScenarios#provideShellCaseScenarios")
+    void testShellCaseScenarios(final String deletableCaseTypes,
+                                 final String scriptPath,
+                                 final List<Long> initialStateRowIds,
+                                 final Map<String, List<Long>> indexedData,
+                                 final List<Long> deletableEndStateRowIds,
+                                 final Map<Long, List<String>> deletableDocuments,
+                                 final Map<Long, List<String>> deletableRoles,
+                                 final Map<String, List<Long>> deletedFromIndexed,
+                                 final Map<String, List<Long>> notDeletedFromIndexed,
+                                 final List<Long> deletableRowIds,
+                                final String shellCaseType) throws Exception {
+        // GIVEN
+        setupData(deletableCaseTypes, "", scriptPath, deletableDocuments, deletableRoles,
+                  initialStateRowIds, indexedData);
+
+        // WHEN
+        executor.execute();
+
+        // THEN
+        verifyShellCaseCreation(shellCaseType,deletableEndStateRowIds);
+        verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
+        //As there is mapping for Document field it should not be deleted it should move to new case
+        verifyDocumentNotDeleted(deletableDocuments);
+        verifyRoleDeletion(deletableRoles);
+        verifyTaskDeletion(deletableRowIds);
+        verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
+        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+    }
+}
