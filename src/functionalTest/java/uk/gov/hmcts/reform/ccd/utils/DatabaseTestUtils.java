@@ -59,15 +59,10 @@ public class DatabaseTestUtils {
     }
 
     public void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
-        final List<Long> shellCaseRowIds = new ArrayList<>();
         with().await()
             .untilAsserted(() -> {
                 List<CaseDataEntity> shellCaseDataList = caseDataRepository.findByCaseType(shellCaseType);
-                if (shellCaseDataList != null && !shellCaseDataList.isEmpty()) {
-                    shellCaseRowIds.add(shellCaseDataList.get(0).getReference());
-                }
+                assertThat(shellCaseDataList).hasSameSizeAs(endStateRows);
             });
-
-        assertThat(shellCaseRowIds).hasSameSizeAs(endStateRows);
     }
 }

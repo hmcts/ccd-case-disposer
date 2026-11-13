@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.ccd;
 
 import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
@@ -19,7 +21,25 @@ import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_
 import static uk.gov.hmcts.reform.ccd.parameter.TestParameterResolver.DELETABLE_CASE_TYPES_PROPERTY_SIMULATION;
 
 @SuppressWarnings({"PMD.TestClassWithoutTestCases","PMD.TooManyMethods"})
+@Slf4j
 public class TestDataProvider {
+
+    private static final List<String> CONNECTION_PROPERTIES = List.of(
+        "spring.datasource.url",
+        "elasticsearch.hosts",
+        "idam.api.url",
+        "idam.s2s-auth.url",
+        "remote.case-definition.host",
+        "remote.document.store.host",
+        "remote.role.assignment.host",
+        "remote.tasks.host",
+        "remote.hearing.host",
+        "remote.ccd-data-store.host",
+        "remote.ccd-definition-store.host",
+        "remote.ccd-document-am.host",
+        "create.global.search",
+        "features.shell-case.enabled"
+    );
 
     @Inject
     private SimulationTestUtils simulationTestUtils;
@@ -51,6 +71,15 @@ public class TestDataProvider {
     @Inject
     private SecurityUtil securityUtil;
 
+    protected static void logHostConfiguration(final Environment environment, final String testClass) {
+        System.getenv().entrySet().stream()
+            .filter(entry -> entry.getKey().contains("HOST"))
+            .sorted(Map.Entry.comparingByKey())
+            .forEach(entry -> log.info("{} environment {}={}", testClass, entry.getKey(), entry.getValue()));
+
+        CONNECTION_PROPERTIES.forEach(property -> log.info("{} resolved {}={}", testClass, property,
+                                                           environment.getProperty(property)));
+    }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     protected void setupData(final String deletableCaseTypes,

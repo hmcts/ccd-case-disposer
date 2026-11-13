@@ -12,6 +12,7 @@ userToken=$(${dir}/idam-lease-user-token.sh ${DEFINITION_IMPORTER_USERNAME:-ccd.
 serviceToken=$(${dir}/idam-lease-service-token.sh)
 
 echo DEFINITION_STORE_HOST = $DEFINITION_STORE_HOST
+
 uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
   ${DEFINITION_STORE_HOST:-http://localhost:4451}/import \
   -H "Authorization: Bearer ${userToken}" \
