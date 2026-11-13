@@ -19,7 +19,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 @ActiveProfiles("functional")
-@SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
+@SpringBootTest(
+    classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class},
+    properties = "features.shell-case.enabled=true"
+)
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd"})
 class ShellCaseDeletionFunctionalTest extends TestDataProvider {
 

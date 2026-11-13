@@ -18,7 +18,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @ActiveProfiles("functional")
-@SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
+@SpringBootTest(
+    classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class},
+    properties = "features.shell-case.enabled=false"
+)
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd"})
 class CaseDeletionFunctionalTest extends TestDataProvider {
 
