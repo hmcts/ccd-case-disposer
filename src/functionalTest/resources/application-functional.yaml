@@ -42,6 +42,9 @@ remote:
   tasks.enabled: ${TASKS_ENABLED:true}
   hearing.host: ${HEARING_RECORDING_HOST:http://localhost:4678}
   hearing.case.type: DPR_FT_HearingCaseType
+  ccd-data-store.host: ${CCD_DATA_STORE_HOST:http://localhost:4452}
+  ccd-definition-store.host: ${CCD_DEFINITION_STORE_HOST:http://localhost:4451}
+  ccd-document-am.host: ${CCD_DOCUMENT_AM_HOST:http://localhost:4455}
 
 create.global.search: ${CREATE_GLOBAL_SEARCH:true}
 
