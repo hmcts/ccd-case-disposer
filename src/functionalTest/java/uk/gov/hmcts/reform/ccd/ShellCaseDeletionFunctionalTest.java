@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
@@ -30,7 +31,8 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
     private ApplicationExecutor executor;
 
     @BeforeAll
-    static void setup() {
+    static void setup(@Autowired Environment environment) {
+        logHostConfiguration(environment, ShellCaseDeletionFunctionalTest.class.getSimpleName());
         Awaitility.setDefaultPollInterval(0, TimeUnit.MILLISECONDS);
         Awaitility.setDefaultPollDelay(Durations.FIVE_SECONDS);
         Awaitility.setDefaultTimeout(70, TimeUnit.SECONDS);
