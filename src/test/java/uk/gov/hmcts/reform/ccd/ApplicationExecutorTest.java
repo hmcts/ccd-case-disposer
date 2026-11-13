@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
@@ -105,15 +106,16 @@ class ApplicationExecutorTest {
         ));
         when(parameterResolver.getRequestLimit()).thenReturn(2);
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
-        when(caseDisposalWorkflow.dispose(any())).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+        when(caseDisposalWorkflow.dispose(any(CaseData.class), eq(false)))
+            .thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
 
         givenNoSimulatedCases();
 
         applicationExecutor.execute();
 
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
-        verify(caseDisposalWorkflow, never()).dispose(TestData.DELETABLE_CASE_DATA5_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL, false);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL, false);
+        verify(caseDisposalWorkflow, never()).dispose(TestData.DELETABLE_CASE_DATA5_WITH_PAST_TTL, false);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         verify(processedCasesRecordHolder, never()).addProcessedCase(TestData.DELETABLE_CASE_DATA5_WITH_PAST_TTL);
@@ -135,7 +137,7 @@ class ApplicationExecutorTest {
 
         applicationExecutor.execute();
 
-        verify(caseDisposalWorkflow, times(expectedDeleteCount)).dispose(any());
+        verify(caseDisposalWorkflow, times(expectedDeleteCount)).dispose(any(), eq(false));
         verify(processedCasesRecordHolder, times(expectedDeleteCount)).addProcessedCase(any());
     }
 
@@ -153,13 +155,15 @@ class ApplicationExecutorTest {
                 throw new LogAndAuditException("log and audit failed");
             }
             return null;
-        }).when(caseDisposalWorkflow).dispose(any());
+        }).when(caseDisposalWorkflow).dispose(any(),eq(false));
+        when(caseDisposalWorkflow.dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL, false))
+            .thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+
 
         applicationExecutor.execute();
 
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
-        verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL, false);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL, false);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         assertThat(output).contains("Error deleting case 1");
     }
@@ -173,7 +177,7 @@ class ApplicationExecutorTest {
         CaseData caseData = TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE)))
             .thenReturn(Set.of(caseData));
-        when(caseDisposalWorkflow.dispose(caseData)).thenReturn(outcome);
+        when(caseDisposalWorkflow.dispose(caseData, false)).thenReturn(outcome);
 
         applicationExecutor.execute();
 
@@ -186,7 +190,7 @@ class ApplicationExecutorTest {
         CaseData caseData = TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL;
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE)))
             .thenReturn(Set.of(caseData));
-        when(caseDisposalWorkflow.dispose(caseData)).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+        when(caseDisposalWorkflow.dispose(caseData, false)).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
 
         applicationExecutor.execute();
 
@@ -207,15 +211,18 @@ class ApplicationExecutorTest {
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE_SIMULATION)))
             .thenReturn(simulatedCases);
-        when(caseDisposalWorkflow.dispose(any())).thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+        when(caseDisposalWorkflow.dispose(any(CaseData.class),eq(false)))
+            .thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+        when(caseDisposalWorkflow.dispose(any(CaseData.class),eq(true)))
+            .thenReturn(CaseDisposalWorkflow.DisposalOutcome.SIMULATED);
 
         applicationExecutor.execute();
 
         verify(processedCasesRecordHolder).setSimulatedCases(simulatedCases);
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
-        verify(caseDisposalWorkflow, never()).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1);
-        verify(caseDisposalWorkflow, never()).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL, false);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL, false);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_1, true);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL_SIMULATION_2, true);
         verify(caseDeletionLoggingService).logCases();
     }
 
@@ -236,13 +243,13 @@ class ApplicationExecutorTest {
         doAnswer(invocation -> {
             deletionCompleted.countDown();
             return null;
-        }).when(caseDisposalWorkflow).dispose(any());
+        }).when(caseDisposalWorkflow).dispose(any(),eq(false));
 
         applicationExecutor.execute();
 
         assertThat(deletionCompleted.await(0, TimeUnit.SECONDS)).isTrue();
 
-        verify(caseDisposalWorkflow, times(2)).dispose(any());
+        verify(caseDisposalWorkflow, times(2)).dispose(any(),eq(false));
     }
 
     @Test
@@ -271,7 +278,7 @@ class ApplicationExecutorTest {
             }
             bothDeletionsCompleted.countDown();
             return null;
-        }).when(caseDisposalWorkflow).dispose(any());
+        }).when(caseDisposalWorkflow).dispose(any(),eq(false));
 
         AtomicReference<Throwable> executionFailure = new AtomicReference<>();
         Thread executorThread = runExecutorAsync(executionFailure);
@@ -324,7 +331,7 @@ class ApplicationExecutorTest {
             }
             secondDeletionCompleted.countDown();
             return null;
-        }).when(caseDisposalWorkflow).dispose(any());
+        }).when(caseDisposalWorkflow).dispose(any(),eq(false));
 
         AtomicReference<Throwable> executionFailure = new AtomicReference<>();
         Thread executorThread = runExecutorAsync(executionFailure);
@@ -339,8 +346,8 @@ class ApplicationExecutorTest {
         assertThat(executorThread.isAlive()).isFalse();
         assertThat(executionFailure.get()).isNull();
         assertThat(secondDeletionCompleted.await(0, TimeUnit.SECONDS)).isTrue();
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
-        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL, false);
+        verify(caseDisposalWorkflow).dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL, false);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA_WITH_PAST_TTL);
         verify(processedCasesRecordHolder).addProcessedCase(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL);
         verify(caseDeletionLoggingService).logCases();
@@ -372,13 +379,13 @@ class ApplicationExecutorTest {
                 throw e;
             }
             return null;
-        }).when(caseDisposalWorkflow).dispose(any());
+        }).when(caseDisposalWorkflow).dispose(any(), eq(false));
 
         AtomicReference<Throwable> executionFailure = new AtomicReference<>();
         Thread testThread = runExecutorAsync(executionFailure);
 
         assertThat(bothDeletionsStarted.await(1, TimeUnit.SECONDS)).isTrue();
-        verify(caseDisposalWorkflow, atLeastOnce()).dispose(any());
+        verify(caseDisposalWorkflow, atLeastOnce()).dispose(any(), eq(false));
 
         testThread.interrupt();
         testThread.join(2_000);

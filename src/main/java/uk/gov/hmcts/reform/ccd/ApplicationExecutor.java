@@ -55,7 +55,12 @@ public class ApplicationExecutor {
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
 
         log.info("Found deletable cases {}...", allDeletableCases.size());
-        processCases(allDeletableCases, requestLimit);
+        if (!simulatedCases.isEmpty()) {
+            processCases(simulatedCases, requestLimit, true);
+        }
+        if (!allDeletableCases.isEmpty()) {
+            processCases(allDeletableCases, requestLimit, false);
+        }
 
         caseDeletionLoggingService.logCases();
 
@@ -72,7 +77,7 @@ public class ApplicationExecutor {
     }
 
     @SuppressWarnings({"PMD.ExceptionAsFlowControl", "PMD.CognitiveComplexity"})
-    private void processCases(final Set<CaseData> cases, int requestLimit) {
+    private void processCases(final Set<CaseData> cases, int requestLimit, Boolean isSimulationMode) {
         int remainingRequests = requestLimit;
         LocalTime cutOffTime = parameterResolver.getCutOffTime();
         // check if we need to add one day to the cut off time
@@ -87,12 +92,14 @@ public class ApplicationExecutor {
             }
 
             Future<?> future = taskExecutor.submit(() -> {
+                CaseDisposalWorkflow.DisposalOutcome outcome = null;
                 try {
                     if (Thread.currentThread().isInterrupted()) {
                         throw new InterruptedException("Case deletion interrupted");
                     }
-                    CaseDisposalWorkflow.DisposalOutcome outcome = caseDisposalWorkflow.dispose(caseData);
-                    if (outcome != CaseDisposalWorkflow.DisposalOutcome.DELETED) {
+                    outcome = caseDisposalWorkflow.dispose(caseData, isSimulationMode);
+                    if (outcome != CaseDisposalWorkflow.DisposalOutcome.DELETED
+                        && outcome != CaseDisposalWorkflow.DisposalOutcome.SIMULATED) {
                         processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
                     }
                 } catch (InterruptedException e) {
@@ -105,7 +112,9 @@ public class ApplicationExecutor {
                     processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
                     log.error("Unexpected error deleting case {}", caseData.getReference(), exc);
                 } finally {
-                    processedCasesRecordHolder.addProcessedCase(caseData);
+                    if (outcome != CaseDisposalWorkflow.DisposalOutcome.SIMULATED) {
+                        processedCasesRecordHolder.addProcessedCase(caseData);
+                    }
                 }
             });
 
