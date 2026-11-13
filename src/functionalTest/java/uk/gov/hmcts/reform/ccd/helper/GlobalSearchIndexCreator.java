@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd.helper;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import static uk.gov.hmcts.reform.ccd.constants.TestConstants.GLOBAL_SEARCH_PATH
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISATION_HEADER;
 
 @Service
+@Slf4j
 public class GlobalSearchIndexCreator {
 
     @Value("${create.global.search}")
@@ -30,6 +32,7 @@ public class GlobalSearchIndexCreator {
     private SecurityUtils securityUtils;
 
     public void createGlobalSearchIndex() {
+        log.info("Creating global search (createGlobalSearch - {}, isPreview - {})", createGlobalSearch, isPreview());
         if ("true".equals(createGlobalSearch) && isPreview()) {
             final Response response = RestAssured
                     .given()

@@ -113,6 +113,8 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_PORT = '5432'
     env.ELASTIC_SEARCH_DATA_NODES_HOSTS = "http://es-ccd-case-disposer-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_DEFINITION_STORE_HOST = "https://ccd-definition-store-ccd-case-disposer-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_DATA_STORE_HOST = "http://ccd-data-store-ccd-case-disposer-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TASKS_HOST= "http://wa-task-management-api-aat.service.core-compute-aat.internal"
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
@@ -133,6 +135,9 @@ withPipeline(type, product, component) {
     env.DATA_STORE_DB_PORT = '5432'
     env.DATA_STORE_DB_OPTIONS = '?sslmode=require'
     env.DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+    env.CCD_DEFINITION_STORE_HOST = "http://ccd-definition-store-api-aat.service.core-compute-aat.internal"
+    env.CCD_DATA_STORE_HOST = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.CCD_DOCUMENT_AM_HOST = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
     env.DATA_STORE_DB_HOST = "ccd-data-store-api-postgres-db-v15-aat.postgres.database.azure.com"
     env.DOCUMENT_STORE_HOST = "http://dm-store-aat.service.core-compute-aat.internal"
     env.TASKS_HOST= "http://wa-task-management-api-aat.service.core-compute-aat.internal"
@@ -162,7 +167,7 @@ withPipeline(type, product, component) {
     env.HEARING_RECORDING_HOST = "http://em-hrs-api-aat.service.core-compute-aat.internal"
 
     echo "Just waiting a while to ensure that the pod has run the job"
-    sh "sleep 120s"
+    sh "sleep 60s"
     // Load the CCD definitions here:
     // https://github.com/hmcts/ccd-test-definitions/raw/master/src/main/resources/uk/gov/hmcts/ccd/test_definitions/excel/DISPOSER_Master_Definition.xlsx
     uploadCoreCaseDataDefinitions(env.ENV)

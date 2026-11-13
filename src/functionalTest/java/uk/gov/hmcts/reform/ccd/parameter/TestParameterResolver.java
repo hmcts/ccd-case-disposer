@@ -29,7 +29,7 @@ public class TestParameterResolver implements ParameterResolver {
     @Value("${elasticsearch.cases.index.type}")
     private String casesIndexType;
 
-    @Value("${remote.case-definition.host}")
+    @Value("${remote.ccd-definition-store.host}")
     private String caseDefinitionHost;
 
     @Value("${idam.api.username}")
