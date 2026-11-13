@@ -122,7 +122,7 @@ class CcdCaseServiceTest {
         when(ccdClient.getCreateCaseToken(SERVICE_TOKEN, USER_TOKEN, TRIGGER_ID, SHELL_CASE_TYPE))
             .thenReturn(new CcdCreateCaseEventResponse(EVENT_TOKEN));
 
-        underTest.createShellCase(originalCase, mappedData, SHELL_CASE_TYPE);
+        underTest.createShellCase(originalCase, mappedData, SHELL_CASE_TYPE, false);
 
         ArgumentCaptor<ShellCasePayload> payloadCaptor = ArgumentCaptor.forClass(ShellCasePayload.class);
         verify(ccdClient).getCreateCaseToken(SERVICE_TOKEN, USER_TOKEN, TRIGGER_ID, SHELL_CASE_TYPE);
@@ -148,7 +148,7 @@ class CcdCaseServiceTest {
             .thenReturn(null);
 
         assertThatThrownBy(() -> underTest.createShellCase(
-            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE))
+            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE, false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Invalid create case token returned from CCD for case " + ORIGINAL_CASE_REFERENCE);
     }
@@ -160,7 +160,7 @@ class CcdCaseServiceTest {
             .thenReturn(new CcdCreateCaseEventResponse(" "));
 
         assertThatThrownBy(() -> underTest.createShellCase(
-            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE))
+            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE, false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Invalid create case token returned from CCD for case " + ORIGINAL_CASE_REFERENCE);
     }
@@ -172,7 +172,7 @@ class CcdCaseServiceTest {
             .thenReturn(new CcdCreateCaseEventResponse(null));
 
         assertThatThrownBy(() -> underTest.createShellCase(
-            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE))
+            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE, false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Invalid create case token returned from CCD for case " + ORIGINAL_CASE_REFERENCE);
     }
@@ -185,7 +185,7 @@ class CcdCaseServiceTest {
             .thenThrow(clientFailure);
 
         assertThatThrownBy(() -> underTest.createShellCase(
-            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE))
+            originalCase, JsonNodeFactory.instance.objectNode(), SHELL_CASE_TYPE, false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Failed to create shell case " + ORIGINAL_CASE_REFERENCE)
             .hasCause(clientFailure);
@@ -201,7 +201,7 @@ class CcdCaseServiceTest {
         doThrow(clientFailure).when(ccdClient).createCase(
             eq(SERVICE_TOKEN), eq(USER_TOKEN), eq(SHELL_CASE_TYPE), any(ShellCasePayload.class));
 
-        assertThatThrownBy(() -> underTest.createShellCase(originalCase, mappedData, SHELL_CASE_TYPE))
+        assertThatThrownBy(() -> underTest.createShellCase(originalCase, mappedData, SHELL_CASE_TYPE, false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Failed to create shell case " + ORIGINAL_CASE_REFERENCE)
             .hasCause(clientFailure);
