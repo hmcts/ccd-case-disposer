@@ -18,6 +18,7 @@ job:
     ELASTIC_SEARCH_DATA_NODES_HOSTS: http://${SERVICE_NAME}-es-master:9200
     ELASTIC_SEARCH_SCHEME: http
     DEFINITION_STORE_HOST: http://${SERVICE_NAME}-ccd-definition-store
+    CCD_DATA_STORE_HOST: http://${SERVICE_NAME}-ccd-data-store-api
     DOCUMENT_STORE_HOST: http://dm-store-aat.service.core-compute-aat.internal
     TASKS_HOST: http://wa-task-management-api-aat.service.core-compute-aat.internal
     ROLE_ASSIGNMENT_HOST: http://am-role-assignment-service-aat.service.core-compute-aat.internal
