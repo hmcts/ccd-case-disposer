@@ -72,4 +72,3 @@ curl -q --insecure --fail --show-error --silent --output /dev/null -X PUT \
     "security_classification": "'${classification}'"
   }'
 
-echo "Role added successfully"
