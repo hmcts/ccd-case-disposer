@@ -4,9 +4,25 @@
 
 set -eu
 
+mask() {
+  local value="$1"
+  if [ ${#value} -le 2 ]; then
+    echo "**"
+  else
+    echo "${value:0:1}***${value: -1}"
+  fi
+}
+
+
 username=${1}
 password=${2}
 clientSecret=${API_GATEWAY_IDAM_SECRET:-ccd_gateway_secret}
+
+echo "IDAM_API_URL: ${IDAM_API_URL:-http://localhost:5000}"
+echo "username: $(mask "$username")"
+echo "password: $(mask "$password")"
+echo "client_secret: $(mask "$clientSecret")"
+
 
 curl --insecure --fail --show-error --silent \
   -X POST \
