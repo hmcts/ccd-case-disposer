@@ -59,7 +59,7 @@ curl -q -k -sS \
 
 echo "Exit code: $?"
 
-curl --insecure --fail --show-error --silent --output /dev/null -X PUT \
+curl -q --insecure --fail --show-error --silent --output /dev/null -X PUT \
   "${ccdUrl}/api/user-role" \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
