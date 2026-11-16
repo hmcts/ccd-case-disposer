@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -eu
+
 ## Usage: ./ccd-add-role.sh role [classification]
 ##
 ## Options:
