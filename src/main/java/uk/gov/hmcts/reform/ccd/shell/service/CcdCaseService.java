@@ -76,10 +76,7 @@ public class CcdCaseService {
             shellCaseData.put(ORIGINAL_CASE_REFERENCE, originalCaseData.getReference().toString());
             shellCaseData.put(ORIGINAL_CASE_TYPE, originalCaseData.getCaseType());
             if (isSimulationMode) {
-                log.info(
-                    "Shell Case Data for Original Case: {} {}", originalCaseData.getReference(),
-                    shellCaseData
-                );
+                log.info("Simulation Mode - Shell Case Data : {}", shellCaseData.toPrettyString());
             } else {
                 CcdCreateCaseEventResponse response = ccdClient.getCreateCaseToken(
                     securityUtil.getServiceAuthorization(),

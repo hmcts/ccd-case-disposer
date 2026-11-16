@@ -59,9 +59,7 @@ public class CaseDisposalWorkflow {
     }
 
     private void shellCaseFlow(CaseData caseData, Boolean isSimulationMode) {
-        String caseType = caseData.getCaseType();
-        log.info("CaseType: {}", caseType);
-        ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseType);
+        ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
 
         if (shellMapping != null && !mappingRequireShell(shellMapping, caseData)) {
             return;
