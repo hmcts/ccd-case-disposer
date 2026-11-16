@@ -52,6 +52,12 @@ echo "Payload: ${payload}"
 echo "$payload" | jq .
 echo "========================================"
 
+curl -q -k -sS \
+  -o /dev/null \
+  -w 'HTTP: %{http_code}\nRemote IP: %{remote_ip}\n' \
+  "${ccdUrl}/api/user-role"
+
+echo "Exit code: $?"
 
 curl --insecure --fail --show-error --silent --output /dev/null -X PUT \
   "${ccdUrl}/api/user-role" \
@@ -62,3 +68,5 @@ curl --insecure --fail --show-error --silent --output /dev/null -X PUT \
     "role": "'${role}'",
     "security_classification": "'${classification}'"
   }'
+
+echo "Role added successfully"
