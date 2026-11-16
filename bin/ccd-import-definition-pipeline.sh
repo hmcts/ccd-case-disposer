@@ -31,7 +31,7 @@ echo "serviceToken length: ${#serviceToken}"
 
 echo "================================================="
 
-uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
+uploadResponse=$(curl --insecure --verbose --silent -w "\n%{http_code}" --show-error -X POST \
   ${DEFINITION_STORE_HOST:-http://localhost:4451}/import \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
