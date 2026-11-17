@@ -238,9 +238,9 @@ ccd:
   ingressHost: ${SERVICE_FQDN}.preview.platform.hmcts.net
 
   global:
-    ccdDefinitionStoreUrl: http://ccd-definition-store-${SERVICE_FQDN}
-    ccdDataStoreUrl: http://ccd-data-store-api-${SERVICE_FQDN}
-    ccdUserProfileUrl: http://${SERVICE_NAME}-ccd-user-profile-api
+    ccdDefinitionStoreUrl: https://ccd-definition-store-${SERVICE_FQDN}
+    ccdDataStoreUrl: https://ccd-data-store-api-${SERVICE_FQDN}
+    ccdUserProfileUrl: https://${SERVICE_NAME}-ccd-user-profile-api
     dmStoreUrl: http://dm-store-aat.service.core-compute-aat.internal
     idamApiUrl: https://idam-web-public.aat.platform.hmcts.net
     idamWebUrl: https://idam-web-public.aat.platform.hmcts.net
