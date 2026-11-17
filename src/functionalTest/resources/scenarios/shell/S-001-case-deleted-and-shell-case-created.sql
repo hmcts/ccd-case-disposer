@@ -17,5 +17,5 @@ VALUES ('DPR_FT_MasterCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
           "EmailField": "PUBLIC",
           "TextField": "PUBLIC"
         }',
-        1004259907353839,
+        1004259907353829,
         '2016-06-24 20:44:52.824');
