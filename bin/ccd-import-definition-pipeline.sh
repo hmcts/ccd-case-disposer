@@ -13,24 +13,6 @@ serviceToken=$(${dir}/idam-lease-service-token.sh)
 
 echo DEFINITION_STORE_HOST = $DEFINITION_STORE_HOST
 
-curl -q -k -sS \
-  -o /dev/null \
-  -w 'HTTP: %{http_code}\nRemote IP: %{remote_ip}\n' \
-  "${DEFINITION_STORE_HOST}/import"
-
-echo "Exit code: $?"
-
-echo "========== CCD IMPORT DEFINITION DEBUG =========="
-echo "filepath: [${filepath}]"
-echo "uploadFilename: [${uploadFilename}]"
-
-echo "userToken set: $([ -n "${userToken:-}" ] && echo yes || echo no)"
-echo "userToken length: ${#userToken}"
-echo "serviceToken set: $([ -n "${serviceToken:-}" ] && echo yes || echo no)"
-echo "serviceToken length: ${#serviceToken}"
-
-echo "================================================="
-
 uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X POST \
   ${DEFINITION_STORE_HOST:-http://localhost:4451}/import \
   -H "Authorization: Bearer ${userToken}" \
@@ -39,9 +21,6 @@ uploadResponse=$(curl --insecure --silent -w "\n%{http_code}" --show-error -X PO
 
 upload_http_code=$(echo "$uploadResponse" | tail -n1)
 upload_response_content=$(echo "$uploadResponse" | sed '$d')
-
-echo "upload_http_code - ${upload_http_code}"
-echo "upload_response_content - ${upload_response_content}"
 
 if [[ "${upload_http_code}" == '504' ]]; then
   for try in {1..20}

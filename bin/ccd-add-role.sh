@@ -35,34 +35,7 @@ userToken=$(${binFolder}/idam-lease-user-token.sh "${DEFINITION_IMPORTER_USERNAM
 serviceToken=$(${binFolder}/idam-lease-service-token.sh)
 ccdUrl=${DEFINITION_STORE_HOST:-http://localhost:4451}
 
-
-echo "========== CCD ADD ROLE DEBUG =========="
-echo "ccdUrl: [${ccdUrl}]"
-echo "role: [${role}]"
-echo "classification: [${classification}]"
-
-echo "userToken set: $([ -n "${userToken:-}" ] && echo yes || echo no)"
-echo "userToken length: ${#userToken}"
-echo "serviceToken set: $([ -n "${serviceToken:-}" ] && echo yes || echo no)"
-echo "serviceToken length: ${#serviceToken}"
-
-payload='{
-  "role": "'${role}'",
-  "security_classification": "'${classification}'"
-}'
-
-echo "Payload: ${payload}"
-echo "$payload" | jq .
-echo "========================================"
-
-curl -q -k -sS \
-  -o /dev/null \
-  -w 'HTTP: %{http_code}\nRemote IP: %{remote_ip}\n' \
-  "${ccdUrl}/api/user-role"
-
-echo "Exit code: $?"
-
-curl -q --insecure --fail --show-error --silent --output /dev/null -X PUT \
+curl --insecure --fail --show-error --silent --output /dev/null -X PUT \
   "${ccdUrl}/api/user-role" \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
