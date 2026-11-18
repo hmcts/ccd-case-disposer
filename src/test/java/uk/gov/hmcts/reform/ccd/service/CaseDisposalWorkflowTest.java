@@ -11,11 +11,13 @@ import uk.gov.hmcts.reform.ccd.data.model.CaseData;
 import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellCaseFieldMapping;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
 import uk.gov.hmcts.reform.ccd.shell.service.CcdCaseService;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentService;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
+import uk.gov.hmcts.reform.ccd.shell.service.client.CcdClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +32,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings({"PMD.AvoidDuplicateLiterals"})
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals","PMD.TooManyMethods"})
 class CaseDisposalWorkflowTest {
 
     private static final Long CASE_REFERENCE = 1234567890123456L;
@@ -47,6 +49,8 @@ class CaseDisposalWorkflowTest {
     private ShellCaseDataMapper shellCaseDataMapper;
     @Mock
     ShellDocumentService shellDocumentService;
+    @Mock
+    CcdClient ccdClient;
 
     private ShellCaseProperties shellCaseProperties;
 
@@ -76,7 +80,7 @@ class CaseDisposalWorkflowTest {
     void shouldReturnDeletedWithoutLoadingShellCaseDataWhenShellCasesAreDisabled() {
         shellCaseProperties.setEnabled(false);
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData,false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
@@ -88,7 +92,7 @@ class CaseDisposalWorkflowTest {
         shellCaseProperties.setEnabled(true);
         when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(new ShellMappingResponse(null, List.of(), null));
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData,false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
@@ -103,7 +107,7 @@ class CaseDisposalWorkflowTest {
         when(shellMappingService.loadMappings(CASE_TYPE))
             .thenReturn(new ShellMappingResponse("ShellCaseType", List.of(state), List.of()));
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData,false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
@@ -114,24 +118,17 @@ class CaseDisposalWorkflowTest {
     @Test
     void shouldCreateShellCaseWithDocumentHashesWhenShellMappingExists() {
         shellCaseProperties.setEnabled(true);
-        ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState(CASE_STATE, "");
-        ShellMappingResponse mapping = new ShellMappingResponse("ShellCaseType", List.of(state), List.of());
-        ObjectNode originalData = JsonNodeFactory.instance.objectNode();
         ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
-        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
-        when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
-        when(ccdCaseService.loadCase(CASE_REFERENCE)).thenReturn(originalCase);
-        when(ccdCaseService.findShellCase(mapping.shellCaseTypeId(), CASE_REFERENCE))
-            .thenReturn(Optional.empty());
-        when(shellCaseDataMapper.map(originalData, mapping.shellCaseMappings())).thenReturn(mappedData);
+        ObjectNode originalData = JsonNodeFactory.instance.objectNode();
+        ShellMappingResponse mapping = setupShellCaseMapping(originalData,mappedData);
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData,false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
         verify(ccdCaseService).loadCase(CASE_REFERENCE);
         verify(ccdCaseService).findShellCase(mapping.shellCaseTypeId(), CASE_REFERENCE);
-        verify(shellCaseDataMapper).map(originalData, mapping.shellCaseMappings());
+        verify(shellCaseDataMapper).map(originalData, mapping.shellCaseMappings(),false);
         verify(shellDocumentService).appendDocumentHashes(mappedData);
         verify(ccdCaseService).createShellCase(caseData, mappedData, mapping.shellCaseTypeId());
         verify(caseDeletionService, times(1)).deleteCaseData(caseData);
@@ -140,20 +137,13 @@ class CaseDisposalWorkflowTest {
     @Test
     void shouldNotDeleteCaseWhenDocumentHashRetrievalFails() {
         shellCaseProperties.setEnabled(true);
-        ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState(CASE_STATE, "");
-        ShellMappingResponse mapping = new ShellMappingResponse("ShellCaseType", List.of(state), List.of());
         ObjectNode originalData = JsonNodeFactory.instance.objectNode();
         ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
-        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
-        when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
-        when(ccdCaseService.loadCase(CASE_REFERENCE)).thenReturn(originalCase);
-        when(ccdCaseService.findShellCase(mapping.shellCaseTypeId(), CASE_REFERENCE))
-            .thenReturn(Optional.empty());
-        when(shellCaseDataMapper.map(originalData, mapping.shellCaseMappings())).thenReturn(mappedData);
+        setupShellCaseMapping(originalData,mappedData);
         doThrow(new ShellCaseException())
             .when(shellDocumentService).appendDocumentHashes(mappedData);
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData,false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
         verifyNoInteractions(caseDeletionService);
@@ -162,20 +152,13 @@ class CaseDisposalWorkflowTest {
     @Test
     void shouldNotDeleteCaseWhenShellCaseCreationFails() {
         shellCaseProperties.setEnabled(true);
-        ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState(CASE_STATE, "");
-        ShellMappingResponse mapping = new ShellMappingResponse("ShellCaseType", List.of(state), List.of());
         ObjectNode originalData = JsonNodeFactory.instance.objectNode();
         ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
-        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
-        when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
-        when(ccdCaseService.findShellCase(mapping.shellCaseTypeId(), CASE_REFERENCE))
-            .thenReturn(Optional.empty());
-        when(ccdCaseService.loadCase(CASE_REFERENCE)).thenReturn(originalCase);
-        when(shellCaseDataMapper.map(originalData, mapping.shellCaseMappings())).thenReturn(mappedData);
+        ShellMappingResponse mapping = setupShellCaseMapping(originalData,mappedData);
         doThrow(new ShellCaseException()).when(ccdCaseService)
             .createShellCase(caseData, mappedData, mapping.shellCaseTypeId());
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData, false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
         verify(caseDeletionService, never()).deleteCaseData(caseData);
@@ -186,7 +169,7 @@ class CaseDisposalWorkflowTest {
         shellCaseProperties.setEnabled(true);
         when(shellMappingService.loadMappings(CASE_TYPE)).thenThrow(new ShellCaseException());
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData, false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
@@ -201,7 +184,7 @@ class CaseDisposalWorkflowTest {
             .thenReturn(new ShellMappingResponse("ShellCaseType", List.of(state), List.of()));
         when(ccdCaseService.loadCase(CASE_REFERENCE)).thenThrow(new ShellCaseException());
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData, false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_FAILED);
         verify(shellMappingService).loadMappings(CASE_TYPE);
@@ -220,12 +203,63 @@ class CaseDisposalWorkflowTest {
         when(ccdCaseService.findShellCase("ShellCaseType", CASE_REFERENCE))
             .thenReturn(Optional.of(9876543210123456L));
 
-        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData);
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData, false);
 
         assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_ALREADY_EXISTS);
 
         verify(ccdCaseService, never()).loadCase(CASE_REFERENCE);
         verify(ccdCaseService, never()).createShellCase(any(), any(), any());
         verifyNoInteractions(shellCaseDataMapper, shellDocumentService, caseDeletionService);
+    }
+
+    @Test
+    void shouldLogMappingIfInSimulationMode() {
+        shellCaseProperties.setEnabled(true);
+        ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState(CASE_STATE, "");
+        ShellMappingResponse mapping = new ShellMappingResponse("ShellCaseType", List.of(state), List.of());
+        ObjectNode originalData = JsonNodeFactory.instance.objectNode();
+        ObjectNode mappedData = JsonNodeFactory.instance.objectNode();
+        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
+        when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
+        when(ccdCaseService.loadCase(CASE_REFERENCE)).thenReturn(originalCase);
+        when(ccdCaseService.findShellCase(mapping.shellCaseTypeId(), CASE_REFERENCE))
+            .thenReturn(Optional.empty());
+        when(shellCaseDataMapper.map(originalData, mapping.shellCaseMappings(),true)).thenReturn(mappedData);
+
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.dispose(caseData,true);
+
+        assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SIMULATED);
+        verify(shellMappingService).loadMappings(CASE_TYPE);
+        verify(ccdCaseService).loadCase(CASE_REFERENCE);
+        verify(ccdCaseService).findShellCase(mapping.shellCaseTypeId(), CASE_REFERENCE);
+        verify(shellCaseDataMapper).map(originalData, mapping.shellCaseMappings(),true);
+        verifyNoInteractions(caseDeletionService);
+        verify(ccdClient, times(0)).getCreateCaseToken(any(),any(),any(),any());
+        verify(ccdClient, times(0)).createCase(any(),any(),any(),any());
+    }
+
+    private ShellMappingResponse setupShellCaseMapping(ObjectNode originalData, ObjectNode mappedData) {
+        ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState(CASE_STATE, "");
+        ShellCaseFieldMapping mappingField = new ShellCaseFieldMapping(
+            "applicantName",
+            "shellApplicantName"
+        );
+
+        ShellMappingResponse mapping = new ShellMappingResponse(
+            "ShellCaseType",
+            List.of(state),
+            List.of(mappingField)
+        );
+
+        originalData.put("applicantName", "John Smith");
+        mappedData.put("shellApplicantName", "John Smith");
+
+        CcdCaseResponse originalCase = new CcdCaseResponse(CASE_REFERENCE, CASE_TYPE, CASE_STATE, originalData);
+        when(shellMappingService.loadMappings(CASE_TYPE)).thenReturn(mapping);
+        when(ccdCaseService.findShellCase(mapping.shellCaseTypeId(), CASE_REFERENCE))
+            .thenReturn(Optional.empty());
+        when(ccdCaseService.loadCase(CASE_REFERENCE)).thenReturn(originalCase);
+        when(shellCaseDataMapper.map(originalData, mapping.shellCaseMappings(),false)).thenReturn(mappedData);
+        return mapping;
     }
 }

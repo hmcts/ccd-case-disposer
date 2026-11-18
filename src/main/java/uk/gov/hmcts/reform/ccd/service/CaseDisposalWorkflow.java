@@ -30,14 +30,17 @@ public class CaseDisposalWorkflow {
     private final ShellDocumentService shellDocumentService;
 
 
-    public DisposalOutcome dispose(CaseData caseData) {
+    public DisposalOutcome dispose(CaseData caseData, Boolean isSimulationMode) {
         try {
             if (shellCaseProperties.isEnabled()) {
-                shellCaseFlow(caseData);
+                shellCaseFlow(caseData, isSimulationMode);
             }
+            if (!isSimulationMode) {
+                caseDeletionService.deleteCaseData(caseData);
+                return DisposalOutcome.DELETED;
+            }
+            return DisposalOutcome.SIMULATED;
 
-            caseDeletionService.deleteCaseData(caseData);
-            return DisposalOutcome.DELETED;
         } catch (ShellAlreadyExistsException exc) {
             log.error(
                 "Shell case already exists. Case ref: {}, case type: {}, shell case ref: {}",
@@ -55,10 +58,10 @@ public class CaseDisposalWorkflow {
         }
     }
 
-    private void shellCaseFlow(CaseData caseData) {
+    private void shellCaseFlow(CaseData caseData, Boolean isSimulationMode) {
         ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
 
-        if (!mappingRequireShell(shellMapping, caseData)) {
+        if (shellMapping != null && !mappingRequireShell(shellMapping, caseData)) {
             return;
         }
 
@@ -72,12 +75,14 @@ public class CaseDisposalWorkflow {
         CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
 
         ObjectNode mappedData = shellCaseDataMapper.map(
-            originalCaseData.data(), shellMapping.shellCaseMappings());
+            originalCaseData.data(), shellMapping.shellCaseMappings(),isSimulationMode);
 
-        shellDocumentService.appendDocumentHashes(mappedData);
-        ccdCaseService.createShellCase(caseData, mappedData, shellCaseType);
+        if (!mappedData.isEmpty() && !isSimulationMode) {
+            shellDocumentService.appendDocumentHashes(mappedData);
+            ccdCaseService.createShellCase(caseData, mappedData, shellCaseType);
 
-        log.info("Created shell case for original case reference: {}", caseData.getReference());
+            log.info("Created shell case for original case reference: {}", caseData.getReference());
+        }
     }
 
     private boolean mappingRequireShell(ShellMappingResponse shellMapping, CaseData caseData) {
@@ -98,6 +103,7 @@ public class CaseDisposalWorkflow {
 
     public enum DisposalOutcome {
         DELETED,
+        SIMULATED,
         SHELL_ALREADY_EXISTS,
         SHELL_FAILED
     }
