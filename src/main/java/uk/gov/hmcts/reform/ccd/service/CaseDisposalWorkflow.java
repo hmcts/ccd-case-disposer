@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellAlreadyExistsException;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellDecision;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellPlan;
 import uk.gov.hmcts.reform.ccd.shell.service.CcdCaseService;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentService;
@@ -29,6 +31,23 @@ public class CaseDisposalWorkflow {
     private final ShellCaseDataMapper shellCaseDataMapper;
     private final ShellDocumentService shellDocumentService;
 
+    public ShellPlan preview(CaseData caseData) {
+        return prepareShell(caseData);
+    }
+
+    public DisposalOutcome disposeV2(CaseData caseData) {
+        ShellPlan plan = prepareShell(caseData);
+        if (plan.decision() != ShellDecision.CREATE_SHELL) {
+            // to be expanded
+            return DisposalOutcome.SHELL_FAILED;
+        }
+
+        shellDocumentService.appendDocumentHashes(plan.shellData());
+        ccdCaseService.createShellCase(caseData, plan.shellData(), plan.shellCaseType());
+
+        caseDeletionService.deleteCaseData(caseData);
+        return DisposalOutcome.DELETED;
+    }
 
     public DisposalOutcome dispose(CaseData caseData) {
         try {
@@ -54,6 +73,37 @@ public class CaseDisposalWorkflow {
             return DisposalOutcome.SHELL_FAILED;
         }
     }
+
+    private ShellPlan prepareShell(CaseData caseData) {
+        ShellMappingResponse mapping = shellMappingService.loadMappings(caseData.getCaseType());
+        if (!mappingRequireShell(mapping, caseData)) {
+            return skippedShell(caseData, "NO_SHELL_MAPPING");
+        }
+        if (mapping.caseStates().stream().noneMatch(state -> state.name().equals(caseData.getState()))) {
+            return skippedShell(caseData, "STATE_EXCLUDED");
+        }
+
+        Optional<Long> existingShellCase = ccdCaseService.findShellCase(mapping.shellCaseTypeId(), caseData.getReference());
+        if (existingShellCase.isPresent()) {
+            return skippedShell(caseData, "SHELL_ALREADY_EXISTS");
+        }
+
+        CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
+
+        ObjectNode mappedData = shellCaseDataMapper.map(
+            originalCaseData.data(), mapping.shellCaseMappings());
+
+        mappedData.put("original_case_reference", caseData.getReference().toString());
+        mappedData.put("original_case_type", caseData.getCaseType());
+        return new ShellPlan(
+            caseData.getReference(),
+            mapping.shellCaseTypeId(),
+            ShellDecision.CREATE_SHELL,
+            mappedData,
+            null
+        );
+    }
+
 
     private void shellCaseFlow(CaseData caseData) {
         ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
@@ -94,6 +144,16 @@ public class CaseDisposalWorkflow {
             log.info("Case state {} is explicitly set to be excluded from shell creation", caseData.getState());
         }
         return stateMapped;
+    }
+
+    private ShellPlan skippedShell(CaseData caseData, String reason) {
+        return new ShellPlan(
+            caseData.getReference(),
+            null,
+            ShellDecision.SKIP_SHELL,
+            null,
+            reason
+        );
     }
 
     public enum DisposalOutcome {

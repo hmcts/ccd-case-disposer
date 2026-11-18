@@ -12,6 +12,8 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDisposalWorkflow;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
+import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellPlan;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
@@ -33,6 +35,7 @@ public class ApplicationExecutor {
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseCollectorService caseCollectorService;
+    private final ShellCaseProperties shellCaseProperties;
     @Qualifier("caseDeletionExecutor")
     private final ThreadPoolTaskExecutor taskExecutor;
 
@@ -55,6 +58,9 @@ public class ApplicationExecutor {
         Integer requestLimit = parameterResolver.getRequestLimit();
         processedCasesRecordHolder.setSimulatedCases(simulatedCases);
 
+        if (shellCaseProperties.isEnabled()) {
+            previewCases(simulatedCases);
+        }
         log.info("Found deletable cases {}...", allDeletableCases.size());
         processCases(allDeletableCases, requestLimit);
 
@@ -70,6 +76,13 @@ public class ApplicationExecutor {
         log.info("Deletion simulated case types: {}", parameterResolver.getDeletableCaseTypesSimulation());
         parameterResolver.getElasticsearchHosts().forEach(host -> log.info("Elasticsearch host: {}", host));
         log.info("Hearing Case Type: {}", parameterResolver.getHearingCaseType());
+    }
+
+    private void previewCases(Set<CaseData> cases) {
+        for (CaseData caseData : cases) {
+            ShellPlan plan = caseDisposalWorkflow.preview(caseData);
+            // print what we want from plan
+        }
     }
 
     @SuppressWarnings({"PMD.ExceptionAsFlowControl", "PMD.CognitiveComplexity"})
@@ -93,7 +106,7 @@ public class ApplicationExecutor {
                         throw new InterruptedException("Case deletion interrupted");
                     }
 
-                    CaseDisposalWorkflow.DisposalOutcome outcome = caseDisposalWorkflow.dispose(caseData);
+                    CaseDisposalWorkflow.DisposalOutcome outcome = caseDisposalWorkflow.disposeV2(caseData);
                     if (outcome != CaseDisposalWorkflow.DisposalOutcome.DELETED) {
                         processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);
                     }
