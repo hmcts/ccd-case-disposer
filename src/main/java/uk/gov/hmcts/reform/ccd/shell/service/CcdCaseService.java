@@ -70,33 +70,27 @@ public class CcdCaseService {
         }
     }
 
-    public void createShellCase(CaseData originalCaseData, ObjectNode shellCaseData,
-                                String shellCaseType, Boolean isSimulationMode) {
+    public void createShellCase(CaseData originalCaseData, ObjectNode shellCaseData, String shellCaseType) {
         try {
+            CcdCreateCaseEventResponse response = ccdClient.getCreateCaseToken(
+                securityUtil.getServiceAuthorization(),
+                securityUtil.getIdamClientToken(),
+                TRIGGER_ID,
+                shellCaseType
+            );
+            if (response == null || response.token() == null || response.token().isBlank()) {
+                throw new ShellCaseException(
+                    "Invalid create case token returned from CCD for case " + originalCaseData.getReference());
+            }
             shellCaseData.put(ORIGINAL_CASE_REFERENCE, originalCaseData.getReference().toString());
             shellCaseData.put(ORIGINAL_CASE_TYPE, originalCaseData.getCaseType());
-            if (isSimulationMode) {
-                log.info("Simulation Mode - Shell Case Data : {}", shellCaseData.toPrettyString());
-            } else {
-                CcdCreateCaseEventResponse response = ccdClient.getCreateCaseToken(
-                    securityUtil.getServiceAuthorization(),
-                    securityUtil.getIdamClientToken(),
-                    TRIGGER_ID,
-                    shellCaseType
-                );
-                if (response == null || response.token() == null || response.token().isBlank()) {
-                    throw new ShellCaseException(
-                        "Invalid create case token returned from CCD for case " + originalCaseData.getReference());
-                }
-                ShellCasePayload payload = ShellCasePayload.withEvent(shellCaseData, response.token(), TRIGGER_ID);
-
-                ccdClient.createCase(
-                    securityUtil.getServiceAuthorization(),
-                    securityUtil.getIdamClientToken(),
-                    shellCaseType,
-                    payload
-                );
-            }
+            ShellCasePayload payload = ShellCasePayload.withEvent(shellCaseData, response.token(), TRIGGER_ID);
+            ccdClient.createCase(
+                securityUtil.getServiceAuthorization(),
+                securityUtil.getIdamClientToken(),
+                shellCaseType,
+                payload
+            );
         } catch (FeignException exc) {
             throw new ShellCaseException("Failed to create shell case " + originalCaseData.getReference(), exc);
         }

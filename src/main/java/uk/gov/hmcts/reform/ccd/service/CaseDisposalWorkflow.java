@@ -75,12 +75,14 @@ public class CaseDisposalWorkflow {
         CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
 
         ObjectNode mappedData = shellCaseDataMapper.map(
-            originalCaseData.data(), shellMapping.shellCaseMappings());
+            originalCaseData.data(), shellMapping.shellCaseMappings(),isSimulationMode);
 
-        shellDocumentService.appendDocumentHashes(mappedData);
-        ccdCaseService.createShellCase(caseData, mappedData, shellCaseType,isSimulationMode);
+        if (!mappedData.isEmpty() && !isSimulationMode) {
+            shellDocumentService.appendDocumentHashes(mappedData);
+            ccdCaseService.createShellCase(caseData, mappedData, shellCaseType);
 
-        log.info("Created shell case for original case reference: {}", caseData.getReference());
+            log.info("Created shell case for original case reference: {}", caseData.getReference());
+        }
     }
 
     private boolean mappingRequireShell(ShellMappingResponse shellMapping, CaseData caseData) {
