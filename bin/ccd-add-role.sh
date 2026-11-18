@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -eu
+
 ## Usage: ./ccd-add-role.sh role [classification]
 ##
 ## Options:
@@ -33,7 +36,7 @@ serviceToken=$(${binFolder}/idam-lease-service-token.sh)
 ccdUrl=${DEFINITION_STORE_HOST:-http://localhost:4451}
 
 curl --insecure --fail --show-error --silent --output /dev/null -X PUT \
-  ${DEFINITION_STORE_HOST:-http://localhost:4451}/api/user-role \
+  "${ccdUrl}/api/user-role" \
   -H "Authorization: Bearer ${userToken}" \
   -H "ServiceAuthorization: Bearer ${serviceToken}" \
   -H "Content-Type: application/json" \
@@ -41,3 +44,4 @@ curl --insecure --fail --show-error --silent --output /dev/null -X PUT \
     "role": "'${role}'",
     "security_classification": "'${classification}'"
   }'
+
