@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.ccd.parameter.ParameterResolver;
 import uk.gov.hmcts.reform.ccd.service.CaseDeletionLoggingService;
 import uk.gov.hmcts.reform.ccd.service.CaseDisposalWorkflow;
 import uk.gov.hmcts.reform.ccd.service.v2.CaseCollectorService;
+import uk.gov.hmcts.reform.ccd.shell.service.ShellMappingService;
 import uk.gov.hmcts.reform.ccd.util.ProcessedCasesRecordHolder;
 import uk.gov.hmcts.reform.ccd.util.perf.LogExecutionTime;
 
@@ -33,8 +34,10 @@ public class ApplicationExecutor {
     private final ProcessedCasesRecordHolder processedCasesRecordHolder;
     private final CaseDeletionLoggingService caseDeletionLoggingService;
     private final CaseCollectorService caseCollectorService;
+    private final ShellMappingService shellMappingService;
     @Qualifier("caseDeletionExecutor")
     private final ThreadPoolTaskExecutor taskExecutor;
+
     private final Clock clock;
 
     private LocalDateTime applicationStartTime;
@@ -91,6 +94,7 @@ public class ApplicationExecutor {
                     if (Thread.currentThread().isInterrupted()) {
                         throw new InterruptedException("Case deletion interrupted");
                     }
+
                     CaseDisposalWorkflow.DisposalOutcome outcome = caseDisposalWorkflow.dispose(caseData);
                     if (outcome != CaseDisposalWorkflow.DisposalOutcome.DELETED) {
                         processedCasesRecordHolder.addFailedToDeleteCaseRef(caseData);

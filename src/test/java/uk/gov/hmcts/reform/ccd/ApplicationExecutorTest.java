@@ -146,6 +146,7 @@ class ApplicationExecutorTest {
             TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL
         ));
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
+
         givenNoSimulatedCases();
         doAnswer(invocation -> {
             CaseData caseData = invocation.getArgument(0);
@@ -154,6 +155,9 @@ class ApplicationExecutorTest {
             }
             return null;
         }).when(caseDisposalWorkflow).dispose(any());
+
+        when(caseDisposalWorkflow.dispose(TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL))
+            .thenReturn(CaseDisposalWorkflow.DisposalOutcome.DELETED);
 
         applicationExecutor.execute();
 
