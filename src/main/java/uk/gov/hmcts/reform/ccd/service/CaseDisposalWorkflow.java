@@ -36,17 +36,35 @@ public class CaseDisposalWorkflow {
     }
 
     public DisposalOutcome disposeV2(CaseData caseData) {
-        ShellPlan plan = prepareShell(caseData);
-        if (plan.decision() != ShellDecision.CREATE_SHELL) {
-            // to be expanded
+        try {
+            if (shellCaseProperties.isEnabled()) {
+                ShellPlan plan = prepareShell(caseData);
+                switch(plan.decision()) {
+                    case CREATE_SHELL -> {
+                        shellDocumentService.appendDocumentHashes(plan.shellData());
+                        ccdCaseService.createShellCase(caseData, plan.shellData(), plan.shellCaseType());
+                    } case NO_SHELL_MAPPING, STATE_EXCLUDED -> {
+                        log.info(
+                            "Shell case creation skipped for case: {}. Decision: {}",
+                            caseData.getReference(), plan.decision()
+                        );
+                    } case SHELL_ALREADY_EXISTS -> {
+                        return DisposalOutcome.SHELL_ALREADY_EXISTS;
+                    } default -> {
+                        return DisposalOutcome.SHELL_FAILED;
+                    }
+                }
+            }
+
+            caseDeletionService.deleteCaseData(caseData);
+            return DisposalOutcome.DELETED;
+        } catch (ShellCaseException exc) {
+            log.error("Shell case creation failed for case: {}", caseData.getReference(), exc);
             return DisposalOutcome.SHELL_FAILED;
+        } catch (RuntimeException exc) {
+            log.error("Unexpected error occurred while disposing case: {}", caseData.getReference(), exc);
+            return DisposalOutcome.DELETION_FAILED;
         }
-
-        shellDocumentService.appendDocumentHashes(plan.shellData());
-        ccdCaseService.createShellCase(caseData, plan.shellData(), plan.shellCaseType());
-
-        caseDeletionService.deleteCaseData(caseData);
-        return DisposalOutcome.DELETED;
     }
 
     public DisposalOutcome dispose(CaseData caseData) {
@@ -76,16 +94,18 @@ public class CaseDisposalWorkflow {
 
     private ShellPlan prepareShell(CaseData caseData) {
         ShellMappingResponse mapping = shellMappingService.loadMappings(caseData.getCaseType());
-        if (!mappingRequireShell(mapping, caseData)) {
-            return skippedShell(caseData, "NO_SHELL_MAPPING");
-        }
-        if (mapping.caseStates().stream().noneMatch(state -> state.name().equals(caseData.getState()))) {
-            return skippedShell(caseData, "STATE_EXCLUDED");
+        if (mapping.shellCaseTypeId() == null) {
+            return skippedShell(caseData, ShellDecision.NO_SHELL_MAPPING);
         }
 
-        Optional<Long> existingShellCase = ccdCaseService.findShellCase(mapping.shellCaseTypeId(), caseData.getReference());
+        if (mapping.caseStates().stream().noneMatch(state -> state.name().equals(caseData.getState()))) {
+            return skippedShell(caseData, ShellDecision.STATE_EXCLUDED);
+        }
+
+        Optional<Long> existingShellCase = ccdCaseService.findShellCase(
+            mapping.shellCaseTypeId(), caseData.getReference());
         if (existingShellCase.isPresent()) {
-            return skippedShell(caseData, "SHELL_ALREADY_EXISTS");
+            return skippedShell(caseData, ShellDecision.SHELL_ALREADY_EXISTS);
         }
 
         CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
@@ -146,19 +166,21 @@ public class CaseDisposalWorkflow {
         return stateMapped;
     }
 
-    private ShellPlan skippedShell(CaseData caseData, String reason) {
+    private ShellPlan skippedShell(CaseData caseData, ShellDecision decision) {
         return new ShellPlan(
             caseData.getReference(),
             null,
-            ShellDecision.SKIP_SHELL,
+            decision,
             null,
-            reason
+            decision.name()
         );
     }
 
     public enum DisposalOutcome {
         DELETED,
+        NO_SHELL_REQUIRED,
         SHELL_ALREADY_EXISTS,
-        SHELL_FAILED
+        SHELL_FAILED,
+        DELETION_FAILED
     }
 }

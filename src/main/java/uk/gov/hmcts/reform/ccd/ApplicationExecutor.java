@@ -61,6 +61,7 @@ public class ApplicationExecutor {
         if (shellCaseProperties.isEnabled()) {
             previewCases(simulatedCases);
         }
+
         log.info("Found deletable cases {}...", allDeletableCases.size());
         processCases(allDeletableCases, requestLimit);
 

@@ -112,6 +112,48 @@ class CaseDisposalWorkflowTest {
     }
 
     @Test
+    void shouldDeleteWithoutCreatingShellInV2WhenCaseStateIsExcluded() {
+        shellCaseProperties.setEnabled(true);
+        ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState("ExcludedState", "");
+        when(shellMappingService.loadMappings(CASE_TYPE))
+            .thenReturn(new ShellMappingResponse("ShellCaseType", List.of(state), List.of()));
+
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.disposeV2(caseData);
+
+        assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+        verify(caseDeletionService).deleteCaseData(caseData);
+        verifyNoInteractions(ccdCaseService, shellCaseDataMapper, shellDocumentService);
+    }
+
+    @Test
+    void shouldDeleteWithoutCreatingShellInV2WhenMappingDoesNotExist() {
+        shellCaseProperties.setEnabled(true);
+        when(shellMappingService.loadMappings(CASE_TYPE))
+            .thenReturn(new ShellMappingResponse(null, List.of(), null));
+
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.disposeV2(caseData);
+
+        assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.DELETED);
+        verify(caseDeletionService).deleteCaseData(caseData);
+        verifyNoInteractions(ccdCaseService, shellCaseDataMapper, shellDocumentService);
+    }
+
+    @Test
+    void shouldNotDeleteInV2WhenShellAlreadyExists() {
+        shellCaseProperties.setEnabled(true);
+        ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState(CASE_STATE, "");
+        when(shellMappingService.loadMappings(CASE_TYPE))
+            .thenReturn(new ShellMappingResponse("ShellCaseType", List.of(state), List.of()));
+        when(ccdCaseService.findShellCase("ShellCaseType", CASE_REFERENCE))
+            .thenReturn(Optional.of(9876543210123456L));
+
+        CaseDisposalWorkflow.DisposalOutcome result = underTest.disposeV2(caseData);
+
+        assertThat(result).isEqualTo(CaseDisposalWorkflow.DisposalOutcome.SHELL_ALREADY_EXISTS);
+        verifyNoInteractions(caseDeletionService, shellCaseDataMapper, shellDocumentService);
+    }
+
+    @Test
     void shouldCreateShellCaseWithDocumentHashesWhenShellMappingExists() {
         shellCaseProperties.setEnabled(true);
         ShellMappingResponse.CaseState state = new ShellMappingResponse.CaseState(CASE_STATE, "");
