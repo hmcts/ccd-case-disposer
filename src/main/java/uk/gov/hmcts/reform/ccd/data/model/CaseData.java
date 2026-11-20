@@ -15,6 +15,7 @@ public class CaseData {
     Long reference;
     String caseType;
     String jurisdiction;
+    String state;
     LocalDate resolvedTtl;
     Long familyId;
     CaseData parentCase;

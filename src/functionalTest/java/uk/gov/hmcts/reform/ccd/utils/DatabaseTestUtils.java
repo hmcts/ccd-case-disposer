@@ -57,4 +57,12 @@ public class DatabaseTestUtils {
             ScriptUtils.executeSqlScript(connection, resource);
         }
     }
+
+    public void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
+        with().await()
+            .untilAsserted(() -> {
+                List<CaseDataEntity> shellCaseDataList = caseDataRepository.findByCaseType(shellCaseType);
+                assertThat(shellCaseDataList).hasSameSizeAs(endStateRows);
+            });
+    }
 }
