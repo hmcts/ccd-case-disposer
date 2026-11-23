@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.helper.SecurityUtils;
+import uk.gov.hmcts.reform.ccd.model.DocumentField;
+import uk.gov.hmcts.reform.ccd.model.StoredDocumentHalResourceCollection;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.io.UnsupportedEncodingException;
@@ -51,12 +53,14 @@ public class DocumentDeleteTestUtils {
                 }));
     }
 
-    public void verifyDocumentNotDeleted(final Map<Long, List<String>> deletableDocuments) {
+    public void verifyZeroOriginalCaseDocumentToDelete(final Map<Long, List<String>> deletableDocuments) {
         with().await()
             .untilAsserted(() -> deletableDocuments.entrySet().forEach(entry -> {
                 final CaseDocumentsDeletionResults caseDocumentsDeletionResults = documentDeletionRecordHolder
                     .getCaseDocumentsDeletionResults(Long.toString(entry.getKey()));
-                assertThat(caseDocumentsDeletionResults).isNull();
+                assertThat(caseDocumentsDeletionResults).isNotNull();
+                assertThat(caseDocumentsDeletionResults.getMarkedForDeletion()).isZero();
+                assertThat(caseDocumentsDeletionResults.getCaseDocumentsFound()).isZero();
             }));
     }
 
@@ -84,5 +88,58 @@ public class DocumentDeleteTestUtils {
                                 log.error("Error while uploading document {}", filename, e);
                             }
                         }));
+    }
+
+
+    public DocumentField uploadDocument(Long caseId, String filename,
+                                        String caseTypeId, String jurisdiction) {
+        try {
+            Response response = RestAssured
+                .given()
+                .relaxedHTTPSValidation()
+                .baseUri(documentStoreHost + DOCUMENT_PATH)
+                .header(SERVICE_AUTHORISATION_HEADER,
+                        securityUtils.getServiceAuthorization())
+                .header("user-id", DOCUMENT_STORE_USER)
+                .multiPart("files", fileUtils.getResourceFile(filename),
+                           IMAGE_JPEG_VALUE)
+                .multiPart("classification", "PUBLIC")
+                .multiPart("metadata[case_id]", Long.toString(caseId))
+                .multiPart("metadata[case_type_id]", caseTypeId)
+                .multiPart("metadata[jurisdiction]", jurisdiction)
+                .when()
+                .post()
+                .andReturn();
+
+            assertThat(response.getStatusCode()).isEqualTo(200);
+            return buildDocumentField(response);
+
+        } catch (UnsupportedEncodingException e) {
+            log.error("Error while uploading document {}", filename, e);
+            return null;
+        }
+
+    }
+
+    private DocumentField buildDocumentField(Response response) {
+        StoredDocumentHalResourceCollection collection =
+            response.as(StoredDocumentHalResourceCollection.class);
+
+        StoredDocumentHalResourceCollection.StoredDocument document =
+            collection.embedded().documents().getFirst();
+
+        StoredDocumentHalResourceCollection.Version version = document
+            .embedded()
+            .allDocumentVersions()
+            .embedded()
+            .documentVersions()
+            .getFirst();
+
+        return new DocumentField(
+            document.links().self().href(),
+            document.links().binary().href(),
+            version.originalDocumentName(),
+            version.createdOn()
+        );
     }
 }

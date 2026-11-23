@@ -1,12 +1,17 @@
 package uk.gov.hmcts.reform.ccd.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.CaseDataRepository;
 import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
+import uk.gov.hmcts.reform.ccd.model.DocumentField;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,6 +24,8 @@ import static org.awaitility.Awaitility.with;
 
 @Component
 public class DatabaseTestUtils {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Inject
     private DataSource dataSource;
@@ -50,6 +57,13 @@ public class DatabaseTestUtils {
                 });
     }
 
+    public void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
+        with().await()
+            .untilAsserted(() -> {
+                List<CaseDataEntity> shellCaseDataList = caseDataRepository.findByCaseType(shellCaseType);
+                assertThat(shellCaseDataList).hasSameSizeAs(endStateRows);
+            });
+    }
 
     public void insertDataIntoDatabase(final String scriptPath) throws SQLException {
         try (Connection connection = dataSource.getConnection()) {
@@ -58,11 +72,24 @@ public class DatabaseTestUtils {
         }
     }
 
-    public void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
-        with().await()
-            .untilAsserted(() -> {
-                List<CaseDataEntity> shellCaseDataList = caseDataRepository.findByCaseType(shellCaseType);
-                assertThat(shellCaseDataList).hasSameSizeAs(endStateRows);
-            });
+    public void insertDataIntoDatabase(
+        String scriptPath,
+        DocumentField documentField
+    ) throws SQLException, IOException {
+        try (Connection connection = dataSource.getConnection()) {
+            ClassPathResource resource = new ClassPathResource(scriptPath);
+            String sql = new String(
+                resource.getInputStream().readAllBytes(),
+                StandardCharsets.UTF_8
+            );
+
+            String documentJson = objectMapper.writeValueAsString(documentField);
+            sql = sql.replace("DOCUMENT_FIELD_DATA", documentJson);
+
+            ScriptUtils.executeSqlScript(
+                connection,
+                new ByteArrayResource(sql.getBytes(StandardCharsets.UTF_8))
+            );
+        }
     }
 }

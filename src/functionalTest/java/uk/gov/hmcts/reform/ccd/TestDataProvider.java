@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
+import uk.gov.hmcts.reform.ccd.model.DocumentField;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
@@ -88,7 +89,9 @@ public class TestDataProvider {
                              final Map<Long, List<String>> deletableDocuments,
                              final Map<Long, List<String>> deletableRoles,
                              final List<Long> rowIds,
-                             final Map<String, List<Long>> indexedData) throws Exception {
+                             final Map<String, List<Long>> indexedData,
+                             final boolean isShellCaseEnabled
+    ) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
 
@@ -96,18 +99,27 @@ public class TestDataProvider {
 
         createGlobalSearchIndex();
 
-        documentDeleteTestUtils.uploadDocument(deletableDocuments);
         roleDeleteTestUtils.createRoleAssignment(deletableRoles);
 
         elasticSearchTestUtils.resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
-
-        databaseTestUtils.insertDataIntoDatabase(scriptPath);
+        if (isShellCaseEnabled) {
+            Map.Entry<Long, List<String>> entry = deletableDocuments.entrySet().iterator().next();
+            DocumentField documentField = documentDeleteTestUtils.uploadDocument(
+                entry.getKey(),
+                entry.getValue().getFirst(),
+                deletableCaseTypes.split(",")[0], // use first case type for document upload
+                "DISPOSER_MASTER" // use default jurisdiction for document upload
+            );
+            databaseTestUtils.insertDataIntoDatabase(scriptPath, documentField);
+        } else {
+            documentDeleteTestUtils.uploadDocument(deletableDocuments);
+            databaseTestUtils.insertDataIntoDatabase(scriptPath);
+        }
 
         databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
-
         elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
     }
 
@@ -133,8 +145,8 @@ public class TestDataProvider {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
     }
 
-    protected void verifyDocumentNotDeleted(final Map<Long, List<String>> deletableDocuments) {
-        documentDeleteTestUtils.verifyDocumentNotDeleted(deletableDocuments);
+    protected void verifyZeroOriginalCaseDocumentToDelete(final Map<Long, List<String>> deletableDocuments) {
+        documentDeleteTestUtils.verifyZeroOriginalCaseDocumentToDelete(deletableDocuments);
     }
 
     protected void verifyHearingDocumentDeletion(final Map<String, List<Long>> deletedFromIndexed) {

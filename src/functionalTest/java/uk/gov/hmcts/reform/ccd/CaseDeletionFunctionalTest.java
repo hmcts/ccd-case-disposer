@@ -54,7 +54,7 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                        final List<Long> deletableRowIds) throws Exception {
         // GIVEN
         setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
-                  initialStateRowIds, indexedData);
+                  initialStateRowIds, indexedData,false);
 
         // WHEN
         executor.execute();

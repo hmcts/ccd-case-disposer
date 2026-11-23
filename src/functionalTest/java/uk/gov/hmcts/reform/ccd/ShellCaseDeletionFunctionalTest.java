@@ -56,7 +56,7 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
         Map<String, List<Long>> mutableIndexedData = new ConcurrentHashMap<>(indexedData);
         mutableIndexedData.put(shellCaseType, List.of()); // delete created shell cases in previous runs/tests
         setupData(deletableCaseTypes, "", scriptPath, deletableDocuments, deletableRoles,
-                  initialStateRowIds, mutableIndexedData);
+                  initialStateRowIds, mutableIndexedData,true);
 
         // WHEN
         executor.execute();
@@ -65,8 +65,8 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
         verifyShellCaseCreation(shellCaseType, initialStateRowIds);
         verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
         //As there is mapping for Document field it should not be deleted it should move to new case
-        // needs to be updated as currently there is no mapping for it.
-        // verifyDocumentNotDeleted(deletableDocuments);
+        //Verify for original case there is no Document to delete as it has  been moved to new case
+        verifyZeroOriginalCaseDocumentToDelete(deletableDocuments);
         verifyRoleDeletion(deletableRoles);
         verifyTaskDeletion(deletableRowIds);
         verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
