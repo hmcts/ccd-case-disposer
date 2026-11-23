@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,12 +58,18 @@ public class DatabaseTestUtils {
                 });
     }
 
-    public void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
-        with().await()
-            .untilAsserted(() -> {
-                List<CaseDataEntity> shellCaseDataList = caseDataRepository.findByCaseType(shellCaseType);
-                assertThat(shellCaseDataList).hasSameSizeAs(endStateRows);
-            });
+    public Long verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
+        AtomicReference<List<CaseDataEntity>> result = new AtomicReference<>();
+
+        with().await().untilAsserted(() -> {
+            List<CaseDataEntity> cases =
+                caseDataRepository.findByCaseType(shellCaseType);
+
+            assertThat(cases).hasSameSizeAs(endStateRows);
+            result.set(cases);
+        });
+
+        return result.get().getFirst().getReference();
     }
 
     public void insertDataIntoDatabase(final String scriptPath) throws SQLException {

@@ -68,5 +68,11 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+
+        //clearDocument
+        if (!deletableDocuments.isEmpty()) {
+            deletableDocuments.keySet()
+                .forEach(caseId -> deleteDocument(caseId.toString()));
+        }
     }
 }

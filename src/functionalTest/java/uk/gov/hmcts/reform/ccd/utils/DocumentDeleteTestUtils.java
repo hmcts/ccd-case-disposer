@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
+import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
 import uk.gov.hmcts.reform.ccd.helper.SecurityUtils;
 import uk.gov.hmcts.reform.ccd.model.DocumentField;
 import uk.gov.hmcts.reform.ccd.model.StoredDocumentHalResourceCollection;
@@ -19,7 +20,10 @@ import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.awaitility.Awaitility.with;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.IMAGE_JPEG_VALUE;
+import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DELETE_DOCUMENT_PATH;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_PATH;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.DOCUMENT_STORE_USER;
 import static uk.gov.hmcts.reform.ccd.constants.TestConstants.SERVICE_AUTHORISATION_HEADER;
@@ -141,5 +145,20 @@ public class DocumentDeleteTestUtils {
             version.originalDocumentName(),
             version.createdOn()
         );
+    }
+
+    public void deleteDocument(final String caseRef) {
+        final DocumentsDeletePostRequest documentsDeleteRequest = new DocumentsDeletePostRequest(caseRef);
+        Response response = RestAssured
+            .given()
+            .relaxedHTTPSValidation()
+            .baseUri(documentStoreHost + DELETE_DOCUMENT_PATH)
+            .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .header(SERVICE_AUTHORISATION_HEADER,
+                    securityUtils.getServiceAuthorization())
+            .request().body(documentsDeleteRequest)
+            .post()
+            .andReturn();
+        assertThat(response.getStatusCode()).isEqualTo(200);
     }
 }

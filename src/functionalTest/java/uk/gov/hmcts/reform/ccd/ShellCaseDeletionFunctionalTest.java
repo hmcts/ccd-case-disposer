@@ -62,7 +62,7 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
         executor.execute();
 
         // THEN
-        verifyShellCaseCreation(shellCaseType, initialStateRowIds);
+        final String shellCaseReference = verifyShellCaseCreation(shellCaseType, initialStateRowIds).toString();
         verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
         //As there is mapping for Document field it should not be deleted it should move to new case
         //Verify for original case there is no Document to delete as it has  been moved to new case
@@ -71,5 +71,8 @@ class ShellCaseDeletionFunctionalTest extends TestDataProvider {
         verifyTaskDeletion(deletableRowIds);
         verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+
+        //clear Document
+        deleteDocument(shellCaseReference);
     }
 }

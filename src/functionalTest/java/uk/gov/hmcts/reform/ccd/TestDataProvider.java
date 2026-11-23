@@ -128,8 +128,8 @@ public class TestDataProvider {
         databaseTestUtils.verifyDatabaseDeletion(initialRowIds, endStateRowIds);
     }
 
-    protected void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRowIds) {
-        databaseTestUtils.verifyShellCaseCreation(shellCaseType, endStateRowIds);
+    protected Long verifyShellCaseCreation(String shellCaseType, List<Long> endStateRowIds) {
+        return databaseTestUtils.verifyShellCaseCreation(shellCaseType, endStateRowIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
@@ -179,6 +179,10 @@ public class TestDataProvider {
 
     private void createGlobalSearchIndex() {
         globalSearchIndexCreator.createGlobalSearchIndex();
+    }
+
+    protected void deleteDocument(final String caseRef) {
+        documentDeleteTestUtils.deleteDocument(caseRef);
     }
 
 }
