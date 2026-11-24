@@ -52,9 +52,15 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed,
                        final List<Long> deletableRowIds) throws Exception {
-        // GIVEN
+        //clear Document if any before test execution
+        if (!deletableDocuments.isEmpty()) {
+            deletableDocuments.keySet()
+                .forEach(caseId -> deleteDocument(caseId.toString()));
+        }
         setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
                   initialStateRowIds, indexedData,false);
+
+
 
         // WHEN
         executor.execute();
@@ -68,11 +74,5 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
         verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
         verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
         verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
-
-        //clearDocument
-        if (!deletableDocuments.isEmpty()) {
-            deletableDocuments.keySet()
-                .forEach(caseId -> deleteDocument(caseId.toString()));
-        }
     }
 }
