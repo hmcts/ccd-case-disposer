@@ -77,12 +77,20 @@ public class CaseDisposalWorkflow {
         ObjectNode mappedData = shellCaseDataMapper.map(
             originalCaseData.data(), shellMapping.shellCaseMappings(),isSimulationMode);
 
-        if (!mappedData.isEmpty() && !isSimulationMode) {
-            shellDocumentService.appendDocumentHashes(mappedData);
-            ccdCaseService.createShellCase(caseData, mappedData, shellCaseType);
-
-            log.info("Created shell case for original case reference: {}", caseData.getReference());
+        if (mappedData.isEmpty()) {
+            throw new ShellCaseException(
+                "Mapped data is empty for case type " + caseData.getCaseType()
+            );
         }
+
+        if (isSimulationMode) {
+            return;
+        }
+
+        shellDocumentService.appendDocumentHashes(mappedData);
+        ccdCaseService.createShellCase(caseData, mappedData, shellCaseType);
+
+        log.info("Created shell case for original case reference: {}", caseData.getReference());
     }
 
     private boolean mappingRequireShell(ShellMappingResponse shellMapping, CaseData caseData) {
