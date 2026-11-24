@@ -148,6 +148,7 @@ class ApplicationExecutorTest {
             TestData.DELETABLE_CASE_DATA4_WITH_PAST_TTL
         ));
         when(caseCollectorService.getDeletableCases(List.of(TestData.DELETABLE_CASE_TYPE))).thenReturn(deletableCases);
+
         givenNoSimulatedCases();
         doAnswer(invocation -> {
             CaseData caseData = invocation.getArgument(0);
