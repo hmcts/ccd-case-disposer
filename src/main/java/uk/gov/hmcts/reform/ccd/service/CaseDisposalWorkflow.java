@@ -80,6 +80,7 @@ public class CaseDisposalWorkflow {
         if (mappedData.isEmpty()) {
             throw new ShellCaseException(
                 "Mapped data is empty for case type " + caseData.getCaseType()
+                    + " and case reference " + caseData.getReference()
             );
         }
 
