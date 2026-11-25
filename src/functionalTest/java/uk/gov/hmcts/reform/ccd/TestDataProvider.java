@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.ccd;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
 import uk.gov.hmcts.reform.ccd.model.DocumentField;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
@@ -105,17 +106,18 @@ public class TestDataProvider {
 
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
+        Map<Long, List<DocumentField>> uploadDocuments  = documentDeleteTestUtils.uploadDocument(
+            deletableDocuments,
+            deletableCaseTypes.split(",")[0], // use first case type for document upload
+            "DISPOSER_MASTER" // use default jurisdiction for document upload
+        );
         if (isShellCaseEnabled) {
-            Map.Entry<Long, List<String>> entry = deletableDocuments.entrySet().iterator().next();
-            DocumentField documentField = documentDeleteTestUtils.uploadDocument(
-                entry.getKey(),
-                entry.getValue().getFirst(),
-                deletableCaseTypes.split(",")[0], // use first case type for document upload
-                "DISPOSER_MASTER" // use default jurisdiction for document upload
-            );
-            databaseTestUtils.insertDataIntoDatabase(scriptPath, documentField);
+            for (Map.Entry<Long, List<DocumentField>> entry : uploadDocuments.entrySet()) {
+                for (DocumentField documentField : entry.getValue()) {
+                    databaseTestUtils.insertDataIntoDatabase(scriptPath, documentField);
+                }
+            }
         } else {
-            documentDeleteTestUtils.uploadDocument(deletableDocuments);
             databaseTestUtils.insertDataIntoDatabase(scriptPath);
         }
 
@@ -128,7 +130,7 @@ public class TestDataProvider {
         databaseTestUtils.verifyDatabaseDeletion(initialRowIds, endStateRowIds);
     }
 
-    protected Long verifyShellCaseCreation(String shellCaseType, List<Long> endStateRowIds) {
+    protected CaseDataEntity verifyShellCaseCreation(String shellCaseType, List<Long> endStateRowIds) {
         return databaseTestUtils.verifyShellCaseCreation(shellCaseType, endStateRowIds);
     }
 
@@ -145,8 +147,8 @@ public class TestDataProvider {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
     }
 
-    protected void verifyZeroOriginalCaseDocumentToDelete(final Map<Long, List<String>> deletableDocuments) {
-        documentDeleteTestUtils.verifyZeroOriginalCaseDocumentToDelete(deletableDocuments);
+    protected void verifyOriginalCaseDocumentHasMoved(final Map<Long, List<String>> deletableDocuments) {
+        documentDeleteTestUtils.verifyOriginalCaseDocumentHasMoved(deletableDocuments);
     }
 
     protected void verifyHearingDocumentDeletion(final Map<String, List<Long>> deletedFromIndexed) {
@@ -183,6 +185,11 @@ public class TestDataProvider {
 
     protected void deleteDocument(final String caseRef) {
         documentDeleteTestUtils.deleteDocument(caseRef);
+    }
+
+    protected void verifyShellCaseDocument(final CaseDataEntity caseDataEntity,
+                                           final Map<Long, List<String>> deletableDocuments) {
+        documentDeleteTestUtils.verifyShellCaseDocument(caseDataEntity, deletableDocuments);
     }
 
 }

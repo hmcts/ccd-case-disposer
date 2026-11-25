@@ -9,14 +9,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.ccd.data.em.CaseDocumentsDeletionResults;
 import uk.gov.hmcts.reform.ccd.data.em.DocumentsDeletePostRequest;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.helper.SecurityUtils;
 import uk.gov.hmcts.reform.ccd.model.DocumentField;
 import uk.gov.hmcts.reform.ccd.model.StoredDocumentHalResourceCollection;
 import uk.gov.hmcts.reform.ccd.util.log.DocumentDeletionRecordHolder;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.awaitility.Awaitility.with;
@@ -57,7 +60,7 @@ public class DocumentDeleteTestUtils {
                 }));
     }
 
-    public void verifyZeroOriginalCaseDocumentToDelete(final Map<Long, List<String>> deletableDocuments) {
+    public void verifyOriginalCaseDocumentHasMoved(final Map<Long, List<String>> deletableDocuments) {
         with().await()
             .untilAsserted(() -> deletableDocuments.entrySet().forEach(entry -> {
                 final CaseDocumentsDeletionResults caseDocumentsDeletionResults = documentDeletionRecordHolder
@@ -68,60 +71,36 @@ public class DocumentDeleteTestUtils {
             }));
     }
 
-    public void uploadDocument(final Map<Long, List<String>> deletableDocuments) {
-        deletableDocuments.entrySet()
-                .forEach(entry -> entry.getValue()
-                        .forEach(filename -> {
-                            try {
-                                final Response response = RestAssured
-                                        .given()
-                                        .relaxedHTTPSValidation()
-                                        .baseUri(documentStoreHost + DOCUMENT_PATH)
-                                        .header(SERVICE_AUTHORISATION_HEADER, securityUtils.getServiceAuthorization())
-                                        .header("user-id", DOCUMENT_STORE_USER)
-                                        .multiPart("files", fileUtils.getResourceFile(filename), IMAGE_JPEG_VALUE)
-                                        .multiPart("classification", "PUBLIC")
-                                        .multiPart("metadata[case_id]", Long.toString(entry.getKey()))
-                                        .when()
-                                        .post()
-                                        .andReturn();
+    public Map<Long, List<DocumentField>> uploadDocument(final Map<Long, List<String>> deletableDocuments,
+                               String caseTypeId, String jurisdiction) {
+        Map<Long, List<DocumentField>> uploadedDocuments = new ConcurrentHashMap<>(deletableDocuments.size());
+        deletableDocuments.forEach((key, value) -> value
+            .forEach(filename -> {
+                try {
+                    final Response response = RestAssured
+                        .given()
+                        .relaxedHTTPSValidation()
+                        .baseUri(documentStoreHost + DOCUMENT_PATH)
+                        .header(SERVICE_AUTHORISATION_HEADER, securityUtils.getServiceAuthorization())
+                        .header("user-id", DOCUMENT_STORE_USER)
+                        .multiPart("files", fileUtils.getResourceFile(filename), IMAGE_JPEG_VALUE)
+                        .multiPart("classification", "PUBLIC")
+                        .multiPart("metadata[case_id]", Long.toString(key))
+                        .multiPart("metadata[case_type_id]", caseTypeId)
+                        .multiPart("metadata[jurisdiction]", jurisdiction)
+                        .when()
+                        .post()
+                        .andReturn();
 
-                                assertThat(response.getStatusCode()).isEqualTo(200);
+                    assertThat(response.getStatusCode()).isEqualTo(200);
+                    uploadedDocuments.computeIfAbsent(key, k -> new ArrayList<>())
+                        .add(buildDocumentField(response));
 
-                            } catch (final UnsupportedEncodingException e) {
-                                log.error("Error while uploading document {}", filename, e);
-                            }
-                        }));
-    }
-
-
-    public DocumentField uploadDocument(Long caseId, String filename,
-                                        String caseTypeId, String jurisdiction) {
-        try {
-            Response response = RestAssured
-                .given()
-                .relaxedHTTPSValidation()
-                .baseUri(documentStoreHost + DOCUMENT_PATH)
-                .header(SERVICE_AUTHORISATION_HEADER,
-                        securityUtils.getServiceAuthorization())
-                .header("user-id", DOCUMENT_STORE_USER)
-                .multiPart("files", fileUtils.getResourceFile(filename),
-                           IMAGE_JPEG_VALUE)
-                .multiPart("classification", "PUBLIC")
-                .multiPart("metadata[case_id]", Long.toString(caseId))
-                .multiPart("metadata[case_type_id]", caseTypeId)
-                .multiPart("metadata[jurisdiction]", jurisdiction)
-                .when()
-                .post()
-                .andReturn();
-
-            assertThat(response.getStatusCode()).isEqualTo(200);
-            return buildDocumentField(response);
-
-        } catch (UnsupportedEncodingException e) {
-            log.error("Error while uploading document {}", filename, e);
-            return null;
-        }
+                } catch (final UnsupportedEncodingException e) {
+                    log.error("Error while uploading document {}", filename, e);
+                }
+            }));
+        return uploadedDocuments;
 
     }
 
@@ -160,5 +139,13 @@ public class DocumentDeleteTestUtils {
             .post()
             .andReturn();
         assertThat(response.getStatusCode()).isEqualTo(200);
+    }
+
+    public void verifyShellCaseDocument(final CaseDataEntity caseDataEntity,
+                                        final Map<Long, List<String>> deletableDocuments) {
+        Map.Entry<Long, List<String>> firstEntry =
+            deletableDocuments.entrySet().iterator().next();
+        String fileName = firstEntry.getValue().getFirst();
+        assertThat(caseDataEntity.getData().contains(fileName)).isTrue();
     }
 }

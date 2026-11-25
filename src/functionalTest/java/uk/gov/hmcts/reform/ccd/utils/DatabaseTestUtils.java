@@ -58,7 +58,7 @@ public class DatabaseTestUtils {
                 });
     }
 
-    public Long verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
+    public CaseDataEntity verifyShellCaseCreation(String shellCaseType, List<Long> endStateRows) {
         AtomicReference<List<CaseDataEntity>> result = new AtomicReference<>();
 
         with().await().untilAsserted(() -> {
@@ -69,7 +69,7 @@ public class DatabaseTestUtils {
             result.set(cases);
         });
 
-        return result.get().getFirst().getReference();
+        return result.get().getFirst();
     }
 
     public void insertDataIntoDatabase(final String scriptPath) throws SQLException {
