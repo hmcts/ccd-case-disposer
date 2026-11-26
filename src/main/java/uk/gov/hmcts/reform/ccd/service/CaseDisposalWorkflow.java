@@ -9,7 +9,9 @@ import uk.gov.hmcts.reform.ccd.shell.config.ShellCaseProperties;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellAlreadyExistsException;
 import uk.gov.hmcts.reform.ccd.shell.exception.ShellCaseException;
 import uk.gov.hmcts.reform.ccd.shell.model.CcdCaseResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellDecision;
 import uk.gov.hmcts.reform.ccd.shell.model.ShellMappingResponse;
+import uk.gov.hmcts.reform.ccd.shell.model.ShellPlan;
 import uk.gov.hmcts.reform.ccd.shell.service.CcdCaseService;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellCaseDataMapper;
 import uk.gov.hmcts.reform.ccd.shell.service.ShellDocumentService;
@@ -29,6 +31,41 @@ public class CaseDisposalWorkflow {
     private final ShellCaseDataMapper shellCaseDataMapper;
     private final ShellDocumentService shellDocumentService;
 
+    public ShellPlan preview(CaseData caseData) {
+        return prepareShell(caseData);
+    }
+
+    public DisposalOutcome disposeV2(CaseData caseData) {
+        try {
+            if (shellCaseProperties.isEnabled()) {
+                ShellPlan plan = prepareShell(caseData);
+                switch(plan.decision()) {
+                    case CREATE_SHELL -> {
+                        shellDocumentService.appendDocumentHashes(plan.shellData());
+                        ccdCaseService.createShellCase(caseData, plan.shellData(), plan.shellCaseType());
+                    } case NO_SHELL_MAPPING, STATE_EXCLUDED -> {
+                        log.info(
+                            "Shell case creation skipped for case: {}. Decision: {}",
+                            caseData.getReference(), plan.decision()
+                        );
+                    } case SHELL_ALREADY_EXISTS -> {
+                        return DisposalOutcome.SHELL_ALREADY_EXISTS;
+                    } default -> {
+                        return DisposalOutcome.SHELL_FAILED;
+                    }
+                }
+            }
+
+            caseDeletionService.deleteCaseData(caseData);
+            return DisposalOutcome.DELETED;
+        } catch (ShellCaseException exc) {
+            log.error("Shell case creation failed for case: {}", caseData.getReference(), exc);
+            return DisposalOutcome.SHELL_FAILED;
+        } catch (RuntimeException exc) {
+            log.error("Unexpected error occurred while disposing case: {}", caseData.getReference(), exc);
+            return DisposalOutcome.DELETION_FAILED;
+        }
+    }
 
     public DisposalOutcome dispose(CaseData caseData) {
         try {
@@ -54,6 +91,39 @@ public class CaseDisposalWorkflow {
             return DisposalOutcome.SHELL_FAILED;
         }
     }
+
+    private ShellPlan prepareShell(CaseData caseData) {
+        ShellMappingResponse mapping = shellMappingService.loadMappings(caseData.getCaseType());
+        if (mapping.shellCaseTypeId() == null) {
+            return skippedShell(caseData, ShellDecision.NO_SHELL_MAPPING);
+        }
+
+        if (mapping.caseStates().stream().noneMatch(state -> state.name().equals(caseData.getState()))) {
+            return skippedShell(caseData, ShellDecision.STATE_EXCLUDED);
+        }
+
+        Optional<Long> existingShellCase = ccdCaseService.findShellCase(
+            mapping.shellCaseTypeId(), caseData.getReference());
+        if (existingShellCase.isPresent()) {
+            return skippedShell(caseData, ShellDecision.SHELL_ALREADY_EXISTS);
+        }
+
+        CcdCaseResponse originalCaseData = ccdCaseService.loadCase(caseData.getReference());
+
+        ObjectNode mappedData = shellCaseDataMapper.map(
+            originalCaseData.data(), mapping.shellCaseMappings());
+
+        mappedData.put("original_case_reference", caseData.getReference().toString());
+        mappedData.put("original_case_type", caseData.getCaseType());
+        return new ShellPlan(
+            caseData.getReference(),
+            mapping.shellCaseTypeId(),
+            ShellDecision.CREATE_SHELL,
+            mappedData,
+            null
+        );
+    }
+
 
     private void shellCaseFlow(CaseData caseData) {
         ShellMappingResponse shellMapping = shellMappingService.loadMappings(caseData.getCaseType());
@@ -96,9 +166,21 @@ public class CaseDisposalWorkflow {
         return stateMapped;
     }
 
+    private ShellPlan skippedShell(CaseData caseData, ShellDecision decision) {
+        return new ShellPlan(
+            caseData.getReference(),
+            null,
+            decision,
+            null,
+            decision.name()
+        );
+    }
+
     public enum DisposalOutcome {
         DELETED,
+        NO_SHELL_REQUIRED,
         SHELL_ALREADY_EXISTS,
-        SHELL_FAILED
+        SHELL_FAILED,
+        DELETION_FAILED
     }
 }
