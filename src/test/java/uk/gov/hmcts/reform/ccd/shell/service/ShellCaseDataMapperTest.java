@@ -38,7 +38,7 @@ class ShellCaseDataMapperTest {
             mapping("caseNumber", "legacyReference"),
             mapping("applicant.firstName", "party.name.first"),
             mapping("applicant.lastName", "party.name.last")
-        ));
+        ),false);
 
         assertThat(result.get("legacyReference").asString()).isEqualTo("1234567890123456");
         assertThat(result.get("party").get("name").get("first").asString()).isEqualTo("John");
@@ -50,7 +50,7 @@ class ShellCaseDataMapperTest {
         ObjectNode caseData = JsonNodeFactory.instance.objectNode();
         caseData.put("caseNumber", "1234567890123456");
 
-        ObjectNode result = shellCaseDataMapper.map(caseData, List.of());
+        ObjectNode result = shellCaseDataMapper.map(caseData, List.of(),false);
 
         assertThat(result.isEmpty()).isTrue();
     }
@@ -63,7 +63,7 @@ class ShellCaseDataMapperTest {
         ObjectNode result = shellCaseDataMapper.map(caseData, List.of(
             mapping("missing.field", "shell.missing"),
             mapping("existing", "shell.existing")
-        ));
+        ),false);
 
         assertThat(result.get("shell").has("missing")).isFalse();
         assertThat(result.get("shell").get("existing").asString()).isEqualTo("value");
@@ -74,7 +74,7 @@ class ShellCaseDataMapperTest {
         ObjectNode caseData = JsonNodeFactory.instance.objectNode();
         caseData.putNull("value");
 
-        ObjectNode result = shellCaseDataMapper.map(caseData, List.of(mapping("value", "mappedValue")));
+        ObjectNode result = shellCaseDataMapper.map(caseData, List.of(mapping("value", "mappedValue")),false);
 
         assertThat(result.has("mappedValue")).isTrue();
         assertThat(result.get("mappedValue").isNull()).isTrue();
@@ -87,7 +87,7 @@ class ShellCaseDataMapperTest {
         ArrayNode documents = details.putArray("documents");
         documents.addObject().put("name", "original.pdf");
 
-        ObjectNode result = shellCaseDataMapper.map(caseData, List.of(mapping("details", "archivedDetails")));
+        ObjectNode result = shellCaseDataMapper.map(caseData, List.of(mapping("details", "archivedDetails")),false);
         details.put("status", "changed");
         documents.addObject().put("name", "updated.pdf");
 
@@ -104,7 +104,8 @@ class ShellCaseDataMapperTest {
 
         assertThatThrownBy(() -> shellCaseDataMapper.map(
             caseData,
-            List.of(mapping("applicant.name", "party.name"))
+            List.of(mapping("applicant.name", "party.name")),
+            false
         ))
             .isInstanceOf(ShellCaseException.class)
             .hasMessageContaining("applicant.name")
@@ -119,7 +120,8 @@ class ShellCaseDataMapperTest {
 
         assertThatThrownBy(() -> shellCaseDataMapper.map(
             caseData,
-            List.of(mapping(sourcePath, "validTarget"))
+            List.of(mapping(sourcePath, "validTarget")),
+            false
         ))
             .isInstanceOf(ShellCaseException.class);
     }
@@ -132,7 +134,8 @@ class ShellCaseDataMapperTest {
 
         assertThatThrownBy(() -> shellCaseDataMapper.map(
             caseData,
-            List.of(mapping("validSource", targetPath))
+            List.of(mapping("validSource", targetPath)),
+            false
         ))
             .isInstanceOf(ShellCaseException.class);
     }
@@ -146,7 +149,7 @@ class ShellCaseDataMapperTest {
         assertThatThrownBy(() -> shellCaseDataMapper.map(caseData, List.of(
             mapping("first", "duplicate"),
             mapping("second", "duplicate")
-        )))
+        ),false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Conflicting shell case target mappings: 'duplicate' and 'duplicate'");
     }
@@ -160,7 +163,7 @@ class ShellCaseDataMapperTest {
         assertThatThrownBy(() -> shellCaseDataMapper.map(caseData, List.of(
             mapping("first", "party"),
             mapping("second", "party.name")
-        )))
+        ),false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Conflicting shell case target mappings: 'party' and 'party.name'");
     }
@@ -174,7 +177,7 @@ class ShellCaseDataMapperTest {
         assertThatThrownBy(() -> shellCaseDataMapper.map(caseData, List.of(
             mapping("first", "party.name"),
             mapping("second", "party")
-        )))
+        ),false))
             .isInstanceOf(ShellCaseException.class)
             .hasMessage("Conflicting shell case target mappings: 'party.name' and 'party'");
     }

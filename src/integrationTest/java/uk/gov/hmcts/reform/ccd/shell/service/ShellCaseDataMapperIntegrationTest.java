@@ -24,7 +24,8 @@ class ShellCaseDataMapperIntegrationTest {
 
         ObjectNode result = shellCaseDataMapper.map(
             caseData,
-            List.of(new ShellCaseFieldMapping("applicant.name", "party.fullName"))
+            List.of(new ShellCaseFieldMapping("applicant.name", "party.fullName")),
+                    false
         );
 
         assertThat(result.get("party").get("fullName").stringValue()).isEqualTo("Jane Smith");

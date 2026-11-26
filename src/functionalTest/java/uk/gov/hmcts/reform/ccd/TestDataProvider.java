@@ -3,7 +3,9 @@ package uk.gov.hmcts.reform.ccd;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import uk.gov.hmcts.reform.ccd.data.entity.CaseDataEntity;
 import uk.gov.hmcts.reform.ccd.helper.GlobalSearchIndexCreator;
+import uk.gov.hmcts.reform.ccd.model.DocumentField;
 import uk.gov.hmcts.reform.ccd.util.SecurityUtil;
 import uk.gov.hmcts.reform.ccd.utils.DatabaseTestUtils;
 import uk.gov.hmcts.reform.ccd.utils.DocumentDeleteTestUtils;
@@ -88,7 +90,9 @@ public class TestDataProvider {
                              final Map<Long, List<String>> deletableDocuments,
                              final Map<Long, List<String>> deletableRoles,
                              final List<Long> rowIds,
-                             final Map<String, List<Long>> indexedData) throws Exception {
+                             final Map<String, List<Long>> indexedData,
+                             final boolean isShellCaseEnabled
+    ) throws Exception {
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY);
         System.clearProperty(DELETABLE_CASE_TYPES_PROPERTY_SIMULATION);
 
@@ -96,18 +100,28 @@ public class TestDataProvider {
 
         createGlobalSearchIndex();
 
-        documentDeleteTestUtils.uploadDocument(deletableDocuments);
         roleDeleteTestUtils.createRoleAssignment(deletableRoles);
 
         elasticSearchTestUtils.resetIndices(indexedData.keySet());
 
         setDeletableCaseTypes(deletableCaseTypes);
         setDeletableCaseTypesSimulation(deletableCaseTypesSimulation);
-
-        databaseTestUtils.insertDataIntoDatabase(scriptPath);
+        Map<Long, List<DocumentField>> uploadDocuments  = documentDeleteTestUtils.uploadDocument(
+            deletableDocuments,
+            deletableCaseTypes.split(",")[0], // use first case type for document upload
+            "DISPOSER_MASTER" // use default jurisdiction for document upload
+        );
+        if (isShellCaseEnabled) {
+            for (Map.Entry<Long, List<DocumentField>> entry : uploadDocuments.entrySet()) {
+                for (DocumentField documentField : entry.getValue()) {
+                    databaseTestUtils.insertDataIntoDatabase(scriptPath, documentField);
+                }
+            }
+        } else {
+            databaseTestUtils.insertDataIntoDatabase(scriptPath);
+        }
 
         databaseTestUtils.verifyDatabaseIsPopulated(rowIds);
-
         elasticSearchTestUtils.verifyCaseDataAreInElasticsearch(indexedData);
     }
 
@@ -116,8 +130,8 @@ public class TestDataProvider {
         databaseTestUtils.verifyDatabaseDeletion(initialRowIds, endStateRowIds);
     }
 
-    protected void verifyShellCaseCreation(String shellCaseType, List<Long> endStateRowIds) {
-        databaseTestUtils.verifyShellCaseCreation(shellCaseType, endStateRowIds);
+    protected CaseDataEntity verifyShellCaseCreation(String shellCaseType, List<Long> endStateRowIds) {
+        return databaseTestUtils.verifyShellCaseCreation(shellCaseType, endStateRowIds);
     }
 
     protected void verifyElasticsearchDeletion(final Map<String, List<Long>> deletedFromIndexed,
@@ -133,8 +147,8 @@ public class TestDataProvider {
         documentDeleteTestUtils.verifyDocumentStoreDeletion(deletableDocuments);
     }
 
-    protected void verifyDocumentNotDeleted(final Map<Long, List<String>> deletableDocuments) {
-        documentDeleteTestUtils.verifyDocumentNotDeleted(deletableDocuments);
+    protected void verifyOriginalCaseDocumentHasMoved(final Map<Long, List<String>> deletableDocuments) {
+        documentDeleteTestUtils.verifyOriginalCaseDocumentHasMoved(deletableDocuments);
     }
 
     protected void verifyHearingDocumentDeletion(final Map<String, List<Long>> deletedFromIndexed) {
@@ -167,6 +181,15 @@ public class TestDataProvider {
 
     private void createGlobalSearchIndex() {
         globalSearchIndexCreator.createGlobalSearchIndex();
+    }
+
+    protected void deleteDocument(final String caseRef) {
+        documentDeleteTestUtils.deleteDocument(caseRef);
+    }
+
+    protected void verifyShellCaseDocument(final CaseDataEntity caseDataEntity,
+                                           final Map<Long, List<String>> deletableDocuments) {
+        documentDeleteTestUtils.verifyShellCaseDocument(caseDataEntity, deletableDocuments);
     }
 
 }

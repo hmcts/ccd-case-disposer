@@ -52,21 +52,31 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed,
                        final List<Long> deletableRowIds) throws Exception {
-        // GIVEN
-        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
-                  initialStateRowIds, indexedData);
+        try {
+            setupData(
+                deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
+                initialStateRowIds, indexedData, false
+            );
 
-        // WHEN
-        executor.execute();
 
-        // THEN
-        verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
-        verifyDocumentDeletion(deletableDocuments);
-        verifyHearingDocumentDeletion(deletedFromIndexed);
-        verifyRoleDeletion(deletableRoles);
-        verifyTaskDeletion(deletableRowIds);
-        verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
-        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
-        verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+            // WHEN
+            executor.execute();
+
+            // THEN
+            verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
+            verifyDocumentDeletion(deletableDocuments);
+            verifyHearingDocumentDeletion(deletedFromIndexed);
+            verifyRoleDeletion(deletableRoles);
+            verifyTaskDeletion(deletableRowIds);
+            verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
+            verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+            verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+        } finally {
+            //clear Document after test execution
+            if (!deletableDocuments.isEmpty()) {
+                deletableDocuments.keySet()
+                    .forEach(caseId -> deleteDocument(caseId.toString()));
+            }
+        }
     }
 }
