@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.ccd.shell.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.JsonNodeFactory;
@@ -20,9 +21,10 @@ import java.util.Set;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ShellCaseDataMapper {
 
-    public ObjectNode map(JsonNode caseJsonData, List<ShellCaseFieldMapping> mappings) {
+    public ObjectNode map(JsonNode caseJsonData, List<ShellCaseFieldMapping> mappings, Boolean isSimulationMode) {
 
         ObjectNode shellData = JsonNodeFactory.instance.objectNode();
         Set<String> targetPaths = new HashSet<>();
@@ -39,6 +41,10 @@ public class ShellCaseDataMapper {
             if (value != null) {
                 writeValue(shellData, targetPath, value.deepCopy());
             }
+        }
+        // If simulation mode is enabled, check and log the mapping results for each field mapping
+        if (isSimulationMode) {
+            checkAndLogMapping(caseJsonData, shellData, mappings);
         }
 
         return shellData;
@@ -121,6 +127,29 @@ public class ShellCaseDataMapper {
         }
 
         targetPaths.add(targetPath);
+    }
+
+    private void checkAndLogMapping(JsonNode originalCaseData,
+                                    ObjectNode shellCaseData, List<ShellCaseFieldMapping> mappings) {
+        log.info("Checking mapping for caseId {} and caseType {}",
+                 originalCaseData.get("id"), originalCaseData.get("caseType"));
+
+        for (ShellCaseFieldMapping mapping : mappings) {
+            String sourcePath = mapping.getOriginatingCaseFieldName();
+            String targetPath = mapping.getShellCaseFieldName();
+
+            JsonNode sourceValue = readValue(originalCaseData, sourcePath);
+            JsonNode targetValue = readValue(shellCaseData, targetPath);
+
+            if (sourceValue == null || targetValue == null) {
+                log.info("Missing field in mapping {} -> {} (source: {}, target: {})",
+                         sourcePath, targetPath, sourceValue != null, targetValue != null);
+                continue;
+            }
+
+            log.info("Value {} for mapping {} -> {}",
+                     sourceValue.equals(targetValue) ? "matches" : "mismatch", sourcePath, targetPath);
+        }
     }
 
 }
