@@ -11,6 +11,7 @@ public final class TestConstants {
     public static final String FILES_FOLDER = "files/";
     public static final String JSON_FOLDER = "/json/";
     public static final String DOCUMENT_STORE_USER = "case.disposer.idam.system.user@gmail.com";
+    public static final String DELETE_DOCUMENT_PATH = "/documents/delete";
 
     private TestConstants() {
     }

@@ -120,6 +120,7 @@ withPipeline(type, product, component) {
     env.ROLE_ASSIGNMENT_HOST = "http://am-role-assignment-service-aat.service.core-compute-aat.internal"
     env.LOG_AND_AUDIT_HOST = "http://lau-case-backend-aat.service.core-compute-aat.internal"
     env.HEARING_RECORDING_HOST = "http://em-hrs-api-aat.service.core-compute-aat.internal"
+    env.CCD_DOCUMENT_AM_HOST = "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
     env.PACT_BROKER_FULL_URL = "https://pact-broker.platform.hmcts.net"
     env.PACT_BROKER_URL = "pact-broker.platform.hmcts.net"
     env.PACT_BROKER_PORT = "443"

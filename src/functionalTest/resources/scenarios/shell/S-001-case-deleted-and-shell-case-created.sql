@@ -10,12 +10,14 @@ VALUES ('DPR_FT_MasterCaseType', 'DISPOSER_MASTER', 'CaseCreated', 'PUBLIC',
         '{
           "PersonFirstName": "Janet",
           "EmailField": "test@test.com",
-          "TextField": "test"
+          "TextField": "test",
+          "DocumentField": DOCUMENT_FIELD_DATA
         }',
         '{
           "PersonFirstName": "PUBLIC",
           "EmailField": "PUBLIC",
-          "TextField": "PUBLIC"
+          "TextField": "PUBLIC",
+          "DocumentField": "PUBLIC"
         }',
         1004259907353839,
         '2016-06-24 20:44:52.824');
