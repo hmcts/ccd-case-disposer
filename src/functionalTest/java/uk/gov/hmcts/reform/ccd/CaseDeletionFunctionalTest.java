@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import uk.gov.hmcts.reform.ccd.config.ElasticsearchConfiguration;
 import uk.gov.hmcts.reform.ccd.config.TestApplicationConfiguration;
@@ -18,7 +19,10 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @ActiveProfiles("functional")
-@SpringBootTest(classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class})
+@SpringBootTest(
+    classes = {TestApplicationConfiguration.class, ElasticsearchConfiguration.class},
+    properties = "features.shell-case.enabled=false"
+)
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.idam", "uk.gov.hmcts.reform.ccd"})
 class CaseDeletionFunctionalTest extends TestDataProvider {
 
@@ -26,7 +30,8 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
     private ApplicationExecutor executor;
 
     @BeforeAll
-    static void setup() {
+    static void setup(@Autowired Environment environment) {
+        logHostConfiguration(environment, CaseDeletionFunctionalTest.class.getSimpleName());
         Awaitility.setDefaultPollInterval(0, TimeUnit.MILLISECONDS);
         Awaitility.setDefaultPollDelay(Durations.FIVE_SECONDS);
         Awaitility.setDefaultTimeout(70, TimeUnit.SECONDS);
@@ -47,21 +52,31 @@ class CaseDeletionFunctionalTest extends TestDataProvider {
                        final Map<String, List<Long>> deletedFromIndexed,
                        final Map<String, List<Long>> notDeletedFromIndexed,
                        final List<Long> deletableRowIds) throws Exception {
-        // GIVEN
-        setupData(deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
-                  initialStateRowIds, indexedData);
+        try {
+            setupData(
+                deletableCaseTypes, deletableCaseTypesSimulation, scriptPath, deletableDocuments, deletableRoles,
+                initialStateRowIds, indexedData, false
+            );
 
-        // WHEN
-        executor.execute();
 
-        // THEN
-        verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
-        verifyDocumentDeletion(deletableDocuments);
-        verifyHearingDocumentDeletion(deletedFromIndexed);
-        verifyRoleDeletion(deletableRoles);
-        verifyTaskDeletion(deletableRowIds);
-        verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
-        verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
-        verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+            // WHEN
+            executor.execute();
+
+            // THEN
+            verifyDatabaseDeletion(initialStateRowIds, deletableEndStateRowIds);
+            verifyDocumentDeletion(deletableDocuments);
+            verifyHearingDocumentDeletion(deletedFromIndexed);
+            verifyRoleDeletion(deletableRoles);
+            verifyTaskDeletion(deletableRowIds);
+            verifyLauLogs(new ArrayList<>(deletedFromIndexed.values()));
+            verifyElasticsearchDeletion(deletedFromIndexed, notDeletedFromIndexed);
+            verifyDatabaseDeletionSimulation(simulatedEndStateRowIds);
+        } finally {
+            //clear Document after test execution
+            if (!deletableDocuments.isEmpty()) {
+                deletableDocuments.keySet()
+                    .forEach(caseId -> deleteDocument(caseId.toString()));
+            }
+        }
     }
 }

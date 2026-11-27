@@ -25,6 +25,10 @@ public class CaseDataEntity {
     private String caseType;
     @Column(name = "jurisdiction", nullable = false)
     private String jurisdiction;
+    @Column(name = "state", nullable = false)
+    private String state;
     @Column(name = "resolved_ttl")
     private LocalDate resolvedTtl;
+    @Column(name = "data", columnDefinition = "jsonb")
+    private String data;
 }
