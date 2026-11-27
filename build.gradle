@@ -192,7 +192,7 @@ dependencyManagement {
     }
     dependencies {
       dependency 'com.fasterxml.jackson.core:jackson-databind:2.23.0'
-      dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.4'
+      dependency 'org.apache.httpcomponents.core5:httpcore5:5.5'
     }
 }
 
